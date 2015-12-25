@@ -1,0 +1,75 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <include layout="@layout/top_register_title" />
+
+    <cn.sx.decentworld.widget.ClearEditText
+        android:id="@+id/et_mobile"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="35dp"
+        android:background="@drawable/bg_line_press"
+        android:gravity="center_horizontal"
+        android:hint="请输入您的手机号"
+        android:inputType="number"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:textColor="@color/two_black"
+        android:textColorHint="@color/three_black"
+        android:textCursorDrawable="@drawable/color_cursor"
+        android:textSize="@dimen/new_textsize_13sp" />
+
+    <cn.sx.decentworld.widget.ClearEditText
+        android:id="@+id/et_code"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/bg_line_press"
+        android:gravity="center_horizontal"
+        android:hint="请输入验证码"
+        android:inputType="number"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:textColor="@color/two_black"
+        android:textColorHint="@color/three_black"
+        android:textCursorDrawable="@drawable/color_cursor"
+        android:textSize="@dimen/new_textsize_13sp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp" >
+
+        <Button
+            android:id="@+id/btn_OK"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:background="@drawable/bg_btn_yellow_selector"
+            android:padding="10dp"
+            android:text="OK"
+            android:textColor="@color/white"
+            android:textSize="@dimen/new_textsize_15sp" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tv_no_receive_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:padding="8dp"
+        android:text="没有收到短信验证码？"
+        android:textColor="@color/new_black_three"
+        android:textSize="@dimen/new_textsize_12sp"
+        android:visibility="gone" />
+
+</LinearLayout>

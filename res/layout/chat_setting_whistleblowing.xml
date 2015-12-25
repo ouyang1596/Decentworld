@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.6814"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#f0eff5"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/activity_whistleblowing_reason_title1"
+                android:textColor="#66000000"
+                android:textSize="@dimen/text_size_16" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_chat_setting_whistleblowing_1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/find_item_selector"
+            android:gravity="center_vertical" >
+
+            <RadioButton
+                android:id="@+id/activity_whistleblowing_reason_1"
+                style="@style/whistleblowing_radio_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:paddingLeft="40dp"
+                android:clickable="false"
+                android:text="@string/activity_whistleblowing_reason_1"
+                android:textSize="@dimen/text_size_17" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="70dp"
+            android:src="@drawable/divide_line" />
+
+        <LinearLayout
+            android:id="@+id/ll_chat_setting_whistleblowing_2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/find_item_selector"
+            android:gravity="center_vertical" >
+
+            <RadioButton
+                android:id="@+id/activity_whistleblowing_reason_2"
+                style="@style/whistleblowing_radio_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:paddingLeft="40dp"
+                android:clickable="false"
+                android:text="@string/activity_whistleblowing_reason_2"
+                android:textSize="@dimen/text_size_17" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="70dp"
+            android:src="@drawable/divide_line" />
+
+        <LinearLayout
+            android:id="@+id/ll_chat_setting_whistleblowing_3"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/find_item_selector"
+            android:gravity="center_vertical" >
+
+            <RadioButton
+                android:id="@+id/activity_whistleblowing_reason_3"
+                style="@style/whistleblowing_radio_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:paddingLeft="40dp"
+                android:clickable="false"
+                android:text="@string/activity_whistleblowing_reason_3"
+                android:textSize="@dimen/text_size_17" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="70dp"
+            android:src="@drawable/divide_line" />
+
+        <LinearLayout
+            android:id="@+id/ll_chat_setting_whistleblowing_4"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/find_item_selector"
+            android:gravity="center_vertical" >
+
+            <RadioButton
+                android:id="@+id/activity_whistleblowing_reason_4"
+                style="@style/whistleblowing_radio_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:paddingLeft="40dp"
+                android:clickable="false"
+                android:text="@string/activity_whistleblowing_reason_4"
+                android:textSize="@dimen/text_size_17" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="70dp"
+            android:src="@drawable/divide_line" />
+
+        <LinearLayout
+            android:id="@+id/ll_chat_setting_whistleblowing_5"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/find_item_selector"
+            android:gravity="center_vertical" >
+
+            <RadioButton
+                android:id="@+id/activity_whistleblowing_reason_5"
+                style="@style/whistleblowing_radio_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:paddingLeft="40dp"
+                android:clickable="false"
+                android:text="@string/activity_whistleblowing_reason_5"
+                android:textSize="@dimen/text_size_17" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="70dp"
+            android:src="@drawable/divide_line" />
+
+        <LinearLayout
+            android:id="@+id/ll_chat_setting_whistleblowing_6"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/find_item_selector"
+            android:gravity="center_vertical" >
+
+            <RadioButton
+                android:id="@+id/activity_whistleblowing_reason_6"
+                style="@style/whistleblowing_radio_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:paddingLeft="40dp"
+                android:clickable="false"
+                android:text="@string/activity_whistleblowing_reason_6"
+                android:textSize="@dimen/text_size_17" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="70dp"
+            android:src="@drawable/divide_line" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/find_item_selector"
+            android:gravity="center_vertical"
+            android:focusable="true"
+            android:clickable="true"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="17dp"
+                android:text="@string/activity_whistleblowing_reason_7"
+                android:textSize="@dimen/text_size_19" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/more" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="70dp"
+        android:src="@drawable/divide_line" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.3186"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.2032"
+            android:background="#f0eff5"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="3dp"
+                android:text="@string/activity_whistleblowing_reason_title2"
+                android:textColor="#66000000"
+                android:textSize="@dimen/text_size_16" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.7968"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:id="@+id/chat_setting_whistleblowing_supplement"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="@drawable/find_item_selector"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:text="@string/activity_whistleblowing_reason_8"
+                    android:textSize="@dimen/text_size_18" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:text="@string/activity_whistleblowing_nowrite"
+                    android:textColor="#66000000"
+                    android:textSize="@dimen/text_size_16" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="16dp"
+                    android:src="@drawable/more" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#f0eff5" >
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:background="#f0eff5" >
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

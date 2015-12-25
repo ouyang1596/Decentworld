@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_near_card_detail_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <include layout="@layout/layout_register_title_bg2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_marginLeft="82px"
+                android:layout_marginRight="82px"
+                android:text="陌生人"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size_20" />
+        </RelativeLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="600px" >
+
+                    <cn.sx.decentworld.widget.HackyViewPager
+                        android:id="@+id/vp_near_card_detail_pager"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="66px"
+                        android:background="#ffffff" />
+
+                    <TextView
+                        android:id="@+id/vp_near_card_detail_indicator"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:background="@android:color/transparent"
+                        android:gravity="center"
+                        android:text="@string/viewpager_indicator"
+                        android:textColor="@android:color/white"
+                        android:textSize="18sp"
+                        />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="5px" >
+
+                        <ImageView
+                            android:id="@+id/iv_dislike"
+                            android:layout_width="100px"
+                            android:layout_height="100px"
+                            android:layout_marginLeft="108px"
+                            android:src="@drawable/near_card_dislike" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <ImageView
+                            android:id="@+id/iv_like"
+                            android:layout_width="132px"
+                            android:layout_height="132px"
+                            android:src="@drawable/near_card_like" />
+
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <ImageView
+                            android:id="@+id/iv_like"
+                            android:layout_width="100px"
+                            android:layout_height="100px"
+                            android:layout_marginRight="108px"
+                            android:src="@drawable/near_card_like" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/tv_realname_nickname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25px"
+                    android:text="you name"
+                    android:textColor="@color/text_color_black_one"
+                    android:textSize="@dimen/textsize_36px" />
+
+                <LinearLayout
+                    android:id="@+id/ll_attribute"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/item_nearby_stranger_name"
+                    android:layout_marginTop="36px"
+                    android:gravity="center_horizontal"
+                    android:orientation="horizontal" >
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/shoes" />
+
+                        <TextView
+                            android:id="@+id/tv_age"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="6px"
+                            android:inputType="number"
+                            android:text="24"
+                            android:textColor="@color/text_color_black_two"
+                            android:textSize="@dimen/textsize_28px" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20px"
+                        android:gravity="center"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/location" />
+
+                        <TextView
+                            android:id="@+id/tv_addr"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="6px"
+                            android:text="10km"
+                            android:textColor="@color/text_color_black_two"
+                            android:textSize="@dimen/textsize_28px" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20px"
+                        android:gravity="center"
+                        android:orientation="horizontal" >
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/money" />
+
+                        <TextView
+                            android:id="@+id/item_nearby_stranger_worth"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="6px"
+                            android:inputType="number"
+                            android:text="120"
+                            android:textColor="@color/text_color_black_two"
+                            android:textSize="@dimen/textsize_28px" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/tv_talk_stranger"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30px"
+                    android:src="@drawable/talk_to_stranger" />
+
+                <TextView
+                    android:id="@+id/item_nearby_stranger_work"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="33px"
+                    android:text="input occupation"
+                    android:textColor="@color/text_color_black_two"
+                    android:textSize="@dimen/textsize_28px" />
+
+                <TextView
+                    android:id="@+id/item_nearby_stranger_sign"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="33px"
+                    android:text="input sign"
+                    android:textColor="@color/text_color_black_two"
+                    android:textSize="@dimen/textsize_28px" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="30px"
+                    android:background="#66000000" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="100px"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="5px" >
+
+                    <LinearLayout
+                        android:layout_width="0px"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="horizontal" >
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="90px"
+                            android:gravity="center"
+                            android:text="简介"
+                            android:textSize="46px" />
+
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="80px"
+                            android:src="@drawable/details_info_icon_2" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0px"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical" >
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="90px"
+                            android:gravity="center"
+                            android:text="作品圈"
+                            android:textSize="46px" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="20px"
+                    android:background="@drawable/user_detail_info_tab_left" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+
+                    <!-- 作品圈信息 -->
+
+                    <include layout="@layout/user_detail_info" />
+                    <!-- 用户详细信息 -->
+
+                    <include layout="@layout/user_detail_info" />
+                </FrameLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</FrameLayout>

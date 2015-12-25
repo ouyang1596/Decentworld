@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+   <RelativeLayout 
+       android:layout_width="match_parent"
+       android:layout_height="18dp"
+       android:background="@color/chat_find_background"
+       >
+       <TextView 
+           android:id="@+id/tv_distance_left"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textSize="@dimen/text_size_16"
+           android:layout_alignParentLeft="true"
+           android:text="@string/distance"
+           android:textColor="@color/contact_choice_default"
+           />
+       <TextView 
+           android:id="@+id/tv_distance_right"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:textSize="@dimen/text_size_16"
+		   android:layout_toRightOf="@id/tv_distance_left"
+           android:text="@string/distance"
+           android:textColor="@color/contact_choice_default"
+           
+           />
+   </RelativeLayout>
+	<cn.sx.decentworld.widget.ListViewForScrollView
+	    android:id="@+id/lv_all_distance_item_inter_group"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    
+	    ></cn.sx.decentworld.widget.ListViewForScrollView>
+</LinearLayout>

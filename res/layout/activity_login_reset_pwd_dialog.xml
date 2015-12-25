@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="720px"
+    android:layout_height="593px"
+    android:layout_gravity="center_horizontal"
+    android:background="@drawable/login_dialog_bg4" 
+    android:id="@+id/activity_login_reset_pwd_dialog"
+    >
+
+    <TextView
+        android:id="@+id/tv_if_id_card_correct"
+        android:layout_width="380px"
+        android:layout_height="60px"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="216px"
+        android:gravity="center"
+        android:text="身份证号码不匹配"
+        android:textColor="@color/darkgray"
+        android:textSize="@dimen/text_size_px_30"
+        android:visibility="invisible"
+         >
+    </TextView>
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="380px"
+        android:layout_height="60px"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/tv_if_id_card_correct"
+        android:background="@drawable/login_et_bg" >
+
+        <EditText
+            android:id="@+id/et_id_card_number"
+            android:layout_width="370px"
+            android:layout_height="60px"
+            android:layout_marginLeft="10px"
+            android:background="@null"
+            android:gravity="center"
+            android:hint="@string/forget_idcode_info"
+            android:maxLength="18"
+            android:singleLine="true"
+            android:textSize="@dimen/text_size_px_28" />
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/bt_sure_reset_pwd"
+        android:layout_width="228px"
+        android:layout_height="52px"
+        android:layout_below="@+id/linearLayout1"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="66px"
+        android:background="@drawable/login_sure_bt"
+        android:clickable="true"
+        android:text="@string/make_sure"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_px_28" />
+<RelativeLayout
+    android:id="@+id/activity_login_reset_pwd_dialog_dismiss"
+        android:layout_width="90px"
+        android:layout_height="100px"
+        android:layout_alignParentRight="true"
+		android:layout_alignTop="@id/linearLayout1"
+         >
+        <ImageView 
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/chat_room_set_nickname_bg"
+            />
+    </RelativeLayout>
+    <RelativeLayout
+    android:id="@+id/activity_login_reset_pwd_dialog_back"
+        android:layout_width="90px"
+        android:layout_height="100px"
+        android:layout_alignParentLeft="true"
+		android:layout_alignTop="@id/linearLayout1"
+         >
+        <ImageView 
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/chat_room_set_nickname_bg"
+            />
+    </RelativeLayout>
+</RelativeLayout>

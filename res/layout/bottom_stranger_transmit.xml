@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="49dp"
+    android:background="@color/black_80_percent"
+    android:gravity="center_vertical"
+    android:orientation="horizontal" >
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="14dp" >
+
+        <!-- cn.sx.decentworld.widget.CircularImageView -->
+
+        <cn.sx.decentworld.widget.CircularImageView
+            android:layout_width="43dp"
+            android:layout_height="43dp"
+            android:layout_gravity="center"
+            android:src="@drawable/main_icon_bg" />
+
+        <cn.sx.decentworld.widget.CircularImageView
+            android:id="@+id/iv_main_head"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center"
+            android:src="@drawable/main_stranger_near_click" />
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/fragment_stranger_tab_tv"
+        android:layout_width="20px"
+        android:layout_height="20px"
+        android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/tv_money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:text="身家为：1000万"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_16" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <ImageView
+        android:id="@+id/fragment_stranger_tab"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginRight="14dp"
+        android:src="@drawable/iv_new_heart_" />
+
+</LinearLayout>

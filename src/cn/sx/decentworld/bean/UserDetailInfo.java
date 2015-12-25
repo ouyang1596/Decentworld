@@ -1,0 +1,622 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+import java.util.List;
+
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+
+/**
+ * @ClassName: UserDetailInfo.java
+ * @Description:保存用户的详细信息，该表在登录时新建，初次保存dwID、phoneNum、password
+ * @author: cj
+ * @date: 2015年8月25日 下午5:30:39
+ */
+@Table(name = "UserDetailInfos")
+public class UserDetailInfo extends Model
+{
+	private static String TAG = "UserDetailInfo";
+	
+	//主键
+	@Column(name = "dwID")
+	public String dwID;
+	// 身价
+	@Column(name = "worth")
+	public String worth;
+	// 身家
+	@Column(name = "wealth")
+	public String wealth;
+	// 经度
+	@Column(name = "longitude")
+	public double longitude;
+	// 纬度
+	@Column(name = "latitude")
+	public double latitude;
+	// 位置
+	@Column(name = "location")
+	public String location;
+	//密码
+	@Column(name = "password")
+	public String password;
+	//头像
+	@Column(name = "icon")
+	public String icon;
+	
+	//1 个性签名
+	@Column(name = "sign")
+	public String sign;
+	
+	//2 实名
+	@Column(name = "realName")
+	public String realName;
+	
+	//3 昵称
+	@Column(name = "nickName")
+	public String nickName;
+	
+	//4 年龄
+	@Column(name = "age")
+	public int age;
+	
+	//5 性别
+	@Column(name = "sex")
+	public int sex;
+	
+	/**
+	 * 6 职业
+	 */
+	@Column(name="occupation")
+	private String occupation;
+	
+	/**
+	 * 7 公司
+	 */
+	@Column(name="corporation")
+	private String corporation;
+	
+	/**
+	 * 8 职位
+	 */
+	@Column(name="job")
+	private String job;
+	
+	/**
+	 * 9 学校
+	 */
+	@Column(name="school")
+	private String school;
+	/**
+	 * 10 院系
+	 */
+	@Column(name="department")
+	private String department;
+	
+	/**
+	 * 11 班级
+	 */
+	@Column(name="uc_classes")
+	private String classes;
+	
+	/**
+	 * 12 类型(才、财、貌)
+	 */
+	@Column(name="type")
+	private int type;
+	
+	/**
+	 * 13 你的家乡信息
+	 */
+	@Column(name="hometown")
+	private String hometown;
+	
+	/**
+	 * 14 民族
+	 */
+	@Column(name="nation")
+	private String nation;
+	
+	//15 手机号码
+	@Column(name = "phoneNum")
+	public String phoneNum;
+	
+	/**
+	 * 16 邮箱
+	 */
+	@Column(name="email")
+	private String email;
+	
+	
+	/**
+	 * 17 qq
+	 */
+	@Column(name="qq")
+	private String qq;
+	
+
+	/**
+	 * 18 微信
+	 */
+	@Column(name="wechat")
+	private String wechat;
+
+	/**
+	 * 19 微博
+	 */
+	@Column(name="blog")
+	private String blog;
+	
+	/**
+	 * 20 车子
+	 */
+	@Column(name="vehicle")
+	private String vehicle;
+	
+	/**
+	 * 21 血型
+	 */
+	@Column(name="bloodType")
+	private String bloodType;
+	/**
+	 * 22 星座
+	 */
+	@Column(name="constellatory")
+	private String constellatory;
+	/**
+	 * 23 美食
+	 */
+	@Column(name="cate")
+	private String cate;
+	/**
+	 * 24 婚姻状况
+	 */
+	@Column(name="MaritalStatus")
+	private String MaritalStatus;
+	
+	/**
+	 * 25 宗教
+	 */
+	@Column(name="religion")
+	private String religion;
+	
+	/**
+	 * 26 常去的地点
+	 */
+	@Column(name="position")
+	private String position;
+	
+	/**
+	 * 27 特长
+	 */
+	@Column(name="speciality")
+	private String speciality;
+	
+	/**
+	 * 28 喜欢的书和动漫 
+	 */
+	@Column(name="likebooks")
+	private String likebooks;
+	
+	/**
+	 * 29 喜欢的音乐
+	 */
+	@Column(name="uc_likemusic")
+	private String likemusic;
+	
+	/**
+	 * 30 喜欢的影视
+	 */
+	@Column(name="uc_likesmovies")
+	private String likesmovies;
+	
+	/**
+	 * 31 喜欢的运动
+	 */
+	@Column(name="uc_likesport")
+	private String likesport;
+	
+	/**
+	 * 32 偶像
+	 */
+	@Column(name="idol")
+	private String idol;
+	
+	/**
+	 * 33 座右铭
+	 */
+	@Column(name="motto")
+	private String motto;
+	
+	
+	
+	/**
+	 * 用户头像2
+	 */
+	@Column(name = "icon2")
+	private String icon2;
+	
+	/**
+	 * 用户头像3
+	 */
+	@Column(name = "icon3")
+	private String icon3;
+	
+	/**
+	 * 用户头像4
+	 */
+	@Column(name = "icon4")
+	private String icon4;
+	
+	/**
+	 * 我的贵人
+	 */
+	@Column(name = "grId")
+	private String grId;
+	
+	/**
+	 * 我是谁的贵人
+	 */
+	@Column(name = "isgrId")
+	private String isgrId;
+
+	/**
+	 * 身高
+	 */
+	@Column(name="uc_stature")
+	private String stature;
+
+	/**
+	 * 推荐人
+	 */
+	@Column(name = "uc_referrer")
+	private String referrer;
+
+	/**
+	 * 旅行足迹
+	 */
+	@Column(name="uc_footprint")
+	private String footprint;
+
+	public UserDetailInfo()
+	{
+
+	}
+
+	public UserDetailInfo(String icon, String sign, String nickName,
+			int age, String worth, String wealth, String dwID,
+			String realName, double longitude,
+			double latitude)
+	{
+		super();
+		this.icon = icon;
+		this.sign = sign;
+		this.nickName = nickName;
+		this.age = age;
+		this.worth = worth;
+		this.wealth = wealth;
+		this.dwID = dwID;
+		this.realName = realName;
+		this.longitude = longitude;
+		this.latitude = latitude;
+	}
+
+	/**
+	 * @param icon
+	 * @param sign
+	 * @param nickName
+	 * @param age
+	 * @param worth
+	 * @param wealth
+	 * @param dwId
+	 * @param realName
+	 * @param dispalyRealName
+	 * @param longitude
+	 * @param latitude
+	 * @param location
+	 */
+	public UserDetailInfo(String icon, String sign, String nickName,
+			int age, String worth, String wealth, String dwID,
+			String realName, double longitude,
+			double latitude, String location)
+	{
+		super();
+		this.icon = icon;
+		this.sign = sign;
+		this.nickName = nickName;
+		this.age = age;
+		this.worth = worth;
+		this.wealth = wealth;
+		this.dwID = dwID;
+		this.realName = realName;
+		this.longitude = longitude;
+		this.latitude = latitude;
+		this.location = location;
+	}
+
+	public String getIcon()
+	{
+		return icon;
+	}
+
+	public void setIcon(String icon)
+	{
+		this.icon = icon;
+	}
+
+	public String getSign()
+	{
+		return sign;
+	}
+
+	public void setSign(String sign)
+	{
+		this.sign = sign;
+	}
+
+	public String getNickName()
+	{
+		return nickName;
+	}
+
+	public void setNickName(String nickName)
+	{
+		this.nickName = nickName;
+	}
+
+	public int getAge()
+	{
+		return age;
+	}
+
+	public void setAge(int age)
+	{
+		this.age = age;
+	}
+
+	public String getWorth()
+	{
+		return worth;
+	}
+
+	public void setWorth(String worth)
+	{
+		this.worth = worth;
+	}
+
+	public String getWealth()
+	{
+		return wealth;
+	}
+
+	public void setWealth(String wealth)
+	{
+		this.wealth = wealth;
+	}
+
+	public String getRealName()
+	{
+		return realName;
+	}
+
+	public void setRealName(String realName)
+	{
+		this.realName = realName;
+	}
+
+	/**
+	 * @return the longitude
+	 */
+	public double getLongitude()
+	{
+		return longitude;
+	}
+
+	/**
+	 * @param longitude
+	 *            the longitude to set
+	 */
+	public void setLongitude(double longitude)
+	{
+		this.longitude = longitude;
+	}
+
+	/**
+	 * @return the latitude
+	 */
+	public double getLatitude()
+	{
+		return latitude;
+	}
+
+	/**
+	 * @param latitude
+	 *            the latitude to set
+	 */
+	public void setLatitude(double latitude)
+	{
+		this.latitude = latitude;
+	}
+
+	/**
+	 * @return the dwId
+	 */
+	public String getDwID()
+	{
+		return dwID;
+	}
+
+	/**
+	 * @param dwId
+	 *            the dwId to set
+	 */
+	public void setDwID(String dwID)
+	{
+		this.dwID = dwID;
+	}
+
+
+
+	/**
+	 * @return the location
+	 */
+	public String getLocation()
+	{
+		return location;
+	}
+
+	/**
+	 * @param location
+	 *            the location to set
+	 */
+	public void setLocation(String location)
+	{
+		this.location = location;
+	}
+
+	/**
+	 * @return the phoneNum
+	 */
+	public String getPhoneNum()
+	{
+		return phoneNum;
+	}
+
+	/**
+	 * @param phoneNum
+	 *            the phoneNum to set
+	 */
+	public void setPhoneNum(String phoneNum)
+	{
+		this.phoneNum = phoneNum;
+	}
+
+	/**
+	 * @return the password
+	 */
+	public String getPassword()
+	{
+		return password;
+	}
+
+	/**
+	 * @param password
+	 *            the password to set
+	 */
+	public void setPassword(String password)
+	{
+		this.password = password;
+	}
+	
+
+	/**
+	 * 添加一条记录，并保存账号（电话号码）和密码
+	 * @param phoneNum
+	 * @param password
+	 */
+	public void savePhoneNumAndPwd(String phoneNum,String password)
+	{
+		UserDetailInfo userDetailInfo = new UserDetailInfo();
+		userDetailInfo.setPhoneNum(phoneNum);
+		userDetailInfo.setPassword(password);
+		userDetailInfo.save();
+		LogUtils.i(TAG, "向UserDetailInfo表中增加一条记录，并且保存 phoneNum and password！"
+				+",其中phoneNum="+phoneNum+",password="+password);
+	}
+	
+	/**
+	 * 根据电话号码，将对应的dwID保存在数据库中
+	 * @param phoneNum
+	 * @param dwID
+	 */
+	public void saveByDwID(String phoneNum,String dwID)
+	{
+		UserDetailInfo detailInfo = UserDetailInfo.queryByPhoneNum(phoneNum);
+		if(detailInfo!=null)
+		{
+			detailInfo.dwID = dwID;
+			detailInfo.save();
+			LogUtils.i(TAG, "根据电话号码，将对应的dwID保存在数据库中完毕！"
+					+",其中dwID="+dwID);
+		}
+		else
+		{
+			LogUtils.i(TAG, "数据库中无数据");
+		}
+	}
+	
+	
+
+	/**
+	 * 查找全部个人设置信息
+	 * 
+	 * @return
+	 */
+	public static List<UserDetailInfo> queryAll()
+	{
+		return new Select().from(UserDetailInfo.class).execute();
+	}
+
+	/**
+	 * 查询一条指定 字段 名 和 字段值 的记录
+	 * 
+	 * @param fieldName
+	 *            字段名
+	 * @param fieldValue
+	 *            字段值
+	 * @return
+	 */
+	public static UserDetailInfo queryByField(String fieldName, String fieldValue)
+	{
+		return new Select().from(UserDetailInfo.class)
+				.where(fieldName + "=?", fieldValue).executeSingle();
+	}
+
+	/**
+	 * 删除个人设置信息
+	 */
+	public static void deleteAll()
+	{
+		new Delete().from(UserDetailInfo.class).execute();
+	}
+
+	/**
+	 * 删除指定dwID号的记录
+	 * 
+	 * @param dwID
+	 */
+	public static void deleteByDwID(String dwID)
+	{
+		new Delete().from(UserDetailInfo.class).where("dwID=?", new String[]
+		{ dwID }).execute();
+	}
+
+	/**
+	 * 查询指定dwID号的记录并返回结果
+	 * 
+	 * @param dwID
+	 */
+	public static UserDetailInfo queryByDwID(String dwID)
+	{
+		return new Select().from(UserDetailInfo.class).where("dwID=?", dwID)
+				.executeSingle();
+	}
+
+	/**
+	 * 查询指定电话号码的记录
+	 * 
+	 * @param phoneNum
+	 *            电话号码
+	 */
+	public static UserDetailInfo queryByPhoneNum(String phoneNum)
+	{
+		return new Select().from(UserDetailInfo.class)
+				.where("phoneNum=?", phoneNum).executeSingle();
+	}
+
+}

@@ -1,0 +1,54 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.component.ui;
+
+import cn.sx.decentworld.R;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.graphics.drawable.AnimationDrawable;
+import android.view.View;
+import android.widget.ImageView;
+
+/**
+ * @ClassName: DialogComponent.java
+ * @Description:
+ * @author: cj
+ * @date: 2015年12月3日 上午10:07:57
+ */
+public class DialogComponent {
+	protected Context mContext;
+	protected ProgressDialog mWaitingDialog;
+	private AlertDialog mDialog;
+	private AnimationDrawable mAnimationDrawable;
+
+	public void showWaitingDialog() {
+		initDialog();
+		View loadingView = View.inflate(mContext, R.layout.alert_loading, null);
+		ImageView imgv = (ImageView) loadingView.findViewById(R.id.imgv);
+		mAnimationDrawable = (AnimationDrawable) imgv.getDrawable();
+		mAnimationDrawable.start();
+		mDialog.show();
+		mDialog.getWindow().setContentView(loadingView);
+	}
+
+	private void initDialog() {
+		if (mDialog == null) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+			mDialog = builder.create();
+			mDialog.setCancelable(false);
+		}
+	}
+
+	public void hideWaitingDialog() {
+		if (mDialog != null) {
+			mDialog.dismiss();
+			mDialog = null;
+			if (mAnimationDrawable != null) {
+				mAnimationDrawable.stop();
+				mAnimationDrawable = null;
+			}
+		}
+	}
+}

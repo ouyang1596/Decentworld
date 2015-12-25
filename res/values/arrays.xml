@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <string-array name="user_info_indexs">
+        <item>sign</item>
+        <item>realName</item>
+        <item>nickname</item>
+        <item>age</item>
+        <item>sex</item>
+        <item>position</item>
+        <item>type</item>
+        <item>wealth</item>
+        <item>school</item>
+        <item>department</item>
+        <item>classes</item>
+        <item>occupation</item>
+        <item>corporation</item>
+        <item>job</item>
+        <item>hometown</item>
+        <item>nation</item>
+        <item>phoneNum</item>
+        <item>email</item>
+        <item>qq</item>
+        <item>wechat</item>
+        <item>blog</item>
+        <item>vehicle</item>
+        <item>bloodType</item>
+        <item>constellatory</item>
+        <item>maritalStatus</item>
+        <item>religion</item>
+        <item>speciality</item>
+        <item>idol</item>
+        <item>motto</item>
+        <item>footprint</item>
+        <item>likebooks</item>
+        <item>likemusic</item>
+        <item>likesmovies</item>
+        <item>likesport</item>
+        <item>cate</item>
+    </string-array>
+    <string-array name="user_info_titles">
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>基本信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+        <item>详细信息</item>
+    </string-array>
+    <string-array name="user_info_keys">
+        <item>个性签名</item>
+        <item>实名</item>
+        <item>昵称</item>
+        <item>年龄</item>
+        <item>性别</item>
+        <item>位置</item>
+        <item>类别</item>
+        <item>身家</item>
+        <item>学校</item>
+        <item>学院</item>
+        <item>班级</item>
+        <item>职业</item>
+        <item>公司</item>
+        <item>职位</item>
+        <item>故乡</item>
+        <item>名族</item>
+        <item>电话</item>
+        <item>邮箱</item>
+        <item>QQ</item>
+        <item>微信</item>
+        <item>博客</item>
+        <item>车子</item>
+        <item>血型</item>
+        <item>星座</item>
+        <item>婚姻状况</item>
+        <item>宗教</item>
+        <item>特长</item>
+        <item>偶像</item>
+        <item>座右铭</item>
+        <item>足迹</item>
+        <item>喜欢的书</item>
+        <item>喜欢的音乐</item>
+        <item>喜欢的电影</item>
+        <item>喜欢的运动</item>
+        <item>美食</item>
+    </string-array>
+    <string-array name="user_info_values">
+        <item>个性签名，是指你在某个论坛注册之后， 就可以设置自己的签名了，即在你的每个帖子底部显示的文字， 有些象便签抬头。 </item>
+        <item>陈杰</item>
+        <item>追随我心</item>
+        <item>25</item>
+        <item>男</item>
+        <item>互联网</item>
+        <item>滴滴答答</item>
+        <item>Android工程师</item>
+        <item>理工大学</item>
+        <item>测绘学院</item>
+        <item>遥感 10 02</item>
+        <item>财</item>
+        <item>湖南 长沙</item>
+        <item>汉</item>
+        <item>18824582749</item>
+        <item>hncschen@163.com</item>
+        <item>642373034</item>
+        <item>hncschen</item>
+        <item>博客</item>
+        <item>悍马</item>
+        <item>O型</item>
+        <item>狮子座</item>
+        <item>杂酱面</item>
+        <item>未婚</item>
+        <item>信仰</item>
+        <item>常出没</item>
+        <item>特长</item>
+        <item>喜欢的书</item>
+        <item>喜欢的音乐</item>
+        <item>喜欢的电影</item>
+        <item>喜欢的运动</item>
+        <item>钱学森</item>
+        <item>雄关漫道真如铁，而今迈步从头越</item>
+        <item>踏遍千山万水</item>
+    </string-array>
+    <!-- 行业 -->
+
+    <string-array name="edit_user_info_occupation">
+        <item>互联网</item>
+        <item>金融</item>
+        <item>互联网金融</item>
+        <item>房地产</item>
+    </string-array>
+    <string-array name="edit_user_info_nation">
+        <item>汉族</item>
+        <item>壮族</item>
+        <item>回族</item>
+        <item>满族</item>
+        <item>彝族</item>
+        <item>蒙古族</item>
+        <item>瑶族</item>
+        <item>白族</item>
+    </string-array>
+    <string-array name="edit_user_info_bloodType">
+        <item>A型</item>
+        <item>B型</item>
+        <item>AB型</item>
+        <item>O型</item>
+    </string-array>
+    <string-array name="edit_user_info_constellatory">
+        <item>白羊座</item>
+        <item>金牛座</item>
+        <item>双子座</item>
+        <item>巨蟹座</item>
+        <item>狮子座</item>
+        <item>处女座</item>
+        <item>天秤座</item>
+        <item>天蝎座</item>
+        <item>射手座</item>
+        <item>魔蝎座</item>
+        <item>水瓶座</item>
+        <item>双鱼座</item>
+    </string-array>
+    <string-array name="edit_user_info_maritalStatus">
+        <item>已婚</item>
+        <item>未婚</item>
+        <item></item>
+    </string-array>
+    <string-array name="edit_user_info_religion">
+        <item>佛教</item>
+        <item>道教</item>
+        <item>儒教</item>
+        <item>基督教</item>
+        <item>伊斯兰教</item>
+    </string-array>
+    <string-array name="edit_user_info_speciality">
+        <item>唱歌</item>
+        <item>跳舞</item>
+        <item>书法</item>
+        <item>踢球</item>
+    </string-array>
+    <string-array name="edit_user_info_idol">
+        <item>成龙</item>
+        <item>刘德华</item>
+        <item>周星驰</item>
+        <item>周润发</item>
+    </string-array>
+    <string-array name="edit_user_info_footprint">
+        <item>张家界</item>
+        <item>桂林</item>
+        <item>北京</item>
+        <item>天津</item>
+        <item>南京</item>
+        <item>深圳</item>
+        <item>珠海</item>
+    </string-array>
+    <string-array name="edit_user_info_likebooks">
+        <item>明朝那些事儿</item>
+        <item>我们仨</item>
+        <item>鲁迅经典传奇</item>
+        <item>聊斋志异</item>
+        <item>喻世明言</item>
+        <item>红楼梦</item>
+        <item>水浒传</item>
+        <item>三国演义</item>
+        <item>西游记</item>
+        <item>官场现形记</item>
+        <item>东周列国志</item>
+        <item>楚辞</item>
+        <item>资治通鉴</item>
+        <item>欧也尼葛朗台</item>
+        <item>变色龙</item>
+        <item>战争与和平</item>
+        <item>悲惨世界</item>
+        <item>红与黑</item>
+        <item>呼啸山庄</item>
+        <item>巴黎圣母院</item>
+        <item>堂吉诃德</item>
+    </string-array>
+    <string-array name="edit_user_info_likemusic">
+        <item>涛声依旧</item>
+        <item>爱如潮水</item>
+        <item>心雨</item>
+        <item>王妃</item>
+        <item>我的未来不是梦</item>
+        <item>阳光总在风雨后</item>
+        <item>万水千山总是情</item>
+    </string-array>
+    <string-array name="edit_user_info_likesmovies">
+        <item>肖申克的救赎</item>
+        <item>霸王别姬</item>
+        <item>教父</item>
+        <item>阿甘正传</item>
+        <item>泰坦尼克号</item>
+        <item>美丽人生</item>
+        <item>机器人总动员</item>
+        <item>新警察故事</item>
+        <item>捉妖记</item>
+        <item>速度与激情7</item>
+    </string-array>
+    <string-array name="edit_user_info_likesport">
+        <item>踢足球</item>
+        <item>打羽毛球</item>
+        <item>打乒乓球</item>
+        <item>爬山</item>
+        <item>滑雪</item>
+        <item>跳伞</item>
+        <item>打高尔夫球</item>
+        <item>打台球</item>
+        <item>跑步</item>
+        <item>游泳</item>
+    </string-array>
+    <string-array name="edit_user_info_cate">
+        <item>大盘鸡</item>
+        <item>茶香排骨</item>
+        <item>茄酱鲜虾炒意粉</item>
+        <item>鱼香虾仁</item>
+        <item>鲜带鱼</item>
+        <item>微波面包</item>
+        <item>牛肉后腿皮</item>
+    </string-array>
+
+</resources>

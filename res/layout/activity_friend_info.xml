@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_friend_info_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <!-- 下拉刷新布局 -->
+
+    <com.handmark.pulltorefresh.library.PullToRefreshScrollView
+        xmlns:ptr="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sl_friend_info_pullToRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
+        android:visibility="gone"
+        ptr:ptrAnimationStyle="flip"
+        ptr:ptrMode="both" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="682px" >
+
+                <cn.sx.decentworld.widget.HackyViewPager
+                    android:id="@+id/vp_friend_info_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="616px"
+                    android:background="#6600ff00" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="132px"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center_vertical" >
+
+                    <RelativeLayout
+                        android:layout_width="132px"
+                        android:layout_height="132px"
+                        android:layout_alignParentLeft="true"
+                        android:layout_marginLeft="68px"
+                        android:background="@drawable/me_avatar_circle_bg" >
+
+
+                        <cn.sx.decentworld.widget.CircularImage
+                            android:id="@+id/iv_friend_info_avatar"
+                            android:layout_width="110px"
+                            android:layout_height="110px"
+                             android:layout_centerInParent="true"
+                            android:src="@drawable/work_default" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:id="@+id/rl_friend_info_setting"
+                        android:layout_width="78px"
+                        android:layout_height="78px"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="108px"
+                        android:background="@drawable/me_setting_circle_bg" >
+
+                        <ImageView
+                            android:layout_width="40px"
+                            android:layout_height="40px"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/me_setting" />
+                    </RelativeLayout>
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/tv_friend_info_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32px"
+                android:gravity="center"
+                android:padding="10px"
+                android:text="欧阳慕容"
+                android:textSize="36px" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="30px"
+                android:background="#dfe2eb" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:id="@+id/ll_friend_info_detail"
+                    android:layout_width="0px"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true" >
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+
+                        <TextView
+                            android:id="@+id/tv_friend_info_refer_4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="简介" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_friend_info_work_circle"
+                    android:layout_width="0px"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="作品圈" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/iv_friend_info_tab"
+                android:layout_width="match_parent"
+                android:layout_height="12px"
+                android:background="@drawable/user_detail_info_tab_left" />
+
+            <LinearLayout
+                android:id="@+id/ll_friend_info_container"
+                android:layout_width="match_parent"
+                android:layout_height="0px"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </LinearLayout>
+    </com.handmark.pulltorefresh.library.PullToRefreshScrollView>
+
+    <RelativeLayout
+        android:id="@+id/rl_friend_info_header"
+        android:layout_width="match_parent"
+        android:layout_height="96px"
+        android:alpha="0.7"
+        android:background="@color/rg_black" >
+
+        <TextView
+            android:id="@+id/tv_friend_info_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/main_bottom_me"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_16" />
+    </RelativeLayout>
+
+</RelativeLayout>

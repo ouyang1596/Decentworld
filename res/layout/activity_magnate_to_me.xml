@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <LinearLayout
+        android:id="@+id/ll_magnate_to_me_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="408px"
+            android:background="@drawable/magnate_to_me_add_bg"
+            android:gravity="center" >
+
+            <RelativeLayout
+                android:id="@+id/rl_magnate_to_me_add_magnate"
+                android:layout_width="280px"
+                android:layout_height="280px"
+                android:background="@drawable/magnate_to_me_add_circle"
+                android:gravity="center" >
+
+                <TextView
+                    android:id="@+id/tv_magnate_to_me_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="@string/click_add_magnate"
+                    android:textSize="@dimen/text_size_px_26" />
+            </RelativeLayout>
+        </LinearLayout>
+        
+        <Button 
+            android:id="@+id/btn_magnate_to_me_delete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="删除贵人"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_magnate_to_me_rule"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="30dp"
+                android:text="@string/add_magnate_rule"
+                android:textSize="@dimen/text_size_px_26" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

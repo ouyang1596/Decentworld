@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_bg_smaller" >
+
+    <ImageView
+        android:id="@+id/add_friend_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="14dp"
+        android:paddingRight="22dp"
+        android:src="@drawable/close_button" />
+
+    <TextView
+        android:id="@+id/title_add_newfriend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="14dp"
+        android:text="@string/validate"
+        android:textColor="@color/darkgray"
+        android:textSize="@dimen/text_size_20" />
+    <LinearLayout 
+        android:id="@+id/ll_editT"
+        android:layout_width="195dp"
+        android:layout_height="35dp"
+        android:layout_below="@+id/title_add_newfriend"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="2dp"
+        android:background="@drawable/edittext_selector"
+        >
+    <EditText
+        android:id="@+id/editT_myname"
+        android:layout_width="190dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="5dp"
+        android:gravity="center_vertical"
+        android:textSize="@dimen/text_size_14"
+        android:singleLine="true"
+        android:hint="输入验证信息"
+        android:background="@null"
+         >
+    </EditText>
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/info_add_newfriend"
+        android:layout_width="191dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/ll_editT"
+        android:layout_centerHorizontal="true"
+        android:text="@string/validate_long_info"
+        android:textColor="#9b9b9b"
+        android:textSize="@dimen/text_size_12" />
+
+    <Button
+        android:id="@+id/group_name_nickname_yes"
+        android:layout_width="114dp"
+        android:layout_height="26dp"
+        android:layout_below="@id/info_add_newfriend"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/dialog_click_selector"
+        android:text="@string/sure" />
+
+</RelativeLayout>

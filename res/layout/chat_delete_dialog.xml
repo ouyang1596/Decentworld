@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <TextView 
+        android:id="@+id/delete_conversation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/fragment_delete_dialog"
+        android:textSize="@dimen/text_size_18"
+        android:textColor="@color/black"
+        />
+    <TextView 
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="#E6E6E6" 
+        />
+    <TextView 
+        android:id="@+id/delete_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/fragment_delete_dia_and_mess"
+        android:textSize="@dimen/text_size_18"
+        android:textColor="@color/black"
+        />
+     <TextView 
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="#E6E6E6" 
+        />
+    <TextView 
+        android:id="@+id/to_top_list"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/set_top"
+        android:textSize="@dimen/text_size_18"
+        />
+    <TextView 
+        
+        android:layout_width="match_parent"
+        android:layout_height="1dip"
+        android:background="#E6E6E6" 
+        />
+    <TextView 
+        android:id="@+id/to_message_no_interrupt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/message_no_interrupt"
+        android:textSize="@dimen/text_size_18"
+        />
+
+</LinearLayout>

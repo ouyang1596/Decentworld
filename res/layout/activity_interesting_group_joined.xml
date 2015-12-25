@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:id="@+id/rl_group_search"
+                android:layout_width="match_parent"
+                android:layout_height="104px"
+                android:background="@drawable/fragment_chat_contact_search_bg" >
+
+                <TextView
+                    android:id="@+id/tv_search_group_joined"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40px"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="112px"
+                    android:hint="@string/input_detail_interesting_group"
+                    android:textColor="@color/contact_choice_default"
+                    android:textSize="30px"
+                     />
+            </RelativeLayout>
+            <cn.sx.decentworld.widget.ListViewForScrollView
+                android:id="@+id/lv_interesting_group_joined" 
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                
+                ></cn.sx.decentworld.widget.ListViewForScrollView>
+            
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

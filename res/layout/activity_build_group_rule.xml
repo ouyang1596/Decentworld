@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    
+     >
+     <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+     <LinearLayout 
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:orientation="vertical"
+         android:id="@+id/root_activitiy_build_group_rule"
+         >
+	<TextView 
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_horizontal"
+	    android:text="@string/rule_of_build"
+	    android:textSize="44px"
+	    android:textColor="@color/darkgrey"
+	    android:layout_marginTop="80px"
+	    android:singleLine="true"
+	    />
+	<TextView 
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="40px"
+	    android:layout_gravity="center_horizontal"
+	    
+	    />
+	<Button 
+	    android:id="@+id/bt_rule_toshow_fragment"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_gravity="center_horizontal"
+	    android:text="@string/sure"
+	    android:textSize="28px"
+	    android:textColor="@color/white"
+	    android:background="@drawable/login_sure_bt"
+	    />
+	</LinearLayout>
+</LinearLayout>

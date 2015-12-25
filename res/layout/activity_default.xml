@@ -1,0 +1,109 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/new_yellow" >
+
+    <View
+        android:id="@+id/view_center"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_centerInParent="true"
+        android:background="@color/new_yellow" />
+
+    <View
+        android:id="@+id/view_below_center"
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_below="@+id/view_center"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="60dp"
+        android:background="@color/new_yellow" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@+id/view_below_center"
+        android:background="@drawable/default_pic"
+        android:gravity="bottom" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#60000000"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_motto_six"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:text="态度决定一切"
+                android:textColor="@color/white"
+                android:textSize="@dimen/new_textsize_18sp" />
+
+            <TextView
+                android:id="@+id/tv_motto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="，实力捍卫尊严!人要经得起诱惑耐得住寂寞!"
+                android:textColor="@color/white"
+                android:textSize="@dimen/new_textsize_14sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/view_below_center"
+        android:background="@color/new_yellow"
+        android:paddingBottom="20dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="20dp"
+        android:paddingTop="10dp" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="NOV"
+                android:textColor="@color/white"
+                android:textSize="@dimen/new_textsize_18sp" />
+
+            <TextView
+                android:id="@+id/tv_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2015"
+                android:textColor="@color/white"
+                android:textSize="@dimen/new_textsize_18sp" />
+
+            <TextView
+                android:id="@+id/tv_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WEDNESDAY"
+                android:textColor="@color/white"
+                android:textSize="@dimen/new_textsize_14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:text="06"
+            android:textColor="@color/white"
+            android:textSize="@dimen/new_textsize_60sp" />
+    </RelativeLayout>
+
+</RelativeLayout>

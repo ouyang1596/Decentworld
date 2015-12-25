@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.2679"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tv_modification_phone_num_two_number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:paddingBottom="5dp"
+            android:paddingLeft="@dimen/text_margin_left"
+            android:paddingTop="5dp"
+            android:text="@string/activity_modification_phone_num_two_1" />
+
+        <LinearLayout
+            android:id="@+id/ll_modification_bank_card_one_1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:background="@drawable/me_setting_row_selector"
+            android:clickable="true"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/tv_modification_bank_card_one_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/text_margin_left"
+                android:text="@string/activity_modification_phone_num_two_2"
+                android:textSize="@dimen/text_size_16" />
+
+            <EditText
+                android:id="@+id/et_modification_phone_num_two_num"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/text_margin_left"
+                android:layout_weight="1"
+                android:inputType="number"
+                style="@style/style_edittext_bg"
+                android:hint="@string/activity_modification_phone_num_two_number" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:src="@drawable/divide_line_thin" />
+
+        <LinearLayout
+            android:id="@+id/ll_modification_bank_card_one_2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:background="@drawable/me_setting_row_selector"
+            android:clickable="true"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/tv_modification_bank_card_one_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/text_margin_left"
+                android:text="@string/activity_modification_phone_num_two_3"
+                android:textSize="@dimen/text_size_16" />
+
+            <EditText
+                android:id="@+id/et_modification_phone_num_two_code"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/text_margin_left"
+                android:layout_weight="1"
+                style="@style/style_edittext_bg"
+                android:hint="@string/activity_modification_phone_num_two_code" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.7321" 
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/text_margin_left"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal" >
+
+            <CheckBox
+                android:id="@+id/cb_modification_phone_num_two_agree"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="同意《用户协议》" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_modification_phone_num_two_commit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="29dp"
+            android:enabled="false"
+            android:background="@drawable/activity_modification_bank_card_one_bt_bg_default"
+            android:text="提交" />
+    </LinearLayout>
+
+</LinearLayout>

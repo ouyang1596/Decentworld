@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="538px"
+    android:layout_height="382px"
+    android:background="@drawable/dialog_bg_382"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:id="@+id/root_activity_build_group_name_dialog"
+     >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="60px"
+        android:text="@string/name_interesting_group"
+        android:layout_centerHorizontal="true"
+        android:textColor="#4A4A4A"
+        android:textSize="30px" />
+
+    <EditText
+        android:id="@+id/ed_group_name_set"
+        android:layout_width="290px"
+        android:layout_height="80px"
+		android:layout_centerHorizontal="true"
+        android:layout_marginTop="120px"
+        android:background="@drawable/edittext_selector"
+        android:singleLine="true"
+        android:paddingLeft="8dp"
+        android:hint="名称填写的建议"
+        android:textColor="#4A4A4A"
+        android:textSize="30px" >
+    </EditText>
+	<TextView 
+	    android:id="@+id/group_name_not_null_tip"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:text="@string/name_not_null"
+	    android:layout_marginTop="210px"
+	    android:layout_centerHorizontal="true"
+	    android:textColor="@color/red"
+	    android:textSize="25px"
+	    android:layout_gravity="center_horizontal"
+	    android:visibility="invisible"
+	    />
+    <Button
+        android:id="@+id/bt_forsure_groupname"
+        android:layout_width="228px"
+        android:layout_height="52px"
+        android:layout_marginTop="250px"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/button_bg"
+        android:textColor="@color/white"
+        android:text="@string/sure"
+        android:textSize="27px" />
+
+</RelativeLayout>

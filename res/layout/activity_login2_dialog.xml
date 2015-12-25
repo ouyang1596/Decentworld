@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/login11"
+    android:layout_width="720px"
+    android:layout_height="593px"
+    android:background="@drawable/login_dialog_bg2" >
+
+    <LinearLayout
+        android:id="@+id/et_username_second_ll"
+        android:layout_width="360px"
+        android:layout_height="60px"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="252px"
+        android:background="@drawable/login_et_bg" >
+
+        <EditText
+            android:id="@+id/et_username_second"
+            android:layout_width="350px"
+            android:layout_height="60px"
+            android:layout_marginLeft="10px"
+            android:background="@null"
+            android:gravity="center"
+            android:hint="@string/to_login_info"
+            android:singleLine="true"
+            android:textSize="@dimen/text_size_px_28" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/et_password_second_ll"
+        android:layout_width="360px"
+        android:layout_height="60px"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="336px"
+        android:background="@drawable/login_et_bg" >
+
+        <EditText
+            android:id="@+id/et_password_second"
+            android:layout_width="350px"
+            android:layout_height="60px"
+            android:layout_marginLeft="10px"
+            android:background="@null"
+            android:gravity="center"
+            android:hint="@string/password"
+            android:password="true"
+            android:singleLine="true"
+            android:textSize="@dimen/text_size_px_28" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/bt_login_second"
+        android:layout_width="228px"
+        android:layout_height="52px"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="410px"
+        android:background="@drawable/login_sure_bt"
+        android:clickable="true"
+        android:text="@string/login"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_px_28" />
+
+    <RelativeLayout
+        android:id="@+id/rl_forget_psw"
+        android:layout_width="250px"
+        android:layout_height="100px"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="36px" >
+
+        <TextView
+            android:layout_width="250px"
+            android:layout_height="100px"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="@string/forget_psw"
+            android:textSize="@dimen/text_size_px_24" />
+    </RelativeLayout>
+
+</RelativeLayout>

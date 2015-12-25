@@ -1,0 +1,63 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <include layout="@layout/layout_register_title_bg2" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="82px"
+            android:layout_marginRight="82px"
+            android:text="向我显示"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textsize_24px" />
+    </RelativeLayout>
+
+    <LinearLayout style="@style/select_ll" >
+
+        <TextView
+            android:id="@+id/tv_showToMe_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="38px"
+            android:text="行业" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <EditText
+            android:id="@+id/et_showTome_value"
+            android:layout_width="436px"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_line_press"
+            android:completionThreshold="1"
+            android:dropDownVerticalOffset="1dp"
+            android:gravity="center_horizontal"
+            android:hint="所属行业"
+            android:textColor="@color/rg_gray"
+            android:textSize="@dimen/textsize_26px" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="38px"
+            android:text="取消" />
+    </LinearLayout>
+
+</LinearLayout>

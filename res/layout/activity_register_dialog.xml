@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="721px"
+    android:layout_height="593px"
+    android:layout_gravity="center_horizontal"
+    android:background="@drawable/register_dialog_bg1"
+    android:id="@+id/root_activity_register_dialog"
+     >
+
+    <LinearLayout
+        android:id="@+id/register_phone_num"
+        android:layout_width="360px"
+        android:layout_height="60px"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="257px"
+        android:background="@drawable/login_et_bg" >
+
+        <EditText
+            android:id="@+id/et_mobile_num"
+            android:layout_width="350px"
+            android:layout_height="60px"
+            android:layout_marginLeft="10px"
+            android:background="@null"
+            android:gravity="center"
+            android:hint="@string/mobile_num"
+            android:maxLength="11"
+            android:phoneNumber="true"
+            android:textSize="@dimen/text_size_px_28" 
+            android:singleLine="true"
+            />
+    </LinearLayout>
+<LinearLayout 
+    android:id="@+id/ll_identify_code_1"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:orientation="horizontal"
+	    android:layout_centerHorizontal="true"
+	    android:layout_below="@id/register_phone_num"
+	    android:layout_marginTop="20px"
+	    >
+    <LinearLayout
+        android:id="@+id/ll_identify_code_2"
+        android:layout_width="190px"
+        android:layout_height="60px"
+        android:layout_alignParentLeft="true"
+        android:background="@drawable/login_et_bg" >
+
+        <EditText
+            android:id="@+id/et_register_identify_code"
+            android:layout_width="185px"
+            android:layout_height="60px"
+            android:layout_marginLeft="5px"
+            android:background="@null"
+            android:hint="@string/input_identify_code"
+            android:singleLine="true"
+            android:textSize="@dimen/text_size_px_28" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/count_time_2"
+        android:layout_width="154px"
+        android:layout_height="60px"
+        android:layout_marginLeft="15px"
+        android:background="@drawable/login_sure_bt"
+        android:text="@string/get_identify_code"
+        android:textColor="@color/white" 
+        android:textSize="@dimen/text_size_px_24"
+        />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/register_bt_click_next"
+        android:layout_width="198px"
+        android:layout_height="52px"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/ll_identify_code_1"
+        android:layout_marginTop="20px"
+        android:background="@drawable/login_sure_bt"
+        android:clickable="true"
+        android:text="@string/next"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_px_28" />
+
+    <TextView
+        android:id="@+id/register_if_identify_code_correct"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/ll_identify_code_1"
+        android:layout_marginTop="5px"
+        android:layout_centerHorizontal="true"
+        android:text="@string/identify_code_wrong"
+        android:visibility="invisible"
+         />
+
+</RelativeLayout>

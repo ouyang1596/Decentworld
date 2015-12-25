@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/dialog_bg_382"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/et_draw_cash_amount"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/edittext_selector"
+        android:hint="请输入要提取的金额"
+        android:paddingLeft="8dp"
+        android:inputType="number"
+        android:singleLine="true"
+        android:textColor="#4A4A4A"
+        android:textSize="30px" >
+    </EditText>
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="20dp"
+        android:text="现金将于24小时内到帐于绑定的银行卡"
+        android:textColor="#4A4A4A"
+        android:textSize="@dimen/text_size_14" />
+
+    <Button
+        android:id="@+id/btn_draw_cash_confirm"
+        android:layout_width="114dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/button_bg"
+        android:text="确认" />
+
+</LinearLayout>

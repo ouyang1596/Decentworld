@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_activity_login_dialog"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="673px"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/login_dialog_bg" >
+
+        <LinearLayout
+            android:id="@+id/ll_login_dialog_refer_1"
+            android:layout_width="360px"
+            android:layout_height="61px"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="250px"
+            android:background="@drawable/login_et_bg" >
+
+            <EditText
+                android:id="@+id/et_username"
+                android:layout_width="350px"
+                android:layout_height="60px"
+                android:layout_marginLeft="10px"
+                android:background="@null"
+                android:gravity="center"
+                android:hint="@string/to_login_info"
+                android:singleLine="true"
+                android:textSize="@dimen/text_size_px_28" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_login_dialog_refer_2"
+            android:layout_width="360px"
+            android:layout_height="60px"
+            android:layout_below="@id/ll_login_dialog_refer_1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="34px"
+            android:background="@drawable/login_et_bg" >
+
+            <EditText
+                android:id="@+id/et_password"
+                android:layout_width="350px"
+                android:layout_height="60px"
+                android:layout_marginLeft="10px"
+                android:background="@null"
+                android:gravity="center"
+                android:hint="@string/password"
+                android:password="true"
+                android:singleLine="true"
+                android:textSize="@dimen/text_size_px_28" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/bt_login"
+            android:layout_width="228px"
+            android:layout_height="52px"
+            android:layout_below="@id/ll_login_dialog_refer_2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="34px"
+            android:background="@drawable/login_sure_bt"
+            android:clickable="true"
+            android:text="@string/login"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_px_28" />
+    </RelativeLayout>
+
+</RelativeLayout>

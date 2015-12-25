@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_activity_register_three_item_dialog"
+    android:layout_width="735px"
+    android:layout_height="828px"
+    android:layout_gravity="center_horizontal"
+    android:background="@drawable/register_dialog_bg5" >
+
+    <RelativeLayout
+        android:id="@+id/rl_have_money"
+        android:layout_width="360px"
+        android:layout_height="120px"
+        android:layout_marginLeft="135px"
+        android:layout_marginTop="337px"
+        
+        android:visibility="invisible"
+         >
+<!-- android:background="@drawable/register_three_item_1" -->
+        <TextView
+            android:id="@+id/tv_have_money"
+            android:layout_width="250px"
+            android:layout_height="70px"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/login_three_item_only_text_bg"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@string/have_money"
+            android:textSize="@dimen/text_size_px_28" />
+		<ImageView 
+		    android:id="@+id/iv_have_money"
+		    android:layout_width="120px"
+		    android:layout_height="120px"
+		    android:layout_alignParentLeft="true"
+		    android:src="@drawable/login_three_item_only_pic_bg"
+		    android:layout_alignParentTop="true"
+		    
+		    />
+        
+    </RelativeLayout>
+	<Button
+            android:id="@+id/bt_have_money"
+            android:layout_width="360px"
+            android:layout_height="70px"
+            android:layout_marginLeft="135px"
+        	android:layout_marginTop="337px"
+            android:layout_alignParentTop="true"
+            android:background="@drawable/login_sure_bt2"
+            android:singleLine="true"
+            android:text="@string/have_money"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_px_28"
+            android:visibility="visible" >
+        </Button>
+        
+    <RelativeLayout
+        android:id="@+id/rl_have_ability"
+        android:layout_width="360px"
+        android:layout_height="120px"
+        android:layout_marginLeft="135px"
+        android:layout_marginTop="443px"
+        android:visibility="invisible"
+         >
+
+        <TextView
+            android:id="@+id/tt_have_ability"
+            android:layout_width="250px"
+            android:layout_height="70px"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/login_three_item_only_text_bg"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@string/have_ability"
+            android:textSize="@dimen/text_size_px_28" />
+		<ImageView 
+		    android:id="@+id/iv_have_ability"
+		    android:layout_width="120px"
+		    android:layout_height="120px"
+		    android:src="@drawable/login_three_item_only_pic_bg"
+		    android:layout_alignParentLeft="true"
+		    android:layout_centerVertical="true"
+		    
+		    />
+        
+    </RelativeLayout>
+	<Button
+            android:id="@+id/bt_have_ability"
+            android:layout_width="360px"
+            android:layout_height="70px"
+            android:layout_marginLeft="135px"
+        	android:layout_marginTop="468px"
+            android:background="@drawable/login_sure_bt2"
+            android:singleLine="true"
+            android:text="@string/have_ability"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_px_28"
+            android:visibility="visible" >
+        </Button>
+    <RelativeLayout
+        android:id="@+id/rl_have_face"
+        android:layout_width="360px"
+        android:layout_height="120px"
+        android:layout_marginLeft="135px"
+        android:layout_marginTop="549px"
+        android:visibility="invisible"
+        >
+
+        <TextView
+            android:id="@+id/tt_have_face"
+            android:layout_width="250px"
+            android:layout_height="70px"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/login_three_item_only_text_bg"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="@string/have_face"
+            android:textSize="@dimen/text_size_px_28" />
+        <ImageView 
+		    android:id="@+id/iv_have_face"
+		    android:layout_width="120px"
+		    android:layout_height="120px"
+		    android:src="@drawable/login_three_item_only_pic_bg"
+		    android:layout_alignParentLeft="true"
+		    android:layout_alignParentBottom="true"
+		    
+		    />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/bt_have_face"
+        android:layout_width="360px"
+        android:layout_height="70px"
+        android:layout_marginLeft="135px"
+        android:layout_marginTop="599px"
+        android:background="@drawable/login_sure_bt2"
+        android:text="@string/have_face"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_px_28"
+        android:visibility="visible" >
+    </Button>
+
+    <RelativeLayout
+        android:id="@+id/activity_register_three_item_dialog_back"
+        android:layout_width="70px"
+        android:layout_height="70px"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="20px"
+        android:layout_marginTop="375px" >
+
+        <ImageView
+            android:id="@+id/imageaaa"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:scaleType="centerCrop"
+            android:src="@drawable/chat_room_set_nickname_bg" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_three_item_info"
+        android:layout_width="260px"
+        android:layout_height="200px"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="30px"
+        android:layout_marginTop="30px"
+        android:text="123"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_px_20"
+        android:visibility="gone" />
+    <RelativeLayout
+        android:id="@+id/activity_register_three_item_dialog_next"
+        android:layout_width="70px"
+        android:layout_height="70px"
+        android:layout_marginRight="30px"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="375px" >
+
+        <ImageView
+            android:id="@+id/imagea_next"
+            android:layout_width="70px"
+            android:layout_height="70px"
+            android:scaleType="center"
+            android:src="@drawable/chat_room_set_nickname_bg" />
+    </RelativeLayout>
+
+</RelativeLayout>

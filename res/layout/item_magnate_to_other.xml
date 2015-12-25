@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/item_magnate_to_other_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/ll_magnate_to_other_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/me_setting_row_selector"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="10px"
+        android:paddingTop="10px" >
+
+        <ImageView
+            android:id="@+id/iv_magnate_to_other_avatar"
+            android:layout_width="82px"
+            android:layout_height="82px"
+            android:layout_marginLeft="@dimen/text_margin_left"
+            android:src="@drawable/magnate" />
+
+        <TextView
+            android:id="@+id/tv_magnate_to_other_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/image_text_interval"
+            android:text="艾丽娅"
+            android:textSize="@dimen/text_size_px_26" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/check_details"
+            android:textSize="@dimen/text_size_px_26" />
+
+        <ImageView
+            android:layout_width="17px"
+            android:layout_height="28px"
+            android:layout_marginLeft="@dimen/image_text_interval"
+            android:layout_marginRight="@dimen/image_margin_right"
+            android:src="@drawable/more" />
+    </LinearLayout>
+
+</LinearLayout>

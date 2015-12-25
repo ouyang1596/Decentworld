@@ -1,0 +1,239 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.component.ui;
+
+import java.util.List;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.activity.LoginActivity_;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.PickUser;
+import cn.sx.decentworld.bean.StrangerInfo;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.common.CharacterParser;
+import cn.sx.decentworld.service.PacketListenerService;
+import cn.sx.decentworld.utils.ExitAppUtils;
+import cn.sx.decentworld.utils.LoginHelper;
+
+import com.googlecode.androidannotations.annotations.AfterInject;
+import com.googlecode.androidannotations.annotations.EBean;
+import com.googlecode.androidannotations.annotations.RootContext;
+
+/**
+ * @ClassName: MainFragmentComponent.java
+ * @Description: 主界面的4个功能模块的组件
+ * @author: yj
+ * @date: 2015年7月17日 下午5:19:46
+ */
+
+@EBean
+public class MainFragmentComponent {
+
+	@RootContext
+	Context context;
+
+	@RootContext
+	Activity activity;
+
+	private CharacterParser characterParser;
+
+	@AfterInject
+	public void init() {
+
+	}
+
+	/**
+	 * 登出注销操作
+	 */
+	public void loginout() {
+        ProgressDialog pd=null;
+        try {
+            pd = new ProgressDialog(context);
+            pd.setMessage("正在退出登录...");
+            pd.setCanceledOnTouchOutside(false);
+            pd.show();
+        } catch (Exception e) {
+            Log.e(MainFragmentComponent.class.getName(),"退出出错",e);
+        }
+
+		//清除SharedPre和Application中的数据
+		LoginHelper.clearLoginInfo(context);
+		//删除数据库中的某些表
+		UserInfo.deleteAll();
+		StrangerInfo.deleteAll();
+		//断开与服务器的连接
+		DecentWorldApp.getInstance().closeConnection();
+		// 关闭服务消息监听服务
+		context.stopService(new Intent(context, PacketListenerService.class));
+		//返回到LoginActivity
+		String username = DecentWorldApp.getInstance().getUserName();
+		Intent intent = new Intent(context, LoginActivity_.class);
+		intent.putExtra("loginout", true);
+		intent.putExtra("username", username);
+		context.startActivity(intent);
+		//销毁除了LoginActivity的所有Activity
+		ExitAppUtils.getInstance().loginout();
+		///////////////////////////
+        
+        try {
+            if(pd!=null){
+                pd.dismiss();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+	/**
+	 * 主界面中fragment跳转
+	 * 
+	 * @param ac
+	 *            跳转activity
+	 */
+	public <T> void toActivity(Class<T> ac) {
+		Intent intent = new Intent(activity, ac);
+		activity.startActivity(intent);
+	}
+
+	/************************* 聊天界面 *********************************/
+	/************************* 通讯录界面 *********************************/
+	/************************* 发现界面 *********************************/
+	/************************* 我的界面 *********************************/
+
+	/**
+	 * 获取内存中的好友集合
+	 * 
+	 * @return 好友集合
+	 */
+//	public List<User> getUserList()
+//	{
+//
+//		List<User> list = new ArrayList<User>();
+//		Map<String, User> users = null;// DecentWorldApp.getInstance().getContactList();
+//		Iterator<Entry<String, User>> iterator = users.entrySet().iterator();
+//		while (iterator.hasNext())
+//		{
+//			Entry<String, User> entry = iterator.next();
+//			if (!entry.getKey().equals(Constants.NEW_FRIENDS_USERNAME) && !entry.getKey().equals(Constants.GROUP_USERNAME) && !entry.getKey().equals(Constants.CHAT_ROOM)
+//					&& !entry.getKey().equals(Constants.CHAT_ROBOT))
+//				list.add(entry.getValue());
+//		}
+//
+//		return list;
+//
+//	}
+
+	/**
+	 * 获取用户中的集合并排序（用于选择）
+	 * 
+	 * @return
+	 */
+//	@SuppressWarnings("unchecked")
+//	public List<PickUser> getPickUserList() {
+//		PickUser pUser;
+//		List<PickUser> pList = new ArrayList<PickUser>();
+//		List<User> list = new ArrayList<User>();
+//		Map<String, User> users = null;// DecentWorldApp.getInstance().getContactList();
+//		Iterator<Entry<String, User>> iterator = users.entrySet().iterator();
+//		while (iterator.hasNext()) {
+//			Entry<String, User> entry = iterator.next();
+//			if (!entry.getKey().equals(Constants.NEW_FRIENDS_USERNAME)
+//					&& !entry.getKey().equals(Constants.GROUP_USERNAME)
+//					&& !entry.getKey().equals(Constants.CHAT_ROOM)
+//					&& !entry.getKey().equals(Constants.CHAT_ROBOT)) {
+//				// {
+//				// list.add(entry.getValue());
+//				//
+//				// pUser = new PickUser(entry.getValue().getUsername(),
+//				// entry.getValue().getUnreadMsgCount(),
+//				// entry.getValue().getSortLetters(),
+//				// entry.getValue().getAvatar(), entry.getValue().getUsername(),
+//				// false);
+//				//
+//				// pList.add(pUser);
+//				// }
+//			}
+//			pList = (List<PickUser>) filledData(pList);
+//		}
+//		return pList;
+//
+//	}
+
+	/**
+	 * 根据list中User的username填充list中User的SortLetters
+	 * 即给User对象的SortLetters字段设置一个[A-Z]中对应的字母或#
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public List<? extends ContactUser> filledData(
+			List<? extends ContactUser> date) {
+		characterParser = CharacterParser.getInstance();
+
+		for (int i = 0; i < date.size(); i++) {
+			// 汉字转换成拼音
+			String pinyin = characterParser.getSelling(date.get(i)
+					.getNickName());
+			String sortString = pinyin.substring(0, 1).toUpperCase();
+
+			// 正则表达式，判断首字母是否是英文字母
+			if (sortString.matches("[A-Z]")) {
+				date.get(i).setSortLetters(sortString);
+			} else {
+				date.get(i).setSortLetters("#");
+			}
+		}
+		return date;
+	}
+
+	/**
+	 * 根据环信的群组id查找全部成员
+	 * 
+	 * @param groupid
+	 *            环信的群组id
+	 * @return
+	 */
+	public List<PickUser> getGroupPickUserList(String groupid) {
+		// PickUser pUser;
+		// List<PickUser> pList = new ArrayList<PickUser>();
+		// List<User> list = new ArrayList<User>();
+		// List<String>
+		// memberList=EMGroupManager.getInstance().getGroup(groupid).getMembers();
+		// for (int i = 0; i < memberList.size(); i++) {
+		// User user
+		// }
+		// Map<String, User> users =
+		// Iterator<Entry<String, User>> iterator = users.entrySet().iterator();
+		// while (iterator.hasNext()) {
+		// Entry<String, User> entry = iterator.next();
+		// if (!entry.getKey().equals(Constants.NEW_FRIENDS_USERNAME)
+		// && !entry.getKey().equals(Constants.GROUP_USERNAME)
+		// && !entry.getKey().equals(Constants.CHAT_ROOM)
+		// && !entry.getKey().equals(Constants.CHAT_ROBOT)) {
+		// {
+		// list.add(entry.getValue());
+		//
+		// pUser = new PickUser(entry.getValue().getUsername(), entry
+		// .getValue().getUnreadMsgCount(), entry.getValue()
+		// .getSortLetters(), entry.getValue().getAvatar(),
+		// entry.getValue().getUsername(), false);
+		//
+		// pList.add(pUser);
+		// }
+		// }
+		// pList = (List<PickUser>) filledData(pList);
+		// }
+		return null;
+
+	}
+	/**
+	 * 陌生人
+	 */
+
+}

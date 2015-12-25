@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/chat_me_for_work_root"
+    android:layout_width="720px"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <cn.sx.decentworld.widget.ListViewForScrollView
+        android:id="@+id/fragment_me_work_lv1"
+        android:layout_width="720px"
+        android:layout_height="wrap_content"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="20px"
+        android:drawSelectorOnTop="false"
+        android:listSelector="#00000000" >
+    </cn.sx.decentworld.widget.ListViewForScrollView>
+
+</LinearLayout>

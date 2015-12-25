@@ -1,0 +1,81 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.component.ui;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.component.ToastComponent;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Background;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EBean;
+import com.googlecode.androidannotations.annotations.RootContext;
+
+/**
+ * @ClassName: SearchAddContactComponent.java
+ * @Description: 查找和添加用户
+ * @author: yj
+ * @date: 2015年8月8日 上午10:41:33
+ */
+@EBean
+public class SearchAddContactComponent {
+	@RootContext
+	Activity activity;
+	
+	@RootContext
+	Context context;
+	
+	@Bean
+	ToastComponent toast;
+	
+	@AfterViews
+	public void init(){
+		
+	}
+	
+	
+	
+	private void searchContact(String values){
+		
+	}
+	@Background
+	public  void addContact(String values,String request){
+//		if(DecentWorldApp.getInstance().getUserName().equals(values)){
+//			context.startActivity(new Intent(context, AlertDialogHx.class).putExtra("msg", "你不能添加自己!"));
+//			return;
+//		}
+//		
+//		if(DecentWorldApp.getInstance().getContactList().containsKey(values)){
+//		    //提示已在好友列表中，无需添加
+////		    if(EMContactManager.getInstance().getBlackListUsernames().contains(values)){
+////		    	context.startActivity(new Intent(context, AlertDialogHx.class).putExtra("msg", "此用户已是你好友(被拉黑状态)，从黑名单列表中移出即可"));
+////		        return;
+////		    }
+////		    context.startActivity(new Intent(context, AlertDialogHx.class).putExtra("msg", "此用户已是你好友，无需再添加！"));
+////			return;
+//		}
+		
+		try {
+//			EMContactManager.getInstance().addContact(values, request);
+//			
+//			activity.runOnUiThread(new Runnable() {
+//				
+//				@Override
+//				public void run() {
+//						
+//				}
+//			});
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
+	
+	
+}

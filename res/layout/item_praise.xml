@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:id="@+id/rl_praise_root"
+        android:layout_width="match_parent"
+        android:layout_height="126px" >
+
+        <ImageView
+            android:id="@+id/iv_praise_avatar"
+            android:layout_width="82px"
+            android:layout_height="82px"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20px"
+            android:src="@drawable/magnate" />
+
+        <TextView
+            android:id="@+id/tv_praise_nickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/iv_praise_avatar"
+            android:layout_marginLeft="40px"
+            android:layout_toRightOf="@id/iv_praise_avatar"
+            android:text="昵称"
+            android:textSize="@dimen/text_size_px_30" />
+
+        <TextView
+            android:id="@+id/tv_praise_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16px"
+            android:layout_below="@id/tv_praise_nickname"
+            android:layout_alignLeft="@id/tv_praise_nickname"
+            android:text="8-2 08:15"
+            android:textSize="@dimen/text_size_px_26" />
+        
+        <ImageView 
+            android:id="@+id/iv_praise_icon"
+            android:layout_width="40px"
+            android:layout_height="37px"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="50px"
+            android:layout_centerVertical="true"
+            android:src="@drawable/praise_heart"/>
+    </RelativeLayout>
+
+</LinearLayout>

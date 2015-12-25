@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <ScrollView
+        android:id="@+id/sv_interesting_group_near"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:id="@+id/rl_group_search"
+                android:layout_width="match_parent"
+                android:layout_height="104px"
+                android:background="@drawable/fragment_chat_contact_search_bg" >
+
+                <TextView
+                    android:id="@+id/tv_search_new_interesting_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40px"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="112px"
+                    android:hint="@string/input_detail_interesting_group"
+                    android:textColor="@color/contact_choice_default"
+                    android:textSize="30px"
+                     />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="36px"
+                android:background="@color/chat_find_background" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="8px"
+                    android:text="推荐群组"
+                    android:textColor="@color/contact_choice_default"
+                    android:textSize="26px" />
+            </RelativeLayout>
+
+            <cn.sx.decentworld.widget.ListViewForScrollView
+                android:id="@+id/lv_recommand_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" 
+                
+                >
+            </cn.sx.decentworld.widget.ListViewForScrollView>
+
+          <cn.sx.decentworld.widget.ListViewForScrollView
+                android:id="@+id/lv_group_distance_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </cn.sx.decentworld.widget.ListViewForScrollView>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/add_content_content"
+        android:layout_width="match_parent"
+        android:layout_height="300px"
+        android:gravity="top"
+        android:hint="@string/add_content_hint"
+        android:text="sssssssssssssssssssssss"
+        android:textSize="30px" />
+
+    <cn.sx.decentworld.widget.ExpandGridView
+        android:id="@+id/add_content_icon_gridview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:gravity="start"
+        android:horizontalSpacing="6dp"
+        android:listSelector="@android:color/transparent"
+        android:numColumns="3"
+        android:verticalSpacing="10dp" >
+    </cn.sx.decentworld.widget.ExpandGridView>
+
+</LinearLayout>

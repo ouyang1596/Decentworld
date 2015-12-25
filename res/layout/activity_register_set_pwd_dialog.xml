@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="721px"
+    android:layout_height="593px"
+    android:layout_gravity="center_horizontal"
+    android:background="@drawable/register_dialog_bg2"
+    android:id="@+id/root_activity_register_set_pwd_dialog"
+     >
+
+    <TextView
+        android:id="@+id/tv_set_pwd_info"
+        android:layout_width="360px"
+        android:layout_height="60px"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="252px"
+        android:gravity="center"
+        android:text="@string/set_pwd_info"
+        android:textColor="@color/darkgrey"
+        android:textSize="20px"
+         >
+    </TextView>
+
+    <LinearLayout
+        android:layout_width="360px"
+        android:layout_height="60px"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="336px"
+        android:background="@drawable/login_et_bg" >
+
+        <EditText
+            android:id="@+id/et_register_pwd"
+            android:layout_width="350px"
+            android:layout_height="60px"
+            android:layout_marginLeft="10px"
+            android:background="@null"
+            android:gravity="center"
+            android:maxLength="8"
+            android:phoneNumber="true"
+            android:singleLine="true"
+            android:textSize="@dimen/text_size_px_28" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/register_set_pwd_bt_sure"
+        android:layout_width="228px"
+        android:layout_height="52px"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="438px"
+        android:background="@drawable/login_sure_bt"
+        android:clickable="true"
+        android:text="@string/make_sure"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_px_28" />
+
+    <RelativeLayout
+        android:id="@+id/activity_register_setpwd_dialog_dismiss"
+        android:layout_width="70px"
+        android:layout_height="70px"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="20px"
+        android:layout_below="@id/tv_set_pwd_info"
+         >
+        <ImageView 
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/chat_room_set_nickname_bg"
+            />
+    </RelativeLayout>
+<RelativeLayout
+    android:id="@+id/activity_register_setpwd_dialog_back"
+        android:layout_width="70px"
+        android:layout_height="70px"
+        android:layout_alignParentLeft="true"
+        android:layout_marginLeft="20px"
+        android:layout_below="@id/tv_set_pwd_info"
+         >
+        <ImageView 
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/chat_room_set_nickname_bg"
+            />
+    </RelativeLayout>
+</RelativeLayout>

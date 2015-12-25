@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:id="@+id/rl_search"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/fragment_chat_contact_search_bg"
+                android:visibility="gone" >
+
+                <TextView
+                    android:id="@+id/tv_search_new_friend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="20dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="56dp"
+                    android:hint="@string/search_detail"
+                    android:textColor="@color/contact_choice_default" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_two_add_friedn"
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:background="@color/white"
+                android:orientation="horizontal" 
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/tv_recommand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="64dp"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:text="@string/recommand"
+                        android:textColor="@color/darkgrey" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="2dp"
+                    android:layout_height="match_parent"
+                    android:src="@color/chat_find_background" />
+
+                <LinearLayout
+                    android:id="@+id/tv_for_sure"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="64dp"
+                        android:layout_weight="1"
+                        android:gravity="center_horizontal"
+                        android:text="@string/for_sure"
+                        android:textColor="@color/darkgrey" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/iv_divider"
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:src="@color/chat_find_background" 
+                android:visibility="gone"/>
+
+            <cn.sx.decentworld.widget.ListViewForScrollView
+                android:id="@+id/lv_newfriends"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </cn.sx.decentworld.widget.ListViewForScrollView>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
