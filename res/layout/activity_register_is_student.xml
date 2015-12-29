@@ -18,9 +18,9 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:text="您将与全球的精英交往，并享受DW为您提供的福利。为了不影响您的尽快体验，我们首先选择信任。请提交真实材料，作假必究！"
+        android:text="您是否是学生？"
         android:textColor="@color/two_black"
-        android:textSize="@dimen/new_textsize_16sp" />
+        android:textSize="@dimen/new_textsize_24sp" />
 
     <View
         android:layout_width="match_parent"

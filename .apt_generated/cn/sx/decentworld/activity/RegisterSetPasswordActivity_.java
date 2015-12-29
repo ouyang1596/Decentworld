@@ -43,12 +43,12 @@ public final class RegisterSetPasswordActivity_
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        llRegisterSetPassword = ((LinearLayout) findViewById(id.root_activity_register_set_password));
-        btnOk = ((Button) findViewById(id.btn_OK));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivPwdIsShow = ((ImageView) findViewById(id.iv_pwd_is_show));
         etvPwd = ((EditText) findViewById(id.etv_reset_pwd));
+        btnOk = ((Button) findViewById(id.btn_OK));
+        llRegisterSetPassword = ((LinearLayout) findViewById(id.root_activity_register_set_password));
+        ivPwdIsShow = ((ImageView) findViewById(id.iv_pwd_is_show));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();

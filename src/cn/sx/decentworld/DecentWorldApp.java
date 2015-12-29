@@ -241,15 +241,15 @@ public class DecentWorldApp extends Application {
 	}
 
 	public void initFile() {
-		File file = new File(Constants.HomePath);
+		File file = new File(Constants.HOME_PATH);
 		if (!file.exists()) {
 			file.mkdirs();
 		}
-		file = new File(Constants.CAMERA_PATH);
+		file = new File(Constants.HOME_PATH + Constants.CAMERA_PATH);
 		if (!file.exists()) {
 			file.mkdirs();
 		}
-		file = new File(Constants.RecorderAudiosPath);
+		file = new File(Constants.HOME_PATH + Constants.CLIP_IMAGE);
 		if (!file.exists()) {
 			file.mkdirs();
 		}

@@ -15,6 +15,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -51,7 +52,6 @@ public class RegisterTalentActivity extends BaseFragmentActivity implements
 	ImageView ivUploadPic;
 	@ViewById(R.id.root_register_talent)
 	LinearLayout llRegisterTalent;
-
 	private static final int REQUEST_CODE = 100;
 	private static final int CHOICE_ONE_PIC = 1;
 	private FragmentManager fragmentManager;
@@ -76,6 +76,18 @@ public class RegisterTalentActivity extends BaseFragmentActivity implements
 		initData();
 		setBtnState();
 		fragmentManager = getSupportFragmentManager();
+		etvMaterialKind.setOnFocusChangeListener(new OnFocusChangeListener() {
+
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					etvMaterialKind.setHint("");
+				} else {
+					etvMaterialKind
+							.setHint("也许你是梵高，请原谅我们只能以世俗有据可查的标准来审核上传的（请注明，粉丝截图、获奖证明、我的视图等）");
+				}
+			}
+		});
 		etvMaterialKind.addTextChangedListener(new TextWatcher() {
 
 			@Override
@@ -286,7 +298,7 @@ public class RegisterTalentActivity extends BaseFragmentActivity implements
 	 * */
 	private File handleFile(String filePath) {
 		Bitmap bitmap = ImageUtils.scalePic(filePath);
-		String picPath = Constants.HomePath + "/temp"
+		String picPath = Constants.HOME_PATH + "/temp"
 				+ ImageUtils.generateFileName() + ".png";
 		ImageUtils.saveBitmap(picPath, bitmap);
 		File file = new File(picPath);

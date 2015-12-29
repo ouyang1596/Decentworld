@@ -25,8 +25,8 @@ public final class ChatRoomComponent_
         if (!(context_ instanceof Activity)) {
             return ;
         }
-        ((ToastComponent_) toast).afterSetContentView_();
         ((MainFragmentComponent_) mainComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 
@@ -48,8 +48,8 @@ public final class ChatRoomComponent_
         if (context_ instanceof Activity) {
             activity = ((Activity) context_);
         }
-        toast = ToastComponent_.getInstance_(context_);
         mainComponent = MainFragmentComponent_.getInstance_(context_);
+        toast = ToastComponent_.getInstance_(context_);
     }
 
     public static ChatRoomComponent_ getInstance_(Context context) {

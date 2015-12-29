@@ -37,31 +37,16 @@ public final class PickContactActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        titleBar = TitleBar_.getInstance_(this);
-        maincompon = MainFragmentComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
         setUserInfo = SetUserInfo_.getInstance_(this);
+        maincompon = MainFragmentComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         lv_pick_contact_person = ((ListView) findViewById(id.lv_pick_contact_person));
-        ll_listview_all_picked = ((LinearLayout) findViewById(id.ll_listview_all_picked));
         gv_people_had_added = ((HorizontalListView) findViewById(id.imgList));
-        {
-            View view = findViewById(id.main_header_right_tv);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        PickContactActivity_.this.Confirm();
-                    }
-
-                }
-                );
-            }
-        }
+        ll_listview_all_picked = ((LinearLayout) findViewById(id.ll_listview_all_picked));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -77,10 +62,25 @@ public final class PickContactActivity_
                 );
             }
         }
-        ((TitleBar_) titleBar).afterSetContentView_();
-        ((MainFragmentComponent_) maincompon).afterSetContentView_();
+        {
+            View view = findViewById(id.main_header_right_tv);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        PickContactActivity_.this.Confirm();
+                    }
+
+                }
+                );
+            }
+        }
         ((ToastComponent_) toast).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
         ((SetUserInfo_) setUserInfo).afterSetContentView_();
+        ((MainFragmentComponent_) maincompon).afterSetContentView_();
         init();
     }
 

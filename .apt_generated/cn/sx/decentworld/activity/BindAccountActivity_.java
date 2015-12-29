@@ -16,6 +16,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.TitleBar_;
 import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.network.request.GetUserInfo_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -33,13 +34,14 @@ public final class BindAccountActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         getUserInfo = GetUserInfo_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tv_bind_account_wx = ((TextView) findViewById(id.tv_bind_account_wx));
         tv_bind_account_alipay = ((TextView) findViewById(id.tv_bind_account_alipay));
+        tv_bind_account_wx = ((TextView) findViewById(id.tv_bind_account_wx));
         {
             View view = findViewById(id.tv_bind_account_alipay);
             if (view!= null) {
@@ -70,8 +72,24 @@ public final class BindAccountActivity_
                 );
             }
         }
-        ((ToastComponent_) toast).afterSetContentView_();
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        BindAccountActivity_.this.back();
+                    }
+
+                }
+                );
+            }
+        }
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

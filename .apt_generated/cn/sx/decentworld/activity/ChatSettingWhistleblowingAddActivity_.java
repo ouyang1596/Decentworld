@@ -32,26 +32,11 @@ public final class ChatSettingWhistleblowingAddActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        titleBar = TitleBar_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingWhistleblowingAddActivity_.this.setBackBtn();
-                    }
-
-                }
-                );
-            }
-        }
         {
             View view = findViewById(id.main_header_right_tv);
             if (view!= null) {
@@ -67,8 +52,23 @@ public final class ChatSettingWhistleblowingAddActivity_
                 );
             }
         }
-        ((TitleBar_) titleBar).afterSetContentView_();
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatSettingWhistleblowingAddActivity_.this.setBackBtn();
+                    }
+
+                }
+                );
+            }
+        }
         ((ToastComponent_) toast).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

@@ -33,8 +33,8 @@ public final class AboutUsActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
@@ -71,8 +71,8 @@ public final class AboutUsActivity_
                 );
             }
         }
-        ((ToastComponent_) toast).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

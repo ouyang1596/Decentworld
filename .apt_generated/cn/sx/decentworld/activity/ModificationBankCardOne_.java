@@ -40,9 +40,9 @@ public final class ModificationBankCardOne_
     }
 
     private void afterSetContentView_() {
+        etBankCard = ((EditText) findViewById(id.et_modification_bank_card_one_account));
         btn_modification_bank_card_one_next = ((Button) findViewById(id.btn_modification_bank_card_one_next));
         tvRealName = ((TextView) findViewById(id.et_modification_bank_card_one_name));
-        etBankCard = ((EditText) findViewById(id.et_modification_bank_card_one_account));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {

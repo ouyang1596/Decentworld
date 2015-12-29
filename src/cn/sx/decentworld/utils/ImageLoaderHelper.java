@@ -41,7 +41,7 @@ public class ImageLoaderHelper {
 					.build();
 			ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 					context).diskCache(
-					new UnlimitedDiskCache(new File(Constants.HomePath
+					new UnlimitedDiskCache(new File(Constants.HOME_PATH
 							+ "/imageLoader"))).build();
 			mImageLoader.init(config);
 

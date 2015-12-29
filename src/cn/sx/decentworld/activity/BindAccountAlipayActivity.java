@@ -5,6 +5,8 @@ package cn.sx.decentworld.activity;
 
 import java.util.HashMap;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -44,8 +46,8 @@ public class BindAccountAlipayActivity extends BaseFragmentActivity
 	ToastComponent toast;
 	@Bean
 	TitleBar titleBar;
-	@ViewById(R.id.tv_bind_account_alipay)
-	EditText tv_bind_account_alipay;
+	@ViewById(R.id.et_bind_account_alipay)
+	EditText et_bind_account_alipay;
 	
 	@ViewById(R.id.btn_bind_account_confirm)
 	Button btn_bind_account_confirm;
@@ -58,7 +60,7 @@ public class BindAccountAlipayActivity extends BaseFragmentActivity
 	{
 		accountType = getIntent().getIntExtra("accountType", 3);
 		accountName = getIntent().getStringExtra("accountName");
-		tv_bind_account_alipay.setText(accountName);
+		et_bind_account_alipay.setText(accountName);
 		titleBar.setTitleBar("返回", "修改绑定的支付宝");
 	}
 	
@@ -70,11 +72,13 @@ public class BindAccountAlipayActivity extends BaseFragmentActivity
 	@Click(R.id.btn_bind_account_confirm)
 	void confirm(View v)
 	{
-		String result = tv_bind_account_alipay.getText().toString().trim();
+		
+		String result = et_bind_account_alipay.getText().toString().trim();
 		if(CommUtil.isNotBlank(result))
 		{
+			int accountType = 0;
 			String dwID = DecentWorldApp.getInstance().getDwID();
-			setPaycardAccount(dwID,accountType,accountName);
+			setPaycardAccount(dwID,accountType,result);
 		}
 		else
 		{
@@ -108,14 +112,12 @@ public class BindAccountAlipayActivity extends BaseFragmentActivity
 				{
 					LogUtils.i(TAG, "setPaycardAccount...success");
 					ToastUtils.toast(BindAccountAlipayActivity.this, "设置成功");
-					//保存到数据库
-//					UserInfo info = UserInfoManager.getUserInfoInstance();
-//					
-//					//传递到开启界面
-//					Intent intent = new Intent();
-//					intent.putExtra(PrivacySettingActivity.PAYACCOUNT, account);
-//					setResult(activity.RESULT_OK, intent);
-//					finish();
+					//传递到开启界面
+					Intent intent = new Intent(BindAccountAlipayActivity.this,BindAccountActivity_.class);
+					intent.putExtra("accountType", accountType);
+					intent.putExtra("accountName", account);
+					BindAccountAlipayActivity.this.startActivity(intent);
+					finish();
 				}else if(msg.getResultCode() == 3333)
 				{
 					LogUtils.i(TAG, "setPaycardAccount...failure,case by:"+msg.getMsg());
@@ -131,6 +133,13 @@ public class BindAccountAlipayActivity extends BaseFragmentActivity
 			}
 		});
 	}
-
-
+	
+	/**
+	 * 返回
+	 */
+	@Click(R.id.main_header_left)
+	void back()
+	{
+		finish();
+	}
 }

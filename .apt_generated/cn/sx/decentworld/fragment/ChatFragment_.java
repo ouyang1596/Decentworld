@@ -39,14 +39,14 @@ public final class ChatFragment_
     private View contentView_;
 
     private void init_(Bundle savedInstanceState) {
-        meComponent = MeComponent_.getInstance_(getActivity());
-        toast = ToastComponent_.getInstance_(getActivity());
-        setFriendInfo = SetFriendInfo_.getInstance_(getActivity());
-        loginComponent = LoginComponent_.getInstance_(getActivity());
         setUserInfo = SetUserInfo_.getInstance_(getActivity());
+        loginComponent = LoginComponent_.getInstance_(getActivity());
+        toast = ToastComponent_.getInstance_(getActivity());
         choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(getActivity());
         getUserInfo = GetUserInfo_.getInstance_(getActivity());
         mainFragmentComponent = MainFragmentComponent_.getInstance_(getActivity());
+        meComponent = MeComponent_.getInstance_(getActivity());
+        setFriendInfo = SetFriendInfo_.getInstance_(getActivity());
     }
 
     @Override
@@ -56,51 +56,81 @@ public final class ChatFragment_
     }
 
     private void afterSetContentView_() {
-        fragment_chat_contact_sv = ((FloatScrollView) findViewById(cn.sx.decentworld.R.id.fragment_chat_contact_sv));
-        tv_chat_me_sign = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_sign));
-        fragment_chat_contact_header = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.fragment_chat_contact_header));
-        chat_scrollLayout = ((ScrollLayout) findViewById(cn.sx.decentworld.R.id.chat_scrollLayout));
-        menu_tab3_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab3_tv));
-        menu_tab1_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab1_iv));
-        tv_chat_me_edit = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_edit));
-        main_bottom_ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.main_bottom_ll));
-        interesting_group_ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.interesting_group_ll));
-        menu_tab4_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab4_tv));
-        tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
-        new_friends_ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.new_friends_ll));
-        group_chat_ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.group_chat_ll));
-        ll_chat_me_user_detail = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_chat_me_user_detail));
-        tv_chat_me_introduce = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_introduce));
-        menu_tab_2 = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_2));
-        unreadLabel = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab1_unread_msg_number));
+        mPager = ((HackyViewPager) findViewById(cn.sx.decentworld.R.id.vp_near_card_detail_pager));
+        fragment_contact_choice_ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.fragment_contact_choice_ll));
         rl_error_item = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_error_item));
-        fragment_chat_contact_lv = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.fragment_chat_contact_lv));
-        menu_tab_3 = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_3));
+        menu_tab2_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab2_iv));
+        menu_tab3_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab3_iv));
+        fragment_chat_chat_lv = ((ListView) findViewById(cn.sx.decentworld.R.id.fragment_chat_chat_lv));
         menu_tab2_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab2_tv));
         menu_tab_4 = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_4));
-        menu_tab4_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab4_iv));
-        fragment_contact_choice_ll_child = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.fragment_contact_choice_ll_child));
-        tv_chat_me_wealth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_wealth));
-        ll_contact_list_recommend = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact_list_recommend));
-        relTitle = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.chat_room_title_root));
-        iv_chat_me_avatar = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_chat_me_avatar));
-        ll_contact_list_invite = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact_list_invite));
-        btn_chat_me_send_msg = ((Button) findViewById(cn.sx.decentworld.R.id.btn_chat_me_send_msg));
-        ll_contact_list_guarantee = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact_list_guarantee));
-        fragment_chat_chat_lv = ((ListView) findViewById(cn.sx.decentworld.R.id.fragment_chat_chat_lv));
-        tv_chat_me_worth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_worth));
-        menu_tab2_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab2_iv));
-        fragment_contact_choice_ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.fragment_contact_choice_ll));
-        tv_chat_me_name = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_name));
         errorText = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_connect_errormsg));
-        ll_chat_me_chat_room = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_chat_me_chat_room));
-        new_friends_ll_unread_msg_number = ((TextView) findViewById(cn.sx.decentworld.R.id.new_friends_ll_unread_msg_number));
-        mPager = ((HackyViewPager) findViewById(cn.sx.decentworld.R.id.vp_near_card_detail_pager));
+        menu_tab_3 = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_3));
+        fragment_chat_contact_header = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.fragment_chat_contact_header));
         menu_tab1_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab1_tv));
-        menu_tab3_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab3_iv));
-        tv_chat_me_school = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_school));
+        fragment_chat_contact_sv = ((FloatScrollView) findViewById(cn.sx.decentworld.R.id.fragment_chat_contact_sv));
+        iv_chat_me_avatar = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_chat_me_avatar));
         menu_tab_1 = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_1));
+        ll_contact_list_guarantee = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact_list_guarantee));
+        menu_tab_2 = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_2));
+        btn_chat_me_send_msg = ((Button) findViewById(cn.sx.decentworld.R.id.btn_chat_me_send_msg));
+        tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
+        interesting_group_ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.interesting_group_ll));
+        ll_contact_list_invite = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact_list_invite));
+        tv_chat_me_worth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_worth));
+        ll_contact_list_recommend = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact_list_recommend));
+        tv_chat_me_school = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_school));
+        tv_chat_me_introduce = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_introduce));
+        tv_chat_me_edit = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_edit));
+        fragment_contact_choice_ll_child = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.fragment_contact_choice_ll_child));
+        new_friends_ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.new_friends_ll));
+        relTitle = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.chat_room_title_root));
+        chat_scrollLayout = ((ScrollLayout) findViewById(cn.sx.decentworld.R.id.chat_scrollLayout));
+        tv_chat_me_name = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_name));
+        group_chat_ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.group_chat_ll));
+        menu_tab4_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab4_iv));
+        tv_chat_me_wealth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_wealth));
+        main_bottom_ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.main_bottom_ll));
+        fragment_chat_contact_lv = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.fragment_chat_contact_lv));
         ivSearch = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_search));
+        menu_tab1_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab1_iv));
+        ll_chat_me_chat_room = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_chat_me_chat_room));
+        tv_chat_me_sign = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_sign));
+        new_friends_ll_unread_msg_number = ((TextView) findViewById(cn.sx.decentworld.R.id.new_friends_ll_unread_msg_number));
+        unreadLabel = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab1_unread_msg_number));
+        ll_chat_me_user_detail = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_chat_me_user_detail));
+        menu_tab4_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab4_tv));
+        menu_tab3_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab3_tv));
+        {
+            View view = findViewById(cn.sx.decentworld.R.id.group_chat_ll);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatFragment_.this.showGroupChat();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(cn.sx.decentworld.R.id.ll_chat_me_chat_room);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatFragment_.this.editRoomList();
+                    }
+
+                }
+                );
+            }
+        }
         {
             View view = findViewById(cn.sx.decentworld.R.id.btn_chat_me_send_msg);
             if (view!= null) {
@@ -132,66 +162,6 @@ public final class ChatFragment_
             }
         }
         {
-            View view = findViewById(cn.sx.decentworld.R.id.ll_chat_me_chat_room);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatFragment_.this.editRoomList();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(cn.sx.decentworld.R.id.fragment_chat_find_group_interested);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatFragment_.this.fragment_chat_find_group_interested();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(cn.sx.decentworld.R.id.fragment_chat_find_work_circle);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatFragment_.this.fragment_chat_find_work_circle();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(cn.sx.decentworld.R.id.group_chat_ll);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatFragment_.this.showGroupChat();
-                    }
-
-                }
-                );
-            }
-        }
-        {
             AdapterView<?> view = ((AdapterView<?> ) findViewById(cn.sx.decentworld.R.id.fragment_chat_chat_lv));
             if (view!= null) {
                 view.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -207,14 +177,14 @@ public final class ChatFragment_
                 );
             }
         }
-        ((MeComponent_) meComponent).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
-        ((SetFriendInfo_) setFriendInfo).afterSetContentView_();
-        ((LoginComponent_) loginComponent).afterSetContentView_();
         ((SetUserInfo_) setUserInfo).afterSetContentView_();
+        ((LoginComponent_) loginComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((MainFragmentComponent_) mainFragmentComponent).afterSetContentView_();
+        ((MeComponent_) meComponent).afterSetContentView_();
+        ((SetFriendInfo_) setFriendInfo).afterSetContentView_();
         init();
     }
 

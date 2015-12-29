@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_gray"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:gravity="center_horizontal"
     android:orientation="vertical" >
 
@@ -35,6 +37,7 @@
             android:hint="也许你是梵高，请原谅我们只能以世俗有据可查的标准来审核上传的（请注明，粉丝截图、获奖证明、我的视图等）"
             android:padding="5dp"
             android:textColor="@color/two_black"
+            android:textColorHint="@color/three_black"
             android:textSize="@dimen/new_textsize_13sp" />
     </LinearLayout>
 

@@ -25,8 +25,8 @@ public final class RegisterThreeItemDialogFragment_
     private View contentView_;
 
     private void init_(Bundle savedInstanceState) {
-        ChoceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(getActivity());
         toast = ToastComponent_.getInstance_(getActivity());
+        ChoceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(getActivity());
     }
 
     @Override
@@ -36,20 +36,20 @@ public final class RegisterThreeItemDialogFragment_
     }
 
     private void afterSetContentView_() {
-        tv_three_item_info = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_three_item_info));
-        bt_have_face = ((Button) findViewById(cn.sx.decentworld.R.id.bt_have_face));
-        rl_have_ability = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_have_ability));
-        rl_have_face = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_have_face));
-        iv_have_face = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_have_face));
-        root_activity_register_three_item_dialog = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.root_activity_register_three_item_dialog));
-        bt_have_ability = ((Button) findViewById(cn.sx.decentworld.R.id.bt_have_ability));
-        iv_have_ability = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_have_ability));
-        activity_register_three_item_dialog_next = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.activity_register_three_item_dialog_next));
-        iv_have_money = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_have_money));
-        rl_have_money = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_have_money));
-        imageaaa = ((ImageView) findViewById(cn.sx.decentworld.R.id.imageaaa));
         bt_have_money = ((Button) findViewById(cn.sx.decentworld.R.id.bt_have_money));
+        bt_have_face = ((Button) findViewById(cn.sx.decentworld.R.id.bt_have_face));
+        rl_have_face = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_have_face));
+        tv_three_item_info = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_three_item_info));
+        root_activity_register_three_item_dialog = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.root_activity_register_three_item_dialog));
         activity_register_three_item_dialog_back = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.activity_register_three_item_dialog_back));
+        iv_have_money = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_have_money));
+        iv_have_face = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_have_face));
+        imageaaa = ((ImageView) findViewById(cn.sx.decentworld.R.id.imageaaa));
+        rl_have_money = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_have_money));
+        rl_have_ability = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_have_ability));
+        iv_have_ability = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_have_ability));
+        bt_have_ability = ((Button) findViewById(cn.sx.decentworld.R.id.bt_have_ability));
+        activity_register_three_item_dialog_next = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.activity_register_three_item_dialog_next));
         {
             View view = findViewById(cn.sx.decentworld.R.id.activity_register_three_item_dialog_next);
             if (view!= null) {
@@ -65,8 +65,8 @@ public final class RegisterThreeItemDialogFragment_
                 );
             }
         }
-        ((ChoceAndTakePictureComponent_) ChoceAndTakePictureComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((ChoceAndTakePictureComponent_) ChoceAndTakePictureComponent).afterSetContentView_();
         init();
     }
 

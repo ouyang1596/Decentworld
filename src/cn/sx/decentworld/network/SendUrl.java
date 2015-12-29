@@ -273,6 +273,7 @@ public class SendUrl {
 		try {
 			if (null != images) {
 				requestparams.put("file", images);
+				
 			}
 		} catch (FileNotFoundException e1) {
 		}

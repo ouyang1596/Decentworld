@@ -59,6 +59,13 @@ public class RecommendBenefitList extends Model
 	 */
 	@Column(name = "isRegister")
 	boolean isRegister;
+	
+	/**
+	 * 还没有提现的金额
+	 */
+	@Column(name = "stored")
+	float stored;
+	
 
 	/**
 	 * 
@@ -185,4 +192,23 @@ public class RecommendBenefitList extends Model
 	{
 		this.isRegister = isRegister;
 	}
+
+	/**
+	 * @return the stored
+	 */
+	public float getStored()
+	{
+		return stored;
+	}
+
+	/**
+	 * @param stored the stored to set
+	 */
+	public void setStored(float stored)
+	{
+		this.stored = stored;
+	}
+	
+	
+	
 }

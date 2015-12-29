@@ -26,14 +26,14 @@
             android:layout_centerInParent="true"
             android:text="时间" />
 
-        <ImageView
-            android:id="@+id/iv_recommend_benefit_status"
+        <TextView
+            android:id="@+id/tv_recommend_benefit_status"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_marginRight="30dp"
-            android:layout_centerVertical="true"
-            android:src="@drawable/switch_circle_close" />
+            android:text="状态"
+            android:layout_centerVertical="true"/>
     </RelativeLayout>
     
     <View 

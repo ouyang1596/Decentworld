@@ -124,12 +124,11 @@ public class PacketReader {
 	public void startup() throws XMPPException {
 		connectionSemaphore = new Semaphore(1);
 
-		//add by Jackchen...begin
-		if(readerThread.isAlive())
-		{
+		// add by Jackchen...begin
+		if (readerThread.isAlive()) {
 			return;
 		}
-		//add by Jackchen...end
+		// add by Jackchen...end
 		readerThread.start();
 		// Wait for stream tag before returing. We'll wait a couple of seconds
 		// before
@@ -409,6 +408,8 @@ public class PacketReader {
 		if (packet == null) {
 			return;
 		}
+		String msg = packet.toXML();
+		LogUtils.i("bm", msg);
 		// Loop through all collectors and notify the appropriate ones.
 		for (PacketCollector collector : connection.getPacketCollectors()) {
 			collector.processPacket(packet);

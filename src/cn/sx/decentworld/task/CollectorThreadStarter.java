@@ -29,6 +29,7 @@ public class CollectorThreadStarter extends Thread {
 	public void run() {
 		while (true) {
 			Packet packet = collector.nextResult();
+			
 			try {
 				Class<? extends DWPacketHandler> executor = collector
 						.getExecutor();

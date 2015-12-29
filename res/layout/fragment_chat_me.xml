@@ -25,6 +25,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="393dp" >
 
+                <!-- 顶部的头像 的ViewPager -->
+
                 <cn.sx.decentworld.widget.HackyViewPager
                     android:id="@+id/vp_near_card_detail_pager"
                     android:layout_width="match_parent"
@@ -53,6 +55,7 @@
                             android:src="@drawable/default_avatar"
                             android:visibility="visible" />
                     </RelativeLayout>
+                    <!-- 设置页面 按钮 -->
 
                     <RelativeLayout
                         android:id="@+id/rl_chat_me_setting"
@@ -69,6 +72,8 @@
                             android:layout_centerInParent="true"
                             android:src="@drawable/me_setting" />
                     </RelativeLayout>
+
+                    <!-- 充值 -->
 
                     <RelativeLayout
                         android:id="@+id/rl_chat_me_recharge"
@@ -87,6 +92,7 @@
                     </RelativeLayout>
                 </RelativeLayout>
             </RelativeLayout>
+            <!-- 用户名 -->
 
             <TextView
                 android:id="@+id/tv_chat_me_name"
@@ -97,6 +103,8 @@
                 android:padding="5dp"
                 android:text="欧阳慕容"
                 android:textSize="18sp" />
+
+            <!-- 聊天室 -->
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -178,6 +186,8 @@
                 android:layout_marginTop="20dp"
                 android:gravity="center" >
 
+                <!-- 立即发信息信息的Fragment -->
+
                 <Button
                     android:id="@+id/btn_chat_me_send_msg"
                     android:layout_width="90dp"
@@ -191,12 +201,16 @@
                 android:layout_marginTop="16dp"
                 android:gravity="center" >
 
+                <!-- 我就读的学校 -->
+
                 <TextView
                     android:id="@+id/tv_chat_me_school"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="我就读的的的静静的 点击" />
             </LinearLayout>
+
+            <!-- 个性签名 -->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -213,6 +227,8 @@
                     android:maxLines="3"
                     android:text="另外除了系统在概念上具有领先地位之外，Chrome OS实际上还具有一个非常凶残的功能。它的出现让亿万生活在边缘和底层的小应用类网站看到了希望，这对于谷歌来说可以说是无限商机。" />
             </LinearLayout>
+
+            <!-- 我的的模块 -->
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -246,9 +262,11 @@
                     android:background="#000000" />
             </RelativeLayout>
 
+            <!-- 底部的信息展示模块  水平的模式的LinearLayout -->
+
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal" >
 
@@ -258,6 +276,8 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:clickable="true" >
+
+                    <!-- 左侧的编辑模块 -->
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -281,6 +301,7 @@
                             android:textSize="@dimen/new_textsize_16sp" />
                     </RelativeLayout>
                 </LinearLayout>
+                <!-- 右侧的作品圈模块 -->
 
                 <LinearLayout
                     android:id="@+id/ll_chat_me_work_circle"
@@ -297,6 +318,8 @@
                         android:textSize="@dimen/new_textsize_16sp" />
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- 下面是内容的容器 -->
 
             <LinearLayout
                 android:id="@+id/ll_chat_me_container"

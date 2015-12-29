@@ -41,10 +41,10 @@ public final class ShowToMeSchoolActivity_
 
     private void afterSetContentView_() {
         tvCancel = ((TextView) findViewById(id.tv_cancel));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         llShowToMeSchool = ((LinearLayout) findViewById(id.ll_show_to_me_school));
         aTvUniversity = ((AutoCompleteTextView) findViewById(id.act_university));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((ToastComponent_) toast).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         init();

@@ -416,7 +416,7 @@ public class RegisterStudentGreenPassActivity extends BaseFragmentActivity
 	 * */
 	private File handleFile(String filePath) {
 		Bitmap bitmap = ImageUtils.scalePic(filePath);
-		String picPath = Constants.HomePath + "/temp"
+		String picPath = Constants.HOME_PATH + "/temp"
 				+ ImageUtils.generateFileName() + ".png";
 		ImageUtils.saveBitmap(picPath, bitmap);
 		File file = new File(picPath);

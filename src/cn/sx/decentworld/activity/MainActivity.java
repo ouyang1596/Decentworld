@@ -564,7 +564,7 @@ public class MainActivity extends BaseFragmentActivity implements
 	public void receiveSingleAudio(final DWMessage dwMessage) {
 		String fileName = System.currentTimeMillis() + ".mp3";
 		LogUtils.i("bm", fileName);
-		httpUtils.download(dwMessage.getUri(), Constants.HomePath
+		httpUtils.download(dwMessage.getUri(), Constants.HOME_PATH
 				+ Constants.AUDIO_PATH + fileName, new RequestCallBack<File>() {
 
 			@Override
@@ -602,7 +602,7 @@ public class MainActivity extends BaseFragmentActivity implements
 	public void receiveChatRoomAudio(final DWMessage dwMessage) {
 		String fileName = System.currentTimeMillis() + ".mp3";
 		LogUtils.i("bm", fileName);
-		httpUtils.download(dwMessage.getUri(), Constants.HomePath
+		httpUtils.download(dwMessage.getUri(), Constants.HOME_PATH
 				+ Constants.AUDIO_PATH + fileName, new RequestCallBack<File>() {
 
 			@Override
@@ -624,7 +624,7 @@ public class MainActivity extends BaseFragmentActivity implements
 	public void onNetConnected() {
 		// 可以注释掉
 		LogUtils.d(TAG, "onNetConnected called");
-		toast.showLong("注意，网络已连接");
+//		toast.showLong("注意，网络已连接");
 
 		if (!XmppHelper.WasAuthenticated()) {
 			String dwID = DecentWorldApp.getInstance().getDwID();

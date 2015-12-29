@@ -33,16 +33,16 @@ public final class ExamineActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        registerComponent = RegisterComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        registerComponent = RegisterComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         ivNoPass = ((ImageView) findViewById(id.iv_no_pass));
-        vpExamine = ((HackyViewPager) findViewById(id.vp_examine));
         ivPass = ((ImageView) findViewById(id.iv_pass));
-        ((RegisterComponent_) registerComponent).afterSetContentView_();
+        vpExamine = ((HackyViewPager) findViewById(id.vp_examine));
         ((ToastComponent_) toast).afterSetContentView_();
+        ((RegisterComponent_) registerComponent).afterSetContentView_();
         init();
     }
 

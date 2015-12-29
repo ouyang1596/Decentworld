@@ -35,26 +35,26 @@ public final class NearCardDetail2Activity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         getStrangerInfo = GetStrangerInfo_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        btnOK = ((Button) findViewById(id.btn_OK));
-        lvAnonymousInfo = ((ListView) findViewById(id.lv_anonymous_info));
-        imgv2 = ((ImageView) findViewById(id.imgv2));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        ivSex = ((ImageView) findViewById(id.iv_sex));
         tvAge = ((TextView) findViewById(id.tv_age));
-        tvUserSign = ((TextView) findViewById(id.tv_user_detail_info_sign));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        tvAddr = ((TextView) findViewById(id.tv_addr));
-        ivShowIcon = ((ImageView) findViewById(id.iv_show_icon));
-        imgv1 = ((ImageView) findViewById(id.imgv1));
-        tvRealNameNickname = ((TextView) findViewById(id.tv_realname_nickname));
+        lvAnonymousInfo = ((ListView) findViewById(id.lv_anonymous_info));
         imgv3 = ((ImageView) findViewById(id.imgv3));
-        ((ToastComponent_) toast).afterSetContentView_();
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivShowIcon = ((ImageView) findViewById(id.iv_show_icon));
+        tvRealNameNickname = ((TextView) findViewById(id.tv_realname_nickname));
+        ivSex = ((ImageView) findViewById(id.iv_sex));
+        btnOK = ((Button) findViewById(id.btn_OK));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        tvUserSign = ((TextView) findViewById(id.tv_user_detail_info_sign));
+        imgv2 = ((ImageView) findViewById(id.imgv2));
+        imgv1 = ((ImageView) findViewById(id.imgv1));
+        tvAddr = ((TextView) findViewById(id.tv_addr));
         ((GetStrangerInfo_) getStrangerInfo).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

@@ -286,18 +286,18 @@ public class MsgNotifyManager
 	/**
 	 * 新的收益，由被推荐人员返回
 	 */
-	public void newBenefit()
+	public void newBenefit(String msg)
 	{		// 消息通知栏
 		// 定义NotificationManager
 		NotificationManager notificationManager = (NotificationManager) context.getSystemService(service_type);
 		// 定义通知栏展现的内容信息
 		int icon = R.drawable.ic_launcher;
-		CharSequence tickerText ="你有新的收益";
+		CharSequence tickerText ="你有新的收益"+msg;
 		long when = System.currentTimeMillis();
 		Notification notification = new Notification(icon , tickerText , when);
 		// 定义下拉通知栏时要展现的内容信息
-		CharSequence title = "信息收益";
-		CharSequence content = "点击查看新的收益";
+		CharSequence title = "新的收益";
+		CharSequence content = msg;
 		Intent notificationIntent = new Intent(context , RecommendBenefitActivity_.class);
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
 		notification.setLatestEventInfo(context, title, content, contentIntent);// 只有一条消息，相同的ID会覆盖

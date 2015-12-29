@@ -15,6 +15,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -75,6 +76,18 @@ public class RegisterMoneyActivity extends BaseFragmentActivity implements
 		initData();
 		fragmentManager = getSupportFragmentManager();
 		setBtnState();
+		etvMaterialKind.setOnFocusChangeListener(new OnFocusChangeListener() {
+
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					etvMaterialKind.setHint("");
+				} else {
+					etvMaterialKind
+							.setHint("你有我们能查得到的什么证明？房产证？行驶证？白金卡？还是其他？（请注明，房产证、行驶证、白金卡等）");
+				}
+			}
+		});
 		etvMaterialKind.addTextChangedListener(new TextWatcher() {
 
 			@Override
@@ -289,7 +302,7 @@ public class RegisterMoneyActivity extends BaseFragmentActivity implements
 	 * */
 	private File handleFile(String filePath) {
 		Bitmap bitmap = ImageUtils.scalePic(filePath);
-		String picPath = Constants.HomePath + "/temp"
+		String picPath = Constants.HOME_PATH + "/temp"
 				+ ImageUtils.generateFileName() + ".png";
 		ImageUtils.saveBitmap(picPath, bitmap);
 		File file = new File(picPath);

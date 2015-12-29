@@ -35,14 +35,14 @@ public final class ModificationBankCardTwo_
     }
 
     private void init_(Bundle savedInstanceState) {
-        privacyettingInfo = PrivacySettingInfo_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
+        privacyettingInfo = PrivacySettingInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        btn_modification_bank_card_two_next = ((Button) findViewById(id.btn_modification_bank_card_two_next));
         tvBankCard = ((TextView) findViewById(id.tv_modification_bank_card_two_number));
+        btn_modification_bank_card_two_next = ((Button) findViewById(id.btn_modification_bank_card_two_next));
         tvRealName = ((TextView) findViewById(id.tv_modification_bank_card_two_type));
         {
             View view = findViewById(id.main_header_left);
@@ -59,9 +59,9 @@ public final class ModificationBankCardTwo_
                 );
             }
         }
-        ((PrivacySettingInfo_) privacyettingInfo).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
+        ((PrivacySettingInfo_) privacyettingInfo).afterSetContentView_();
         init();
     }
 

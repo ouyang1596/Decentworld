@@ -36,21 +36,21 @@ public final class TopicContentActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        btnOK = ((Button) findViewById(id.btn_OK));
-        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
-        ivCover = ((ImageView) findViewById(id.iv_cover));
-        etSubjectName = ((EditText) findViewById(id.tv_subj_name));
-        tvIntroduce = ((TextView) findViewById(id.tv_introduce));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         ivHead = ((ImageView) findViewById(id.iv_head));
-        ((ToastComponent_) toast).afterSetContentView_();
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        tvIntroduce = ((TextView) findViewById(id.tv_introduce));
+        ivCover = ((ImageView) findViewById(id.iv_cover));
+        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
+        btnOK = ((Button) findViewById(id.btn_OK));
+        etSubjectName = ((EditText) findViewById(id.tv_subj_name));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

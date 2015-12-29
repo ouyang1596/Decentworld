@@ -32,8 +32,8 @@ public final class WorkActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        findComponent = FindComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        findComponent = FindComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
@@ -67,8 +67,8 @@ public final class WorkActivity_
                 );
             }
         }
-        ((FindComponent_) findComponent).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((FindComponent_) findComponent).afterSetContentView_();
         init();
     }
 

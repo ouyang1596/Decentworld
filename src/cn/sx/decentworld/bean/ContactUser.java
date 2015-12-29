@@ -245,6 +245,10 @@ public class ContactUser extends Model
 		String dwID = DecentWorldApp.getInstance().getDwID();
 		String sql = "userID=? and dwID = ?";
 		ContactUser contactUser = new Select().from(ContactUser.class).where(sql, dwID,friendID).executeSingle();
+		if(CommUtil.isBlank(contactUser))
+		{
+			return "";
+		}
 		if (CommUtil.isNotBlank(contactUser.getRemark()))
 		{
 			return contactUser.getRemark();

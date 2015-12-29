@@ -117,7 +117,7 @@ public class StrangerFragment extends BaseFragment implements OnClickListener {
 	@ViewById(R.id.fragment_stranger_near_lv)
 	public SwipeFlingAdapterView flingContainer;
 	private CardAdapter cardAdapter;
-	private List<NearbyStrangerInfo> flipDataList = new ArrayList<NearbyStrangerInfo>();
+	private ArrayList<NearbyStrangerInfo> flipDataList = new ArrayList<NearbyStrangerInfo>();
 	private String dwID;
 	private int page = 0;
 	private int count = 8;
@@ -676,11 +676,9 @@ public class StrangerFragment extends BaseFragment implements OnClickListener {
 				String data = msg.obj.toString();
 				try {
 					org.json.JSONArray array = new org.json.JSONArray(data);
-					LogUtils.e("bm", "nearStranger==" + data);
+					LogUtils.i("bm", "nearStranger==" + data);
 					ArrayList<NearbyStrangerInfo> strangerData = (ArrayList<NearbyStrangerInfo>) JsonUtils
 							.json2BeanArray(data, NearbyStrangerInfo.class);
-					LogUtils.e("bm",
-							"NearbyStrangerInfo==" + strangerData.toString());
 					flipDataList.addAll(strangerData);
 					DWUtils.sortList(flipDataList);
 					notifyDataSetChange();

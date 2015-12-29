@@ -106,8 +106,8 @@ public class RegisterComponent {
 	/**
 	 * 验证码验证
 	 */
-	public void identifyCode(HashMap<String,String> map, final Handler handler) {
-		
+	public void identifyCode(HashMap<String, String> map, final Handler handler) {
+
 		showProgressDialog();
 		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
 				+ "/validate/phoneCode", Method.GET, new HttpCallBack() {
@@ -453,36 +453,31 @@ public class RegisterComponent {
 	 * @param nick
 	 * @param handler
 	 */
-	public void submitNickName(String nick, final Handler handler) {
-		HashMap<String, String> hashmap = new HashMap<String, String>();
-		hashmap.put("nickName", nick);
-		hashmap.put("phoneNum", tel);
+	public void submitNickName(HashMap<String, String> hashmap, File[] images,
+			String api, final Handler handler) {
 		showProgressDialog();
-		sendUrl.httpRequestWithParams(hashmap, Constants.CONTEXTPATH
-				+ "/validate/nikeName", Method.POST, new HttpCallBack() {
+		sendUrl.httpRequestWithImage(hashmap, images, Constants.CONTEXTPATH
+				+ api, new HttpCallBack() {
+
 			@Override
-			public void onSuccess(String response, final ResultBean msg) {
+			public void onSuccess(String response, ResultBean msg) {
 				hideProgressDialog();
 				if (msg.getResultCode() == 2007) {
 					Message mssg = new Message();
 					mssg.what = Constants.SUCC;
 					handler.sendMessage(mssg);
-					Log.v("RegisterComponent", "设置昵称成功，ResultCode = 2007");
 				} else {
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							toastComponent.show(msg.getMsg());
-						}
-					});
+					showToast(msg.getData().toString());
 				}
 			}
 
 			@Override
 			public void onFailure(String e) {
 				hideProgressDialog();
+				LogUtils.i(TAG, "onFailure:" + e);
 				showToast(Constants.NET_WRONG);
 			}
+
 		});
 	}
 

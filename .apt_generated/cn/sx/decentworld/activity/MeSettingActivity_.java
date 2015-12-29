@@ -34,22 +34,52 @@ public final class MeSettingActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        toast = ToastComponent_.getInstance_(this);
         mainComponent = MainFragmentComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         ll_me_setting_root = ((LinearLayout) findViewById(id.ll_me_setting_root));
         {
-            View view = findViewById(id.ll_me_setting_exit);
+            View view = findViewById(id.main_header_left);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        MeSettingActivity_.this.exit();
+                        MeSettingActivity_.this.setBackBtn();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.ll_me_setting_about_us);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        MeSettingActivity_.this.aboutUs();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.ll_me_setting_recommend_benefit);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        MeSettingActivity_.this.cashIncome();
                     }
 
                 }
@@ -72,14 +102,14 @@ public final class MeSettingActivity_
             }
         }
         {
-            View view = findViewById(id.ll_me_setting_about_us);
+            View view = findViewById(id.ll_me_setting_exit);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        MeSettingActivity_.this.aboutUs();
+                        MeSettingActivity_.this.exit();
                     }
 
                 }
@@ -116,39 +146,9 @@ public final class MeSettingActivity_
                 );
             }
         }
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        MeSettingActivity_.this.setBackBtn();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.ll_me_setting_recommend_benefit);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        MeSettingActivity_.this.cashIncome();
-                    }
-
-                }
-                );
-            }
-        }
+        ((ToastComponent_) toast).afterSetContentView_();
         ((MainFragmentComponent_) mainComponent).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

@@ -227,7 +227,7 @@ public class ImageUtils {
 		LogUtils.i(TAG, "图片信息为：" + image);
 		byte[] bytes = Base64.decode(image, Base64.DEFAULT);
 		// 父路径名
-		String origal_file_path = Constants.HomePath;
+		String origal_file_path = Constants.HOME_PATH;
 		File origal_file = new File(origal_file_path);
 		if (!origal_file.exists()) {
 			origal_file.mkdirs();
@@ -540,11 +540,11 @@ public class ImageUtils {
 	 */
 	public static void saveBitmap(Resources resources) {
 		Bitmap bitmap = BitmapFactory.decodeResource(resources,R.drawable.ic_launcher);
-		File file = new File(Constants.HomePath + "/share/");
+		File file = new File(Constants.HOME_PATH + "/share/");
 		if (!file.exists()) {
 			file.mkdirs();
 		}
-		saveBitmap(Constants.HomePath + "/share/" + "share.png",
+		saveBitmap(Constants.HOME_PATH + "/share/" + "share.png",
 				bitmap);
 	}
 

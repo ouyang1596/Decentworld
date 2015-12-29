@@ -19,6 +19,15 @@ import com.activeandroid.annotation.Table;
 public class RecommendBenefitDetail extends Model
 {
 	/**
+	 * 账单的状态
+	 */
+	public static final int STATUS_TYPE_SUCCESS = 0;//成功
+	public static final int STATUS_TYPE_FAILURE = 1;//失败
+	public static final int STATUS_TYPE_PROCESSING = 2;//处理中
+	public static final int STATUS_TYPE_TEMPORARY_STORED = 3;//转账金额不足，暂时存储到服务器
+	public static final int STATUS_TYPE_STORED= 4;//用户同意暂存服务器
+	
+	/**
 	 * 用户ID
 	 */
 	@Column(name = "userID")
@@ -37,10 +46,16 @@ public class RecommendBenefitDetail extends Model
 	String time;
 	
 	/**
-	 * 状态(是否转账)
+	 * 状态(是否转账)[已经废弃的字段]
 	 */
 	@Column(name = "status")
 	boolean status;
+	
+	/**
+	 * 状态类型
+	 */
+	@Column(name = "statusType")
+	int statusType;
 
 	/**
 	 * 
@@ -51,6 +66,7 @@ public class RecommendBenefitDetail extends Model
 		this.amount = 0;
 		this.time = "";
 		this.status = false;
+		this.statusType = -1;
 	}
 
 	/**
@@ -116,6 +132,22 @@ public class RecommendBenefitDetail extends Model
 	{
 		this.status = status;
 	}
-	
+
+	/**
+	 * @return the statusType
+	 */
+	public int getStatusType()
+	{
+		return statusType;
+	}
+
+	/**
+	 * @param statusType the statusType to set
+	 */
+	public void setStatusType(int statusType)
+	{
+		this.statusType = statusType;
+	}
+
 
 }

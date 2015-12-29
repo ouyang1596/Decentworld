@@ -132,9 +132,11 @@ public class NewsFragment extends BaseFragment {
 					int position, long arg3) {
 				UserInfo info = UserInfoManager.getUserInfoInstance();
 				position = position - 1;
+				
 				if (position == -1) {
 					return;
 				}
+				
 				Intent intent = new Intent(getActivity(),
 						TopicContentActivity_.class);
 				ChatRoomInfo item = adapter.getItem(position);

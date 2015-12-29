@@ -21,9 +21,8 @@ import com.googlecode.androidannotations.annotations.EActivity;
 public class PictureClipActivity extends BaseFragmentActivity {
 	private static final int OPEN_GALLERY = 0;
 	private int aspectX, aspectY, outputX, outputY;
-	private static final String IMAGE_FILE_LOCATION = Environment
-			.getExternalStorageDirectory() + "/temp.jpg";
-	private Uri imageUri = Uri.fromFile(new File(IMAGE_FILE_LOCATION));
+	private Uri imageUri = Uri
+			.fromFile(new File(Constants.IMAGE_FILE_LOCATION));
 	public static final int CLIP_IMAGE = 3;
 
 	@AfterViews
@@ -85,11 +84,11 @@ public class PictureClipActivity extends BaseFragmentActivity {
 			Bitmap photo = data.getParcelableExtra("data");
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			if (null == photo) {
-				photo = BitmapFactory.decodeFile(IMAGE_FILE_LOCATION);
+				photo = BitmapFactory.decodeFile(Constants.IMAGE_FILE_LOCATION);
 			}
 			String fileName = ImageUtils.generateFileName();
-			String filePath = Constants.HomePath + "/clipImage" + fileName
-					+ ".png";
+			String filePath = Constants.HOME_PATH + Constants.CLIP_IMAGE
+					+ fileName + ".png";
 			ImageUtils.saveBitmap(filePath, photo);
 			photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);
 			byte[] datas = baos.toByteArray();

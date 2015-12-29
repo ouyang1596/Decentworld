@@ -43,13 +43,28 @@ public final class MagnateWindowActivity_
     }
 
     private void afterSetContentView_() {
-        tv_magnate_to_other_total_revenue = ((TextView) findViewById(id.tv_magnate_to_other_total_revenue));
+        btn_magnate_window_to_me_add = ((Button) findViewById(id.btn_magnate_window_to_me_add));
         tv_magnate_to_me_name = ((TextView) findViewById(id.tv_magnate_to_me_name));
+        tv_magnate_to_other_total_revenue = ((TextView) findViewById(id.tv_magnate_to_other_total_revenue));
+        btn_magnate_window_to_me_delete = ((Button) findViewById(id.btn_magnate_window_to_me_delete));
         lv_magnate_to_other_names = ((ListView) findViewById(id.lv_magnate_to_other_names));
         iv_magnate_to_me_avatar = ((CircularImage) findViewById(id.iv_magnate_to_me_avatar));
-        btn_magnate_window_to_me_delete = ((Button) findViewById(id.btn_magnate_window_to_me_delete));
-        btn_magnate_window_to_me_add = ((Button) findViewById(id.btn_magnate_window_to_me_add));
         btn_magnate_window_to_me_modify = ((Button) findViewById(id.btn_magnate_window_to_me_modify));
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        MagnateWindowActivity_.this.back();
+                    }
+
+                }
+                );
+            }
+        }
         {
             View view = findViewById(id.btn_magnate_window_to_me_delete);
             if (view!= null) {
@@ -59,21 +74,6 @@ public final class MagnateWindowActivity_
                     @Override
                     public void onClick(View view) {
                         MagnateWindowActivity_.this.deleteMagnate();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.btn_magnate_window_to_me_add);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        MagnateWindowActivity_.this.addMagnate();
                     }
 
                 }
@@ -96,14 +96,14 @@ public final class MagnateWindowActivity_
             }
         }
         {
-            View view = findViewById(id.main_header_left);
+            View view = findViewById(id.btn_magnate_window_to_me_add);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        MagnateWindowActivity_.this.back();
+                        MagnateWindowActivity_.this.addMagnate();
                     }
 
                 }

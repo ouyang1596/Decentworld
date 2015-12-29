@@ -197,13 +197,13 @@ public class DWMMessageManager {
 	private int downloadAudio(String uri, String fileName) {
 		// InputStream inputStream = null;
 		int result = Constants.SUCC;
-		if (!FileUtils.isFileExist(Constants.HomePath)) {
-			FileUtils.createSDDir(Constants.HomePath);
+		if (!FileUtils.isFileExist(Constants.HOME_PATH)) {
+			FileUtils.createSDDir(Constants.HOME_PATH);
 		}
-		if (!FileUtils.isFileExist(Constants.HomePath
-				+ Constants.AudioReceivePath)) {
-			FileUtils.createSDDir(Constants.HomePath
-					+ Constants.AudioReceivePath);
+		if (!FileUtils.isFileExist(Constants.HOME_PATH
+				+ Constants.AUDIO_RECEIVE_PATH)) {
+			FileUtils.createSDDir(Constants.HOME_PATH
+					+ Constants.AUDIO_RECEIVE_PATH);
 		}
 		result = HttpDownloader.downFile(uri, fileName);
 		return result;

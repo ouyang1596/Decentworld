@@ -47,7 +47,7 @@ public class RecorderButton extends Button implements AudioParedListener {
 		mDialog = new RecorderDialog(context);
 
 		// String SD_Path=Constants.RecorderAudiosPath;
-		String SD_Path = Constants.HomePath + Constants.AUDIO_PATH;
+		String SD_Path = Constants.HOME_PATH + Constants.AUDIO_PATH;
 
 		mTheMediaRecorder = TheMediaRecorder.getInstance(SD_Path);
 

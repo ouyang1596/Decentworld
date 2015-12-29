@@ -36,30 +36,18 @@ public final class RecommendBenefitActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        titleBar = TitleBar_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
         getUserInfo = GetUserInfo_.getInstance_(this);
-        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        tv_recommend_benefit_not_takeout = ((TextView) findViewById(id.tv_recommend_benefit_not_takeout));
+        tv_recommend_benefit_all = ((TextView) findViewById(id.tv_recommend_benefit_all));
+        tv_recommend_benefit_reminder = ((TextView) findViewById(id.tv_recommend_benefit_reminder));
         lv_recommend_benefit_detail = ((ListView) findViewById(id.lv_recommend_benefit_detail));
         ll_cash_income_root = ((LinearLayout) findViewById(id.ll_cash_income_root));
-        tv_recommend_all_benefit = ((TextView) findViewById(id.tv_recommend_all_benefit));
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        RecommendBenefitActivity_.this.setBackBtn();
-                    }
-
-                }
-                );
-            }
-        }
+        tv_recommend_benefit_has_back = ((TextView) findViewById(id.tv_recommend_benefit_has_back));
         {
             View view = findViewById(id.ll_cash_income_draw_cash);
             if (view!= null) {
@@ -75,9 +63,24 @@ public final class RecommendBenefitActivity_
                 );
             }
         }
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        RecommendBenefitActivity_.this.setBackBtn();
+                    }
+
+                }
+                );
+            }
+        }
+        ((TitleBar_) titleBar).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

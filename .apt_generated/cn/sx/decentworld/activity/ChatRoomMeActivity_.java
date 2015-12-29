@@ -35,19 +35,19 @@ public final class ChatRoomMeActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        lvChatRooms = ((ListView) findViewById(id.lv_chatrooms));
-        tvEditSelfInfo = ((TextView) findViewById(id.tv_edit_self_info));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        tvCreateChatRoom = ((TextView) findViewById(id.tv_create_chatroom));
         ivHead = ((CircularImageView) findViewById(id.iv_head));
+        lvChatRooms = ((ListView) findViewById(id.lv_chatrooms));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        tvEditSelfInfo = ((TextView) findViewById(id.tv_edit_self_info));
+        tvCreateChatRoom = ((TextView) findViewById(id.tv_create_chatroom));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         init();
     }
 

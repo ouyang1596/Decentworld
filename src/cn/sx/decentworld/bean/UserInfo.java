@@ -281,7 +281,7 @@ public class UserInfo extends Model
 	@Column(name = "acceptBeautyPush")
 	private Boolean acceptBeautyPush;
 	
-	//是否同意自动转账
+	//是否同意自动转账 true同意  false不同意
 	@Column(name = "autoTransfer")
 	private Boolean autoTransfer;
 	

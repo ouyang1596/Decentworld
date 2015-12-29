@@ -5,6 +5,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <!-- 顶部的title -->
+
     <include layout="@layout/top_title" />
 
     <ScrollView
@@ -14,37 +16,36 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical" >
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="250dp"
+                android:layout_height="wrap_content"
                 android:clickable="false"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="10dp"
-                android:weightSum="1" >
+                android:padding="10dp" >
 
                 <ImageView
                     android:id="@+id/iv_edit_user_info_icon_1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.6"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_centerVertical="true"
                     android:src="@drawable/edit_user_detail_info_icon1" />
 
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_weight="0.4"
+                    android:layout_marginLeft="20dp"
+                    android:layout_toRightOf="@id/iv_edit_user_info_icon_1"
                     android:orientation="vertical"
                     android:weightSum="1" >
 
                     <ImageView
                         android:id="@+id/iv_edit_user_info_icon_2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="0dp"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
                         android:layout_marginBottom="2dp"
                         android:layout_weight="0.45"
                         android:scaleType="fitXY"
@@ -52,14 +53,14 @@
 
                     <ImageView
                         android:id="@+id/iv_edit_user_info_icon_3"
-                        android:layout_width="wrap_content"
-                        android:layout_height="0dp"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
                         android:layout_marginTop="2dp"
                         android:layout_weight="0.45"
                         android:scaleType="fitXY"
                         android:src="@drawable/edit_user_detail_info_icon1" />
                 </LinearLayout>
-            </LinearLayout>
+            </RelativeLayout>
 
             <cn.sx.decentworld.widget.ListViewForScrollView
                 android:id="@+id/lv_edit_user_info"

@@ -38,10 +38,10 @@ public final class EditSignActivity_
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_back));
         btn_edit_sign_complete = ((Button) findViewById(id.btn_edit_sign_complete));
-        et_edit_sign = ((EditText) findViewById(id.et_edit_sign));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        et_edit_sign = ((EditText) findViewById(id.et_edit_sign));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

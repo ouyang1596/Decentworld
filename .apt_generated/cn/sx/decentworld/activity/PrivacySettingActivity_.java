@@ -34,17 +34,17 @@ public final class PrivacySettingActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        titleBar = TitleBar_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvMobile = ((TextView) findViewById(id.tv_phone_number));
         tvBankCard = ((TextView) findViewById(id.privacy_setting_bank_card));
+        tvMobile = ((TextView) findViewById(id.tv_phone_number));
+        ll_privacy_setting_root = ((LinearLayout) findViewById(id.ll_privacy_setting_root));
+        privacy_setting_phone_number = ((TextView) findViewById(id.tv_phone_number));
         privacy_setting_password = ((TextView) findViewById(id.privacy_setting_password));
         ll_root = ((LinearLayout) findViewById(id.ll_root));
-        privacy_setting_phone_number = ((TextView) findViewById(id.tv_phone_number));
-        ll_privacy_setting_root = ((LinearLayout) findViewById(id.ll_privacy_setting_root));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -105,8 +105,8 @@ public final class PrivacySettingActivity_
                 );
             }
         }
-        ((TitleBar_) titleBar).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

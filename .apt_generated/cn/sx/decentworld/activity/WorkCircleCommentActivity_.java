@@ -41,8 +41,8 @@ public final class WorkCircleCommentActivity_
 
     private void afterSetContentView_() {
         et_work_circle_comment_edit = ((PasteEditText) findViewById(id.et_work_circle_comment_edit));
-        lv_work_circle_comment = ((ListView) findViewById(id.lv_work_circle_comment));
         btn_work_circle_comment_send = ((Button) findViewById(id.btn_work_circle_comment_send));
+        lv_work_circle_comment = ((ListView) findViewById(id.lv_work_circle_comment));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {

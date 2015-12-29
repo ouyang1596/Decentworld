@@ -41,11 +41,11 @@ public final class ModificationPhoneNumTwo_
     }
 
     private void afterSetContentView_() {
+        et_modification_bank_card_two_code = ((EditText) findViewById(id.et_modification_phone_num_two_code));
+        cb_modification_phone_num_two_agree = ((CheckBox) findViewById(id.cb_modification_phone_num_two_agree));
         btn_modification_phone_num_two_commit = ((Button) findViewById(id.btn_modification_phone_num_two_commit));
         et_modification_phone_num_two_num = ((EditText) findViewById(id.et_modification_phone_num_two_num));
-        et_modification_bank_card_two_code = ((EditText) findViewById(id.et_modification_phone_num_two_code));
         tv_modification_phone_num_two_number = ((TextView) findViewById(id.tv_modification_phone_num_two_number));
-        cb_modification_phone_num_two_agree = ((CheckBox) findViewById(id.cb_modification_phone_num_two_agree));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {

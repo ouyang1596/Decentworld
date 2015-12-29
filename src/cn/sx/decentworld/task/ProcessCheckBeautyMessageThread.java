@@ -6,14 +6,11 @@ package cn.sx.decentworld.task;
 import org.jivesoftware.smack.packet.Message;
 import org.simple.eventbus.EventBus;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.widget.Toast;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.activity.ExamineActivity_;
 import cn.sx.decentworld.bean.AppearanceBean;
@@ -31,23 +28,25 @@ import cn.sx.decentworld.utils.LogUtils;
 public class ProcessCheckBeautyMessageThread extends DWPacketHandler {
 	public static final String TAG = "ProcessCheckBeautyMessageThread";
 
-	public ProcessCheckBeautyMessageThread(Message msg,Context context) {
+	public ProcessCheckBeautyMessageThread(Message msg, Context context) {
 		super(msg, context);
 	}
-	
+
 	public ProcessCheckBeautyMessageThread() {
+
 	}
+
 	@Override
 	public void run() {
-		Message message=(Message)packet;
+		Message message = (Message) packet;
 		LogUtils.i("bm", "body--" + message.getBody());
 		if (message.getSubject().equals("broadcast_beauty")) {
 			AppearanceBean bean = JsonUtils.json2Bean(message.getBody(),
 					AppearanceBean.class);
 			LogUtils.i("bm", "data--" + bean.toString());
-			String data = "{amount:" + bean.amount + "," + "sex:" + bean.sex
-					+ "," + "dwID:" + bean.dwID + "," + "name:" + bean.name
-					+ "}";
+			String data = "{amount:\"" + bean.amount + "\"," + "sex:\""
+					+ bean.sex + "\"," + "dwID:\"" + bean.dwID + "\","
+					+ "name:\"" + bean.name + "\"}";
 			// notifyMe(bean.amount, bean.sex, bean.dwID, bean.name);
 			EventBus.getDefault()
 					.post(data, NotifyByEventBus.NT_CHECK_BEAUTIFY);

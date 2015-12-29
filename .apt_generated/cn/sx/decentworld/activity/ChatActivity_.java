@@ -45,38 +45,38 @@ public final class ChatActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        dwsMessageManager = DWSMessageManager_.getInstance_(this);
+        KeyboardComponent = KeyboardComponent_.getInstance_(this);
+        chatComponent = ChatComponent_.getInstance_(this);
+        choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
         getUserInfo = GetUserInfo_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
-        KeyboardComponent = KeyboardComponent_.getInstance_(this);
-        choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
-        chatComponent = ChatComponent_.getInstance_(this);
-        dwsMessageManager = DWSMessageManager_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        main_header_title = ((TextView) findViewById(id.tv_header_title));
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
-        micImage = ((ImageView) findViewById(id.mic_image));
-        mEditTextContent = ((PasteEditText) findViewById(id.et_sendmessage));
-        main_header_right_tv = ((TextView) findViewById(id.main_header_right_tv));
-        iv_emoticons_normal = ((ImageView) findViewById(id.iv_emoticons_normal));
-        more = ((LinearLayout) findViewById(id.more));
         buttonSetModeKeyboard = ((Button) findViewById(id.btn_set_mode_keyboard));
-        activity_chat_bg = ((ImageView) findViewById(id.activity_chat_bg));
-        edittext_layout = ((RelativeLayout) findViewById(id.edittext_layout));
-        main_header_right_btn = ((ImageView) findViewById(id.main_header_right_btn));
-        btnContainer = ((LinearLayout) findViewById(id.ll_btn_container));
-        listView = ((PullToRefreshListView) findViewById(id.list));
-        buttonPressToSpeak = ((RecorderButton) findViewById(id.btn_press_to_speak));
-        buttonSend = ((Button) findViewById(id.btn_send));
-        btn_location_ll = ((LinearLayout) findViewById(id.btn_location_ll));
-        iv_emoticons_checked = ((ImageView) findViewById(id.iv_emoticons_checked));
-        emojiIconContainer = ((LinearLayout) findViewById(id.ll_face_container));
-        recordingContainer = ((View) findViewById(id.recording_container));
-        btnMore = ((Button) findViewById(id.btn_more));
-        expressionViewpager = ((ViewPager) findViewById(id.vPager));
         btn_set_mode_voice = ((Button) findViewById(id.btn_set_mode_voice));
+        btnContainer = ((LinearLayout) findViewById(id.ll_btn_container));
+        more = ((LinearLayout) findViewById(id.more));
+        expressionViewpager = ((ViewPager) findViewById(id.vPager));
+        btn_location_ll = ((LinearLayout) findViewById(id.btn_location_ll));
+        recordingContainer = ((View) findViewById(id.recording_container));
+        buttonPressToSpeak = ((RecorderButton) findViewById(id.btn_press_to_speak));
         recordingHint = ((TextView) findViewById(id.recording_hint));
+        main_header_right_tv = ((TextView) findViewById(id.main_header_right_tv));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
+        iv_emoticons_normal = ((ImageView) findViewById(id.iv_emoticons_normal));
+        activity_chat_bg = ((ImageView) findViewById(id.activity_chat_bg));
+        micImage = ((ImageView) findViewById(id.mic_image));
+        edittext_layout = ((RelativeLayout) findViewById(id.edittext_layout));
+        listView = ((PullToRefreshListView) findViewById(id.list));
+        buttonSend = ((Button) findViewById(id.btn_send));
+        btnMore = ((Button) findViewById(id.btn_more));
+        iv_emoticons_checked = ((ImageView) findViewById(id.iv_emoticons_checked));
+        mEditTextContent = ((PasteEditText) findViewById(id.et_sendmessage));
+        main_header_title = ((TextView) findViewById(id.tv_header_title));
+        emojiIconContainer = ((LinearLayout) findViewById(id.ll_face_container));
+        main_header_right_btn = ((ImageView) findViewById(id.main_header_right_btn));
         {
             View view = findViewById(id.main_header_right);
             if (view!= null) {
@@ -122,12 +122,12 @@ public final class ChatActivity_
                 );
             }
         }
+        ((DWSMessageManager_) dwsMessageManager).afterSetContentView_();
+        ((KeyboardComponent_) KeyboardComponent).afterSetContentView_();
+        ((ChatComponent_) chatComponent).afterSetContentView_();
+        ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
-        ((KeyboardComponent_) KeyboardComponent).afterSetContentView_();
-        ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
-        ((ChatComponent_) chatComponent).afterSetContentView_();
-        ((DWSMessageManager_) dwsMessageManager).afterSetContentView_();
         init();
     }
 

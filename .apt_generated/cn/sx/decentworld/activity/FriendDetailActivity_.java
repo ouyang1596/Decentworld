@@ -39,20 +39,20 @@ public final class FriendDetailActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        friendDetailComponent = FriendDetailComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        friendDetailComponent = FriendDetailComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ll_friend_info_detail = ((LinearLayout) findViewById(id.ll_friend_info_detail));
-        rl_friend_info_setting = ((RelativeLayout) findViewById(id.rl_friend_info_setting));
-        ll_friend_info_work_circle = ((LinearLayout) findViewById(id.ll_friend_info_work_circle));
-        iv_friend_info_tab = ((ImageView) findViewById(id.iv_friend_info_tab));
-        rl_friend_info_root = ((RelativeLayout) findViewById(id.rl_friend_info_root));
-        vp_friend_info_pager = ((HackyViewPager) findViewById(id.vp_friend_info_pager));
-        sl_friend_info_pullToRefresh = ((PullToRefreshScrollView) findViewById(id.sl_friend_info_pullToRefresh));
         tv_friend_info_title = ((TextView) findViewById(id.tv_friend_info_title));
+        ll_friend_info_work_circle = ((LinearLayout) findViewById(id.ll_friend_info_work_circle));
+        rl_friend_info_root = ((RelativeLayout) findViewById(id.rl_friend_info_root));
+        rl_friend_info_setting = ((RelativeLayout) findViewById(id.rl_friend_info_setting));
         iv_friend_info_avatar = ((CircularImage) findViewById(id.iv_friend_info_avatar));
+        sl_friend_info_pullToRefresh = ((PullToRefreshScrollView) findViewById(id.sl_friend_info_pullToRefresh));
+        iv_friend_info_tab = ((ImageView) findViewById(id.iv_friend_info_tab));
+        ll_friend_info_detail = ((LinearLayout) findViewById(id.ll_friend_info_detail));
+        vp_friend_info_pager = ((HackyViewPager) findViewById(id.vp_friend_info_pager));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -68,8 +68,8 @@ public final class FriendDetailActivity_
                 );
             }
         }
-        ((FriendDetailComponent_) friendDetailComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((FriendDetailComponent_) friendDetailComponent).afterSetContentView_();
         init();
     }
 

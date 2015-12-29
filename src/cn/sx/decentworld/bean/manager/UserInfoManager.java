@@ -27,7 +27,7 @@ public class UserInfoManager
 	/**
 	 * 唯一实例,懒汉模式
 	 */
-	private static UserInfo info = null;
+	private static UserInfo info;
 	/**
 	 * 私有方法，防止通过构造函数新建实例
 	 */

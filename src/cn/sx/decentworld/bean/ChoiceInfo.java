@@ -34,13 +34,13 @@ public class ChoiceInfo extends Model {
 	@Column(name = "maxWorth")
 	public String maxWorth = "100";
 	@Column(name = "scope")
-	public String scope = "100";
+	public String scope = "200";
 	@Column(name = "school")
 	public String school = "";
 	@Column(name = "occupation")
 	public String occupation = "";
 	@Column(name = "sex")
-	public String sex = "1";
+	public String sex = "2";
 	@Column(name = "car")
 	public String car = "";
 	@Column(name = "book")

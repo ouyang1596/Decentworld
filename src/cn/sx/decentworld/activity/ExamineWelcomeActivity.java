@@ -61,6 +61,7 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 	@Bean
 	ToastComponent toast;
 	List<Supportbean> supportbeans = new ArrayList<Supportbean>();
+	Intent intent;
 
 	@AfterViews
 	public void init() {
@@ -69,7 +70,8 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 		vsSupport.setEnabled(false);
 		vsNoSupport.setEnabled(false);
 		initList();
-		startService(new Intent(this, PacketListenerService.class));
+		intent = new Intent(this, PacketListenerService.class);
+		startService(intent);
 		EGetIntent();
 		tvTryAgain.setOnClickListener(this);
 		tvAnotherMethod.setOnClickListener(this);
@@ -92,6 +94,7 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 		standard = getIntent().getStringExtra("standard");
 		// standard = "20";
 		retryTimes = getIntent().getStringExtra("retryTimes");
+		retryTimes = retryTimes.substring(0, retryTimes.indexOf("."));
 		LogUtils.i("bm", "retryTimes--" + retryTimes);
 		setView();
 	}
@@ -139,7 +142,6 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 	}
 
 	private String supportAmount;
-
 	// {"nickName":"test22","supportAmount":"28","supportID":"153344"}
 	@Subscriber(tag = NotifyByEventBus.NT_APPEARANCE_CHECK_SUPPORT)
 	public void receiveSupport(String data) {
@@ -325,5 +327,11 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 			getUserInfo.getUserdwID(DecentWorldApp.getInstance().getUserName(),
 					mHandler);
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		stopService(intent);
 	}
 }

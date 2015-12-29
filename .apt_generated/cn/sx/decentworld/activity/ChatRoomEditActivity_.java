@@ -40,30 +40,30 @@ public final class ChatRoomEditActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        rgFeeContent = ((RadioGroup) findViewById(id.rg_content));
         btnContentSave = ((Button) findViewById(id.btn_content_save));
-        ivCover = ((ImageView) findViewById(id.iv_cover));
-        rbContent = ((RadioButton) findViewById(id.rb_content));
-        btnFeeScaleSave = ((Button) findViewById(id.btn_fee_scale_save));
-        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
-        slFee = ((ScrollLayout) findViewById(id.sl_fee));
-        tvPercent = ((TextView) findViewById(id.tv_percent));
-        tvFeeScale = ((TextView) findViewById(id.rb_fee_scale));
-        rbFeeScale = ((RadioButton) findViewById(id.rb_fee_scale));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        etFee = ((EditText) findViewById(id.et_fee));
-        llEdit = ((LinearLayout) findViewById(id.root_activity_edit));
-        rgFeeScale = ((RadioGroup) findViewById(id.rg_fee_Scale));
         rbFixed = ((RadioButton) findViewById(id.rb_fixed));
+        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
+        rbFeeScale = ((RadioButton) findViewById(id.rb_fee_scale));
+        ivCover = ((ImageView) findViewById(id.iv_cover));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         tvSend = ((TextView) findViewById(id.tv_send));
+        rgFeeScale = ((RadioGroup) findViewById(id.rg_fee_Scale));
         etSubjectName = ((EditText) findViewById(id.tv_subj_name));
-        ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
+        btnFeeScaleSave = ((Button) findViewById(id.btn_fee_scale_save));
+        tvFeeScale = ((TextView) findViewById(id.rb_fee_scale));
+        slFee = ((ScrollLayout) findViewById(id.sl_fee));
+        rbContent = ((RadioButton) findViewById(id.rb_content));
+        rgFeeContent = ((RadioGroup) findViewById(id.rg_content));
+        tvPercent = ((TextView) findViewById(id.tv_percent));
+        llEdit = ((LinearLayout) findViewById(id.root_activity_edit));
+        etFee = ((EditText) findViewById(id.et_fee));
         ((ToastComponent_) toast).afterSetContentView_();
+        ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         init();
     }
 

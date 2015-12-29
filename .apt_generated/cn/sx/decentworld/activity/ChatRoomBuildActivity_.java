@@ -42,37 +42,22 @@ public final class ChatRoomBuildActivity_
     private void init_(Bundle savedInstanceState) {
         chatRoomBuildComponent = ChatRoomBuildComponent_.getInstance_(this);
         choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
-        setRoomInfo = SetRoomInfo_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        setRoomInfo = SetRoomInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        root_activitiy_chat_room_build = ((RelativeLayout) findViewById(id.root_activitiy_chat_room_build));
+        add_topic_button = ((Button) findViewById(id.add_topic_button));
         et_chat_room_build_name = ((EditText) findViewById(id.et_chat_room_build_name));
         add_topic_content2 = ((TextView) findViewById(id.add_topic_content2));
-        iv_chat_room_build_modif_icon = ((ImageView) findViewById(id.iv_chat_room_build_modif_icon));
-        add_topic_button = ((Button) findViewById(id.add_topic_button));
-        iv_chat_room_build_background = ((ImageView) findViewById(id.iv_chat_room_build_background));
         tv_chat_room_build_hostname = ((TextView) findViewById(id.tv_chat_room_build_hostname));
-        et_chat_room_build_owner_introduction = ((EditText) findViewById(id.et_chat_room_build_owner_introduction));
+        root_activitiy_chat_room_build = ((RelativeLayout) findViewById(id.root_activitiy_chat_room_build));
         iv_chat_room_build_icon = ((ImageView) findViewById(id.iv_chat_room_build_icon));
+        et_chat_room_build_owner_introduction = ((EditText) findViewById(id.et_chat_room_build_owner_introduction));
+        iv_chat_room_build_modif_icon = ((ImageView) findViewById(id.iv_chat_room_build_modif_icon));
         iv_chat_room_build_modif_name = ((ImageView) findViewById(id.iv_chat_room_build_modif_name));
-        {
-            View view = findViewById(id.add_topic_button);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatRoomBuildActivity_.this.tocreateChatRoom();
-                    }
-
-                }
-                );
-            }
-        }
+        iv_chat_room_build_background = ((ImageView) findViewById(id.iv_chat_room_build_background));
         {
             View view = findViewById(id.add_topic_content2);
             if (view!= null) {
@@ -97,6 +82,21 @@ public final class ChatRoomBuildActivity_
                     @Override
                     public void onClick(View view) {
                         ChatRoomBuildActivity_.this.back();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.add_topic_button);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatRoomBuildActivity_.this.tocreateChatRoom();
                     }
 
                 }
@@ -165,9 +165,9 @@ public final class ChatRoomBuildActivity_
         }
         ((ChatRoomBuildComponent_) chatRoomBuildComponent).afterSetContentView_();
         ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
-        ((SetRoomInfo_) setRoomInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((SetRoomInfo_) setRoomInfo).afterSetContentView_();
         init();
     }
 

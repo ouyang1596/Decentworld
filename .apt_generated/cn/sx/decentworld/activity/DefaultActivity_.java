@@ -35,11 +35,11 @@ public final class DefaultActivity_
     }
 
     private void afterSetContentView_() {
-        tvWeek = ((TextView) findViewById(id.tv_week));
+        tvYear = ((TextView) findViewById(id.tv_year));
         tvMotto = ((TextView) findViewById(id.tv_motto));
         tvMonth = ((TextView) findViewById(id.tv_month));
-        tvYear = ((TextView) findViewById(id.tv_year));
         tvDay = ((TextView) findViewById(id.tv_day));
+        tvWeek = ((TextView) findViewById(id.tv_week));
         tvMottoSix = ((TextView) findViewById(id.tv_motto_six));
         ((ToastComponent_) toast).afterSetContentView_();
         init();

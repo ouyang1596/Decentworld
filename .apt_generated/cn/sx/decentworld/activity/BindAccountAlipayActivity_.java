@@ -39,8 +39,23 @@ public final class BindAccountAlipayActivity_
     }
 
     private void afterSetContentView_() {
-        tv_bind_account_alipay = ((EditText) findViewById(id.tv_bind_account_alipay));
+        et_bind_account_alipay = ((EditText) findViewById(id.et_bind_account_alipay));
         btn_bind_account_confirm = ((Button) findViewById(id.btn_bind_account_confirm));
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        BindAccountAlipayActivity_.this.back();
+                    }
+
+                }
+                );
+            }
+        }
         {
             View view = findViewById(id.btn_bind_account_confirm);
             if (view!= null) {

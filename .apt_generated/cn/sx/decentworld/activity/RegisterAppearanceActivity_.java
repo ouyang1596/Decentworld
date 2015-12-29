@@ -42,15 +42,15 @@ public final class RegisterAppearanceActivity_
     }
 
     private void afterSetContentView_() {
+        vpPic = ((ViewPager) findViewById(id.vp_pic));
+        ivIdentifyCard = ((ImageView) findViewById(id.iv_identify_card));
+        llRegisterAppearance = ((LinearLayout) findViewById(id.root_activity_register_appearance));
+        llDots = ((LinearLayout) findViewById(id.ll_dots));
+        ivAppearance = ((ImageView) findViewById(id.iv_appearance));
+        btnOk = ((Button) findViewById(id.btn_OK));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
         flVp = ((FrameLayout) findViewById(id.fl_vp));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        btnOk = ((Button) findViewById(id.btn_OK));
-        llDots = ((LinearLayout) findViewById(id.ll_dots));
-        ivIdentifyCard = ((ImageView) findViewById(id.iv_identify_card));
-        vpPic = ((ViewPager) findViewById(id.vp_pic));
-        ivAppearance = ((ImageView) findViewById(id.iv_appearance));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        llRegisterAppearance = ((LinearLayout) findViewById(id.root_activity_register_appearance));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

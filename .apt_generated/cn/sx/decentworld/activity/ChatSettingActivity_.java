@@ -40,12 +40,42 @@ public final class ChatSettingActivity_
     }
 
     private void afterSetContentView_() {
-        rl_chat_details_empty_record = ((RelativeLayout) findViewById(id.rl_chat_details_empty_record));
-        chat_setting_gridview = ((ExpandGridView) findViewById(id.chat_setting_gridview));
         iv_switch_top = ((ImageView) findViewById(id.iv_switch_top));
-        rl_chat_details_whistleblowing = ((RelativeLayout) findViewById(id.rl_chat_details_whistleblowing));
         iv_switch_ddisturb = ((ImageView) findViewById(id.iv_switch_no_disturb));
         rl_chat_details_set_bg = ((RelativeLayout) findViewById(id.rl_chat_details_set_bg));
+        chat_setting_gridview = ((ExpandGridView) findViewById(id.chat_setting_gridview));
+        rl_chat_details_empty_record = ((RelativeLayout) findViewById(id.rl_chat_details_empty_record));
+        rl_chat_details_whistleblowing = ((RelativeLayout) findViewById(id.rl_chat_details_whistleblowing));
+        {
+            View view = findViewById(id.iv_switch_top);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatSettingActivity_.this.switchTop();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.iv_switch_no_disturb);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatSettingActivity_.this.switchNDisturb();
+                    }
+
+                }
+                );
+            }
+        }
         {
             View view = findViewById(id.rl_chat_details_set_bg);
             if (view!= null) {
@@ -77,21 +107,6 @@ public final class ChatSettingActivity_
             }
         }
         {
-            View view = findViewById(id.iv_switch_no_disturb);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingActivity_.this.switchNDisturb();
-                    }
-
-                }
-                );
-            }
-        }
-        {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
@@ -100,21 +115,6 @@ public final class ChatSettingActivity_
                     @Override
                     public void onClick(View view) {
                         ChatSettingActivity_.this.setBack();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.iv_switch_top);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingActivity_.this.switchTop();
                     }
 
                 }

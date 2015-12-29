@@ -1,5 +1,8 @@
 package cn.sx.decentworld.activity;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -9,7 +12,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
@@ -54,12 +60,16 @@ public class RegisterNickActivity extends BaseFragmentActivity implements
 	@ViewById(R.id.root_activity_register_nick)
 	LinearLayout llRegisterNick;
 	private FragmentManager fragmentManager;
+	@ViewById(R.id.iv_nickname)
+	ImageView ivNickName;
 	@Bean
 	RegisterComponent registerComponent;
+	private static final int REQUEST_CODE = 100;
 	@Bean
 	GetUserInfo getUserInfo;
 	@Bean
 	ToastComponent toast;
+	private String filePath;
 	private XMPPConnection con;
 
 	@AfterViews
@@ -72,6 +82,16 @@ public class RegisterNickActivity extends BaseFragmentActivity implements
 			@Override
 			public void onClick(View arg0) {
 				closeKeyBoard();
+			}
+		});
+		ivNickName.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(getApplicationContext(),
+						TakePhotosAndpictureActivity.class);
+				intent.putExtra("max_count", 1);
+				startActivityForResult(intent, REQUEST_CODE);
 			}
 		});
 		initData();
@@ -117,7 +137,19 @@ public class RegisterNickActivity extends BaseFragmentActivity implements
 						// login();
 					}
 				};
-				registerComponent.submitNickName(nickName, handler);
+				File[] images = new File[1];
+				if (null == filePath) {
+					toast.show("请先选择一张图片");
+					return;
+				}
+				File file = new File(filePath);
+				images[0] = file;
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put("nickName", nickName);
+				map.put("phoneNum", RegisterComponent.tel);
+				// registerComponent.submitNickName(nickName, handler);
+				registerComponent.submitNickName(map, images,
+						Constants.API_REGISTER_NICK_IMAGES, handler);
 			}
 		});
 	}
@@ -291,6 +323,28 @@ public class RegisterNickActivity extends BaseFragmentActivity implements
 				keyboardComponent.openKeybord(etvNickName);
 			}
 		}, 500);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (null == data) {
+			return;
+		}
+		if (REQUEST_CODE == requestCode) {
+			// 判断返回的数据
+			int max_count = data.getExtras().getInt("max_count");
+			ArrayList<String> pic_filse = data.getExtras().getStringArrayList(
+					"pic_paths");
+			if (pic_filse.isEmpty()) {
+				return;
+			}
+			filePath = pic_filse.get(0);
+			BitmapFactory.Options options = new BitmapFactory.Options();
+			options.inSampleSize = 2;
+			Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
+			ivNickName.setImageBitmap(bitmap);
+		}
 	}
 
 	/**

@@ -40,11 +40,11 @@ public final class RegisterIsStudentActivity_
     }
 
     private void afterSetContentView_() {
-        btnNo = ((Button) findViewById(id.btn_NO));
         ivBack = ((ImageView) findViewById(id.iv_back));
+        llRegisterIsStudent = ((LinearLayout) findViewById(id.root_activity_register_is_student));
+        btnNo = ((Button) findViewById(id.btn_NO));
         btnOk = ((Button) findViewById(id.btn_OK));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        llRegisterIsStudent = ((LinearLayout) findViewById(id.root_activity_register_is_student));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

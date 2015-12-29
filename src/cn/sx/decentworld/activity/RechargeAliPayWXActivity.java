@@ -49,7 +49,7 @@ public class RechargeAliPayWXActivity extends BaseFragmentActivity {
 				String money = etMoney.getText().toString();
 				Integer data = Integer.valueOf(money);
 				if (data < 2) {
-					toast.show("输入金额小于2元");
+					toast.show("输入金额不能小于2元");
 					return;
 				}
 				Intent intent = new Intent(mContext,

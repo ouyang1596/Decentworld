@@ -615,7 +615,7 @@ public class DWMessageAdapter extends BaseAdapter {
 		}
 		if (message.ifFromNet == 0) {
 			String audioFileName = uri.substring(uri.lastIndexOf("/"));
-			File file = new File(Constants.HomePath + Constants.AUDIO_PATH
+			File file = new File(Constants.HOME_PATH + Constants.AUDIO_PATH
 					+ audioFileName);
 			if (file.exists()) {
 				playLocalMusic(file.getAbsolutePath());
@@ -823,7 +823,7 @@ public class DWMessageAdapter extends BaseAdapter {
 		String uri = message.getUri();
 		String fileName = uri.substring(uri.lastIndexOf("/"));
 		showProgressDialog();
-		httpUtils.download(message.getUri(), Constants.HomePath
+		httpUtils.download(message.getUri(), Constants.HOME_PATH
 				+ Constants.AUDIO_PATH + fileName, new RequestCallBack<File>() {
 
 			@Override

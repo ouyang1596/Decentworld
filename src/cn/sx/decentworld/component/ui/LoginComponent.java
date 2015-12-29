@@ -82,7 +82,6 @@ public class LoginComponent
 		};
 		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/reset/checkCode", Method.POST, new HttpCallBack()
 		{
-
 			@Override
 			public void onSuccess(String response, final ResultBean msg)
 			{

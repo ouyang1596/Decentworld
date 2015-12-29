@@ -34,11 +34,11 @@ public final class RegisterWhatYouHaveActivity_
     }
 
     private void afterSetContentView_() {
-        ivTalent = ((ImageView) findViewById(id.iv_talent));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         ivMoney = ((ImageView) findViewById(id.iv_money));
+        ivTalent = ((ImageView) findViewById(id.iv_talent));
         ivAppearance = ((ImageView) findViewById(id.iv_appearance));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         init();
     }
 

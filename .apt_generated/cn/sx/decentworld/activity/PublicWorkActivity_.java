@@ -37,25 +37,25 @@ public final class PublicWorkActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
-        c = ChoceAndTakePictureComponent_.getInstance_(this);
         publicWorkComponent = PublicWorkComponent_.getInstance_(this);
+        c = ChoceAndTakePictureComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        rl_public_work_see = ((RelativeLayout) findViewById(id.rl_public_work_see));
-        tv_public_work_confirm = ((TextView) findViewById(id.tv_public_work_confirm));
+        rb_public_work_friend = ((RadioButton) findViewById(id.rb_public_work_friend));
         rb_public_work_stranger = ((RadioButton) findViewById(id.rb_public_work_stranger));
-        gv_public_work_pictures = ((ImageViewForGridView) findViewById(id.gv_public_work_pictures));
+        rl_public_work_see = ((RelativeLayout) findViewById(id.rl_public_work_see));
         tv_public_work_description = ((TextView) findViewById(id.tv_public_work_description));
+        ll_public_work_stranger = ((LinearLayout) findViewById(id.ll_public_work_stranger));
+        gv_public_work_pictures = ((ImageViewForGridView) findViewById(id.gv_public_work_pictures));
         ll_public_work_root = ((LinearLayout) findViewById(id.ll_public_work_root));
+        tv_public_work_confirm = ((TextView) findViewById(id.tv_public_work_confirm));
         ll_public_work_friend = ((LinearLayout) findViewById(id.ll_public_work_friend));
         rl_public_work_no_see = ((RelativeLayout) findViewById(id.rl_public_work_no_see));
-        ll_public_work_stranger = ((LinearLayout) findViewById(id.ll_public_work_stranger));
-        rb_public_work_friend = ((RadioButton) findViewById(id.rb_public_work_friend));
-        ((ToastComponent_) toast).afterSetContentView_();
-        ((ChoceAndTakePictureComponent_) c).afterSetContentView_();
         ((PublicWorkComponent_) publicWorkComponent).afterSetContentView_();
+        ((ChoceAndTakePictureComponent_) c).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

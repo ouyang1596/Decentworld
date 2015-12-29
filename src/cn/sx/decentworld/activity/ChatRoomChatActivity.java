@@ -148,8 +148,6 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 
 	@ViewById(R.id.btn_set_mode_keyboard)
 	Button buttonSetModeKeyboard;
-	// @ViewById(R.id.btn_press_to_speak)
-	// LinearLayout buttonPressToSpeak;
 	@ViewById(R.id.btn_press_to_speak)
 	RecorderButton buttonPressToSpeak;
 	@ViewById(R.id.btn_send)
@@ -210,7 +208,6 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 	@AfterViews
 	void init()
 	{
-		// ImageLoaderHelper.initImageLoader(this);
 		EventBus.getDefault().register(this);
 		chatRoomManager = new ChatRoomManager(this);
 		parseData();
@@ -634,7 +631,7 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 								org.json.JSONObject object = new org.json.JSONObject(data);
 								dwMessage.setUri(object.getString("uri"));
 								dwMessage.setVoiceTime(Integer.valueOf(object.getString("length")));
-								String fileName = Constants.HomePath + Constants.AudioReceivePath + File.separator + FileUtils.generateFileName() + ".mp3";
+								String fileName = Constants.HOME_PATH + Constants.AUDIO_RECEIVE_PATH + File.separator + FileUtils.generateFileName() + ".mp3";
 								int send = downloadAudio(object.getString("uri"), fileName);
 								dwMessage.setBody(fileName);
 								dwMessage.setSendSuccess(send);
@@ -708,13 +705,13 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 	{
 		// InputStream inputStream = null;
 		int result = Constants.SUCC;
-		if (!FileUtils.isFileExist(Constants.HomePath))
+		if (!FileUtils.isFileExist(Constants.HOME_PATH))
 		{
-			FileUtils.createSDDir(Constants.HomePath);
+			FileUtils.createSDDir(Constants.HOME_PATH);
 		}
-		if (!FileUtils.isFileExist(Constants.HomePath + Constants.AudioReceivePath))
+		if (!FileUtils.isFileExist(Constants.HOME_PATH + Constants.AUDIO_RECEIVE_PATH))
 		{
-			FileUtils.createSDDir(Constants.HomePath + Constants.AudioReceivePath);
+			FileUtils.createSDDir(Constants.HOME_PATH + Constants.AUDIO_RECEIVE_PATH);
 		}
 		result = HttpDownloader.downFile(uri, fileName);
 		return result;
@@ -1134,7 +1131,7 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 					File file = new File(picturePath);
 
 					Bitmap bimap = ImageUtils.scalePic(file.getAbsolutePath());
-					String picPath = Constants.HomePath + "/temp" + ImageUtils.generateFileName() + ".png";
+					String picPath = Constants.HOME_PATH + "/temp" + ImageUtils.generateFileName() + ".png";
 					ImageUtils.saveBitmap(picPath, bimap);
 					file = new File(picPath);
 
@@ -1186,7 +1183,7 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 		if (ImageUtils.fileLength(filePath) > 2 * 1024 * 1024)
 		{
 			Bitmap bitmap = ImageUtils.scalePic(filePath);
-			String picPath = Constants.HomePath + "/temp" + ImageUtils.generateFileName() + ".png";
+			String picPath = Constants.HOME_PATH + "/temp" + ImageUtils.generateFileName() + ".png";
 			ImageUtils.saveBitmap(picPath, bitmap);
 			file = new File(picPath);
 		}

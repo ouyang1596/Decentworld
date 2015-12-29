@@ -37,20 +37,20 @@ public final class RegisterPersonalMsgActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        keyboardComponent = KeyboardComponent_.getInstance_(this);
         registerComponent = RegisterComponent_.getInstance_(this);
+        keyboardComponent = KeyboardComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        etvName = ((EditText) findViewById(id.etv_name));
-        llRegisterPersonalMsg = ((LinearLayout) findViewById(id.root_activity_register_personal_msg));
         ivBack = ((ImageView) findViewById(id.iv_back));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        btnOk = ((Button) findViewById(id.btn_OK));
+        llRegisterPersonalMsg = ((LinearLayout) findViewById(id.root_activity_register_personal_msg));
         etvIdentifyCard = ((EditText) findViewById(id.etv_identify_card));
-        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
+        etvName = ((EditText) findViewById(id.etv_name));
+        btnOk = ((Button) findViewById(id.btn_OK));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
+        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

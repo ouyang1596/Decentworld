@@ -125,7 +125,7 @@ public class ChatRoomEditMyInfoActivity extends BaseFragmentActivity {
 				}
 				if (ImageUtils.fileLength(picPath) > 2 * 1024 * 1024) {
 					Bitmap scalePic = ImageUtils.scalePic(picPath);
-					String filePath = Constants.HomePath + "/temp"
+					String filePath = Constants.HOME_PATH + "/temp"
 							+ ImageUtils.generateFileName() + ".png";
 					ImageUtils.saveBitmap(filePath, scalePic);
 					picPath = filePath;

@@ -51,7 +51,12 @@ public class RecommendBenefitDetailActivity extends BaseFragmentActivity
 	
 	@Bean
 	TitleBar titleBar;
+
+
 	
+	/**
+	 * 初始化
+	 */
 	@AfterViews
 	void init()
 	{
@@ -107,17 +112,9 @@ public class RecommendBenefitDetailActivity extends BaseFragmentActivity
 					{
 						benefitDetail = new RecommendBenefitDetail();
 						JSONObject object = array.getJSONObject(i);
-						float amount = object.getFloatValue("amount");
-						benefitDetail.setAmount(amount);
+						benefitDetail.setAmount(object.getFloatValue("amount"));
 						benefitDetail.setTime(object.getString("time"));
-						if(object.getString("status").equals("0"))
-						{
-							benefitDetail.setStatus(false);
-						}
-						else
-						{
-							benefitDetail.setStatus(true);
-						}
+						benefitDetail.setStatusType(object.getIntValue("status"));
 						mData.add(benefitDetail);
 					}
 					adapter.notifyDataSetChanged();

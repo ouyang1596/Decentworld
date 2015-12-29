@@ -3,9 +3,9 @@
  */
 package cn.sx.decentworld.utils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import cn.sx.decentworld.bean.NearbyStrangerInfo;
 
@@ -19,7 +19,8 @@ public class DWUtils {
 	/**
 	 * 按照距离进行排序
 	 * */
-	public static void sortList(List<NearbyStrangerInfo> nearByStrangerInfoList) {
+	public static void sortList(
+			ArrayList<NearbyStrangerInfo> nearByStrangerInfoList) {
 		// Collections.sort(groupMemberInfoList,
 		// new Comparator<GroupMemberInfo>() {
 		// @Override
@@ -45,12 +46,14 @@ public class DWUtils {
 							return 0;
 						}
 						String distance1 = near1.getDistance();
-						Float d1 = Float.valueOf(distance1);
+						LogUtils.i("bm", "distance1--" + distance1);
+						Double d1 = Double.valueOf(distance1);
 						String distance2 = near2.getDistance();
-						Float d2 = Float.valueOf(distance2);
-						if (d1 == d2) {
+						LogUtils.i("bm", "distance2--" + distance2);
+						Double d2 = Double.valueOf(distance2);
+						if (d1.doubleValue() == d2.doubleValue()) {
 							return 0;
-						} else if (d1 > d2) {
+						} else if (d1.doubleValue() > d2.doubleValue()) {
 							return 1;
 						} else {
 							return -1;

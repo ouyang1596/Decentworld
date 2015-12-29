@@ -39,8 +39,8 @@ public final class EditCommon2Activity_
 
     private void afterSetContentView_() {
         ivBack = ((ImageView) findViewById(id.iv_back));
-        btnOk = ((Button) findViewById(id.btn_edit_sign_complete));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        btnOk = ((Button) findViewById(id.btn_edit_sign_complete));
         et_edit_common2_content = ((EditText) findViewById(id.et_edit_common2_content));
         ((ToastComponent_) toast).afterSetContentView_();
         init();

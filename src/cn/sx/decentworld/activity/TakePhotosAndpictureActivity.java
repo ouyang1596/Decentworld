@@ -106,7 +106,8 @@ public class TakePhotosAndpictureActivity extends Activity {
 								Toast.LENGTH_SHORT).show();
 						return;
 					}
-					tempCameraPath = Constants.CAMERA_PATH + "/"
+					tempCameraPath = Constants.HOME_PATH
+							+ Constants.CAMERA_PATH
 							+ System.currentTimeMillis() + ".jpg";
 					Log.e("cxm", "path============" + tempCameraPath);
 					PickPhotoUtil.getInstance().takePhoto(
@@ -411,6 +412,7 @@ public class TakePhotosAndpictureActivity extends Activity {
 							.findViewById(R.id.grid_image);
 					gridHolder.grid_img = (ImageView) convertView
 							.findViewById(R.id.grid_img);
+					gridHolder.grid_image.setTag(gridHolder.grid_img);
 					convertView.setTag(gridHolder);
 					break;
 				default:
@@ -435,7 +437,7 @@ public class TakePhotosAndpictureActivity extends Activity {
 				mImageLoader.displayImage("file://" + getItem(position),
 						gridHolder.grid_image, options);
 
-				gridHolder.grid_img
+				gridHolder.grid_image
 						.setOnClickListener(new View.OnClickListener() {
 
 							@Override
@@ -443,13 +445,13 @@ public class TakePhotosAndpictureActivity extends Activity {
 								if (addedPath.contains(getItem(position))) {
 									// 已经包含这个path了，则干掉
 									addedPath.remove(getItem(position));
-									((ImageView) view)
+									((ImageView) view.getTag())
 											.setImageResource(R.drawable.friends_sends_pictures_select_icon_unselected);
 								} else {
 									// 判断大小
 									if (addedPath.size() < limit_count) {
 										addedPath.add(getItem(position));
-										((ImageView) view)
+										((ImageView) view.getTag())
 												.setImageResource(R.drawable.friends_sends_pictures_select_icon_selected);
 										// 添加图片，显示出来张数
 									}
@@ -457,7 +459,6 @@ public class TakePhotosAndpictureActivity extends Activity {
 								mYhandler.sendEmptyMessage(0);
 							}
 						});
-
 				if (addedPath.contains(getItem(position))) {
 					// 已经添加过了
 					gridHolder.grid_img
@@ -467,7 +468,6 @@ public class TakePhotosAndpictureActivity extends Activity {
 							.setImageResource(R.drawable.friends_sends_pictures_select_icon_unselected);
 				}
 			}
-
 			return convertView;
 		}
 
@@ -479,7 +479,6 @@ public class TakePhotosAndpictureActivity extends Activity {
 			ImageView grid_image;
 			public ImageView grid_img;
 		}
-
 	}
 
 	Handler mYhandler = new Handler() {

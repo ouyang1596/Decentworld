@@ -22,7 +22,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:padding="10dp"
             android:src="@drawable/friends_sends_pictures_select_icon_unselected" />
     </RelativeLayout>
 

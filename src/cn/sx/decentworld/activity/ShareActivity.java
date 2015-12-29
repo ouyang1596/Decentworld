@@ -158,7 +158,7 @@ public class ShareActivity extends BaseFragmentActivity implements
 		// sp.setText("Decent World http://www.baidu.com");
 		// sp.setImageData(BitmapFactory.decodeResource(getResources(),
 		// R.drawable.ic_launcher));
-		sp.setImagePath(Constants.HomePath + "/share/" + "share.png");
+		sp.setImagePath(Constants.HOME_PATH + "/share/" + "share.png");
 		Platform weibo = ShareSDK.getPlatform(WechatMoments.NAME);
 		weibo.setPlatformActionListener(new PlatformActionListener() {
 
@@ -191,7 +191,7 @@ public class ShareActivity extends BaseFragmentActivity implements
 		sp.setUrl("http://112.74.13.117/data/apk/share/dw.apk");
 		// sp.setImageData(BitmapFactory.decodeResource(getResources(),
 		// R.drawable.ic_launcher));
-		sp.setImagePath(Constants.HomePath + "/share/" + "share.png");
+		sp.setImagePath(Constants.HOME_PATH + "/share/" + "share.png");
 		Platform weChat = ShareSDK.getPlatform(Wechat.NAME);
 		weChat.setPlatformActionListener(new PlatformActionListener() {
 

@@ -39,7 +39,8 @@ import com.googlecode.androidannotations.annotations.RootContext;
  * @date: 2015年9月25日 上午10:30:41
  */
 @EBean
-public class GetUserInfo {
+public class GetUserInfo
+{
 	private static String TAG = "GetUserInfo";
 	@RootContext
 	Context context;
@@ -51,7 +52,8 @@ public class GetUserInfo {
 	private ProgressDialog mProDialog;
 
 	@AfterViews
-	void init() {
+	void init()
+	{
 		sendUrl = new SendUrl(context);
 	}
 
@@ -60,10 +62,13 @@ public class GetUserInfo {
 	 * 
 	 * @param bean
 	 */
-	private void showToastInfo(final String toastInfo) {
-		activity.runOnUiThread(new Runnable() {
+	private void showToastInfo(final String toastInfo)
+	{
+		activity.runOnUiThread(new Runnable()
+		{
 			@Override
-			public void run() {
+			public void run()
+			{
 				toast.show(toastInfo);
 			}
 		});
@@ -74,43 +79,50 @@ public class GetUserInfo {
 	 * 
 	 * @param phoneNum
 	 */
-	public void getUserdwID(final String phoneNum, final Handler handler) {
+	public void getUserdwID(final String phoneNum, final Handler handler)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("phoneNum", phoneNum);
 		LogUtils.i(TAG, "getUserdwID...begin,phoneNum=" + phoneNum);
 		showProgressDialog();
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ Constants.API_GET_USERID, Method.POST, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + Constants.API_GET_USERID, Method.POST, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, final ResultBean bean) {
+			public void onSuccess(String response, final ResultBean bean)
+			{
 				hideProgressDialog();
-				LogUtils.i(TAG,
-						"getUserdwID...getResultCode=" + bean.getResultCode()
-								+ ",getData=" + bean.getData() + ",getMsg="
-								+ bean.getMsg());
-				if (bean.getResultCode() == 2222) {
+				LogUtils.i(TAG, "getUserdwID...getResultCode=" + bean.getResultCode() + ",getData=" + bean.getData() + ",getMsg=" + bean.getMsg());
+				if (bean.getResultCode() == 2222)
+				{
 					// 获取成功，返回 dwID,token
 					Message message = handler.obtainMessage();
 					message.what = bean.getResultCode();
 					message.obj = bean.getData().toString();
 					handler.sendMessage(message);
-				} else if (bean.getResultCode() == 2010) {
+				}
+				else if (bean.getResultCode() == 2010)
+				{
 					Message message = handler.obtainMessage();
 					message.what = bean.getResultCode();
 					message.obj = bean.getData().toString();
 					handler.sendMessage(message);
-				} else if (bean.getResultCode() == 2011) {
+				}
+				else if (bean.getResultCode() == 2011)
+				{
 					Message message = handler.obtainMessage();
 					message.what = bean.getResultCode();
 					message.obj = bean.getData().toString();
 					handler.sendMessage(message);
-				} else if (bean.getResultCode() == 3333) {
+				}
+				else if (bean.getResultCode() == 3333)
+				{
 					showToastInfo(bean.getMsg());
 				}
 			}
 
 			@Override
-			public void onFailure(String e) {
+			public void onFailure(String e)
+			{
 				hideProgressDialog();
 				LogUtils.i(TAG, "getUserdwID ...onFailure,cause by:" + e);
 				showToastInfo(Constants.NET_WRONG);
@@ -128,36 +140,35 @@ public class GetUserInfo {
 	 * @param resultCode
 	 *            回调中msg.what 的值
 	 */
-	public void getWealth(String dwID, final Handler handler,
-			final int resultCode) {
+	public void getWealth(String dwID, final Handler handler, final int resultCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		LogUtils.i(TAG, "getWealth...begin，dwID=" + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/user/getWealth", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/getWealth", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean bean) {
-				LogUtils.i(TAG,
-						"getWealth...getResultCode=" + bean.getResultCode()
-								+ ",getData=" + bean.getData() + ",getMsg="
-								+ bean.getMsg());
-				if (bean.getResultCode() == 2222) {
-					JSONObject json = JSON.parseObject(bean.getData()
-							.toString());
+			public void onSuccess(String response, ResultBean bean)
+			{
+				LogUtils.i(TAG, "getWealth...getResultCode=" + bean.getResultCode() + ",getData=" + bean.getData() + ",getMsg=" + bean.getMsg());
+				if (bean.getResultCode() == 2222)
+				{
+					JSONObject json = JSON.parseObject(bean.getData().toString());
 					Message message = Message.obtain();
 					message.obj = json.getString("wealth");
 					message.what = resultCode;
 					handler.sendMessage(message);
 					LogUtils.i(TAG, "getWealth...success");
 				}
-				if (bean.getResultCode() == 3333) {
-					LogUtils.i(TAG,
-							"getWealth...failure,cause by:" + bean.getMsg());
+				if (bean.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "getWealth...failure,cause by:" + bean.getMsg());
 				}
 			}
 
 			@Override
-			public void onFailure(String error) {
+			public void onFailure(String error)
+			{
 				LogUtils.i(TAG, "getWealth...onFailure,cause by:" + error);
 			}
 		});
@@ -173,22 +184,20 @@ public class GetUserInfo {
 	 * @param resultCode
 	 *            回调中msg.what 的值
 	 */
-	public void getWorth(String dwID, final Handler handler,
-			final int resultCode) {
+	public void getWorth(String dwID, final Handler handler, final int resultCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		LogUtils.i(TAG, "getWorth...begin,dwID" + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/user/getWorth", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/getWorth", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean bean) {
-				LogUtils.i(TAG,
-						"getWorth...getResultCode=" + bean.getResultCode()
-								+ ",getData=" + bean.getData() + ",getMsg="
-								+ bean.getMsg());
-				if (bean.getResultCode() == 2222) {
-					JSONObject json = JSON.parseObject(bean.getData()
-							.toString());
+			public void onSuccess(String response, ResultBean bean)
+			{
+				LogUtils.i(TAG, "getWorth...getResultCode=" + bean.getResultCode() + ",getData=" + bean.getData() + ",getMsg=" + bean.getMsg());
+				if (bean.getResultCode() == 2222)
+				{
+					JSONObject json = JSON.parseObject(bean.getData().toString());
 					Message message = Message.obtain();
 					message.obj = json.getString("worth");
 					message.what = resultCode;
@@ -196,14 +205,15 @@ public class GetUserInfo {
 					LogUtils.i(TAG, "getWorth...success");
 				}
 
-				if (bean.getResultCode() == 3333) {
-					LogUtils.i(TAG,
-							"getWorth...failure,cause by:" + bean.getMsg());
+				if (bean.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "getWorth...failure,cause by:" + bean.getMsg());
 				}
 			}
 
 			@Override
-			public void onFailure(String error) {
+			public void onFailure(String error)
+			{
 				LogUtils.i(TAG, "getWorth...onFailure,cause by:" + error);
 			}
 		});
@@ -214,21 +224,17 @@ public class GetUserInfo {
 	 * 
 	 * @param dwID
 	 */
-	public void getUserInfo(final String dwID, final Handler handler,
-			final int requestCode) {
+	public void getUserInfo(final String dwID, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		LogUtils.i(TAG, "getUserInfo...begin，dwID= " + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/user/retrieveInfo", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/retrieveInfo", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean bean) {
-				LogUtils.i(
-						TAG,
-						"getUserInfo...msg.getResultCode="
-								+ bean.getResultCode() + ",getData="
-								+ bean.getData() + ",msg.getMsg="
-								+ bean.getMsg());
+			public void onSuccess(String response, ResultBean bean)
+			{
+				LogUtils.i(TAG, "getUserInfo...msg.getResultCode=" + bean.getResultCode() + ",getData=" + bean.getData() + ",msg.getMsg=" + bean.getMsg());
 				if (bean.getResultCode() == 2222)// 获取成功
 				{
 					Message message = Message.obtain();
@@ -236,14 +242,15 @@ public class GetUserInfo {
 					message.obj = bean.getData().toString();
 					handler.sendMessage(message);
 				}
-				if (bean.getResultCode() == 3333) {
-					LogUtils.i(TAG,
-							"getUserInfo...failure,cause by:" + bean.getMsg());
+				if (bean.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "getUserInfo...failure,cause by:" + bean.getMsg());
 				}
 			}
 
 			@Override
-			public void onFailure(String error) {
+			public void onFailure(String error)
+			{
 				showToastInfo(Constants.NET_WRONG);
 				LogUtils.i(TAG, "getUserInfo...onFailure,cause by:" + error);
 			}
@@ -257,36 +264,35 @@ public class GetUserInfo {
 	 * @param handler
 	 * @param requestCode
 	 */
-	public void getUserDisplayInfo(String dwID, final Handler handler,
-			final int requestCode) {
+	public void getUserDisplayInfo(String dwID, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		LogUtils.i(TAG, "getUserDisplayInfo...begin");
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/user/getDisplayInfo", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/getDisplayInfo", Method.GET, new HttpCallBack()
+		{
 
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(
-						TAG,
-						"getUserDisplayInfo...msg.getResultCode="
-								+ msg.getResultCode() + ",msg.getMsg="
-								+ msg.getMsg() + ",msg.getData="
-								+ msg.getData().toString());
-				if (msg.getResultCode() == 2222) {
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getUserDisplayInfo...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg() + ",msg.getData=" + msg.getData().toString());
+				if (msg.getResultCode() == 2222)
+				{
 					Message message = Message.obtain();
 					message.what = requestCode;
 					message.obj = msg.getData().toString();
 					handler.sendMessage(message);
 					LogUtils.i(TAG, "getUserDisplayInfo...success");
 				}
-				if (msg.getResultCode() == 3333) {
+				if (msg.getResultCode() == 3333)
+				{
 					LogUtils.i(TAG, "getUserDisplayInfo...failure");
 				}
 			}
 
 			@Override
-			public void onFailure(String e) {
+			public void onFailure(String e)
+			{
 				LogUtils.i(TAG, "getUserDisplayInfo...failure,cause by:" + e);
 			}
 		});
@@ -300,20 +306,17 @@ public class GetUserInfo {
 	 * @param handler
 	 * @param requestCode
 	 */
-	public void getUserInfoAuth(final String dwID, final Handler handler,
-			final int requestCode) {
+	public void getUserInfoAuth(final String dwID, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		LogUtils.i(TAG, "getUserInfoAuth...begin，dwID= " + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/user/getUserAuth", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/getUserAuth", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(
-						TAG,
-						"getUserInfoAuth...msg.getResultCode="
-								+ msg.getResultCode() + ",msg.getMsg="
-								+ msg.getMsg());
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getUserInfoAuth...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg());
 				if (msg.getResultCode() == 2222)// 获取成功
 				{
 					Message message = Message.obtain();
@@ -321,16 +324,15 @@ public class GetUserInfo {
 					message.obj = msg.getData().toString();
 					handler.sendMessage(message);
 				}
-				if (msg.getResultCode() == 3333) {
-					LogUtils.i(
-							TAG,
-							"getUserInfoAuth...failure,cause by:"
-									+ msg.getMsg());
+				if (msg.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "getUserInfoAuth...failure,cause by:" + msg.getMsg());
 				}
 			}
 
 			@Override
-			public void onFailure(String error) {
+			public void onFailure(String error)
+			{
 				LogUtils.i(TAG, "getUserInfoAuth...failure,cause by:" + error);
 			}
 		});
@@ -343,38 +345,34 @@ public class GetUserInfo {
 	 * @param handler
 	 * @param requestCode
 	 */
-	public void getMyProteges(final String dwID, final Handler handler,
-			final int requestCode) {
+	public void getMyProteges(final String dwID, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		LogUtils.i(TAG, "getMyProteges...begin，dwID= " + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/user/getMyProteges", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/getMyProteges", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(
-						TAG,
-						"getMyProteges...msg.getResultCode="
-								+ msg.getResultCode() + ",msg.getMsg="
-								+ msg.getMsg() + ",msg.getData="
-								+ msg.getData().toString());
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getMyProteges...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg() + ",msg.getData=" + msg.getData().toString());
 				if (msg.getResultCode() == 2222)// 获取成功
 				{
-					LogUtils.i(TAG, "getMyProteges...我是 " + msg.getMsg()
-							+ " 个人的贵人。");
+					LogUtils.i(TAG, "getMyProteges...我是 " + msg.getMsg() + " 个人的贵人。");
 					Message message = Message.obtain();
 					message.what = requestCode;
 					message.obj = msg.getData().toString();
 					handler.sendMessage(message);
 				}
-				if (msg.getResultCode() == 3333) {
-					LogUtils.i(TAG,
-							"getMyProteges...failure,cause by:" + msg.getMsg());
+				if (msg.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "getMyProteges...failure,cause by:" + msg.getMsg());
 				}
 			}
 
 			@Override
-			public void onFailure(String error) {
+			public void onFailure(String error)
+			{
 				LogUtils.i(TAG, "getMyProteges...onFailure,cause by:" + error);
 			}
 		});
@@ -387,39 +385,34 @@ public class GetUserInfo {
 	 * @param handler
 	 * @param requestCode
 	 */
-	public void getGrAllBenefit(final String dwID, final Handler handler,
-			final int requestCode) {
+	public void getGrAllBenefit(final String dwID, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		LogUtils.i(TAG, "getGrAllBenefit...begin，dwID= " + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/history/getMyGRBenefit", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/history/getMyGRBenefit", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(
-						TAG,
-						"getGrAllBenefit...msg.getResultCode="
-								+ msg.getResultCode() + ",msg.getMsg="
-								+ msg.getMsg());
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getGrAllBenefit...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg());
 				if (msg.getResultCode() == 2222)// 获取成功
 				{
-					LogUtils.i(TAG, "getGrAllBenefit...获取作为别人的贵人获取的总收益为： "
-							+ msg.getData());
+					LogUtils.i(TAG, "getGrAllBenefit...获取作为别人的贵人获取的总收益为： " + msg.getData());
 					Message message = Message.obtain();
 					message.what = requestCode;
 					message.obj = msg.getData().toString();
 					handler.sendMessage(message);
 				}
-				if (msg.getResultCode() == 3333) {
-					LogUtils.i(
-							TAG,
-							"getGrAllBenefit...failure,cause by:"
-									+ msg.getMsg());
+				if (msg.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "getGrAllBenefit...failure,cause by:" + msg.getMsg());
 				}
 			}
 
 			@Override
-			public void onFailure(String error) {
+			public void onFailure(String error)
+			{
 				LogUtils.i(TAG, "getGrAllBenefit...onFailure,cause by:" + error);
 			}
 		});
@@ -435,45 +428,38 @@ public class GetUserInfo {
 	 * @param handler
 	 * @param requestCode
 	 */
-	public void getGRBenefitHistory(final String grID, String dwID,
-			final Handler handler, final int requestCode) {
+	public void getGRBenefitHistory(final String grID, String dwID, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("grID", grID);
 		map.put("dwID", dwID);
-		LogUtils.i(TAG, "getGRBenefitHistory...begin，自己的ID= " + grID
-				+ ",明细人的ID=" + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/history/getGRBenefitHistory", Method.GET,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(TAG,
-								"getGRBenefitHistory...msg.getResultCode="
-										+ msg.getResultCode() + ",msg.getMsg="
-										+ msg.getMsg());
-						if (msg.getResultCode() == 2222)// 获取成功
-						{
-							LogUtils.i(TAG, "getGRBenefitHistory...获取的详情为："
-									+ msg.getData());
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.obj = msg.getData().toString();
-							handler.sendMessage(message);
-						}
-						if (msg.getResultCode() == 3333) {
-							LogUtils.i(TAG,
-									"getGRBenefitHistory...failure,cause by:"
-											+ msg.getMsg());
-						}
-					}
+		LogUtils.i(TAG, "getGRBenefitHistory...begin，自己的ID= " + grID + ",明细人的ID=" + dwID);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/history/getGRBenefitHistory", Method.GET, new HttpCallBack()
+		{
+			@Override
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getGRBenefitHistory...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg());
+				if (msg.getResultCode() == 2222)// 获取成功
+				{
+					LogUtils.i(TAG, "getGRBenefitHistory...获取的详情为：" + msg.getData());
+					Message message = Message.obtain();
+					message.what = requestCode;
+					message.obj = msg.getData().toString();
+					handler.sendMessage(message);
+				}
+				if (msg.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "getGRBenefitHistory...failure,cause by:" + msg.getMsg());
+				}
+			}
 
-					@Override
-					public void onFailure(String error) {
-						LogUtils.i(TAG,
-								"getGRBenefitHistory...onFailure,cause by:"
-										+ error);
-					}
-				});
+			@Override
+			public void onFailure(String error)
+			{
+				LogUtils.i(TAG, "getGRBenefitHistory...onFailure,cause by:" + error);
+			}
+		});
 	}
 
 	/**
@@ -483,42 +469,43 @@ public class GetUserInfo {
 	 * @param handler
 	 * @param requestCode
 	 */
-	public void validateRecommend(String dwID, String phoneNum,
-			final Handler handler, final int requestCode) {
+	public void validateRecommend(String dwID, String phoneNum, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		map.put("phoneNum", phoneNum);
 		LogUtils.i(TAG, "validateRecommend...begin");
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/user/validateRecommend", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/validateRecommend", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(
-						TAG,
-						"validateRecommend...msg.getResultCode="
-								+ msg.getResultCode());
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "validateRecommend...msg.getResultCode=" + msg.getResultCode());
 				if (msg.getResultCode() == 2001)// 被推荐人已经注册
 				{
-					LogUtils.i(TAG,
-							"validateRecommend...msg.getMsg=" + msg.getMsg());
+					LogUtils.i(TAG, "validateRecommend...msg.getMsg=" + msg.getMsg());
 					ToastUtils.toast(context, "被推荐人已经注册");
-				} else if (msg.getResultCode() == 2009)// 已被他人推荐
+				}
+				else if (msg.getResultCode() == 2009)// 已被他人推荐
 				{
-					LogUtils.i(TAG,
-							"validateRecommend...msg.getMsg=" + msg.getMsg());
+					LogUtils.i(TAG, "validateRecommend...msg.getMsg=" + msg.getMsg());
 					ToastUtils.toast(context, "已被他人推荐");
-				} else if (msg.getResultCode() == 2222) {
+				}
+				else if (msg.getResultCode() == 2222)
+				{
 					LogUtils.i(TAG, "validateRecommend...success,推荐的人有效");
 					handler.sendEmptyMessage(requestCode);
-				} else if (msg.getResultCode() == 3333) {
-					LogUtils.i(TAG,
-							"validateRecommend...msg.getMsg=" + msg.getMsg());
+				}
+				else if (msg.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "validateRecommend...msg.getMsg=" + msg.getMsg());
 					ToastUtils.toast(context, msg.getMsg());
 				}
 			}
 
 			@Override
-			public void onFailure(String e) {
+			public void onFailure(String e)
+			{
 				LogUtils.i(TAG, "validateRecommend...onFailure,caused by:" + e);
 				ToastUtils.toast(context, Constants.NET_WRONG);
 			}
@@ -532,37 +519,37 @@ public class GetUserInfo {
 	 * @param handler
 	 * @param requestCode
 	 */
-	public void validateGuarantee(String phoneNum, final Handler handler,
-			final int requestCode) {
+	public void validateGuarantee(String phoneNum, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("phoneNum", phoneNum);
 		LogUtils.i(TAG, "validateGuarantee...begin");
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/set/checkGuarantee", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/set/checkGuarantee", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(
-						TAG,
-						"validateGuarantee...msg.getResultCode="
-								+ msg.getResultCode());
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "validateGuarantee...msg.getResultCode=" + msg.getResultCode());
 				if (msg.getResultCode() == 3001)// 被担保人已经注册
 				{
-					LogUtils.i(TAG,
-							"validateGuarantee...msg.getMsg=" + msg.getMsg());
+					LogUtils.i(TAG, "validateGuarantee...msg.getMsg=" + msg.getMsg());
 					ToastUtils.toast(context, "被担保人已经注册");
-				} else if (msg.getResultCode() == 3333)// 已被他人担保
+				}
+				else if (msg.getResultCode() == 3333)// 已被他人担保
 				{
-					LogUtils.i(TAG,
-							"validateGuarantee...msg.getMsg=" + msg.getMsg());
+					LogUtils.i(TAG, "validateGuarantee...msg.getMsg=" + msg.getMsg());
 					ToastUtils.toast(context, "已被他人担保");
-				} else if (msg.getResultCode() == 2222) {
+				}
+				else if (msg.getResultCode() == 2222)
+				{
 					LogUtils.i(TAG, "validateGuarantee...success,担保的人有效");
 					handler.sendEmptyMessage(requestCode);
 				}
 			}
 
 			@Override
-			public void onFailure(String e) {
+			public void onFailure(String e)
+			{
 				LogUtils.i(TAG, "validateGuarantee...onFailure,caused by:" + e);
 				ToastUtils.toast(context, Constants.NET_WRONG);
 			}
@@ -583,73 +570,77 @@ public class GetUserInfo {
 	 * @param requestCode
 	 *            请求码
 	 */
-	public void getUserHistoryMsg(String dwID, String toID, long firstIndex,
-			int chatType, final Handler handler) {
+	public void getUserHistoryMsg(String dwID, String toID, long firstIndex, int chatType, final Handler handler)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		map.put("toID", toID);
 		map.put("firstIndex", String.valueOf(firstIndex));
 		map.put("chatType", String.valueOf(chatType));
-		LogUtils.i(TAG, "getUserHistoryMsg...begin,dwID=" + dwID + ",toID="
-				+ toID + ",firstIndex=" + firstIndex + ",chatType=" + chatType);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/chatHistory/getSingleChatHistory", Method.POST,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(
-								TAG,
-								"getUserHistoryMsg...msg.getResultCode="
-										+ msg.getResultCode() + "\nmsg.getMsg="
-										+ msg.getMsg() + "\nmsg.getData="
-										+ msg.getData());
-						if (msg.getResultCode() == 2222) {
-							Message message = Message.obtain();
-							message.what = 1;
-							message.obj = msg.getData().toString();
-							handler.sendMessage(message);
-						}
-						if (msg.getResultCode() == 3333) {
-							LogUtils.i(TAG,
-									"getUserHistoryMsg...onfailure,cause by:"
-											+ msg.getMsg());
-							Message message = Message.obtain();
-							message.obj = msg.getMsg();
-							message.what = 2;
-							handler.sendMessage(message);
-						}
-					}
+		LogUtils.i(TAG, "getUserHistoryMsg...begin,dwID=" + dwID + ",toID=" + toID + ",firstIndex=" + firstIndex + ",chatType=" + chatType);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/chatHistory/getSingleChatHistory", Method.POST, new HttpCallBack()
+		{
+			@Override
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getUserHistoryMsg...msg.getResultCode=" + msg.getResultCode() + "\nmsg.getMsg=" + msg.getMsg() + "\nmsg.getData=" + msg.getData());
+				if (msg.getResultCode() == 2222)
+				{
+					Message message = Message.obtain();
+					message.what = 1;
+					message.obj = msg.getData().toString();
+					handler.sendMessage(message);
+				}
+				if (msg.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "getUserHistoryMsg...onfailure,cause by:" + msg.getMsg());
+					Message message = Message.obtain();
+					message.obj = msg.getMsg();
+					message.what = 2;
+					handler.sendMessage(message);
+				}
+			}
 
-					@Override
-					public void onFailure(String e) {
-						LogUtils.i(TAG,
-								"getUserHistoryMsg...onFailure,cause by:" + e);
-						Message message = Message.obtain();
-						message.obj = "网络错误";
-						message.what = 3;
-						handler.sendMessage(message);
-					}
-				});
+			@Override
+			public void onFailure(String e)
+			{
+				LogUtils.i(TAG, "getUserHistoryMsg...onFailure,cause by:" + e);
+				Message message = Message.obtain();
+				message.obj = "网络错误";
+				message.what = 3;
+				handler.sendMessage(message);
+			}
+		});
 	}
 
-	private void showProgressDialog() {
-		activity.runOnUiThread(new Runnable() {
+	private void showProgressDialog()
+	{
+		activity.runOnUiThread(new Runnable()
+		{
 			@Override
-			public void run() {
-				if (null == mProDialog) {
+			public void run()
+			{
+				if (null == mProDialog)
+				{
 					mProDialog = ProgressDialog.show(context, null, "loading");
-				} else {
+				}
+				else
+				{
 					mProDialog.show();
 				}
 			}
 		});
 	}
 
-	private void hideProgressDialog() {
-		activity.runOnUiThread(new Runnable() {
+	private void hideProgressDialog()
+	{
+		activity.runOnUiThread(new Runnable()
+		{
 			@Override
-			public void run() {
-				if (null != mProDialog) {
+			public void run()
+			{
+				if (null != mProDialog)
+				{
 					mProDialog.dismiss();
 				}
 			}
@@ -666,38 +657,37 @@ public class GetUserInfo {
 	 * @param requestCode
 	 *            请求码
 	 */
-	public void getAddNewFriendHistory(String userID, final Handler handler,
-			final int requestCode) {
+	public void getAddNewFriendHistory(String userID, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", userID);
 		LogUtils.i(TAG, "getAddNewFriendHistory...begin,userID=" + userID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/friend/getFriendStatus", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/friend/getFriendStatus", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(TAG, "getAddNewFriendHistory...msg.getResultCode="
-						+ msg.getResultCode() + "\nmsg.getMsg=" + msg.getMsg()
-						+ "\nmsg.getData=" + msg.getData());
-				if (msg.getResultCode() == 2222) {
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getAddNewFriendHistory...msg.getResultCode=" + msg.getResultCode() + "\nmsg.getMsg=" + msg.getMsg() + "\nmsg.getData=" + msg.getData());
+				if (msg.getResultCode() == 2222)
+				{
 					LogUtils.i(TAG, "getAddNewFriendHistory...success");
 					Message message = Message.obtain();
 					message.obj = msg.getData().toString();
 					message.what = requestCode;
 					handler.sendMessage(message);
-				} else if (msg.getResultCode() == 3333) {
-					LogUtils.i(
-							TAG,
-							"getAddNewFriendHistory...failure,cause by:"
-									+ msg.getMsg());
+				}
+				else if (msg.getResultCode() == 3333)
+				{
+					//数据为空，直接给用户提示
+					LogUtils.i(TAG, "getAddNewFriendHistory...failure,cause by:" + msg.getMsg());
 					ToastUtils.toast(context, msg.getMsg());
 				}
-
 			}
 
 			@Override
-			public void onFailure(String e) {
-				LogUtils.i(TAG, "getAddNewFriendHistory...onFailure,cause by:"
-						+ e);
+			public void onFailure(String e)
+			{
+				LogUtils.i(TAG, "getAddNewFriendHistory...onFailure,cause by:" + e);
 				ToastUtils.toast(context, Constants.NET_WRONG);
 			}
 		});
@@ -705,28 +695,24 @@ public class GetUserInfo {
 
 	/**
 	 * 推荐别人获得的收益列表
-	 * 
 	 * @param userID
 	 *            自己ID
 	 * @param handler
 	 * @param requestCode
 	 */
-	public void getRecommendBenefitList(String userID, final Handler handler,
-			final int requestCode) {
+	public void getRecommendBenefitList(String userID, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", userID);
 		LogUtils.i(TAG, "getRecommendBenefitList...begin,dwID=" + userID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/user/getRecommendList", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/getRecommendList", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(
-						TAG,
-						"getRecommendBenefitList...begin,msg.getResultCode="
-								+ msg.getResultCode() + ",msg.getMsg="
-								+ msg.getMsg() + ",msg.getData="
-								+ msg.getData());
-				if (msg.getResultCode() == 2222) {
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getRecommendBenefitList...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg() + ",msg.getData=" + msg.getData());
+				if (msg.getResultCode() == 2222)
+				{
 					/**
 					 * ResultBean [resultCode=2222, msg=,
 					 * data=[{"amount":"30.0",
@@ -752,14 +738,16 @@ public class GetUserInfo {
 					handler.sendMessage(message);
 				}
 
-				if (msg.getResultCode() == 3333) {
+				if (msg.getResultCode() == 3333)
+				{
 					LogUtils.i(TAG, "getRecommendBenefitList...failure");
 					ToastUtils.toast(context, msg.getMsg());
 				}
 			}
 
 			@Override
-			public void onFailure(String e) {
+			public void onFailure(String e)
+			{
 				LogUtils.i(TAG, "getRecommendBenefitList...onFailure");
 				ToastUtils.toast(context, Constants.NET_WRONG);
 			}
@@ -776,24 +764,20 @@ public class GetUserInfo {
 	 * @param handler
 	 * @param requestCode
 	 */
-	public void getRecommendBenefitDetail(String userID, String otherID,
-			final Handler handler, final int requestCode) {
+	public void getRecommendBenefitDetail(String userID, String otherID, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", userID);
 		map.put("recommenderedID", otherID);
-		LogUtils.i(TAG, "getRecommendBenefitDetail...begin,dwID=" + userID
-				+ ",otherID=" + otherID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/user/getRecommendDetails", Method.GET, new HttpCallBack() {
+		LogUtils.i(TAG, "getRecommendBenefitDetail...begin,dwID=" + userID + ",otherID=" + otherID);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/getRecommendDetails", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(
-						TAG,
-						"getRecommendBenefitDetail...begin,msg.getResultCode="
-								+ msg.getResultCode() + ",msg.getMsg="
-								+ msg.getMsg() + ",msg.getData="
-								+ msg.getData());
-				if (msg.getResultCode() == 0) {
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getRecommendBenefitDetail...success,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg() + ",msg.getData=" + msg.getData());
+				if (msg.getResultCode() == 2222)
+				{
 					// list 包含key为 amount,time,status
 					LogUtils.i(TAG, "getRecommendBenefitDetail...success");
 					Message message = Message.obtain();
@@ -802,14 +786,16 @@ public class GetUserInfo {
 					handler.sendMessage(message);
 				}
 
-				if (msg.getResultCode() == 3333) {
+				if (msg.getResultCode() == 3333)
+				{
 					LogUtils.i(TAG, "getRecommendBenefitDetail...failure");
 					ToastUtils.toast(context, msg.getMsg());
 				}
 			}
 
 			@Override
-			public void onFailure(String e) {
+			public void onFailure(String e)
+			{
 				LogUtils.i(TAG, "getRecommendBenefitDetail...onFailure");
 				ToastUtils.toast(context, Constants.NET_WRONG);
 			}
@@ -823,36 +809,39 @@ public class GetUserInfo {
 	 * @param handler
 	 * @param requestCod
 	 */
-	public void getUserAccount(String dwID, final Handler handler,
-			final int requestCode) {
+	public void getUserAccount(String dwID, final Handler handler, final int requestCode)
+	{
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		LogUtils.i(TAG, "getUserAccount...begin,dwID" + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/user/getAccountInfo", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/getAccountInfo", Method.GET, new HttpCallBack()
+		{
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(
-						TAG,
-						"getUserAccount...msg.getResultCode"
-								+ msg.getResultCode() + ",msg.getMsg="
-								+ msg.getMsg() + ",msg.getData="
-								+ msg.getData());
-				if (msg.getResultCode() == 2222) {
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getUserAccount...msg.getResultCode" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg() + ",msg.getData=" + msg.getData());
+				if (msg.getResultCode() == 2222)
+				{
 					LogUtils.i(TAG, "getUserAccount...success");
 					Message message = Message.obtain();
 					message.what = requestCode;
 					message.obj = msg.getData().toString();
 					handler.sendMessage(message);
-				} else if (msg.getResultCode() == 3333) {
-					LogUtils.i(TAG,
-							"getUserAccount...failure,cause by:" + msg.getMsg());
-					ToastUtils.toast(context, msg.getMsg());
 				}
+				else if (msg.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "getUserAccount...failure,cause by:" + msg.getMsg());
+					ToastUtils.toast(context, msg.getMsg());
+					Message message = Message.obtain();
+					message.what = requestCode + 1;
+					handler.sendMessage(message);
+				}
+
 			}
 
 			@Override
-			public void onFailure(String e) {
+			public void onFailure(String e)
+			{
 				LogUtils.i(TAG, "getUserAccount...onFailure,cause by:" + e);
 				ToastUtils.toast(context, Constants.NET_WRONG);
 			}

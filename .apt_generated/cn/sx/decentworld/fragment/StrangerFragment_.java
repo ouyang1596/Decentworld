@@ -31,10 +31,10 @@ public final class StrangerFragment_
     private View contentView_;
 
     private void init_(Bundle savedInstanceState) {
-        getUserInfo = GetUserInfo_.getInstance_(getActivity());
-        mainFragmentComponent = MainFragmentComponent_.getInstance_(getActivity());
         getStrangerInfo = GetStrangerInfo_.getInstance_(getActivity());
         toast = ToastComponent_.getInstance_(getActivity());
+        getUserInfo = GetUserInfo_.getInstance_(getActivity());
+        mainFragmentComponent = MainFragmentComponent_.getInstance_(getActivity());
     }
 
     @Override
@@ -44,34 +44,19 @@ public final class StrangerFragment_
     }
 
     private void afterSetContentView_() {
-        stranger_scrollLayout = ((ScrollLayout) findViewById(cn.sx.decentworld.R.id.stranger_scrollLayout));
-        near_stranger_scrollLayout = ((ScrollLayout) findViewById(cn.sx.decentworld.R.id.near_stranger_scrollLayout));
-        iv_fragment_stranger_near_tab = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_fragment_stranger_near_tab));
-        lvStrangerInfo = ((ListView) findViewById(cn.sx.decentworld.R.id.fragment_stranger_chat_lv));
-        lvNearStranger = ((PullToRefreshListView) findViewById(cn.sx.decentworld.R.id.lv_near_stranger));
-        tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
         fragment_stranger_tab = ((ImageView) findViewById(cn.sx.decentworld.R.id.fragment_stranger_tab));
-        tvRefresh = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_refresh));
+        near_stranger_scrollLayout = ((ScrollLayout) findViewById(cn.sx.decentworld.R.id.near_stranger_scrollLayout));
+        lvStrangerInfo = ((ListView) findViewById(cn.sx.decentworld.R.id.fragment_stranger_chat_lv));
         ll_stranger_near_root = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.root_ll_stranger_near));
+        relStranger = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.root_main_layout_stranger));
+        iv_fragment_stranger_near_tab = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_fragment_stranger_near_tab));
         flingContainer = ((SwipeFlingAdapterView) findViewById(cn.sx.decentworld.R.id.fragment_stranger_near_lv));
         llStrangerNear = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.root_ll_stranger_near));
+        lvNearStranger = ((PullToRefreshListView) findViewById(cn.sx.decentworld.R.id.lv_near_stranger));
+        tvRefresh = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_refresh));
         tvSelect = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_select));
-        relStranger = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.root_main_layout_stranger));
-        {
-            View view = findViewById(cn.sx.decentworld.R.id.iv_fragment_stranger_near_tab);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        StrangerFragment_.this.ll_fragment_stranger_near_tab();
-                    }
-
-                }
-                );
-            }
-        }
+        tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
+        stranger_scrollLayout = ((ScrollLayout) findViewById(cn.sx.decentworld.R.id.stranger_scrollLayout));
         {
             View view = findViewById(cn.sx.decentworld.R.id.fragment_stranger_tab);
             if (view!= null) {
@@ -102,10 +87,25 @@ public final class StrangerFragment_
                 );
             }
         }
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((MainFragmentComponent_) mainFragmentComponent).afterSetContentView_();
+        {
+            View view = findViewById(cn.sx.decentworld.R.id.iv_fragment_stranger_near_tab);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        StrangerFragment_.this.ll_fragment_stranger_near_tab();
+                    }
+
+                }
+                );
+            }
+        }
         ((GetStrangerInfo_) getStrangerInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
+        ((MainFragmentComponent_) mainFragmentComponent).afterSetContentView_();
         init();
     }
 

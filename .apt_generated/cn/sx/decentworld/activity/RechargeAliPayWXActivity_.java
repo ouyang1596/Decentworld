@@ -36,14 +36,14 @@ public final class RechargeAliPayWXActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_back));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
         llpayMethod = ((LinearLayout) findViewById(id.ll_pay_method));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         etMoney = ((EditText) findViewById(id.et_money));
         {
             View view = findViewById(id.iv_back);
@@ -60,8 +60,8 @@ public final class RechargeAliPayWXActivity_
                 );
             }
         }
-        ((ToastComponent_) toast).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

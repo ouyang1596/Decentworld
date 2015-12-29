@@ -36,10 +36,10 @@ public final class EditOccupationActivity_
     }
 
     private void afterSetContentView_() {
-        tvFinish = ((TextView) findViewById(id.tv_finish));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        gvOccupation = ((GridView) findViewById(id.gv_occupation));
         etOccupation = ((EditText) findViewById(id.et_edit_occupation));
+        tvFinish = ((TextView) findViewById(id.tv_finish));
+        gvOccupation = ((GridView) findViewById(id.gv_occupation));
         init();
     }
 

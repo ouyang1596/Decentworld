@@ -10,6 +10,7 @@ import android.widget.TextView;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.component.TitleBar;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.dialog.ReminderDialog;
 import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
@@ -37,6 +38,8 @@ public class BindAccountActivity extends BaseFragmentActivity
 	private static final String TAG = "BindAccountActivity";
 	@Bean
 	ToastComponent toast;
+	@Bean
+	TitleBar titleBar;
 
 	/**
 	 * 绑定的账号类型
@@ -73,6 +76,7 @@ public class BindAccountActivity extends BaseFragmentActivity
 	@AfterViews
 	void init()
 	{
+		titleBar.setTitleBar("返回", "绑定推荐返利账号");
 		getUserInfo.getUserAccount(DecentWorldApp.getInstance().getDwID(), handler, GET_USER_ACCOUNT);
 	}
 
@@ -142,7 +146,7 @@ public class BindAccountActivity extends BaseFragmentActivity
 		if (accountType != WX)
 		{
 			// 跳转
-			setAlipay();
+			setAlipay(0);
 		}
 		else
 		{
@@ -153,7 +157,7 @@ public class BindAccountActivity extends BaseFragmentActivity
 				@Override
 				public void confirm()
 				{
-					setAlipay();
+					setAlipay(1);
 				}
 			});
 			dialog.show(getSupportFragmentManager(), "alipay");
@@ -163,11 +167,15 @@ public class BindAccountActivity extends BaseFragmentActivity
 	/**
 	 * 跳转到设置支付宝账号界面
 	 */
-	private void setAlipay()
+	private void setAlipay(int type)
 	{
 		Intent intent = new Intent(BindAccountActivity.this , BindAccountAlipayActivity_.class);
 		intent.putExtra("accountType", ALIPAY);
-		intent.putExtra("accountName", accountName);
+		if(type == 0)
+		{
+			intent.putExtra("accountName", accountName);
+		}else
+			intent.putExtra("accountName", "");
 		startActivity(intent);
 	}
 
@@ -182,20 +190,18 @@ public class BindAccountActivity extends BaseFragmentActivity
 		if (accountType != ALIPAY)
 		{
 			// 跳转
-			setWx();
+			setWx(0);
 		}
 		else
 		{
-			toast.show("你目前绑定的是支付宝，确定修改吗？");
 			ReminderDialog dialog = new ReminderDialog();
 			dialog.setInfo("你目前绑定的是支付宝，\n确定修改吗？");
 			dialog.setListener(new ReminderListener()
 			{
-
 				@Override
 				public void confirm()
 				{
-					setWx();
+					setWx(1);
 				}
 			});
 			dialog.show(getSupportFragmentManager(), "wx");
@@ -205,12 +211,40 @@ public class BindAccountActivity extends BaseFragmentActivity
 	/**
 	 * 跳转到绑定微信账号的界面
 	 */
-	private void setWx()
+	private void setWx(int type)
 	{
 		Intent intent = new Intent(BindAccountActivity.this , WXEntryActivity.class);
 		intent.putExtra("accountType", WX);
-		intent.putExtra("accountName", accountName);
+		if(type == 0)
+			intent.putExtra("accountName", accountName);
+		else
+			intent.putExtra("accountName", "");
 		startActivity(intent);
+	}
+	
+	
+	@Override
+	protected void onNewIntent(Intent intent)
+	{
+		super.onNewIntent(intent);
+		setIntent(intent);
+		LogUtils.i(TAG, "进入onNewIntent");
+		if(getIntent().getIntExtra("accountType", 3)!=3)
+		{
+			accountType = getIntent().getIntExtra("accountType", 3);
+			accountName = getIntent().getStringExtra("accountName");
+			initView();
+			LogUtils.i(TAG, "进入onNewIntent，并重新修改数据，accountType="+accountType+",accountName="+accountName);
+		}
+	}
+	
+	/**
+	 * 返回
+	 */
+	@Click(R.id.main_header_left)
+	void back()
+	{
+		finish();
 	}
 
 }

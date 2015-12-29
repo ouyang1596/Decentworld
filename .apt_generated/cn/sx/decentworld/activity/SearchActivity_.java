@@ -35,17 +35,17 @@ public final class SearchActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        searchComponent = SearchComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        searchComponent = SearchComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        setSearch = ((SearchEditText) findViewById(id.cet_search));
         rgSearchTag = ((RadioGroup) findViewById(id.rg_search_tag));
         tvCancel = ((TextView) findViewById(id.tv_cancel));
         lvSearch = ((PullToRefreshListView) findViewById(id.lv_search));
-        setSearch = ((SearchEditText) findViewById(id.cet_search));
-        ((SearchComponent_) searchComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((SearchComponent_) searchComponent).afterSetContentView_();
         init();
     }
 

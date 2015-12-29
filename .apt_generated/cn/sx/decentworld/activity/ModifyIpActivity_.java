@@ -37,28 +37,28 @@ public final class ModifyIpActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         et_modify_one = ((EditText) findViewById(id.et_modify_one));
-        et_modify_two = ((EditText) findViewById(id.et_modify_two));
         tv_modify_result = ((TextView) findViewById(id.tv_modify_result));
-        et_modify_four = ((EditText) findViewById(id.et_modify_four));
+        et_modify_two = ((EditText) findViewById(id.et_modify_two));
         main_header_left = ((LinearLayout) findViewById(id.main_header_left));
-        et_modify_three = ((EditText) findViewById(id.et_modify_three));
         main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
+        et_modify_three = ((EditText) findViewById(id.et_modify_three));
+        et_modify_four = ((EditText) findViewById(id.et_modify_four));
         lv_modify_ip = ((ListView) findViewById(id.lv_modify_ip));
         {
-            View view = findViewById(id.main_header_right);
+            View view = findViewById(id.btn_modify_complete);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        ModifyIpActivity_.this.right(view);
+                        ModifyIpActivity_.this.complete(view);
                     }
 
                 }
@@ -81,22 +81,22 @@ public final class ModifyIpActivity_
             }
         }
         {
-            View view = findViewById(id.btn_modify_complete);
+            View view = findViewById(id.main_header_right);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        ModifyIpActivity_.this.complete(view);
+                        ModifyIpActivity_.this.right(view);
                     }
 
                 }
                 );
             }
         }
-        ((ToastComponent_) toast).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

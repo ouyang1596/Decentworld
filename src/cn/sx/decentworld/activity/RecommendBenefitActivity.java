@@ -10,6 +10,7 @@ import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.adapter.RecommendBenefitListAdapter;
 import cn.sx.decentworld.bean.RecommendBenefitList;
+import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.component.TitleBar;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.dialog.CheckIdentityDialog;
@@ -56,11 +57,23 @@ public class RecommendBenefitActivity extends BaseFragmentActivity
 	@ViewById(R.id.ll_cash_income_root)
 	LinearLayout ll_cash_income_root;
 
-	@ViewById(R.id.tv_recommend_all_benefit)
-	TextView tv_recommend_all_benefit;// 现金总收益
+	/** 应该获得的收益**/
+	@ViewById(R.id.tv_recommend_benefit_all)
+	TextView tv_recommend_benefit_all;
+	/** 已经获得的收益**/
+	@ViewById(R.id.tv_recommend_benefit_has_back)
+	TextView tv_recommend_benefit_has_back;
+	/** 未提现的收益**/
+	@ViewById(R.id.tv_recommend_benefit_not_takeout)
+	TextView tv_recommend_benefit_not_takeout;
+	
 
 	@ViewById(R.id.lv_recommend_benefit_detail)
 	ListView lv_recommend_benefit_detail;// 收益信息
+	
+	/** 没有推荐人提示 **/
+	@ViewById(R.id.tv_recommend_benefit_reminder)
+	TextView tv_recommend_benefit_reminder;
 
 	/**
 	 * 收益
@@ -82,6 +95,7 @@ public class RecommendBenefitActivity extends BaseFragmentActivity
 	{
 		ViewUtil.scaleContentView(ll_cash_income_root);
 		titleBar.setTitleBar("设置", "现金收益");
+		
 		fm = getSupportFragmentManager();
 		userID = DecentWorldApp.getInstance().getDwID();
 		listData = new ArrayList<RecommendBenefitList>();
@@ -164,38 +178,60 @@ public class RecommendBenefitActivity extends BaseFragmentActivity
 					LogUtils.i(TAG, "数据为：" + result);
 					JSONArray array = JSON.parseArray(result);
 					RecommendBenefitList temp;
-					float allBenefit = 0;
-					for (int i = 0; i < array.size(); i++)
+					float allBenefit = 0;//应得总金额
+					float hasBenefit = 0;//已经获得的收益
+					float notTakeout = 0;//还未提现
+					if(array.size()>0)
 					{
-						JSONObject object = array.getJSONObject(i);
-						temp = new RecommendBenefitList();
-						if (object.getString("isRegister").equals("1"))
+						for (int i = 0; i < array.size(); i++)
 						{
-							temp.setRegister(true);
-							if (object.getString("status").equals("0"))
+							JSONObject object = array.getJSONObject(i);
+							temp = new RecommendBenefitList();
+							if (object.getString("isRegister").equals("1"))
 							{
-								temp.setFriend(false);
+								temp.setRegister(true);
+								if (object.getString("status").equals("0"))
+								{
+									temp.setFriend(false);
+								}
+								else
+								{
+									temp.setFriend(true);
+								}
+								float amount = Float.valueOf(object.getString("amount"));
+								temp.setAmount(amount * amount);
+								allBenefit += amount*amount;
+								
+								float benefit = Float.valueOf(object.getString("benefit"));
+								temp.setBenefit(benefit);
+								hasBenefit += benefit;
+								
+								float notTakeout_t = object.getFloatValue("stored");
+								temp.setStored(notTakeout_t);
+								notTakeout += notTakeout_t;
+								
+								temp.setOtherID(object.getString("dwID"));
 							}
 							else
 							{
-								temp.setFriend(true);
+								temp.setRegister(false);
 							}
-							float amount = Float.valueOf(object.getString("amount"));
-							allBenefit += amount;
-							temp.setAmount(amount * amount);
-							temp.setBenefit(Float.valueOf(object.getString("benefit")));
-							temp.setOtherID(object.getString("dwID"));
+							temp.setName(object.getString("name"));
+							
+							listData.add(temp);
+							adapterList.notifyDataSetChanged();
+							// 计算已经获得的收益和未提现的收益并显示
+							tv_recommend_benefit_all.setText(String.valueOf(allBenefit));
+							tv_recommend_benefit_has_back.setText(String.valueOf(hasBenefit));
+							tv_recommend_benefit_not_takeout.setText(String.valueOf(notTakeout));
 						}
-						else
-						{
-							temp.setRegister(false);
-						}
-						temp.setName(object.getString("name"));
-						listData.add(temp);
 					}
-					adapterList.notifyDataSetChanged();
-					// 计算总收益并显示
-					tv_recommend_all_benefit.setText(String.valueOf(allBenefit));
+					else
+					{
+						tv_recommend_benefit_reminder.setText("你还没有推荐过任何人哦！");
+						tv_recommend_benefit_reminder.setVisibility(View.VISIBLE);
+						lv_recommend_benefit_detail.setVisibility(View.INVISIBLE);
+					}
 					break;
 
 				default:

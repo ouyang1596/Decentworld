@@ -20,6 +20,7 @@ import android.os.Build;
 import android.util.Log;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.activity.SendErrorActivity;
+import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.utils.TimeUtils;
 
 /**
@@ -128,6 +129,7 @@ public class CrashHandler implements Thread.UncaughtExceptionHandler {
 				infos.put("android_version", android.os.Build.VERSION.RELEASE);
 				infos.put("package", pi.packageName);
 				infos.put("time", TimeUtils.getDateAllMessage());
+				LogUtils.i(TAG, "提交错误报告的时间为："+TimeUtils.getDateAllMessage());
 			}
 		} catch (PackageManager.NameNotFoundException e) {
 			Log.e(TAG, "an error occured when collect package info", e);

@@ -42,13 +42,13 @@ public final class ChatRoomEditMyInfoActivity_
     }
 
     private void afterSetContentView_() {
-        tvNickName = ((TextView) findViewById(id.tv_nickname));
-        btnOk = ((Button) findViewById(id.btn_OK));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
         etSelfIntroduce = ((EditText) findViewById(id.et_self_introduce));
         llChatRoomHead = ((LinearLayout) findViewById(id.ll_chatroom_head));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        btnOk = ((Button) findViewById(id.btn_OK));
+        tvNickName = ((TextView) findViewById(id.tv_nickname));
         ivChatRoomHead = ((CircularImageView) findViewById(id.iv_chatroom_head));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

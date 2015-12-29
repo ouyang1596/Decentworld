@@ -36,19 +36,19 @@ public final class AddThemeActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         chatroomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ivCover = ((ImageView) findViewById(id.iv_cover));
         lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
         btnContentSave = ((Button) findViewById(id.btn_content_save));
-        etSubjectName = ((EditText) findViewById(id.tv_subj_name));
         tvSend = ((TextView) findViewById(id.tv_send));
+        etSubjectName = ((EditText) findViewById(id.tv_subj_name));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        ((ToastComponent_) toast).afterSetContentView_();
+        ivCover = ((ImageView) findViewById(id.iv_cover));
         ((ChatRoomInfoSettingAndGetting_) chatroomInfoSettingAndGetting).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

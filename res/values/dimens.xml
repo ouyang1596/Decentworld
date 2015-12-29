@@ -87,6 +87,7 @@
     <dimen name="new_textsize_18sp">18sp</dimen>
     <dimen name="new_textsize_19sp">19sp</dimen>
     <dimen name="new_textsize_20sp">20sp</dimen>
+    <dimen name="new_textsize_24sp">24sp</dimen>
     <dimen name="new_textsize_40sp">40sp</dimen>
     <dimen name="new_textsize_60sp">60sp</dimen>
     <dimen name="picture_show_size">300px</dimen>

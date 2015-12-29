@@ -94,16 +94,20 @@ public class RecommendBenefitListAdapter extends BaseAdapter
 		}
 		else
 		{
-			String icon = ImageUtils.getIconByDwID(benefitList.getUserID(), ImageUtils.ICON_SMALL);
+			//是否是朋友（设计）
+			String icon = ImageUtils.getIconByDwID(benefitList.getOtherID(), ImageUtils.ICON_SMALL);
 			ImageLoaderHelper.mImageLoader.displayImage(icon, holder.iv_icon);
 			
 			holder.tv_name.setText(benefitList.getName());
 			holder.tv_detail.setVisibility(View.VISIBLE);
-			int amount = (int) (benefitList.getAmount());
-			holder.pb_grogressBar.setMax(amount);
+
 			int benefit = (int) benefitList.getBenefit();
 			holder.pb_grogressBar.setProgress(benefit);
-			holder.tv_amount.setText(benefit+"/"+amount);
+			
+			int amount = (int) (benefitList.getAmount());
+			holder.pb_grogressBar.setMax(amount);
+			
+			holder.tv_amount.setText(benefitList.getBenefit()+"/"+benefitList.getAmount());
 			holder.tv_detail.setOnClickListener(new OnClickListener()
 			{
 				@Override
@@ -116,9 +120,6 @@ public class RecommendBenefitListAdapter extends BaseAdapter
 				}
 			});
 		}
-
-		
-		
 		return convertView;
 	}
 

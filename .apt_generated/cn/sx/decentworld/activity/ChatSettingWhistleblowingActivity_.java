@@ -39,19 +39,64 @@ public final class ChatSettingWhistleblowingActivity_
     }
 
     private void afterSetContentView_() {
-        activity_whistleblowing_reason_3 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_3));
-        activity_whistleblowing_reason_5 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_5));
+        activity_whistleblowing_reason_6 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_6));
         activity_whistleblowing_reason_2 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_2));
+        ll_chat_setting_whistleblowing_5 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_5));
+        activity_whistleblowing_reason_3 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_3));
         ll_chat_setting_whistleblowing_2 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_2));
+        ll_chat_setting_whistleblowing_3 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_3));
+        chat_setting_whistleblowing_supplement = ((LinearLayout) findViewById(id.chat_setting_whistleblowing_supplement));
+        ll_chat_setting_whistleblowing_4 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_4));
+        ll_chat_setting_whistleblowing_6 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_6));
+        ll_chat_setting_whistleblowing_1 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_1));
+        activity_whistleblowing_reason_5 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_5));
         activity_whistleblowing_reason_1 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_1));
         activity_whistleblowing_reason_4 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_4));
-        ll_chat_setting_whistleblowing_3 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_3));
-        ll_chat_setting_whistleblowing_1 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_1));
-        ll_chat_setting_whistleblowing_6 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_6));
-        chat_setting_whistleblowing_supplement = ((LinearLayout) findViewById(id.chat_setting_whistleblowing_supplement));
-        ll_chat_setting_whistleblowing_5 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_5));
-        activity_whistleblowing_reason_6 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_6));
-        ll_chat_setting_whistleblowing_4 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_4));
+        {
+            View view = findViewById(id.main_header_right_tv);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatSettingWhistleblowingActivity_.this.submit();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.chat_setting_whistleblowing_supplement);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatSettingWhistleblowingActivity_.this.supplement();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatSettingWhistleblowingActivity_.this.setBackBtn();
+                    }
+
+                }
+                );
+            }
+        }
         {
             View view = findViewById(id.ll_chat_setting_whistleblowing_1);
             if (view!= null) {
@@ -136,51 +181,6 @@ public final class ChatSettingWhistleblowingActivity_
                     @Override
                     public void onClick(View view) {
                         ChatSettingWhistleblowingActivity_.this.radioCheck(view);
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.chat_setting_whistleblowing_supplement);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingWhistleblowingActivity_.this.supplement();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingWhistleblowingActivity_.this.setBackBtn();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.main_header_right_tv);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingWhistleblowingActivity_.this.submit();
                     }
 
                 }

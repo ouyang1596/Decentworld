@@ -43,7 +43,9 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_register_appearance)
 public class RegisterAppearanceActivity extends BaseFragmentActivity implements
-		OnLongClickListener, OnBackClickListener {
+		OnLongClickListener, OnClickListener, OnBackClickListener {
+	private static final String TAG = "RegisterAppearanceActivity";
+
 	@ViewById(R.id.vp_pic)
 	ViewPager vpPic;
 	@ViewById(R.id.btn_OK)
@@ -77,12 +79,17 @@ public class RegisterAppearanceActivity extends BaseFragmentActivity implements
 	ToastComponent toast;
 	@Bean
 	RegisterComponent registerComponent;
+	private ImageView leftSelectTips;
+	private ImageView rightSelectTips;
 
 	@AfterViews
 	public void init() {
-		tvTitle.setText("颜值");
-		ivBack.setVisibility(View.VISIBLE);
+
+		initView();
 		initData();
+
+		initListener();
+
 		fragmentManager = getSupportFragmentManager();
 		dotNormalBitmap = BitmapFactory.decodeResource(getResources(),
 				R.drawable.ic_launcher);
@@ -152,18 +159,66 @@ public class RegisterAppearanceActivity extends BaseFragmentActivity implements
 		});
 	}
 
+	/**
+	 * 回调监听的方法
+	 */
+	private void initListener() {
+		leftSelectTips.setOnClickListener(this);
+		rightSelectTips.setOnClickListener(this);
+	}
+
+	/**
+     * 
+     */
+	private void initView() {
+		tvTitle.setText("颜值");
+		ivBack.setVisibility(View.VISIBLE);
+		leftSelectTips = (ImageView) findViewById(R.id.iv_leftTips);
+		rightSelectTips = (ImageView) findViewById(R.id.iv_rightTips);
+
+	}
+
 	private void setCurrentDot() {
 		if (bitmaps.size() > 0 && currentItem >= 0 && dots.size() > currentItem) {
 			currentItem = vpPic.getCurrentItem();
 			dots.get(currentItem).setBackgroundResource(R.drawable.dot_focused);
+			setCurrentItemTips(currentItem);
 		}
+	}
+
+	/**
+	 * 设置滑动导航的指示图片的方法。
+	 * 
+	 * @param currentItem2
+	 */
+	private void setCurrentItemTips(int currentItem) {
+		setDefaultSelectTips();
+
+		int itemSize = bitmaps.size();
+		if (itemSize >= 2) {
+			if (currentItem == itemSize - 1) {
+				leftSelectTips.setVisibility(View.VISIBLE);
+			} else if (currentItem == 0) {
+				rightSelectTips.setVisibility(View.VISIBLE);
+			} else {
+				leftSelectTips.setVisibility(View.VISIBLE);
+				rightSelectTips.setVisibility(View.VISIBLE);
+			}
+		}
+	}
+
+	/**
+     * 
+     */
+	private void setDefaultSelectTips() {
+		leftSelectTips.setVisibility(View.GONE);
+		rightSelectTips.setVisibility(View.GONE);
 	}
 
 	/**
 	 * 填充ViewPager页面的适配器
 	 * 
 	 * @author Administrator
-	 * 
 	 */
 	private class CustomPageAdapter extends PagerAdapter {
 
@@ -209,7 +264,6 @@ public class RegisterAppearanceActivity extends BaseFragmentActivity implements
 	 * 当ViewPager中页面的状态发生改变时调用
 	 * 
 	 * @author Administrator
-	 * 
 	 */
 	private class CustomPageChangeListener implements OnPageChangeListener {
 		private int oldPosition = 0;
@@ -283,7 +337,7 @@ public class RegisterAppearanceActivity extends BaseFragmentActivity implements
 
 	/**
 	 * 将大于2M的图片进行压缩处理
-	 * */
+	 */
 	private void handlePic(ArrayList<String> pic_filse) {
 		for (int i = 0; i < pic_filse.size(); i++) {
 			String filePath = pic_filse.get(i);
@@ -297,10 +351,10 @@ public class RegisterAppearanceActivity extends BaseFragmentActivity implements
 
 	/**
 	 * 将图片压缩到指定的大小
-	 * */
+	 */
 	private File handleFile(String filePath) {
 		Bitmap bitmap = ImageUtils.scalePic(filePath);
-		String picPath = Constants.HomePath + "/temp"
+		String picPath = Constants.HOME_PATH + "/temp"
 				+ ImageUtils.generateFileName() + ".png";
 		ImageUtils.saveBitmap(picPath, bitmap);
 		File file = new File(picPath);
@@ -396,7 +450,7 @@ public class RegisterAppearanceActivity extends BaseFragmentActivity implements
 
 	/**
 	 * 初始化
-	 * */
+	 */
 	private void initData() {
 		bitmaps = new ArrayList<Bitmap>();
 		picPathList = new ArrayList<String>();
@@ -519,5 +573,29 @@ public class RegisterAppearanceActivity extends BaseFragmentActivity implements
 			}
 		});
 		dp.show(fragmentManager, "backDialogs");
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see android.view.View.OnClickListener#onClick(android.view.View)
+	 */
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.iv_leftTips:
+			LogUtils.d(TAG, "Click LeftImageView");
+			currentItem -= 1;
+			vpPic.setCurrentItem(currentItem);
+			break;
+		case R.id.iv_rightTips:
+			LogUtils.d(TAG, "Click rightImageView");
+			currentItem += 1;
+			vpPic.setCurrentItem(currentItem);
+			break;
+		default:
+			break;
+		}
+
 	}
 }

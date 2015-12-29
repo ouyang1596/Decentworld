@@ -67,10 +67,11 @@ public class ChatSettingActivity extends BaseFragmentActivity
 	@ViewById(R.id.iv_switch_no_disturb)
 	ImageView iv_switch_ddisturb;
 
-	private ArrayList<String> members = new ArrayList<String>();
+	private ArrayList<String[]> members = new ArrayList<String[]>();
 	private ChatSettingGridAdapter gridAdapter;
 	private FragmentManager fragmentManager;
 	private String otherID = "";
+	private String otherNick = "";
 	private boolean isCheckedTop = false;// 置顶判断
 	private boolean isCheckedNDisturb = false;// 免打扰开关
 	private boolean isClear = false;// 清空判断
@@ -79,7 +80,6 @@ public class ChatSettingActivity extends BaseFragmentActivity
 	public void init()
 	{
 		titleBar.setTitleBar("聊天详情", null);
-		otherID = DecentWorldApp.getInstance().getDwID();
 		initData();
 	}
 
@@ -90,6 +90,7 @@ public class ChatSettingActivity extends BaseFragmentActivity
 	{
 		fragmentManager = getSupportFragmentManager();
 		otherID = getIntent().getStringExtra("otherID");
+		otherNick = getIntent().getStringExtra("otherNick");
 		ChatSetting chatSetting = ChatSetting.queryByDwID(otherID);
 		if(chatSetting!=null)
 		{
@@ -104,7 +105,7 @@ public class ChatSettingActivity extends BaseFragmentActivity
 				iv_switch_ddisturb.setImageResource(R.drawable.switch_rectangle_open);
 			}
 		}
-		members.add(otherID);
+		members.add(new String[]{otherID,otherNick});
 		gridAdapter = new ChatSettingGridAdapter(ChatSettingActivity.this , R.layout.chat_setting_gridview_item , members);
 		chat_setting_gridview.setAdapter(gridAdapter);
 		chat_setting_gridview.setOnItemClickListener(new OnItemClickListener()
@@ -114,9 +115,14 @@ public class ChatSettingActivity extends BaseFragmentActivity
 			{
 				if (position == gridAdapter.getCount() - 1)
 				{
+					ArrayList<String> temp = new ArrayList<String>();
+					for(int i=0;i<members.size();i++)
+					{
+						temp.add(members.get(i)[0]);
+					}
 					Intent intent = new Intent(ChatSettingActivity.this , ChatPickContactActivity_.class);
 					Bundle bundle = new Bundle();
-					bundle.putStringArrayList("members_had_included", members);
+					bundle.putStringArrayList("members_had_included", temp);
 					bundle.putBoolean("turn_another_activity", true);
 					bundle.putInt("execute", PickContactActivity_.EXECUTE_NOW);
 					intent.putExtras(bundle);

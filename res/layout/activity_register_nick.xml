@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
+        android:gravity="center"
         android:orientation="vertical" >
 
         <cn.sx.decentworld.widget.ClearEditText
@@ -28,6 +29,22 @@
             android:textColorHint="@color/three_black"
             android:textCursorDrawable="@drawable/color_cursor"
             android:textSize="@dimen/new_textsize_13sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="修改昵称需要收费10元"
+            android:textColor="@color/three_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+
+        <ImageView
+            android:id="@+id/iv_nickname"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/camera" />
 
         <FrameLayout
             android:layout_width="match_parent"

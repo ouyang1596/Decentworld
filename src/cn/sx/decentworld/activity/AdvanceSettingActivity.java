@@ -30,10 +30,10 @@ import com.android.volley.Request.Method;
 import com.googlecode.androidannotations.annotations.*;
 
 /**
- * @ClassName: PrivacySettingActivity.java
- * @Description:
+ * @ClassName: AdvanceSettingActivity.java
+ * @Description: 
  * @author: cj
- * @date: 2015年7月24日 上午10:46:33
+ * @date: 2015年12月27日 上午9:27:04
  */
 @EActivity(R.layout.activity_advance_setting)
 public class AdvanceSettingActivity extends BaseFragmentActivity implements OnClickListener
@@ -416,7 +416,6 @@ public class AdvanceSettingActivity extends BaseFragmentActivity implements OnCl
 						checkBoxIsChecked[i] = false;
 					}
 				}
-
 			}
 
 			@Override

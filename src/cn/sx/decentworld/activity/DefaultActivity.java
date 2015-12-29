@@ -102,7 +102,6 @@ public class DefaultActivity extends BaseFragmentActivity implements
 				startActivity(intent);
 				finish();
 			}
-
 		} else {
 			// 确保内存中的数据为空
 			DecentWorldApp.getInstance().setToken("");

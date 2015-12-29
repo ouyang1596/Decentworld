@@ -112,13 +112,15 @@ public class NewFriendsActivity extends BaseFragmentActivity
 		// 路由到ChatFragment
 		EventBus.getDefault().post(newfriend.getDw_id(), NotifyByEventBus.NT_REFRESH_CONTACT);
 		
-		
 		//将陌生人处的会话列表移动到好友处处
-		ConversationList conversationList = ConversationList.queryByDwID(newfriend.getDw_id(), DWMessage.CHAT_RELATIONSHIP_STRANGER);
-		if(conversationList!=null)
+		List<ConversationList> conversationList = ConversationList.queryByDwID(newfriend.getDw_id(), DWMessage.CHAT_RELATIONSHIP_STRANGER);
+		if(conversationList.size()>0)
 		{
-			conversationList.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_FRIEND);
-			conversationList.save();
+			for(ConversationList temp:conversationList)
+			{
+				temp.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_FRIEND);
+				temp.save();
+			}
 			EventBus.getDefault().post("【同意添加，更新好友会话列表】", NotifyByEventBus.NT_INIT_FRIEND_CONVERSATION);
 			EventBus.getDefault().post("【同意添加，更新陌生人会话列表】", NotifyByEventBus.NT_INIT_STRANGER_CONVERSATION);
 		}
@@ -163,6 +165,7 @@ public class NewFriendsActivity extends BaseFragmentActivity
 			switch (msg.what)
 			{
 				case GET_ADD_NEW_FRIEND_HISTORY:
+					
 					NewFriend.deleteAll();
 					LogUtils.i(TAG, "获取添加朋友的历史记录列表，获得数据，待处理："+msg.obj.toString());
 					List<NewFriend> list = new ArrayList<NewFriend>();

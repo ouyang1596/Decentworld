@@ -40,12 +40,12 @@ public final class InterestingGroupActivity_
 
     private void afterSetContentView_() {
         lv_group_distance_group = ((ListView) findViewById(cn.sx.decentworld.R.id.lv_group_distance_group));
-        main_header_left_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.main_header_left_tv));
-        main_header_right = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.main_header_right));
-        main_header_left = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.main_header_left));
+        lv_recommand_group = ((ListView) findViewById(cn.sx.decentworld.R.id.lv_recommand_group));
         main_header_title = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
         sv_interesting_group_near = ((ScrollView) findViewById(cn.sx.decentworld.R.id.sv_interesting_group_near));
-        lv_recommand_group = ((ListView) findViewById(cn.sx.decentworld.R.id.lv_recommand_group));
+        main_header_right = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.main_header_right));
+        main_header_left = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.main_header_left));
+        main_header_left_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.main_header_left_tv));
         {
             View view = findViewById(cn.sx.decentworld.R.id.main_header_left);
             if (view!= null) {

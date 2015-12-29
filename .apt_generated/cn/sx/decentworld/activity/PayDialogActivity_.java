@@ -38,8 +38,8 @@ public final class PayDialogActivity_
     }
 
     private void afterSetContentView_() {
-        tvRenminbi = ((TextView) findViewById(id.tv_renminbi));
         ivPayZhifubao = ((ImageView) findViewById(id.iv_pay_zhifubao));
+        tvRenminbi = ((TextView) findViewById(id.tv_renminbi));
         ivPayWeixin = ((ImageView) findViewById(id.iv_pay_weixin));
         ((RechargeComponent_) rechargeComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();

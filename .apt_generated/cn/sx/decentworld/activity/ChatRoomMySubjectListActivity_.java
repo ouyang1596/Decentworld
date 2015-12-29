@@ -37,9 +37,9 @@ public final class ChatRoomMySubjectListActivity_
     }
 
     private void afterSetContentView_() {
+        ivBack = ((ImageView) findViewById(id.iv_back));
         llMySubjectList = ((LinearLayout) findViewById(id.root_activity_chat_room_my_subject_list));
         lvSubject = ((ListView) findViewById(id.lv_subject));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         ((ChatRoomInfoSettingAndGetting_) ChatRoomInfoSettingAndGetting).afterSetContentView_();
         init();
     }

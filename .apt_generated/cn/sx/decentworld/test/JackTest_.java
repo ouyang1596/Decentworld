@@ -36,9 +36,9 @@ public final class JackTest_
 
     private void afterSetContentView_() {
         btn_play_audio = ((Button) findViewById(id.btn_play_audio));
+        btn_current_thread = ((Button) findViewById(id.btn_current_thread));
         btn_remove_cache = ((Button) findViewById(id.btn_remove_cache));
         btn_current_service = ((Button) findViewById(id.btn_current_service));
-        btn_current_thread = ((Button) findViewById(id.btn_current_thread));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

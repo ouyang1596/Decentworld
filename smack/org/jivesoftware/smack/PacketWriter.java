@@ -20,12 +20,16 @@
 
 package org.jivesoftware.smack;
 
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.IQ.Type;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.Connection.InterceptorWrapper;
 import org.jivesoftware.smack.Connection.ListenerWrapper;
 
 import android.content.SharedPreferences;
 import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.utils.LogUtils;
 
 import java.io.IOException;
@@ -352,7 +356,15 @@ public class PacketWriter {
                     // Send heartbeat if no packet has been sent to the server for a given time
                     if (System.currentTimeMillis() - lastActive >= delay) {
                         try {
-                            writer.write(" ");
+                        	IQ ping=new IQ(){
+                        		@Override
+                        		public String getChildElementXML() {
+                        			return "<ping xmlns=\"urn:xmpp:ping\"/>";
+                        		}
+                        	};
+                        	ping.setFrom(DecentWorldApp.getInstance().getDwID()+Constants.SERVER_NAME+"/Smack");
+                        	ping.setType(Type.GET);
+                            writer.write(ping.toXML());
                             writer.flush();
                             LogUtils.i(TAG, System.currentTimeMillis()+":写一个空字符串到服务器");
                         }

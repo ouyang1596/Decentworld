@@ -473,11 +473,11 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	 * @param dwID
 	 * @return
 	 */
-	public static ConversationList queryByDwID(String otherID,int chatRelationship)
+	public static List<ConversationList> queryByDwID(String otherID,int chatRelationship)
 	{
 		String userID = DecentWorldApp.getInstance().getDwID();
 		String sql = "userID=? and dwID=? and chatRelationship=?";
-		return new Select().from(ConversationList.class).where(sql,userID, otherID,chatRelationship).executeSingle();
+		return new Select().from(ConversationList.class).where(sql,userID, otherID,chatRelationship).execute();
 	}
 	
 	/**

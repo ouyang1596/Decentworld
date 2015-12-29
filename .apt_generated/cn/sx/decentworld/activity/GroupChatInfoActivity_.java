@@ -37,19 +37,34 @@ public final class GroupChatInfoActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        mainFragmentComponent = MainFragmentComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        mainFragmentComponent = MainFragmentComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        exitBtn = ((Button) findViewById(id.btn_exit_grp));
-        set_top_switcher = ((ImageView) findViewById(id.set_top_switcher));
-        real_groupname = ((TextView) findViewById(id.real_groupname));
-        root_fragment_chat_chat_group_info = ((LinearLayout) findViewById(id.root_fragment_chat_chat_group_info));
-        userGridview = ((ExpandGridView) findViewById(id.group_chat_gridview));
         group_chat_group_icon = ((ImageView) findViewById(id.group_chat_group_icon));
-        my_name_groupchat = ((TextView) findViewById(id.my_name_groupchat));
+        userGridview = ((ExpandGridView) findViewById(id.group_chat_gridview));
         interrupt_switcher = ((ImageView) findViewById(id.interrupt_switcher));
+        set_top_switcher = ((ImageView) findViewById(id.set_top_switcher));
+        my_name_groupchat = ((TextView) findViewById(id.my_name_groupchat));
+        root_fragment_chat_chat_group_info = ((LinearLayout) findViewById(id.root_fragment_chat_chat_group_info));
+        exitBtn = ((Button) findViewById(id.btn_exit_grp));
+        real_groupname = ((TextView) findViewById(id.real_groupname));
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        GroupChatInfoActivity_.this.back();
+                    }
+
+                }
+                );
+            }
+        }
         {
             View view = findViewById(id.set_chat_top);
             if (view!= null) {
@@ -80,23 +95,8 @@ public final class GroupChatInfoActivity_
                 );
             }
         }
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        GroupChatInfoActivity_.this.back();
-                    }
-
-                }
-                );
-            }
-        }
-        ((MainFragmentComponent_) mainFragmentComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((MainFragmentComponent_) mainFragmentComponent).afterSetContentView_();
     }
 
     @Override

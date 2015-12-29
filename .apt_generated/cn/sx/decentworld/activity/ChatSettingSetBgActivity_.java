@@ -32,11 +32,41 @@ public final class ChatSettingSetBgActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        titleBar = TitleBar_.getInstance_(this);
         picture = ChoceAndTakePictureComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        {
+            View view = findViewById(id.chat_setting_set_bg_fromlocal);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatSettingSetBgActivity_.this.selectBgFromLocal(view);
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.chat_setting_set_bg_choice_picture);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatSettingSetBgActivity_.this.chat_setting_set_bg_choice_picture();
+                    }
+
+                }
+                );
+            }
+        }
         {
             View view = findViewById(id.chat_setting_set_bg_take_picture);
             if (view!= null) {
@@ -67,38 +97,8 @@ public final class ChatSettingSetBgActivity_
                 );
             }
         }
-        {
-            View view = findViewById(id.chat_setting_set_bg_choice_picture);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingSetBgActivity_.this.chat_setting_set_bg_choice_picture();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.chat_setting_set_bg_fromlocal);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingSetBgActivity_.this.selectBgFromLocal(view);
-                    }
-
-                }
-                );
-            }
-        }
-        ((TitleBar_) titleBar).afterSetContentView_();
         ((ChoceAndTakePictureComponent_) picture).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

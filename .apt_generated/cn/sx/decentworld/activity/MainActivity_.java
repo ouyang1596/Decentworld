@@ -34,18 +34,18 @@ public final class MainActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        getFriendInfo = GetFriendInfo_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
-        mainComponent = MainFragmentComponent_.getInstance_(this);
         getUserInfo = GetUserInfo_.getInstance_(this);
+        getFriendInfo = GetFriendInfo_.getInstance_(this);
+        mainComponent = MainFragmentComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         main_viewpager = ((DWViewPager) findViewById(id.main_viewpager));
-        ((GetFriendInfo_) getFriendInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
-        ((MainFragmentComponent_) mainComponent).afterSetContentView_();
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
+        ((GetFriendInfo_) getFriendInfo).afterSetContentView_();
+        ((MainFragmentComponent_) mainComponent).afterSetContentView_();
         init();
     }
 

@@ -62,7 +62,7 @@ public class DownloadListenService extends Service
 		// 调用系统下载；
 		mDownloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 		Uri uri = Uri.parse(url);
-		File folder = new File(Constants.HomePath);
+		File folder = new File(Constants.HOME_PATH);
 		if (!(folder.exists() && folder.isDirectory()))
 		{
 			folder.mkdirs();

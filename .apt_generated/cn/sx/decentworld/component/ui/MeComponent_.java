@@ -31,18 +31,18 @@ public final class MeComponent_
         if (!(context_ instanceof Activity)) {
             return ;
         }
-        ll_chat_me_work_circle = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_chat_me_work_circle));
-        tv_chat_me_edit = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_edit));
-        tv_chat_me_introduce = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_introduce));
-        relMeTitle = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rel_me_title));
-        ll_chat_me_recharge = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_chat_me_recharge));
-        rl_chat_me_root = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_chat_me_root));
-        sv_chat_me = ((CustomScrollView) findViewById(cn.sx.decentworld.R.id.sv_chat_me));
         ll_chat_me_setting = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_chat_me_setting));
         ll_chat_me_user_detail = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_chat_me_user_detail));
+        rl_chat_me_root = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_chat_me_root));
+        tv_chat_me_edit = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_edit));
+        sv_chat_me = ((CustomScrollView) findViewById(cn.sx.decentworld.R.id.sv_chat_me));
+        ll_chat_me_work_circle = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_chat_me_work_circle));
+        ll_chat_me_recharge = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_chat_me_recharge));
+        relMeTitle = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rel_me_title));
+        tv_chat_me_introduce = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_chat_me_introduce));
+        ((ToastComponent_) toast).afterSetContentView_();
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 
@@ -64,9 +64,9 @@ public final class MeComponent_
             activity = ((Activity) context_);
         }
         context = context_;
+        toast = ToastComponent_.getInstance_(context_);
         getUserInfo = GetUserInfo_.getInstance_(context_);
         choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(context_);
-        toast = ToastComponent_.getInstance_(context_);
     }
 
     public static MeComponent_ getInstance_(Context context) {

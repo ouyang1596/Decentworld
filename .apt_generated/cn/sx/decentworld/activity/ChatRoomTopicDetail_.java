@@ -42,21 +42,6 @@ public final class ChatRoomTopicDetail_
         chat_rooom_detail_bt_join = ((Button) findViewById(id.chat_rooom_detail_bt_join));
         root_activity_chat_room_data = ((RelativeLayout) findViewById(id.root_activity_chat_room_data));
         {
-            View view = findViewById(id.chat_rooom_detail_bt_join);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatRoomTopicDetail_.this.tojoin();
-                    }
-
-                }
-                );
-            }
-        }
-        {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
@@ -65,6 +50,21 @@ public final class ChatRoomTopicDetail_
                     @Override
                     public void onClick(View view) {
                         ChatRoomTopicDetail_.this.doback();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.chat_rooom_detail_bt_join);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatRoomTopicDetail_.this.tojoin();
                     }
 
                 }

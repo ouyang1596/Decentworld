@@ -45,23 +45,23 @@ public final class ChatRoomAddThemeActivity_
     }
 
     private void afterSetContentView_() {
-        etFee = ((EditText) findViewById(id.et_fee));
-        rbContent = ((RadioButton) findViewById(id.rb_content));
-        rbFixed = ((RadioButton) findViewById(id.rb_fixed));
-        ivCover = ((ImageView) findViewById(id.iv_cover));
+        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
         btnFeeScaleSave = ((Button) findViewById(id.btn_fee_scale_save));
-        tvFeeScale = ((TextView) findViewById(id.rb_fee_scale));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        tvSend = ((TextView) findViewById(id.tv_send));
         rgFeeContent = ((RadioGroup) findViewById(id.rg_content));
-        tvPercent = ((TextView) findViewById(id.tv_percent));
-        rbFeeScale = ((RadioButton) findViewById(id.rb_fee_scale));
+        llEdit = ((LinearLayout) findViewById(id.root_activity_edit));
         btnContentSave = ((Button) findViewById(id.btn_content_save));
         slFee = ((ScrollLayout) findViewById(id.sl_fee));
-        etSubjectName = ((EditText) findViewById(id.tv_subj_name));
-        llEdit = ((LinearLayout) findViewById(id.root_activity_edit));
+        ivCover = ((ImageView) findViewById(id.iv_cover));
+        rbContent = ((RadioButton) findViewById(id.rb_content));
+        rbFixed = ((RadioButton) findViewById(id.rb_fixed));
+        tvSend = ((TextView) findViewById(id.tv_send));
         rgFeeScale = ((RadioGroup) findViewById(id.rg_fee_Scale));
-        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
+        tvPercent = ((TextView) findViewById(id.tv_percent));
+        tvFeeScale = ((TextView) findViewById(id.rb_fee_scale));
+        rbFeeScale = ((RadioButton) findViewById(id.rb_fee_scale));
+        etSubjectName = ((EditText) findViewById(id.tv_subj_name));
+        etFee = ((EditText) findViewById(id.et_fee));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

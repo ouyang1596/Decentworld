@@ -41,29 +41,14 @@ public final class InterestingGroupInfoActivity_
     }
 
     private void afterSetContentView_() {
-        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
-        main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
         gridView = ((ExpandGridView) findViewById(id.gv_members_inter_group));
-        rl_if_toshow_member = ((RelativeLayout) findViewById(id.rl_if_toshow_member));
         activity_interesting_group_item_info_root = ((ScrollView) findViewById(id.activity_interesting_group_item_info_root));
+        main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
         main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         iv_if_toshow_member = ((ImageView) findViewById(id.iv_if_toshow_member));
         main_header_title = ((TextView) findViewById(id.tv_header_title));
-        {
-            View view = findViewById(id.rl_if_toshow_member);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        InterestingGroupInfoActivity_.this.if_toshow();
-                    }
-
-                }
-                );
-            }
-        }
+        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
+        rl_if_toshow_member = ((RelativeLayout) findViewById(id.rl_if_toshow_member));
         {
             View view = findViewById(id.rl_toshow_something);
             if (view!= null) {
@@ -88,6 +73,21 @@ public final class InterestingGroupInfoActivity_
                     @Override
                     public void onClick(View view) {
                         InterestingGroupInfoActivity_.this.click_back();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.rl_if_toshow_member);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        InterestingGroupInfoActivity_.this.if_toshow();
                     }
 
                 }

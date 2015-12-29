@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.RecommendBenefitDetailActivity;
 import cn.sx.decentworld.bean.RecommendBenefitDetail;
 import cn.sx.decentworld.utils.TimeUtils;
 import android.content.Context;
@@ -66,7 +67,7 @@ public class RecommendBenefitDetailAdapter extends BaseAdapter
 			convertView = inflater.inflate(R.layout.item_recommend_benefit_detail, null);
 			holder.tv_amount = (TextView) convertView.findViewById(R.id.tv_recommend_benefit_detail_amount);
 			holder.tv_time = (TextView) convertView.findViewById(R.id.tv_recommend_benefit_detail_time);
-			holder.iv_status = (ImageView) convertView.findViewById(R.id.iv_recommend_benefit_status);
+			holder.tv_status = (TextView) convertView.findViewById(R.id.tv_recommend_benefit_status);
 			convertView.setTag(holder);
 		}
 		else
@@ -81,14 +82,23 @@ public class RecommendBenefitDetailAdapter extends BaseAdapter
 		holder.tv_time.setText(time);
 		TimeUtils.currentTimeFormate();
 		
-		if(benefitDetail.isStatus())
+		if(benefitDetail.getStatusType() == RecommendBenefitDetail.STATUS_TYPE_SUCCESS)
 		{
-			holder.iv_status.setImageResource(R.drawable.switch_circle_open);
-		}
-		else
+			holder.tv_status.setText("已经到账");
+		}else if(benefitDetail.getStatusType() == RecommendBenefitDetail.STATUS_TYPE_FAILURE)
 		{
-			holder.iv_status.setImageResource(R.drawable.switch_circle_close);
+			holder.tv_status.setText("转账失败");
+		}else if(benefitDetail.getStatusType() == RecommendBenefitDetail.STATUS_TYPE_PROCESSING)
+		{
+			holder.tv_status.setText("正在处理");
+		}else if(benefitDetail.getStatusType() == RecommendBenefitDetail.STATUS_TYPE_TEMPORARY_STORED)
+		{
+			holder.tv_status.setText("转账金额不足，暂存运营商");
+		}else if(benefitDetail.getStatusType() == RecommendBenefitDetail.STATUS_TYPE_STORED)
+		{
+			holder.tv_status.setText("存在运营商");
 		}
+
 		return convertView;
 	}
 	
@@ -96,6 +106,6 @@ public class RecommendBenefitDetailAdapter extends BaseAdapter
 	{
 		TextView tv_amount;
 		TextView tv_time;
-		ImageView iv_status;
+		TextView tv_status;
 	}
 }

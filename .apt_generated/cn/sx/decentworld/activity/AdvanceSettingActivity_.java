@@ -37,15 +37,15 @@ public final class AdvanceSettingActivity_
     }
 
     private void afterSetContentView_() {
+        iv_advance_setting_2 = ((ImageView) findViewById(id.iv_advance_setting_2));
+        ll_advance_setting_root = ((LinearLayout) findViewById(id.ll_advance_setting_root));
+        iv_advance_setting_phone = ((ImageView) findViewById(id.iv_advance_setting_phone));
         iv_advance_setting_push_appearance = ((ImageView) findViewById(id.iv_advance_setting_push_appearance));
-        iv_advance_setting_1 = ((ImageView) findViewById(id.iv_advance_setting_1));
         iv_advance_setting_realname = ((ImageView) findViewById(id.iv_advance_setting_realname));
         iv_advance_setting_nickname = ((ImageView) findViewById(id.iv_advance_setting_nickname));
-        ll_advance_setting_root = ((LinearLayout) findViewById(id.ll_advance_setting_root));
         iv_advance_setting_autoTransfer = ((ImageView) findViewById(id.iv_advance_setting_autoTransfer));
+        iv_advance_setting_1 = ((ImageView) findViewById(id.iv_advance_setting_1));
         iv_advance_setting_dw = ((ImageView) findViewById(id.iv_advance_setting_dw));
-        iv_advance_setting_2 = ((ImageView) findViewById(id.iv_advance_setting_2));
-        iv_advance_setting_phone = ((ImageView) findViewById(id.iv_advance_setting_phone));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {

@@ -39,23 +39,8 @@ public final class GroupContactActivity_
     }
 
     private void afterSetContentView_() {
-        progressBar = ((LinearLayout) findViewById(id.progress_bar));
         groupListView = ((ListViewForScrollView) findViewById(id.lv_group_chat_joined));
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        GroupContactActivity_.this.click_back();
-                    }
-
-                }
-                );
-            }
-        }
+        progressBar = ((LinearLayout) findViewById(id.progress_bar));
         {
             View view = findViewById(id.main_header_right_btn);
             if (view!= null) {
@@ -65,6 +50,21 @@ public final class GroupContactActivity_
                     @Override
                     public void onClick(View view) {
                         GroupContactActivity_.this.tobuild_group();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        GroupContactActivity_.this.click_back();
                     }
 
                 }

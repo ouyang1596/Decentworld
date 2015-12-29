@@ -34,7 +34,6 @@ import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -242,6 +241,7 @@ public class ChatActivity extends BaseFragmentActivity implements
 		chatManager = DecentWorldApp.getInstance().getConnectionImpl()
 				.getChatManager();
 		setUpView();
+
 		initTitle();
 		adapter = new DWMessageAdapter(ChatActivity.this, listMsg);
 		adapter.setOnMessageClickListener(this);
@@ -465,12 +465,12 @@ public class ChatActivity extends BaseFragmentActivity implements
 		main_header_right_btn
 				.setImageResource(R.drawable.chat_top_right_selector);
 		main_header_right_btn.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(ChatActivity.this,
 						ChatSettingActivity_.class);
 				intent.putExtra("otherID", otherID);
+				intent.putExtra("otherNick", title_name);
 				startActivity(intent);
 			}
 		});
@@ -496,15 +496,6 @@ public class ChatActivity extends BaseFragmentActivity implements
 			// 获取匿名和身价
 			new CommHttp(this).getNicknameAndWorth(otherID, handler, 5);
 		}
-		// if (chatType == DWMessage.CHAT_TYPE_SINGLE && chatRelationship ==
-		// DWMessage.CHAT_RELATIONSHIP_STRANGER &&
-		// StrangerInfo.queryByDwID(otherID) == null)
-		// {
-		// // 如果是由搜索而进入该chatActivity的，即陌生人StrangerInfo表无该陌生人的资料，故先产生
-		// StrangerInfo stranger = new StrangerInfo(otherID , otherNickname ,
-		// otherIcon);
-		// stranger.save();
-		// }
 
 	}
 
@@ -1194,13 +1185,14 @@ public class ChatActivity extends BaseFragmentActivity implements
 	private void setListViewBottom() {
 		listView.getRefreshableView().setSelection(
 				listView.getRefreshableView().getCount() - 1);
+
 	}
 
 	private File handlerFile(String filePath) {
 		File file = null;
 		if (ImageUtils.fileLength(filePath) > 2 * 1024 * 1024) {
 			Bitmap bitmap = ImageUtils.scalePic(filePath);
-			String picPath = Constants.HomePath + "/temp"
+			String picPath = Constants.HOME_PATH + "/temp"
 					+ ImageUtils.generateFileName() + ".png";
 			ImageUtils.saveBitmap(picPath, bitmap);
 			file = new File(picPath);

@@ -405,7 +405,7 @@ public class RechargePayMethodActivity extends BaseFragmentActivity {
 		// 服务器异步通知页面路径
 		orderInfo += "&notify_url="
 				+ "\""
-				+ "http://183.37.107.153:8888/DecentWorldServer/charge/getOrderResponse"
+				+ "http://112.74.13.117:80/DecentWorldServer/charge/getOrderResponse"
 				+ "\"";
 		// 服务接口名称， 固定值
 		orderInfo += "&service=\"mobile.securitypay.pay\"";
@@ -442,7 +442,6 @@ public class RechargePayMethodActivity extends BaseFragmentActivity {
 		// Locale.getDefault());
 		// Date date = new Date();
 		// String key = format.format(date);
-		//
 		// Random r = new Random();
 		// key = key + r.nextInt();
 		// key = key.substring(0, 15);
@@ -462,7 +461,6 @@ public class RechargePayMethodActivity extends BaseFragmentActivity {
 
 	/**
 	 * get the sign type we use. 获取签名方式
-	 * 
 	 */
 	public String getSignType() {
 		return "sign_type=\"RSA\"";

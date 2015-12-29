@@ -39,9 +39,9 @@ public final class EditCommon3Activity_
 
     private void afterSetContentView_() {
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        lv_edit_common3_list = ((GridView) findViewById(id.lv_edit_common3_list));
         etCommon3Content = ((EditText) findViewById(id.et_edit_common3_content));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        lv_edit_common3_list = ((GridView) findViewById(id.lv_edit_common3_list));
         tvFinish = ((TextView) findViewById(id.tv_finish));
         ((ToastComponent_) toast).afterSetContentView_();
         init();

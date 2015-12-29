@@ -37,20 +37,20 @@ public final class ForgetPwdMobileActivity_
 
     private void init_(Bundle savedInstanceState) {
         resetPwdInfo = ResetPwdInfo_.getInstance_(this);
-        keyboardComponent = KeyboardComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        keyboardComponent = KeyboardComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        etMobile = ((ClearEditText) findViewById(id.et_mobile));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        etCode = ((ClearEditText) findViewById(id.et_code));
         btnOk = ((Button) findViewById(id.btn_OK));
-        tvNoReceive = ((TextView) findViewById(id.tv_no_receive_code));
         ivback = ((ImageView) findViewById(id.iv_back));
+        etCode = ((ClearEditText) findViewById(id.et_code));
+        etMobile = ((ClearEditText) findViewById(id.et_mobile));
+        tvNoReceive = ((TextView) findViewById(id.tv_no_receive_code));
         ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();
-        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         init();
     }
 

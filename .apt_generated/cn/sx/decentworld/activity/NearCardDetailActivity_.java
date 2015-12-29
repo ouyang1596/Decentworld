@@ -37,35 +37,35 @@ public final class NearCardDetailActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         getStrangerInfo = GetStrangerInfo_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvDetail = ((TextView) findViewById(id.tv_detail));
-        ivSex = ((ImageView) findViewById(id.iv_sex));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        lvStrangerInfo = ((ListView) findViewById(id.lv_anonymous_info));
-        mPager = ((HackyViewPager) findViewById(id.vp_near_card_detail_pager));
-        llDetail = ((LinearLayout) findViewById(id.ll_detail));
-        ivTalkToStranger = ((ImageView) findViewById(id.iv_talk_stranger));
-        llRootWorks = ((LinearLayout) findViewById(id.ll_root_works));
-        tvLocation = ((TextView) findViewById(id.item_nearby_stranger_location));
-        ivLike = ((ImageView) findViewById(id.iv_like));
-        tvWorth = ((TextView) findViewById(id.item_nearby_stranger_worth));
-        llWorks = ((LinearLayout) findViewById(id.ll_works));
-        tvAge = ((TextView) findViewById(id.tv_age));
-        fCardDetail = ((FrameLayout) findViewById(id.activity_near_card_detail_root));
-        ivDislike = ((ImageView) findViewById(id.iv_dislike));
-        tvUserSign = ((TextView) findViewById(id.tv_user_detail_info_sign));
-        tvRealNameNickname = ((TextView) findViewById(id.tv_realname_nickname));
-        tvWorks = ((TextView) findViewById(id.tv_works));
-        llRootDetailInfo = ((LinearLayout) findViewById(id.user_detail_info_root));
-        ivDetailLine = ((ImageView) findViewById(id.line_iv_detail));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        tvDetail = ((TextView) findViewById(id.tv_detail));
+        llDetail = ((LinearLayout) findViewById(id.ll_detail));
+        llRootWorks = ((LinearLayout) findViewById(id.ll_root_works));
+        tvWorth = ((TextView) findViewById(id.item_nearby_stranger_worth));
+        lvStrangerInfo = ((ListView) findViewById(id.lv_anonymous_info));
+        tvUserSign = ((TextView) findViewById(id.tv_user_detail_info_sign));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        mPager = ((HackyViewPager) findViewById(id.vp_near_card_detail_pager));
+        fCardDetail = ((FrameLayout) findViewById(id.activity_near_card_detail_root));
+        tvRealNameNickname = ((TextView) findViewById(id.tv_realname_nickname));
+        tvLocation = ((TextView) findViewById(id.item_nearby_stranger_location));
+        tvWorks = ((TextView) findViewById(id.tv_works));
+        ivDetailLine = ((ImageView) findViewById(id.line_iv_detail));
+        ivLike = ((ImageView) findViewById(id.iv_like));
+        tvAge = ((TextView) findViewById(id.tv_age));
+        ivDislike = ((ImageView) findViewById(id.iv_dislike));
         ivWorksLine = ((ImageView) findViewById(id.line_iv_works));
-        ((ToastComponent_) toast).afterSetContentView_();
+        llRootDetailInfo = ((LinearLayout) findViewById(id.user_detail_info_root));
+        ivTalkToStranger = ((ImageView) findViewById(id.iv_talk_stranger));
+        ivSex = ((ImageView) findViewById(id.iv_sex));
+        llWorks = ((LinearLayout) findViewById(id.ll_works));
         ((GetStrangerInfo_) getStrangerInfo).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

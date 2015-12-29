@@ -69,7 +69,7 @@ public class ProcessSystemMessageThread extends DWPacketHandler
 			print(message, "【新的收益】");
 			//将消息路由到收益界面
 			/**
-			 * benefit 本该的收益
+			 * benefit 应得的收益
 			 * fee 手续费
 			 * account 账号类型（ALIPAY、WXPAY）
 			 * acctualBenefit （已经获得的收益）
@@ -79,12 +79,15 @@ public class ProcessSystemMessageThread extends DWPacketHandler
 			 * dwID（对方的ID）
 			 */
 			//弹出界面
-			
-			
-			
-			
+			StringBuffer msgBuffer = new StringBuffer();
+			msgBuffer.append("新的收益提示内容：");
+//			if()
+//			{
+//				
+//			}
+			msgBuffer.append("");
 			//消息通知
-			MsgNotifyManager.getInstance().newBenefit();
+			MsgNotifyManager.getInstance().newBenefit(msgBuffer.toString());
 		}
 		else if ("broadcast_worth".equals(subject))
 		{

@@ -20,10 +20,8 @@ public class SignUtils {
 					Base64.decode(privateKey));
 			KeyFactory keyf = KeyFactory.getInstance(ALGORITHM, "BC");
 			PrivateKey priKey = keyf.generatePrivate(priPKCS8);
-
 			java.security.Signature signature = java.security.Signature
 					.getInstance(SIGN_ALGORITHMS);
-
 			signature.initSign(priKey);
 			signature.update(content.getBytes(DEFAULT_CHARSET));
 
@@ -33,8 +31,6 @@ public class SignUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return null;
 	}
-
 }

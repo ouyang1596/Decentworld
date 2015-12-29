@@ -41,10 +41,10 @@ public final class InterestingGroupJoinedInfoActivity_
 
     private void afterSetContentView_() {
         main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
-        main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
+        main_header_title = ((TextView) findViewById(id.tv_header_title));
         main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         inter_group_joined_no_interrupt = ((ImageView) findViewById(id.inter_group_joined_no_interrupt));
-        main_header_title = ((TextView) findViewById(id.tv_header_title));
+        main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
         interesting_group_joined_info_gridview = ((ExpandGridView) findViewById(id.interesting_group_joined_info_gridview));
         inter_group_joined_settop = ((ImageView) findViewById(id.inter_group_joined_settop));
         {

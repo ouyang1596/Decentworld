@@ -35,15 +35,15 @@ public final class ModificationBankCardThree_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         et_modification_bank_card_three_code = ((EditText) findViewById(id.et_modification_bank_card_three_code));
         btn_modification_bank_card_three_next = ((Button) findViewById(id.btn_modification_bank_card_three_next));
-        btn_modification_bank_card_three_code = ((Button) findViewById(id.btn_modification_bank_card_three_code));
         tv_modification_bank_card_three_number = ((TextView) findViewById(id.tv_modification_bank_card_three_number));
+        btn_modification_bank_card_three_code = ((Button) findViewById(id.btn_modification_bank_card_three_code));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -59,8 +59,8 @@ public final class ModificationBankCardThree_
                 );
             }
         }
-        ((ToastComponent_) toast).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

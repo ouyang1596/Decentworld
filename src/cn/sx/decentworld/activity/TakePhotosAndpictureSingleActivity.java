@@ -29,9 +29,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
-import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.bean.ImageBean;
 import cn.sx.decentworld.common.Constants;
@@ -53,9 +51,8 @@ public class TakePhotosAndpictureSingleActivity extends Activity {
 	private ArrayList<Integer> chooseItem = new ArrayList<Integer>();
 	private HashMap<String, ArrayList<String>> mGruopMap = new HashMap<String, ArrayList<String>>();
 	private ArrayList<ImageBean> imgBeanLists = new ArrayList<ImageBean>();
-	private static final String IMAGE_FILE_LOCATION = Environment
-			.getExternalStorageDirectory() + "/temp.jpg";
-	private Uri imageUri = Uri.fromFile(new File(IMAGE_FILE_LOCATION));
+	private Uri imageUri = Uri
+			.fromFile(new File(Constants.IMAGE_FILE_LOCATION));
 	public static final int CLIP_IMAGE = 3;
 	// 所有的图片
 	private ArrayList<String> mAllImgs;
@@ -91,7 +88,8 @@ public class TakePhotosAndpictureSingleActivity extends Activity {
 				if (chooseItem.get(0) == 0 && 0 == position) {
 					// 调用系统相机
 					// 判断是否已满MAX_COUNT张图片
-					tempCameraPath = Constants.CAMERA_PATH + "/"
+					tempCameraPath = Constants.HOME_PATH
+							+ Constants.CAMERA_PATH
 							+ System.currentTimeMillis() + ".jpg";
 					Log.e("bm", "path============" + tempCameraPath);
 					PickPhotoUtil.getInstance().takePhoto(
@@ -149,10 +147,11 @@ public class TakePhotosAndpictureSingleActivity extends Activity {
 					Bitmap photo = data.getParcelableExtra("data");
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					if (null == photo) {
-						photo = BitmapFactory.decodeFile(IMAGE_FILE_LOCATION);
+						photo = BitmapFactory
+								.decodeFile(Constants.IMAGE_FILE_LOCATION);
 					}
 					String fileName = ImageUtils.generateFileName();
-					String filePath = Constants.HomePath + "/clipImage"
+					String filePath = Constants.HOME_PATH + "/clipImage"
 							+ fileName + ".png";
 					ImageUtils.saveBitmap(filePath, photo);
 					photo.compress(Bitmap.CompressFormat.JPEG, 100, baos);

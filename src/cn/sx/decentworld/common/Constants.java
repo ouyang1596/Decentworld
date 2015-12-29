@@ -63,7 +63,7 @@ public class Constants {
 	public static final String CONTEXTPATH_LXD = PROTOCAL + "192.168.1.115"
 			+ ":80/DecentWorldServer";// 调用接口
 	/**
-	 * 处理结果配置
+	 * 处理结果配置18307595364
 	 */
 	public static final int STATUS_SUCCESS = 1;
 	public static final int STATUS_FAILED = 0;
@@ -78,9 +78,6 @@ public class Constants {
 			Constants.IMAGE_PATH);
 	public static final File FILE_PIC_SCREENSHOT = new File(FILE_LOCAL,
 			"images/screenshots");
-	// 注册中储存相册中的图片
-	public static String CAMERA_PATH = Environment
-			.getExternalStorageDirectory().getPath() + "/testPhoto";
 	// 环信常量
 	public static final String NEW_FRIENDS_USERNAME = "item_new_friends";
 	public static final String GROUP_USERNAME = "item_groups";
@@ -123,6 +120,7 @@ public class Constants {
 	// 注册url
 	public static final String API_UPDATA_STUDENT = "/register/updateStudent";
 	public static final String API_UPDATA_TYPE = "/register/updateType";
+	public static final String API_REGISTER_NICK_IMAGES = "/register/register";
 	public static final String API_REQUEST_CODE = "/user/resetpwd";
 	public static final String API_CHECK_ID = "/user/checkIDCard";
 	public static final String API_RESET_PWD = "/user/setpwd";
@@ -139,21 +137,22 @@ public class Constants {
 	public static final String IF_LIKE = "ifLike";
 	public static final int ITEM_KEY = R.id.etv_occupation;
 	// 路径
-	public static final String HomePath = Environment
+	public static final String HOME_PATH = Environment
 			.getExternalStorageDirectory() + File.separator + "decentworld";
-	// 图片文件夹子路径
-	public static final String PictureReceivePath = File.separator
-			+ "decentworld_files_received";
+	// 裁剪图片
+	public static final String CLIP_IMAGE = "/clipImage/";
 	// 语音文件夹子路径
-	public static final String AudioReceivePath = File.separator
-			+ "decentworld_voice_received";
+	public static final String AUDIO_RECEIVE_PATH = File.separator
+			+ "voiceReceive";
 	// 接收到的语音储存路径(单聊/群聊)
-	public static final String AUDIO_PATH = File.separator + "audio/";
+	public static final String AUDIO_PATH = "/audio/";
+	// 注册中储存相册中的图片
+	public static String CAMERA_PATH = "/cameraPic/";
+	// 储存临时文件
+	public static final String IMAGE_FILE_LOCATION = Constants.HOME_PATH
+			+ "/temp.png";
 	// 图片缩略图子路径
 	public static final String thumbnailPath = File.separator + "pic_thumbnail";
-	// 录制的语音全路径
-	public static final String RecorderAudiosPath = Environment
-			.getExternalStorageDirectory() + "/decentworld_recorder_audios";
 	// 下载路径
 	public static final String DOWNLOAD_PATH = "download_path";
 	// 登录

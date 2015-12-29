@@ -322,8 +322,10 @@ public class LoginActivity extends BaseFragmentActivity implements
 			getUserInfo.getUserdwID(mobile, mHandler);
 			break;
 		case R.id.iv_register:
+			// startActivity(new Intent(LoginActivity.this,
+			// RegisterMobileActivity_.class));
 			startActivity(new Intent(LoginActivity.this,
-					RegisterMobileActivity_.class));
+					RegisterIsStudentActivity_.class));
 			break;
 		case R.id.iv_forget_password:
 			startActivity(new Intent(mContext, ForgetPwdMobileActivity_.class));
