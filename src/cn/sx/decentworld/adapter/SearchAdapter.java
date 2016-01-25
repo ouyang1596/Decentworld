@@ -5,28 +5,33 @@ package cn.sx.decentworld.adapter;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.activity.ChatActivity_;
 import cn.sx.decentworld.activity.NearCardDetailActivity_;
 import cn.sx.decentworld.bean.ContactUser;
-import cn.sx.decentworld.bean.DWMessage;
 import cn.sx.decentworld.bean.NewFriend;
 import cn.sx.decentworld.bean.SearchResult;
 import cn.sx.decentworld.common.CommUtil;
@@ -40,7 +45,6 @@ import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.utils.ToastUtils;
-import cn.sx.decentworld.widget.CircularImageView;
 
 import com.android.volley.Request.Method;
 
@@ -53,26 +57,25 @@ import com.android.volley.Request.Method;
 public class SearchAdapter extends BaseAdapter {
 	private static final String TAG = "SearchAdapter";
 	private Context context;
-	private List<SearchResult> list;
+	private List<SearchResult> data;
 	private LayoutInflater inflater;
 	private FragmentManager fragmentManager;
-	private String tag;
 
 	public SearchAdapter(Context context, List<SearchResult> list) {
 		super();
 		this.context = context;
-		this.list = list;
+		this.data = list;
 		inflater = LayoutInflater.from(context);
 	}
 
 	@Override
 	public int getCount() {
-		return list.size();
+		return data.size();
 	}
 
 	@Override
 	public SearchResult getItem(int position) {
-		return list.get(position);
+		return data.get(position);
 	}
 
 	@Override
@@ -81,53 +84,179 @@ public class SearchAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View convertView, ViewGroup parent) {
-		final SearchResult searchResult = list.get(position);
-		ViewHolder holder = null;
-		if (convertView == null) {
-			holder = new ViewHolder();
-			convertView = inflater.inflate(
+	public View getView(int position, View con, ViewGroup parent) {
+		ViewHolder vh = null;
+		if (con == null) {
+			vh = new ViewHolder();
+			con = inflater.inflate(
 					R.layout.activity_interesting_group_joined_item, null);
-			holder.ll_item = (LinearLayout) convertView
-					.findViewById(R.id.ll_join);
-			holder.civ_icon = (CircularImageView) convertView
-					.findViewById(R.id.iv_join);
-			holder.tv_name = (TextView) convertView
-					.findViewById(R.id.tv_join_name);
-			holder.iv_add = (ImageView) convertView
-					.findViewById(R.id.iv_join_add);
-			holder.iv_chat = (ImageView) convertView
-					.findViewById(R.id.iv_join_conversation);
-			convertView.setTag(holder);
+			vh.ivSearchAvatar = (ImageView) con
+					.findViewById(R.id.iv_search_avatar);
+			vh.ivSearchAvatar.setOnClickListener(mOnCListener);
+			vh.ivSearchAdd = (ImageView) con.findViewById(R.id.iv_search_add);
+			vh.ivSearchAdd.setOnClickListener(mOnCListener);
+			vh.tvSearchAge = (TextView) con.findViewById(R.id.tv_Search_age);
+			vh.tvSearchName = (TextView) con.findViewById(R.id.tv_search_name);
+			vh.tvSearchOccupation = (TextView) con
+					.findViewById(R.id.tv_search_occupation);
+			vh.tvSearchSex = (TextView) con.findViewById(R.id.tv_search_sex);
+			vh.tvSearchMatch = (TextView) con
+					.findViewById(R.id.tv_search_match);
+			vh.tvSearchWorth = (TextView) con
+					.findViewById(R.id.tv_search_worth);
+			vh.tvSearchTagRealName = (TextView) con
+					.findViewById(R.id.tv_search_tag_realname);
+			// holder.ll_item = (LinearLayout) convertView
+			// .findViewById(R.id.ll_join);
+			// holder.civ_icon = (CircularImageView) convertView
+			// .findViewById(R.id.iv_join);
+			// holder.tv_name = (TextView) convertView
+			// .findViewById(R.id.tv_join_name);
+			// holder.iv_add = (ImageView) convertView
+			// .findViewById(R.id.iv_join_add);
+			// holder.iv_chat = (ImageView) convertView
+			// .findViewById(R.id.iv_join_conversation);
+			con.setTag(vh);
 		} else {
-			holder = (ViewHolder) convertView.getTag();
+			vh = (ViewHolder) con.getTag();
 		}
+		SearchResult searchResult = data.get(position);
+		showMatchTxt(vh, searchResult);
+		if ("0".equals(searchResult.realName)) {
+			vh.tvSearchTagRealName.setVisibility(View.GONE);
+		} else {
+			vh.tvSearchTagRealName.setVisibility(View.VISIBLE);
+		}
+		vh.ivSearchAvatar.setTag(Constants.ITEM_POSITION, position);
+		vh.ivSearchAdd.setTag(Constants.ITEM_POSITION, position);
+		vh.tvSearchName.setText(searchResult.name);
+		vh.tvSearchOccupation.setText(searchResult.occupation);
+		vh.tvSearchSex.setText(searchResult.gender);
+		vh.tvSearchWorth.setText(searchResult.worth);
 		// 设置头像
-		String iconPath = ImageUtils.getIconByDwID(searchResult.getDwID(),
+		String avatarPath = ImageUtils.getIconByDwID(searchResult.dwID,
 				ImageUtils.ICON_SMALL);
-		if (CommUtil.isNotBlank(iconPath)) {
-			ImageLoaderHelper.mImageLoader.displayImage(iconPath,
-					holder.civ_icon);
+		if (CommUtil.isNotBlank(avatarPath)) {
+			ImageLoaderHelper.mImageLoader.displayImage(avatarPath,
+					vh.ivSearchAvatar, ImageLoaderHelper.mOptions);
 		}
 		// 设置昵称
-		holder.tv_name.setText(searchResult.getNickName());
-		holder.iv_add.setVisibility(View.VISIBLE);
-		holder.civ_icon.setOnClickListener(new ItemClick(holder, searchResult));
-		holder.iv_add.setOnClickListener(new ItemClick(holder, searchResult));
-		holder.iv_chat.setOnClickListener(new ItemClick(holder, searchResult));
-		return convertView;
+		// holder.tv_name.setText(searchResult.getName());
+		// holder.iv_add.setVisibility(View.VISIBLE);
+		// holder.civ_icon.setOnClickListener(new ItemClick(holder,
+		// searchResult));
+		// holder.iv_add.setOnClickListener(new ItemClick(holder,
+		// searchResult));
+		// holder.iv_chat.setOnClickListener(new ItemClick(holder,
+		// searchResult));
+		return con;
 	}
+
+	private void showMatchTxt(ViewHolder vh, SearchResult searchResult) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < searchResult.matchList.size(); i++) {
+			builder.append(searchResult.matchList.get(i).key + ":"
+					+ searchResult.matchList.get(i).value + ";");
+			// TextView textView = new TextView(context);
+			// textView.setTextColor(Color.parseColor("#99000000"));
+			// if (i >= 2) {
+			// textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+			// textView.setText("...");
+			// vh.llSearchMatch.addView(textView);
+			// break;
+			// } else {
+			// String value = searchResult.matchList.get(i).key + ":"
+			// + searchResult.matchList.get(i).value;
+			// String match = getTag(Constants.MATCH);
+			// int index = value.indexOf(match);
+			// SpannableStringBuilder highLightTxt = new SpannableStringBuilder(
+			// value);
+			// // i 未起始字符索引，j 为结束字符索引
+			// highLightTxt.setSpan(new ForegroundColorSpan(Color.RED), index,
+			// index + match.length(),
+			// Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+			// textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+			// textView.setText(highLightTxt);
+			// vh.llSearchMatch.addView(textView);
+			// }
+
+		}
+		if (builder.length() <= 0) {
+			return;
+		}
+		String value = builder.substring(0, builder.length() - 1);
+		String match = getTag(Constants.MATCH);
+		SpannableStringBuilder highLightTxt = new SpannableStringBuilder(value);
+		// 正则表达式查找所有的相匹配的子串
+		Pattern p = Pattern.compile(match);
+		Matcher m = p.matcher(value);
+		indexMap.clear();
+		while (m.find()) {
+			indexMap.put(m.start(), m.end());
+		}
+		for (Map.Entry<Integer, Integer> entry : indexMap.entrySet()) {
+			highLightTxt.setSpan(new ForegroundColorSpan(Color.RED),
+					entry.getKey(), entry.getValue(),
+					Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		}
+		vh.tvSearchMatch.setText(highLightTxt);
+	}
+
+	private HashMap<Integer, Integer> indexMap = new HashMap<Integer, Integer>();
 
 	/**
 	 * Holder
 	 */
 	private static class ViewHolder {
-		LinearLayout ll_item;
-		CircularImageView civ_icon;
-		TextView tv_name;
-		ImageView iv_add;
-		ImageView iv_chat;
+		// LinearLayout ll_item;
+		// CircularImageView civ_icon;
+		// TextView tv_name;
+		// ImageView iv_add;
+		// ImageView iv_chat;
+		ImageView ivSearchAvatar, ivSearchAdd;
+		TextView tvSearchName, tvSearchSex, tvSearchOccupation, tvSearchAge,
+				tvSearchWorth, tvSearchTagRealName, tvSearchMatch;
 	}
+
+	private OnClickListener mOnCListener = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			int position = (Integer) v.getTag(Constants.ITEM_POSITION);
+			SearchResult searchResult = data.get(position);
+			Intent intent;
+			switch (v.getId()) {
+			case R.id.iv_search_avatar:// 头像
+				intent = new Intent(context, NearCardDetailActivity_.class);
+				intent.putExtra(Constants.DW_ID, searchResult.dwID);
+				context.startActivity(intent);
+				break;
+			case R.id.iv_search_add:// 添加
+				fragmentManager = ((FragmentActivity) context)
+						.getSupportFragmentManager();
+				Dialog_Fragment_add_friend dialog = Dialog_Fragment_add_friend
+						.newInstance();
+				dialog.setOnListener(new AddFriendListener(searchResult));
+				dialog.show(fragmentManager, "dialog");
+				break;
+			// case R.id.iv_join_conversation:// 对话
+			// intent = new Intent(context, ChatActivity_.class);
+			// intent.putExtra(ChatActivity.OTHER_ID, result.getDwID());
+			// intent.putExtra(ChatActivity.OTHER_NICKNAME, result.getName());
+			// intent.putExtra(ChatActivity.CHAT_TYPE,
+			// DWMessage.CHAT_TYPE_SINGLE);
+			// if (ContactUser.isContact(result.getDwID())) {
+			// intent.putExtra("chatRelationship",
+			// DWMessage.CHAT_RELATIONSHIP_FRIEND);
+			// } else {
+			// intent.putExtra("chatRelationship",
+			// DWMessage.CHAT_RELATIONSHIP_STRANGER);
+			// }
+			// intent.putExtra(ChatActivity.OTHER_WORTH, result.getWorth());
+			// context.startActivity(intent);
+			// break;
+			}
+		}
+	};
 
 	/**
 	 * 申请加为好友接口
@@ -144,10 +273,11 @@ public class SearchAdapter extends BaseAdapter {
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		map.put("friendID", friendID);
-		map.put("searchType", getTag() + "");
+		map.put("searchType", getTag(Constants.SEARCH_TYPE));
 		map.put("addReason", addReason);
 		LogUtils.i(TAG, "addFriend...dwID=" + dwID + ",friendID="
-				+ ",searchType=" + getTag() + ",addReason=" + addReason);
+				+ ",searchType=" + getTag(Constants.SEARCH_TYPE)
+				+ ",addReason=" + addReason);
 		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
 				+ "/friend/addFriend", Method.GET, new HttpCallBack() {
 			@Override
@@ -176,7 +306,6 @@ public class SearchAdapter extends BaseAdapter {
 							"addFriend...failure，cause by:" + msg.getMsg());
 				}
 			}
-
 		});
 	}
 
@@ -192,38 +321,39 @@ public class SearchAdapter extends BaseAdapter {
 		@Override
 		public void onClick(View v) {
 			Intent intent;
-			switch (v.getId()) {
-			case R.id.iv_join:// 头像
-				intent = new Intent(context, NearCardDetailActivity_.class);
-				intent.putExtra(Constants.DW_ID, result.getDwID());
-				context.startActivity(intent);
-				break;
-			case R.id.iv_join_add:// 添加
-				fragmentManager = ((FragmentActivity) context)
-						.getSupportFragmentManager();
-				Dialog_Fragment_add_friend dialog = Dialog_Fragment_add_friend
-						.newInstance();
-				dialog.setOnListener(new AddFriendListener(result));
-				dialog.show(fragmentManager, "dialog");
-				break;
-			case R.id.iv_join_conversation:// 对话
-				intent = new Intent(context, ChatActivity_.class);
-				intent.putExtra("user_dwID", result.getDwID());
-				intent.putExtra("user_nickname", result.getNickName());
-				intent.putExtra("chatType", DWMessage.CHAT_TYPE_SINGLE);
-				if (ContactUser.isContact(result.getDwID())) {
-					intent.putExtra("chatRelationship",
-							DWMessage.CHAT_RELATIONSHIP_FRIEND);
-				} else {
-					intent.putExtra("chatRelationship",
-							DWMessage.CHAT_RELATIONSHIP_STRANGER);
-				}
-				intent.putExtra("user_worth", result.getWorth());
-				context.startActivity(intent);
-				break;
-			default:
-				break;
-			}
+			// switch (v.getId()) {
+			// case R.id.iv_join:// 头像
+			// intent = new Intent(context, NearCardDetailActivity_.class);
+			// intent.putExtra(Constants.DW_ID, result.getDwID());
+			// context.startActivity(intent);
+			// break;
+			// case R.id.iv_join_add:// 添加
+			// fragmentManager = ((FragmentActivity) context)
+			// .getSupportFragmentManager();
+			// Dialog_Fragment_add_friend dialog = Dialog_Fragment_add_friend
+			// .newInstance();
+			// dialog.setOnListener(new AddFriendListener(result));
+			// dialog.show(fragmentManager, "dialog");
+			// break;
+			// case R.id.iv_join_conversation:// 对话
+			// intent = new Intent(context, ChatActivity_.class);
+			// intent.putExtra(ChatActivity.OTHER_ID, result.getDwID());
+			// intent.putExtra(ChatActivity.OTHER_NICKNAME, result.getName());
+			// intent.putExtra(ChatActivity.CHAT_TYPE,
+			// DWMessage.CHAT_TYPE_SINGLE);
+			// if (ContactUser.isContact(result.getDwID())) {
+			// intent.putExtra("chatRelationship",
+			// DWMessage.CHAT_RELATIONSHIP_FRIEND);
+			// } else {
+			// intent.putExtra("chatRelationship",
+			// DWMessage.CHAT_RELATIONSHIP_STRANGER);
+			// }
+			// intent.putExtra(ChatActivity.OTHER_WORTH, result.getWorth());
+			// context.startActivity(intent);
+			// break;
+			// default:
+			// break;
+			// }
 		}
 	}
 
@@ -240,13 +370,12 @@ public class SearchAdapter extends BaseAdapter {
 
 		@Override
 		public void add_friend_with_reason(String reason) {
-			String otherID = searchResult.getDwID();
+			String otherID = searchResult.dwID;
 			if (ContactUser.queryByDwID(otherID) == null) {
 				apply_reason = reason;
 				addFriend(DecentWorldApp.getInstance().getDwID(), otherID,
 						reason, handler);
 			} else {
-				// TODO 已经是好友，提示不能重复添加
 				Toast.makeText(context, "已经互为好友", Toast.LENGTH_SHORT).show();
 			}
 		}
@@ -257,23 +386,24 @@ public class SearchAdapter extends BaseAdapter {
 				switch (msg.what) {
 				case 0:
 					Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
-					NewFriend newFriend = NewFriend.queryByDwID(searchResult
-							.getDwID());
+					NewFriend newFriend = NewFriend
+							.queryByDwID(searchResult.dwID);
 					if (newFriend != null) {
-						newFriend.setMessage_type(NewFriend.message_had_apply);
-						newFriend.setInfo_detail(apply_reason);
+						newFriend.setMessageType(NewFriend.message_had_apply);
+						newFriend.setAddReason(apply_reason);
 						newFriend.setIsShown(1);
 					} else {
 						newFriend = new NewFriend();
-						newFriend.setUsername(searchResult.getNickName());
-						newFriend.setDw_id(searchResult.getDwID());
-						newFriend.setAvatar(searchResult.getIcon());
-						newFriend.setWorth(searchResult.getWorth());
-						newFriend.setInfo_detail(apply_reason);
-						newFriend.setMessage_type(NewFriend.message_had_apply);
+						newFriend.setUsername(searchResult.name);
+						newFriend.setOtherID(searchResult.dwID);
+						newFriend.setWorth(Float.valueOf(searchResult.worth));
+						newFriend.setAddReason(apply_reason);
+						newFriend.setMessageType(NewFriend.message_had_apply);
 						newFriend.setIsShown(1);
 					}
 					newFriend.save();
+					Activity activity = (Activity) context;
+					activity.finish();
 					break;
 				default:
 					break;
@@ -282,12 +412,14 @@ public class SearchAdapter extends BaseAdapter {
 		};
 	}
 
-	public String getTag() {
-		return tag;
+	private HashMap<String, String> map = new HashMap<String, String>();
+
+	public String getTag(String key) {
+		return map.get(key);
 	}
 
-	public void setTag(String tag) {
-		this.tag = tag;
+	public void setTag(String key, String value) {
+		map.put(key, value);
 	}
 
 }

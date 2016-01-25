@@ -117,6 +117,11 @@ public class LoginHelper
 		editor.putString(Constants.USERNAME, username);
 		editor.putString(Constants.PASSWORD, password);
 		editor.commit();
+		/** 同时保存一个数据到Application内存中 **/
+		DecentWorldApp.getInstance().setToken(token);
+        DecentWorldApp.getInstance().setDwID(dwID);
+        DecentWorldApp.getInstance().setUserName(username);
+        DecentWorldApp.getInstance().setPassword(password);
 	}
 
 	/**

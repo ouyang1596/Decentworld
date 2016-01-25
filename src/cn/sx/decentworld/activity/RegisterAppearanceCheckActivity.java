@@ -25,7 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.bean.RegisterInfo;
+import cn.sx.decentworld.bean.RegisterInfoUseless;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.component.ui.RegisterComponent;
@@ -345,7 +345,7 @@ public class RegisterAppearanceCheckActivity extends BaseFragmentActivity
 	@Override
 	public void backClick(int state) {
 		if (state == Constants.SAVE) {
-			RegisterInfo info = RegisterInfo
+			RegisterInfoUseless info = RegisterInfoUseless
 					.queryByDwID(DecentWorldApp.MAIN_KEY);
 			if (info == null) {
 				toast.show("保存失败");
@@ -396,9 +396,9 @@ public class RegisterAppearanceCheckActivity extends BaseFragmentActivity
 		picPathList = new ArrayList<String>();
 		imageViews = new ArrayList<ImageView>();
 		dots = new ArrayList<View>();
-		RegisterInfo info = RegisterInfo.queryByDwID(registerComponent.tel);
+		RegisterInfoUseless info = RegisterInfoUseless.queryByDwID(registerComponent.tel);
 		if (null == info) {
-			info = new RegisterInfo(registerComponent.tel);
+			info = new RegisterInfoUseless(registerComponent.tel);
 		}
 		String picbeautyOnePath = info.picbeautyOnePath;
 		String picbeautyTwoPath = info.picbeautyTwoPath;

@@ -11,17 +11,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.TitleBar_;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.component.ui.MainFragmentComponent_;
 import cn.sx.decentworld.network.request.SetUserInfo_;
-import cn.sx.decentworld.widget.HorizontalListView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class PickContactActivity_
@@ -38,49 +36,17 @@ public final class PickContactActivity_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
-        titleBar = TitleBar_.getInstance_(this);
         setUserInfo = SetUserInfo_.getInstance_(this);
-        maincompon = MainFragmentComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        lv_pick_contact_person = ((ListView) findViewById(id.lv_pick_contact_person));
-        gv_people_had_added = ((HorizontalListView) findViewById(id.imgList));
-        ll_listview_all_picked = ((LinearLayout) findViewById(id.ll_listview_all_picked));
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        PickContactActivity_.this.back();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.main_header_right_tv);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        PickContactActivity_.this.Confirm();
-                    }
-
-                }
-                );
-            }
-        }
+        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
+        lv_contact = ((ListView) findViewById(id.lv_contact));
         ((ToastComponent_) toast).afterSetContentView_();
-        ((TitleBar_) titleBar).afterSetContentView_();
         ((SetUserInfo_) setUserInfo).afterSetContentView_();
-        ((MainFragmentComponent_) maincompon).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

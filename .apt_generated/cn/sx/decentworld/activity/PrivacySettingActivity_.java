@@ -39,42 +39,11 @@ public final class PrivacySettingActivity_
     }
 
     private void afterSetContentView_() {
-        tvBankCard = ((TextView) findViewById(id.privacy_setting_bank_card));
         tvMobile = ((TextView) findViewById(id.tv_phone_number));
-        ll_privacy_setting_root = ((LinearLayout) findViewById(id.ll_privacy_setting_root));
-        privacy_setting_phone_number = ((TextView) findViewById(id.tv_phone_number));
         privacy_setting_password = ((TextView) findViewById(id.privacy_setting_password));
+        ll_privacy_setting_root = ((LinearLayout) findViewById(id.ll_privacy_setting_root));
         ll_root = ((LinearLayout) findViewById(id.ll_root));
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        PrivacySettingActivity_.this.setBackBtn();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.privacy_setting_modification_bank_card);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        PrivacySettingActivity_.this.bankCardModification(view);
-                    }
-
-                }
-                );
-            }
-        }
+        privacy_setting_phone_number = ((TextView) findViewById(id.tv_phone_number));
         {
             View view = findViewById(id.privacy_setting_modification_phone_number);
             if (view!= null) {
@@ -99,6 +68,21 @@ public final class PrivacySettingActivity_
                     @Override
                     public void onClick(View view) {
                         PrivacySettingActivity_.this.bankCardModification(view);
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        PrivacySettingActivity_.this.setBackBtn();
                     }
 
                 }

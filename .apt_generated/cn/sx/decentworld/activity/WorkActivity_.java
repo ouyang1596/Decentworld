@@ -38,21 +38,6 @@ public final class WorkActivity_
 
     private void afterSetContentView_() {
         {
-            View view = findViewById(id.main_header_right);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        WorkActivity_.this.main_header_right();
-                    }
-
-                }
-                );
-            }
-        }
-        {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
@@ -61,6 +46,21 @@ public final class WorkActivity_
                     @Override
                     public void onClick(View view) {
                         WorkActivity_.this.back();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.main_header_right);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        WorkActivity_.this.main_header_right();
                     }
 
                 }

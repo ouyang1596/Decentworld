@@ -20,7 +20,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.ui.MainFragmentComponent_;
+import cn.sx.decentworld.component.Common_;
 import cn.sx.decentworld.widget.ExpandGridView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
@@ -37,33 +37,18 @@ public final class InterestingGroupInfoActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        component = MainFragmentComponent_.getInstance_(this);
+        common = Common_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         gridView = ((ExpandGridView) findViewById(id.gv_members_inter_group));
-        activity_interesting_group_item_info_root = ((ScrollView) findViewById(id.activity_interesting_group_item_info_root));
-        main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
         main_header_left = ((LinearLayout) findViewById(id.main_header_left));
-        iv_if_toshow_member = ((ImageView) findViewById(id.iv_if_toshow_member));
         main_header_title = ((TextView) findViewById(id.tv_header_title));
-        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
+        activity_interesting_group_item_info_root = ((ScrollView) findViewById(id.activity_interesting_group_item_info_root));
         rl_if_toshow_member = ((RelativeLayout) findViewById(id.rl_if_toshow_member));
-        {
-            View view = findViewById(id.rl_toshow_something);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        InterestingGroupInfoActivity_.this.showsomething();
-                    }
-
-                }
-                );
-            }
-        }
+        main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
+        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
+        iv_if_toshow_member = ((ImageView) findViewById(id.iv_if_toshow_member));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -73,6 +58,21 @@ public final class InterestingGroupInfoActivity_
                     @Override
                     public void onClick(View view) {
                         InterestingGroupInfoActivity_.this.click_back();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.rl_toshow_something);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        InterestingGroupInfoActivity_.this.showsomething();
                     }
 
                 }
@@ -94,7 +94,7 @@ public final class InterestingGroupInfoActivity_
                 );
             }
         }
-        ((MainFragmentComponent_) component).afterSetContentView_();
+        ((Common_) common).afterSetContentView_();
         dosomethy();
     }
 

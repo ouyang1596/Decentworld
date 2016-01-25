@@ -1,16 +1,19 @@
 package cn.sx.decentworld.flingswipe;
 
-import cn.sx.decentworld.R;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.database.DataSetObserver;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.FrameLayout;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.utils.LogUtils;
 
 /**
  * Created by dionysis_lorentzos on 5/8/14 for package com.lorentzos.swipecards
@@ -95,10 +98,8 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
 		if (mAdapter == null) {
 			return;
 		}
-
 		mInLayout = true;
 		final int adapterCount = mAdapter.getCount();
-
 		if (adapterCount == 0) {
 			removeAllViewsInLayout();
 		} else {
@@ -113,9 +114,7 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
 				setTopView();
 			}
 		}
-
 		mInLayout = false;
-
 		if (adapterCount < MAX_VISIBLE)
 			mFlingListener.onAdapterAboutToEmpty(adapterCount);
 	}
@@ -133,11 +132,9 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 	private void makeAndAddView(View child) {
-
 		FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) child
 				.getLayoutParams();
 		addViewInLayout(child, 0, lp, true);
-
 		final boolean needToMeasure = child.isLayoutRequested();
 		if (needToMeasure && lp != null) {
 			int childWidthSpec = getChildMeasureSpec(getWidthMeasureSpec(),
@@ -150,7 +147,6 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
 		} else {
 			cleanupLayoutState(child);
 		}
-
 		int w = child.getMeasuredWidth();
 		int h = child.getMeasuredHeight();
 
@@ -196,6 +192,8 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
 			childTop = getPaddingTop() + lp.topMargin;
 			break;
 		}
+		// Log.i("bm", "childLeft--" + childLeft + "--childTop--" + childTop
+		// + "--childLeft + w--" + childLeft + w);
 
 		child.layout(childLeft, childTop, childLeft + w, childTop + h);
 	}
@@ -205,9 +203,10 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
 	 */
 	private void setTopView() {
 		if (getChildCount() > 0) {
-			mActiveCard = getChildAt(LAST_OBJECT_IN_STACK);
+			mActiveCard = (View) getChildAt(LAST_OBJECT_IN_STACK);
 			if (mActiveCard != null) {
-				flingCardListener = new FlingCardListener(mActiveCard,
+				flingCardListener = new FlingCardListener(
+						SwipeFlingAdapterView.this, mActiveCard,
 						mAdapter.getItem(0), ROTATION_DEGREES,
 						new FlingCardListener.FlingListener() {
 
@@ -308,6 +307,22 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView {
 
 	public interface OnItemClickListener {
 		public void onItemClicked(int itemPosition, Object dataObject);
+	}
+
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		// LogUtils.i("bm", "SwipeFlingAdapterView");
+		if (null == mActiveCard) {
+			getParent().requestDisallowInterceptTouchEvent(true);
+			return true;
+		}
+		if (event.getX() < mActiveCard.getX() + mActiveCard.getWidth()
+				&& event.getY() > mActiveCard.getY()
+				&& event.getY() < mActiveCard.getY() + mActiveCard.getHeight()) {
+			getParent().requestDisallowInterceptTouchEvent(true);
+			return true;
+		}
+		return super.onTouchEvent(event);
 	}
 
 	public interface onFlingListener {

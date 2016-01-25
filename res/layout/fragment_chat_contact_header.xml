@@ -25,20 +25,6 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/ll_contact_list_guarantee"
-            android:layout_width="0px"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical" >
-
-            <ImageView
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/contact_list_guarantee" />
-        </LinearLayout>
-
-        <LinearLayout
             android:id="@+id/ll_contact_list_invite"
             android:layout_width="0px"
             android:layout_height="match_parent"
@@ -74,7 +60,7 @@
             android:layout_height="48dp"
             android:layout_gravity="center_vertical"
             android:layout_marginBottom="10dp"
-            android:layout_marginLeft="12dp"
+            android:layout_marginLeft="16dp"
             android:layout_marginTop="10dp" >
 
             <ImageView
@@ -86,12 +72,12 @@
                 android:id="@+id/new_friends_ll_unread_msg_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/unread_dot_40"
-                android:gravity="center"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
-                android:layout_marginTop="1dp"
                 android:layout_marginRight="2dp"
+                android:layout_marginTop="1dp"
+                android:background="@drawable/unread_dot_40"
+                android:gravity="center"
                 android:textColor="@color/white"
                 android:textSize="@dimen/new_textsize_14sp"
                 android:visibility="invisible" />
@@ -129,7 +115,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginBottom="10dp"
-            android:layout_marginLeft="11dp"
+            android:layout_marginLeft="16dp"
             android:layout_marginTop="10dp"
             android:src="@drawable/fragment_chat_contact_item_groupchat" />
 
@@ -148,7 +134,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
-        android:src="@drawable/divide_line" />
+        android:src="@drawable/divide_line"
+        android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/interesting_group_ll"

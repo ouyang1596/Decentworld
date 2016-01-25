@@ -29,6 +29,8 @@ import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.activity.ChatRoomTopicDetail_;
 import cn.sx.decentworld.adapter.ChatRoomListAdapter2;
 import cn.sx.decentworld.bean.ChatRoomInfo;
+import cn.sx.decentworld.common.XmppHelper;
+import cn.sx.decentworld.component.Common;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.network.SendUrl;
 
@@ -53,7 +55,8 @@ public class ChatRoomComponent {
 	@Bean
 	ToastComponent toast;
 	@Bean
-	MainFragmentComponent mainComponent;
+	Common common;
+//	MainFragmentComponent mainComponent;
 	private static String TAG = "ChatRoomComponent";
 	private SendUrl sendUrl;
 	private String listData;
@@ -77,7 +80,7 @@ public class ChatRoomComponent {
 	void init() {
 		Log.i(TAG, "ChatRoomComponent init()");
 		sendUrl = new SendUrl(context);
-		con = DecentWorldApp.getInstance().getConnectionImpl();
+		con = XmppHelper.getConnection(null);
 		serverName = con.getServiceName();
 		// serverName=Constants.BACK_SERVER_NAME;
 		Log.i(TAG, serverName + "---------");
@@ -237,7 +240,7 @@ public class ChatRoomComponent {
 				Log.i(TAG, "名字：" + entry.getName() + " - ID:" + entry.getJid());
 				if (entry != null) {
 					RoomInfo roominfo = MultiUserChat.getRoomInfo(
-							DecentWorldApp.getInstance().getConnectionImpl(),
+							XmppHelper.getConnection(null),
 							entry.getJid());
 					Log.i(TAG,
 							roominfo.getOccupantsCount() + "//"
@@ -261,7 +264,7 @@ public class ChatRoomComponent {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				mainComponent.toActivity(ChatRoomTopicDetail_.class);
+			    common.toActivity(ChatRoomTopicDetail_.class);
 			}
 		});
 	}

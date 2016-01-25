@@ -90,7 +90,8 @@ public class ModificationPasswordOne extends BaseFragmentActivity implements
 			}
 			HashMap<String, String> map = new HashMap<String, String>();
 			map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
-			newPwd = et_new_password.getText().toString();
+			// newPwd = et_new_password.getText().toString();
+			newPwd = AES.encode(et_new_password.getText().toString());
 			map.put("newpwd", newPwd);
 			privacySettingInfo.setNewPassword(map,
 					Constants.API_RESET_PASSWORD, Method.GET, hadnler);

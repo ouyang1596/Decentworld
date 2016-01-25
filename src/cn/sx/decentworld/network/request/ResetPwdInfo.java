@@ -112,7 +112,10 @@ public class ResetPwdInfo {
 					public void onSuccess(String response, ResultBean msg) {
 						hideProgressDialog();
 						if (msg.getResultCode() == 2222) {
-							handler.sendEmptyMessage(msg.getResultCode());
+							Message message = handler.obtainMessage();
+							message.what = msg.getResultCode();
+							message.obj = msg.getData();
+							handler.sendMessage(message);
 						} else {
 							showToast(msg.getMsg());
 						}

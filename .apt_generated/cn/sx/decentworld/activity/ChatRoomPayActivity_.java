@@ -33,15 +33,15 @@ public final class ChatRoomPayActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         btnOK = ((Button) findViewById(id.btn_OK));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        ((ToastComponent_) toast).afterSetContentView_();
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

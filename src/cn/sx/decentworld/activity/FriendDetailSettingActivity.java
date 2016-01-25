@@ -88,13 +88,11 @@ public class FriendDetailSettingActivity extends BaseFragmentActivity implements
 				//页面跳转
 				reminderDialog.dismiss();
 				//本地数据库通讯录表删除该人
-				ContactUser.deleteContactsBydw_id(userId);
+				ContactUser.deleteByDwID(userId);
 				//将消息页面该对象的聊天记录删除
-				ConversationList.deleteByDWid(userId);
-				
-				DWMessage.deleteBy2DwID(DecentWorldApp.getInstance().getDwID(), userId);
-//				DWMessage.
-				
+				ConversationList.deleteByDwID(userId);
+				/** 删除指定ID的消息 **/
+				DWMessage.deleteByDwID(userId);
 				//数据更新
 				//默认页面跳转完毕后，当前activity为mainActivity的CharFragment
 				startActivity(new Intent(FriendDetailSettingActivity.this,MainActivity_.class));

@@ -7,7 +7,6 @@ import java.io.File;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Environment;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.common.Constants;
 
@@ -33,9 +32,9 @@ public class ImageLoaderHelper {
 	public static void initImageLoader(Context context) {
 		if (null == mOptions) {
 			mOptions = new DisplayImageOptions.Builder()
-					.showImageOnLoading(R.drawable.default_icon)
-					.showImageForEmptyUri(R.drawable.default_icon)
-					.showImageOnFail(R.drawable.default_icon)
+					.showImageOnLoading(R.drawable.loading_pic)
+					.showImageForEmptyUri(R.drawable.loading_pic)
+					.showImageOnFail(R.drawable.loading_pic)
 					.cacheInMemory(true).cacheOnDisk(true)
 					.bitmapConfig(Bitmap.Config.RGB_565) // 设置图片的解码类型
 					.build();
@@ -44,7 +43,6 @@ public class ImageLoaderHelper {
 					new UnlimitedDiskCache(new File(Constants.HOME_PATH
 							+ "/imageLoader"))).build();
 			mImageLoader.init(config);
-
 			clearCache();
 		}
 	}

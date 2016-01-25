@@ -77,7 +77,7 @@ public class UserInfoManager
 	 */
 	private static UserInfo queryByDwID(String dwID)
 	{
-		return new Select().from(UserInfo.class).where("dwID=?", dwID).executeSingle();
+		return new Select().from(UserInfo.class).where("userId=?", dwID).executeSingle();
 	}
 
 }

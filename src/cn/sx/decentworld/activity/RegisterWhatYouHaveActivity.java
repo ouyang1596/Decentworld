@@ -50,8 +50,19 @@ public class RegisterWhatYouHaveActivity extends BaseFragmentActivity implements
 					RegisterAppearanceActivity_.class));
 			break;
 		case R.id.iv_back:
-			finish();
+			backAction();
 			break;
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		backAction();
+	}
+
+	private void backAction() {
+		startActivity(new Intent(mContext, RegisterIsStudentActivity_.class));
+		finish();
 	}
 }

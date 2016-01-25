@@ -23,9 +23,9 @@ import com.alibaba.fastjson.annotation.JSONField;
  * @date: 2015年10月5日 上午11:44:22
  */
 @Table(name = "conversationList")
-public class ConversationList extends Model implements Comparable<ConversationList>
-{
-	//消息是否置顶,1代表不置顶,0代表置顶，默认为不置顶
+public class ConversationList extends Model implements
+		Comparable<ConversationList> {
+	// 消息是否置顶,1代表不置顶,0代表置顶，默认为不置顶
 	public static final int SET_TOP_YES = 0;
 	public static final int SET_TOP_NO = 1;
 	@Column(name = "dwID")
@@ -50,7 +50,7 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	 */
 	@Column(name = "time")
 	private String time;
-	
+
 	/**
 	 * 消息条数
 	 */
@@ -75,7 +75,7 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	 * 消息类型,默认为文字类型
 	 */
 	@Column(name = "messageType")
-	private int messageType=DWMessage.TXT;
+	private int messageType = DWMessage.TXT;
 	/**
 	 * 是否对话置顶，默认为不置顶
 	 */
@@ -84,35 +84,33 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	/**
 	 * 聊天类型，默认为朋友单聊类型
 	 */
-	@Column(name  = "chatType")
+	@Column(name = "chatType")
 	private int chatType = DWMessage.CHAT_TYPE_SINGLE;
-	
+
 	/**
 	 * 聊天关系，默认为朋友
 	 */
-	@Column(name  = "chatRelationship")
+	@Column(name = "chatRelationship")
 	private int chatRelationship = DWMessage.CHAT_RELATIONSHIP_FRIEND;
-	
+
 	/**
 	 * 身价
 	 */
 	@Column(name = "worth")
 	private String worth;
-	
+
 	/**
-	 *用户dwID
+	 * 用户dwID
 	 */
-	@JSONField(serialize=false)
+	@JSONField(serialize = false)
 	@Column(name = "userID")
 	private String userID;
-	
-	
+
 	/**
 	 * 
 	 */
-	public ConversationList()
-	{
-		
+	public ConversationList() {
+
 	}
 
 	/**
@@ -123,8 +121,8 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	 * @param time
 	 * @param count
 	 */
-	public ConversationList(String dwID, String icon, String title, String content, String time, int count)
-	{
+	public ConversationList(String dwID, String icon, String title,
+			String content, String time, int count) {
 		super();
 		this.dwID = dwID;
 		this.icon = icon;
@@ -136,6 +134,7 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 
 	/**
 	 * 构造函数
+	 * 
 	 * @param userID
 	 * @param dwID
 	 * @param icon
@@ -147,10 +146,10 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	 * @param msgState
 	 * @param unRemind
 	 */
-	
-	public ConversationList(String userID,String otherID, String icon, String title,
-			String content, String time, int count, int unReadCount,
-			int msgState, int unRemind) {
+
+	public ConversationList(String userID, String otherID, String icon,
+			String title, String content, String time, int count,
+			int unReadCount, int msgState, int unRemind) {
 		super();
 		this.userID = userID;
 		this.dwID = otherID;
@@ -163,8 +162,6 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 		this.msgstate = msgState;
 		this.unRemind = unRemind;
 	}
-	
-	
 
 	/**
 	 * @param dwID
@@ -199,108 +196,93 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	/**
 	 * @return the icon
 	 */
-	public String getIcon()
-	{
+	public String getIcon() {
 		return icon;
 	}
+
 	/**
-	 * @param icon the icon to set
+	 * @param icon
+	 *            the icon to set
 	 */
-	public void setIcon(String icon)
-	{
+	public void setIcon(String icon) {
 		this.icon = icon;
 	}
+
 	/**
 	 * @return the title
 	 */
-	public String getTitle()
-	{
+	public String getTitle() {
 		return title;
 	}
+
 	/**
-	 * @param title the title to set
+	 * @param title
+	 *            the title to set
 	 */
-	public void setTitle(String title)
-	{
+	public void setTitle(String title) {
 		this.title = title;
 	}
+
 	/**
 	 * @return the content
 	 */
-	public String getContent()
-	{
+	public String getContent() {
 		return content;
 	}
+
 	/**
-	 * @param content the content to set
+	 * @param content
+	 *            the content to set
 	 */
-	public void setContent(String content)
-	{
+	public void setContent(String content) {
 		this.content = content;
 	}
+
 	/**
 	 * @return the time
 	 */
-	public String getTime()
-	{
+	public String getTime() {
 		return time;
 	}
+
 	/**
-	 * @param time the time to set
+	 * @param time
+	 *            the time to set
 	 */
-	public void setTime(String time)
-	{
+	public void setTime(String time) {
 		this.time = time;
 	}
-	
-
-
 
 	/**
 	 * @return the dwID
 	 */
-	public String getDwID()
-	{
+	public String getDwID() {
 		return dwID;
 	}
 
-
-
-
-
 	/**
-	 * @param dwID the dwID to set
+	 * @param dwID
+	 *            the dwID to set
 	 */
-	public void setDwID(String dwID)
-	{
+	public void setDwID(String dwID) {
 		this.dwID = dwID;
 	}
-
-
-
-
 
 	/**
 	 * @return the count
 	 */
-	public int getCount()
-	{
+	public int getCount() {
 		return count;
 	}
 
-
-
-
-
 	/**
-	 * @param count the count to set
+	 * @param count
+	 *            the count to set
 	 */
-	public void setCount(int count)
-	{
+	public void setCount(int count) {
 		this.count = count;
 	}
 
-	
 	/**
 	 * @return the unReadCount
 	 */
@@ -309,7 +291,8 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	}
 
 	/**
-	 * @param unReadCount the unReadCount to set
+	 * @param unReadCount
+	 *            the unReadCount to set
 	 */
 	public void setUnReadCount(int unReadCount) {
 		this.unReadCount = unReadCount;
@@ -323,7 +306,8 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	}
 
 	/**
-	 * @param msg_state the msg_state to set
+	 * @param msg_state
+	 *            the msg_state to set
 	 */
 	public void setMsgstate(int msg_state) {
 		this.msgstate = msg_state;
@@ -337,27 +321,25 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	}
 
 	/**
-	 * @param chat_unremind the chat_unremind to set
+	 * @param chat_unremind
+	 *            the chat_unremind to set
 	 */
 	public void setUnRemind(int chat_unremind) {
 		this.unRemind = chat_unremind;
 	}
 
-	
-	
 	/**
 	 * @return the messageType
 	 */
-	public int getMessageType()
-	{
+	public int getMessageType() {
 		return messageType;
 	}
 
 	/**
-	 * @param messageType the messageType to set
+	 * @param messageType
+	 *            the messageType to set
 	 */
-	public void setMessageType(int messageType)
-	{
+	public void setMessageType(int messageType) {
 		this.messageType = messageType;
 	}
 
@@ -369,188 +351,189 @@ public class ConversationList extends Model implements Comparable<ConversationLi
 	}
 
 	/**
-	 * @param chat_type the chat_type to set
+	 * @param chat_type
+	 *            the chat_type to set
 	 */
 	public void setChatType(int chat_type) {
 		this.chatType = chat_type;
 	}
 
-
 	/**
 	 * @return the chatRelationship
 	 */
-	public int getChatRelationship()
-	{
+	public int getChatRelationship() {
 		return chatRelationship;
-		
-		
+
 	}
 
 	/**
-	 * @param chatRelationship the chatRelationship to set
+	 * @param chatRelationship
+	 *            the chatRelationship to set
 	 */
-	public void setChatRelationship(int chatRelationship)
-	{
+	public void setChatRelationship(int chatRelationship) {
 		this.chatRelationship = chatRelationship;
 	}
 
 	/**
 	 * @return the worth
 	 */
-	public String getWorth()
-	{
+	public String getWorth() {
 		return worth;
 	}
 
 	/**
-	 * @param worth the worth to set
+	 * @param worth
+	 *            the worth to set
 	 */
-	public void setWorth(String worth)
-	{
+	public void setWorth(String worth) {
 		this.worth = worth;
 	}
-	
-	
 
 	/**
 	 * @return the userID
 	 */
-	public String getUserID()
-	{
+	public String getUserID() {
 		return userID;
 	}
 
 	/**
-	 * @param userID the userID to set
+	 * @param userID
+	 *            the userID to set
 	 */
-	public void setUserID(String userID)
-	{
+	public void setUserID(String userID) {
 		this.userID = userID;
 	}
-	
-	
 
 	/**
 	 * @return the setToTop
 	 */
-	public int getSetToTop()
-	{
+	public int getSetToTop() {
 		return setToTop;
 	}
 
 	/**
-	 * @param setToTop the setToTop to set
+	 * @param setToTop
+	 *            the setToTop to set
 	 */
-	public void setSetToTop(int setToTop)
-	{
+	public void setSetToTop(int setToTop) {
 		this.setToTop = setToTop;
 	}
 
 	/**
 	 * 删除消息列表
 	 */
-	public static void deleteAll()
-	{
+	public static void deleteAll() {
 		String userID = DecentWorldApp.getInstance().getDwID();
 		String sql = "userID=?";
-		new Delete().from(ConversationList.class).where(sql,userID).execute();
+		new Delete().from(ConversationList.class).where(sql, userID).execute();
 	}
-	
+
 	/**
 	 * 查询指定dwID | chatType | chatRelationship 查询匹配的记录并返回结果
+	 * 
 	 * @param dwID
 	 * @return
 	 */
-	public static ConversationList queryByDwID(String otherID,int chatType,int chatRelationship)
-	{
+	public static ConversationList queryByDwID(String otherID, int chatType,
+			int chatRelationship) {
 		String userID = DecentWorldApp.getInstance().getDwID();
 		String sql = "userID=? and dwID=? and chatType = ? and chatRelationship=?";
-		return new Select().from(ConversationList.class).where(sql,userID, otherID,chatType,chatRelationship).executeSingle();
+		return new Select().from(ConversationList.class)
+				.where(sql, userID, otherID, chatType, chatRelationship)
+				.executeSingle();
 	}
-	
+
 	/**
 	 * 查询指定dwID | chatRelationship 查询匹配的记录并返回结果
+	 * 
 	 * @param dwID
 	 * @return
 	 */
-	public static List<ConversationList> queryByDwID(String otherID,int chatRelationship)
-	{
+	public static List<ConversationList> queryByDwID(String otherID,
+			int chatRelationship) {
 		String userID = DecentWorldApp.getInstance().getDwID();
 		String sql = "userID=? and dwID=? and chatRelationship=?";
-		return new Select().from(ConversationList.class).where(sql,userID, otherID,chatRelationship).execute();
+		return new Select().from(ConversationList.class)
+				.where(sql, userID, otherID, chatRelationship).execute();
 	}
-	
+
 	/**
 	 * 查询所有记录
+	 * 
 	 * @return
 	 */
-	public static List<ConversationList> queryAll()
-	{
+	public static List<ConversationList> queryAll() {
 		String userID = DecentWorldApp.getInstance().getDwID();
 		String sql = "userID=?";
-		return new Select().from(ConversationList.class).where(sql, userID).orderBy("time desc").execute();
+		return new Select().from(ConversationList.class).where(sql, userID)
+				.orderBy("time desc").execute();
 	}
-	
+
 	/**
 	 * 改UnRealCount=0
 	 */
-	public void updateUnReadCount(){
+	public void updateUnReadCount() {
 		LogUtils.i("MessageList", "updateUnReadCount");
 		String userID = DecentWorldApp.getInstance().getDwID();
 		String sql = "userID=?";
-		new Update(ConversationList.class).set("unReadCount=0").where("userID=? and dwID=? and chatType=?",userID,this.dwID,this. chatType).execute();
+		new Update(ConversationList.class)
+				.set("unReadCount=0")
+				.where("userID=? and dwID=? and chatType=?", userID, this.dwID,
+						this.chatType).execute();
 	}
-	
+
 	/**
 	 * 删除指定dwID号的消息
+	 * 
 	 * @param dwID
 	 */
-	public static void deleteByDWid(String dwID){
-		String userID = DecentWorldApp.getInstance().getDwID();
-		String sql = "userID=? and dwID=?";
-		new Delete().from(ConversationList.class).where(sql, userID,dwID).execute();
-	}
+    public static void deleteByDwID(String otherID)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and dwID=?";
+        new Delete().from(ConversationList.class).where(sql, userID, otherID).execute();
+    }
 
-	
-
-	
 	/**
 	 * 更新消息
 	 */
-	public void receiveMessage(DWMessage msg){
+	public void receiveMessage(DWMessage msg) {
 		this.count++;
-		if(dwID!=null&&!dwID.equals(DecentWorldApp.getInstance().getDwID())){
+		if (dwID != null
+				&& !dwID.equals(DecentWorldApp.getInstance().getDwID())) {
 			this.unReadCount++;
 		}
-		String body="";
-		int msgType=msg.getMessageType();
-		if(msgType==MessageType.NOMAL.getValue()){
-			body=msg.getBody();
+		String body = "";
+		int msgType = msg.getMessageType();
+		if (msgType == MessageType.NOMAL.getValue()) {
+			body = msg.getBody();
 		}
-		this.messageType=msgType;
-		this.content=body;
-		this.time=String.valueOf(System.currentTimeMillis());
+		this.messageType = msgType;
+		this.content = body;
+		this.time = String.valueOf(System.currentTimeMillis());
 	}
-	
+
 	/**
 	 * 删除指定dwID号的会话,用于加、删好友后的会话移动
+	 * 
 	 * @param dwID
 	 * @param friendID
 	 */
-	public static void deleteConversation(String dwID,int relation)
-	{
+	public static void deleteConversation(String dwID, int relation) {
 		String userID = DecentWorldApp.getInstance().getDwID();
 		String sql = "userID=? and dwID =? and chatRelationship=? and chatType=?";
-		new Delete().from(ConversationList.class).where(sql,userID, dwID,relation,DWMessage.CHAT_TYPE_SINGLE).execute();
+		new Delete().from(ConversationList.class)
+				.where(sql, userID, dwID, relation, DWMessage.CHAT_TYPE_SINGLE)
+				.execute();
 	}
 
 	/**
 	 * 排序
 	 */
 	@Override
-	public int compareTo(ConversationList another)
-	{
-		//从大到小排序
-		return (int) (Long.valueOf(another.getTime()) - Long.valueOf(this.getTime()));
+	public int compareTo(ConversationList another) {
+		// 从大到小排序
+		return (int) (Long.valueOf(another.getTime()) - Long.valueOf(this
+				.getTime()));
 	}
 }

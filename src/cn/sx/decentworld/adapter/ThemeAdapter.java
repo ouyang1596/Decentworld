@@ -83,7 +83,7 @@ public class ThemeAdapter extends BaseAdapter implements OnClickListener {
 						vh.ivAddPic, ImageLoaderHelper.mOptions);
 			}
 		}
-		vh.ivAddPic.setTag(Constants.ITEM_KEY, position);
+		vh.ivAddPic.setTag(Constants.ITEM_POSITION, position);
 		vh.ivAddPic.setOnClickListener(this);
 		vh.etContent.addTextChangedListener(new TextWatcher() {
 

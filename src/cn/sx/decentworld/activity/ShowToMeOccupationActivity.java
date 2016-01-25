@@ -37,9 +37,8 @@ public class ShowToMeOccupationActivity extends BaseFragmentActivity {
 	@ViewById(R.id.tv_cancel)
 	TextView tvCancel;
 	public static final int RESULTCODE = 200;
-	private String[] data = { "学生", "IT/互联网/金融", "媒体/公关", "金融", "法律", "咨询",
-			"文化/艺术", "影视/娱乐", "教育/科研", "房地产/建筑", "医药/健康", "能源/环保", "政府机构",
-			"其他（可自己填写）" };
+	private String[] data = { "学生", "IT/互联网/金融", "媒体/公关", "金融", "法律", "咨询", "文化/艺术", "影视/娱乐", "教育/科研", "房地产/建筑", "医药/健康",
+			"能源/环保", "政府机构", "其他（可自己填写）" };
 
 	@AfterViews
 	public void init() {
@@ -67,8 +66,7 @@ public class ShowToMeOccupationActivity extends BaseFragmentActivity {
 			public void onClick(View arg0) {
 				Intent intent = new Intent();
 				if (etvOccupation.length() > 0) {
-					intent.putExtra(SelectedActivity.VALUE, etvOccupation
-							.getText().toString());
+					intent.putExtra(SelectedActivity.VALUE, etvOccupation.getText().toString());
 				} else {
 					intent.putExtra(SelectedActivity.VALUE, "");
 				}
@@ -89,14 +87,12 @@ public class ShowToMeOccupationActivity extends BaseFragmentActivity {
 	private ArrayAdapter<String> adapter;
 
 	private void setAdapter() {
-		adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_expandable_list_item_1, data);
+		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, data);
 		lvOccupation.setAdapter(adapter);
 		lvOccupation.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
-			public void onItemClick(AdapterView<?> arg0, View arg1,
-					int position, long arg3) {
+			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
 				if (position == adapter.getCount() - 1) {
 					etvOccupation.setText("");
 					return;

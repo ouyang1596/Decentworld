@@ -6,26 +6,19 @@ package cn.sx.decentworld.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.googlecode.androidannotations.annotations.ItemClick;
-
-import cn.sx.decentworld.R;
-import cn.sx.decentworld.activity.InterestingGroupInfoActivity_;
-import cn.sx.decentworld.bean.GroupInfo;
-import cn.sx.decentworld.component.ui.MainFragmentComponent;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
-import android.text.NoCopySpan.Concrete;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.GroupInfo;
 
 /**
  * @ClassName: InterestingGroupAdapter.java

@@ -2,9 +2,6 @@ package cn.sx.decentworld.activity;
 
 import java.util.HashMap;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.content.Intent;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -17,16 +14,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.bean.RegisterBean;
-import cn.sx.decentworld.bean.RegisterInfo;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.component.ui.RegisterComponent;
 import cn.sx.decentworld.dialog.GetIdentifyingCodeDialogFragment;
 import cn.sx.decentworld.dialog.GetIdentifyingCodeDialogFragment.OnEnsureClickListener;
-import cn.sx.decentworld.network.utils.JsonUtils;
-import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.widget.ClearEditText;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -56,39 +48,40 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 	private String mMobile = "";
 	@Bean
 	RegisterComponent registerComponent;
-	private Handler mGetIdentifyingCodeHandler = new Handler() {
-		public void handleMessage(android.os.Message msg) {
-			switch (msg.what) {
-			case 1001:
-				toast.show("验证码发送失败");
-				break;
-			case 2001:
-				toast.show("手机号码已被注册");
-				break;
-			default:
-				ifJump(msg);
-				saveToregisterBean(msg);
-				break;
-			}
-		}
-
-		private void saveToregisterBean(android.os.Message msg) {
-			DecentWorldApp.registerBean = new RegisterBean();
-			String jsonData = msg.getData().toString();
-			try {
-				JSONObject joData = new JSONObject(jsonData);
-				String jsonString = joData.getString("record");
-				DecentWorldApp.registerBean = JsonUtils.json2Bean(jsonString,
-						RegisterBean.class);
-			} catch (JSONException e) {
-				LogUtils.v("bm", e.getLocalizedMessage());
-			}
-		}
-	};
-	private Handler mSendHandler = new Handler() {
+	// private Handler mGetIdentifyingCodeHandler = new Handler() {
+	// public void handleMessage(android.os.Message msg) {
+	// switch (msg.what) {
+	// case 2001:
+	// toast.show(msg.obj.toString());
+	// break;
+	// case 1001:
+	// toast.show(msg.obj.toString());
+	// break;
+	// case 0:
+	// toast.show(msg.obj.toString());
+	// break;
+	// case 1:
+	// startIntent(RegisterNickActivity_.class);
+	// break;
+	// }
+	// toast.show(msg.obj.toString());
+	// }
+	// // private void saveToregisterBean(android.os.Message msg) {
+	// // DecentWorldApp.registerBean = new RegisterBean();
+	// // String jsonData = msg.getData().toString();
+	// // try {
+	// // JSONObject joData = new JSONObject(jsonData);
+	// // String jsonString = joData.getString("record");
+	// // DecentWorldApp.registerBean = JsonUtils.json2Bean(jsonString,
+	// // RegisterBean.class);
+	// // } catch (JSONException e) {
+	// // LogUtils.v("bm", e.getLocalizedMessage());
+	// // }
+	// // }
+	// };
+	private Handler mCheckCodeHandle = new Handler() {
 		public void handleMessage(Message msg) {
-			startActivity(new Intent(mContext,
-					RegisterSetPasswordActivity_.class));
+			startActivity(new Intent(mContext, RegisterNickActivity_.class));
 			finish();
 		};
 	};
@@ -150,35 +143,35 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 		String iCode = etCode.getText().toString();
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("phoneNum", etMobile.getText().toString());
-		map.put("phoneCode", iCode);
-		registerComponent.identifyCode(map, mSendHandler);
+		map.put("code", iCode);
+		registerComponent.identifyCode(map, mCheckCodeHandle);
 	}
 
-	public void ifJump(Message msg) {
-		RegisterInfo info = RegisterInfo.queryByDwID(registerComponent.tel);
-		if (null == info) {
-			info = new RegisterInfo(registerComponent.tel);
-			info.save();
-		}
-		switch (msg.what) {
-		case 0:
-		case 1:
-			toast.show("验证码已发送到手机");
-			break;
-		case 2:
-			startIntent(RegisterPersonalMsgActivity_.class);
-			break;
-		case 3:
-			startIntent(RegisterIsStudentActivity_.class);
-			break;
-		case 4:
-			startIntent(RegisterWhatYouHaveActivity_.class);
-			break;
-		case 5:
-			startIntent(RegisterNickActivity_.class);
-			break;
-		}
-	}
+	// public void ifJump(Message msg) {
+	// RegisterInfo info = RegisterInfo.queryByDwID(registerComponent.tel);
+	// if (null == info) {
+	// info = new RegisterInfo(registerComponent.tel);
+	// info.save();
+	// }
+	// switch (msg.what) {
+	// case 0:
+	// case 1:
+	// toast.show("验证码已发送到手机");
+	// break;
+	// case 2:
+	// startIntent(RegisterPersonalMsgActivity_.class);
+	// break;
+	// case 3:
+	// startIntent(RegisterIsStudentActivity_.class);
+	// break;
+	// case 4:
+	// startIntent(RegisterWhatYouHaveActivity_.class);
+	// break;
+	// case 5:
+	// startIntent(RegisterNickActivity_.class);
+	// break;
+	// }
+	// }
 
 	private void getIdentifyingCode() {
 		if (etMobile.length() <= 0) {
@@ -190,7 +183,7 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 			return;
 		}
 		String mobile = etMobile.getText().toString();
-		registerComponent.requestCode(mobile, mGetIdentifyingCodeHandler);
+		registerComponent.requestCode(mobile);
 		timeCount.start();
 		setBtnOk(false);
 	}
@@ -422,5 +415,4 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 	// btnOk.setBackgroundResource(R.drawable.rg_btn_bg_selector);
 	// }
 	// }
-
 }

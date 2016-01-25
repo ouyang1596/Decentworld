@@ -1,7 +1,12 @@
 package org.jivesoftware.smack;
 
+import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.packet.StreamError;
+import org.simple.eventbus.EventBus;
 
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.common.XmppHelper;
 import cn.sx.decentworld.utils.LogUtils;
 
 /**
@@ -87,12 +92,12 @@ public class ReconnectionManager implements ConnectionListener {
                  */
                 private int timeDelay() {
                     if (attempts > 13) {
-                        return 60 * 5;      // 5 minutes
+                        return 60;      // 5 minutes
                     }
                     if (attempts > 7) {
-                        return 60;          // 1 minute
+                        return 10;          // 1 minute
                     }
-                    return 10;              // 10 seconds
+                    return 3;              // 10 seconds
                 }
 
                 /**
@@ -127,12 +132,10 @@ public class ReconnectionManager implements ConnectionListener {
                         // Makes a reconnection attempt
                         try {
                             if (ReconnectionManager.this.isReconnectionAllowed()) {
-                            	if(!connection.isConnected()){
                                     connection.connect();
-                            	}
                             }
                         }
-                        catch (XMPPException e) 
+                        catch (Exception e) 
                         {
                             // Fires the failed reconnection notification
                             ReconnectionManager.this.notifyReconnectionFailed(e);
@@ -157,6 +160,7 @@ public class ReconnectionManager implements ConnectionListener {
                 listener.reconnectionFailed(exception);
             }
         }
+        
     }
 
     /**
@@ -187,6 +191,7 @@ public class ReconnectionManager implements ConnectionListener {
                 String reason = error.getCode();
 
                 if ("conflict".equals(reason)) {
+//					EventBus.getDefault().post("该账号在异地登陆，即将退出！", NotifyByEventBus.NT_CRUSH_OFF_LINE);
                     return;
                 }
             }
@@ -214,6 +219,10 @@ public class ReconnectionManager implements ConnectionListener {
     public void reconnectionSuccessful() {
         // ignore
     	LogUtils.i(TAG, "reconnectionSuccessful");
+    	if(DecentWorldApp.getInstance().isMainActivityInit())
+    	{
+    	    XmppHelper.getConn().sendPacket(new Presence(Presence.Type.available));
+    	}
     }
 
 }

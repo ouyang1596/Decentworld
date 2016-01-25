@@ -240,10 +240,13 @@ public class ChatRoomEditActivity extends BaseFragmentActivity implements
 		case R.id.iv_cover:
 			Intent intent = new Intent(getApplicationContext(),
 					TakePhotosAndpictureSingleActivity.class);
-			intent.putExtra(Constants.ASPECTX, 3);
-			intent.putExtra(Constants.ASPECTY, 1);
-			intent.putExtra(Constants.OUTPUTX, 600);
-			intent.putExtra(Constants.OUTPUTY, 200);
+			intent.putExtra(Constants.ASPECTX,
+					Constants.CHAT_ROOM_SEVEN);
+			intent.putExtra(Constants.ASPECTY, Constants.CHAT_ROOM_FOUR);
+			intent.putExtra(Constants.OUTPUTX,
+					Constants.CHAT_ROOM_SEVEN_HUNDRED);
+			intent.putExtra(Constants.OUTPUTY,
+					Constants.CHAT_ROOM_OUTPUT_FOUR_HUNDRED);
 			startActivityForResult(intent, REQUEST_CODE_COVER);
 			break;
 		case R.id.iv_back:
@@ -314,7 +317,7 @@ public class ChatRoomEditActivity extends BaseFragmentActivity implements
 
 			@Override
 			public void onClick(View view) {
-				position = (Integer) view.getTag(Constants.ITEM_KEY);
+				position = (Integer) view.getTag(Constants.ITEM_POSITION);
 				switch (view.getId()) {
 				case R.id.iv_add_pic:
 					Intent intentPic = new Intent(getApplicationContext(),

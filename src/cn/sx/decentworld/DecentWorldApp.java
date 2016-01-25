@@ -24,14 +24,17 @@ import cn.sx.decentworld.bean.ContactUser;
 import cn.sx.decentworld.bean.EditUserInfoItem;
 import cn.sx.decentworld.bean.NotifyByEventBus;
 import cn.sx.decentworld.bean.RegisterBean;
+import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.common.CrashHandler;
-import cn.sx.decentworld.component.ui.MainFragmentComponent;
+import cn.sx.decentworld.common.XmppHelper;
 import cn.sx.decentworld.inter.CommCallback;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.LogUtils;
-import cn.sx.decentworld.utils.XmppHelper;
+import cn.sx.decentworld.utils.MsgVerify;
+import cn.sx.decentworld.utils.SPUtils;
+import cn.sx.decentworld.utils.ToastUtil;
 
 import com.activeandroid.ActiveAndroid;
 import com.activeandroid.app.Application;
@@ -54,12 +57,10 @@ public class DecentWorldApp extends Application {
 	// 全局变量（）
 	private static DecentWorldApp instance;
 	private static Context applicationContext;
-	private static EventBus eventBus;
 	private String dwID = "";// 用于与Dw服务器进行通信的dwID号
 	private String username = "";// 用户名（目前为手机号码）
 	private String password = "";// 密码
 	private String token = "";// 与dw服务器通信的令牌
-	public static List<EditUserInfoItem> userInfoDatas;
 	// 存放联系人列表
 	private List<ContactUser> list_contactuser;
 	public static final String MAIN_KEY = "1";
@@ -68,8 +69,6 @@ public class DecentWorldApp extends Application {
 	public static String realName;
 	public static String ifGuarantee = "0";
 	public static boolean ifFromAppOwner;
-	@Bean
-	MainFragmentComponent mainComponent;
 	// 通过此来判断聊天室退出是否需要调用退出接口
 	public static boolean ifFixed;
 	public static ChatRoomInfo chatRoomInfo;
@@ -78,6 +77,9 @@ public class DecentWorldApp extends Application {
 	private Intent messageListenerService;
 	private FragmentManager fm;
 	private String currentUserdwID = "";
+	public static int everLogin = -1;
+	private boolean isMainActivityInit = false;
+	private String apiKey = "";
 
 	/**
 	 * packet过滤器
@@ -87,17 +89,13 @@ public class DecentWorldApp extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		initFile();
 		LogUtils.i(TAG, "创建Application");
-		ImageLoaderHelper.initImageLoader(this);
-		// 做初始化操作数据库
+		ToastUtil.initToast(getApplicationContext());
+		initFile();
+		/** 初始化操作数据库 **/
 		ActiveAndroid.initialize(this);
-		// 初始化全局变量...begin
 		applicationContext = this;
 		instance = this;
-		eventBus = EventBus.getDefault();
-		eventBus.register(this);
-		// 初始化全局变量...end
 		mPicList = new ArrayList<String>();
 		// 初始化重连管理者
 		try {
@@ -110,11 +108,23 @@ public class DecentWorldApp extends Application {
 		// 异常报告
 		CrashHandler.getInstance().init(this);
 		ImageUtils.saveBitmap(getResources());
+		generateApiKey();
+	}
+
+	/**
+	 * 生成一个接口key，保存在内存和SP中
+	 */
+	private void generateApiKey() {
+		String apiKey = MsgVerify.getSalt();
+		if (CommUtil.isNotBlank(apiKey)) {
+			SPUtils.put(applicationContext, SPUtils.apiKey, apiKey);
+			this.apiKey = apiKey;
+		}
 	}
 
 	/**
 	 * 获得DecentWorldApp的唯一实例
-	 *
+	 * 
 	 * @return
 	 */
 	public static DecentWorldApp getInstance() {
@@ -202,9 +212,9 @@ public class DecentWorldApp extends Application {
 		return XmppHelper.getConnection(callback);
 	}
 
-	public XMPPConnection getNewConnectionImpl() {
-		return XmppHelper.getNewConnection();
-	}
+//	public XMPPConnection getNewConnectionImpl() {
+//		return XmppHelper.getNewConnection();
+//	}
 
 	/**
 	 * 与服务器断开连接
@@ -213,31 +223,16 @@ public class DecentWorldApp extends Application {
 		XmppHelper.closeConnection();
 	}
 
-	public XMPPConnection getConnectionImpl() {
-		return XmppHelper.getConnection(null);
-	}
+//	public XMPPConnection getConnectionImpl() {
+//		return XmppHelper.getConnection(null);
+//	}
 
 	@Override
 	public void onTerminate() {
 		LogUtils.i(TAG, "销毁Application");
 		super.onTerminate();
-		// 数据库的清理工作
+		/** 完成数据库的清理工作 **/
 		ActiveAndroid.dispose();
-	}
-
-	/**
-	 * @return the currentActivity
-	 */
-	public Activity getCurrentActivity() {
-		return currentActivity;
-	}
-
-	/**
-	 * @param currentActivity
-	 *            the currentActivity to set
-	 */
-	public void setCurrentActivity(Activity currentActivity) {
-		this.currentActivity = currentActivity;
 	}
 
 	public void initFile() {
@@ -253,6 +248,37 @@ public class DecentWorldApp extends Application {
 		if (!file.exists()) {
 			file.mkdirs();
 		}
+	}
+
+	/**
+	 * @return the isMainActivityInit
+	 */
+	public boolean isMainActivityInit() {
+		return isMainActivityInit;
+	}
+
+	/**
+	 * @param isMainActivityInit
+	 *            the isMainActivityInit to set
+	 */
+	public void setMainActivityInit(boolean isMainActivityInit) {
+		this.isMainActivityInit = isMainActivityInit;
+	}
+
+	/**
+	 * 获取ApiKey
+	 * 
+	 * @return the apiKey
+	 */
+	public String getApiKey() {
+		if (CommUtil.isBlank(apiKey)) {
+			String apiString = (String) SPUtils.get(applicationContext,
+					SPUtils.apiKey, "");
+			if (CommUtil.isNotBlank(apiString)) {
+				this.apiKey = apiString;
+			}
+		}
+		return apiKey;
 	}
 
 }

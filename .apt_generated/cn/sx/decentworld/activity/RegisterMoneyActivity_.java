@@ -37,21 +37,21 @@ public final class RegisterMoneyActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         registerComponent = RegisterComponent_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        etvMaterialKind = ((EditText) findViewById(id.etv_material_kind));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        llRegisterMoney = ((LinearLayout) findViewById(id.root_activity_money));
-        ivUploadPic = ((ImageView) findViewById(id.iv_upload_pic));
         btnOk = ((Button) findViewById(id.btn_OK));
-        ((ToastComponent_) toast).afterSetContentView_();
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        ivUploadPic = ((ImageView) findViewById(id.iv_upload_pic));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        etvMaterialKind = ((EditText) findViewById(id.etv_material_kind));
+        llRegisterMoney = ((LinearLayout) findViewById(id.root_activity_money));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

@@ -18,32 +18,40 @@
         android:textColor="#454545"
         android:visibility="gone" />
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/ll_pick_contact"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/chat_lv_item_selector"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:background="@drawable/chat_lv_item_selector">
 
         <ImageView
             android:id="@+id/iv_pick_contact_icon"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:layout_marginBottom="8dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
             android:layout_marginLeft="12dp"
-            android:layout_marginTop="8dp"
             android:src="@drawable/fragment_chat_contact_item1" />
 
         <TextView
             android:id="@+id/tv_pick_contact_name"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/iv_pick_contact_icon"
             android:layout_marginLeft="10dp"
             android:text="杨幂"
             android:textColor="#333333"
             android:textSize="15sp" />
-    </LinearLayout>
+        
+        <CheckBox 
+            android:id="@+id/cb_pick_contact_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:clickable="false"
+            android:layout_marginRight="10dp"/>
+    </RelativeLayout>
 
 </LinearLayout>

@@ -1,1 +1,2 @@
-ALTER TABLE recommendBenefitList ADD stored REAL;
+DROP TABLE myProteges;
+CREATE TABLE noblePerson (Id INTEGER PRIMARY KEY AUTOINCREMENT, occupation TEXT, userID TEXT, direct INTEGER, showName TEXT, gender TEXT, userType INTEGER, worth REAL, otherID TEXT);

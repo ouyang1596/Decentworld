@@ -2,27 +2,54 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/rb_bg"
     android:orientation="vertical" >
 
-    <include
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/main_header" />
-    
-    
+        android:layout_height="48dp"
+        android:background="@drawable/rb_title_bg" >
 
-    <TextView
-        android:id="@+id/tv_bind_account_detail_wx"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:padding="2dp"
-        android:text="绑定微信（向大腕授权）"
-        android:textSize="24sp" />
+        <LinearLayout
+            android:id="@+id/ll_band_back"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center" >
 
-    <View
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/rb_back" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="微信收钱"
+            android:textSize="24sp" />
+    </RelativeLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="@color/three_black" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/tv_bind_account_detail_wx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rb_btn_bg"
+            android:gravity="center_horizontal"
+            android:padding="10dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="绑定微信"
+            android:textColor="@color/white"
+            android:textSize="24sp" />
+    </LinearLayout>
 
 </LinearLayout>

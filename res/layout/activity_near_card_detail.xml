@@ -5,299 +5,152 @@
     android:background="@color/white"
     android:orientation="vertical" >
 
-    <include layout="@layout/top_title" />
-
-    <ScrollView
+    <com.handmark.pulltorefresh.library.PullToRefreshScrollView
+        android:id="@+id/pScrollView"
         android:layout_width="match_parent"
+        android:scrollbars="none"
         android:layout_height="wrap_content" >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical" >
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="500dp" >
+                android:layout_height="360dp" >
 
-                <RelativeLayout
-                    android:id="@+id/rel_iv_show"
+                <cn.sx.decentworld.widget.HackyViewPager
+                    android:id="@+id/vp_near_card_detail_pager"
                     android:layout_width="match_parent"
-                    android:layout_height="360dp" >
+                    android:layout_height="match_parent"
+                    android:background="#ffffff"
+                    android:paddingBottom="25dp" />
 
-                    <cn.sx.decentworld.widget.HackyViewPager
-                        android:id="@+id/vp_near_card_detail_pager"
-                        android:layout_width="match_parent"
-                        android:layout_height="340dp"
-                        android:background="#ffffff" />
+                <ImageView
+                    android:id="@+id/iv_per_like"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="24dp"
+                    android:background="@drawable/iv_per_like_selector" />
 
-                    <LinearLayout
-                        android:id="@+id/ll_iv_show"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true" >
+                <ImageView
+                    android:id="@+id/iv_per_dislike"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginRight="41dp"
+                    android:layout_toLeftOf="@+id/iv_per_like"
+                    android:background="@drawable/iv_per_change_selector" />
 
-                        <!-- cn.sx.decentworld.widget.CircularImageView -->
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
-
-                        <ImageView
-                            android:id="@+id/iv_dislike"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center"
-                            android:scaleType="fitXY"
-                            android:src="@drawable/refresh" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
-
-                        <ImageView
-                            android:id="@+id/iv_talk_stranger"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center"
-                            android:scaleType="fitXY"
-                            android:src="@drawable/talk" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
-
-                        <ImageView
-                            android:id="@+id/iv_like"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_gravity="center"
-                            android:scaleType="fitXY"
-                            android:src="@drawable/iv_new_heart_like_" />
-
-                        <View
-                            android:layout_width="0dp"
-                            android:layout_height="0dp"
-                            android:layout_weight="1" />
-                    </LinearLayout>
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:id="@+id/ll_msg"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/rel_iv_show"
-                    android:layout_marginTop="15dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal" >
-
-                    <TextView
-                        android:id="@+id/tv_realname_nickname"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="16dp"
-                        android:text=""
-                        android:textColor="@color/one_black"
-                        android:textSize="@dimen/new_textsize_16sp" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal" >
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal" >
-
-                            <ImageView
-                                android:id="@+id/iv_sex"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="25dp"
-                                android:src="@drawable/me_sex_women" />
-
-                            <TextView
-                                android:id="@+id/tv_age"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="4dp"
-                                android:text="25"
-                                android:textColor="@color/two_black" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="13dp"
-                            android:gravity="center"
-                            android:orientation="horizontal" >
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/me_worth" />
-
-                            <TextView
-                                android:id="@+id/item_nearby_stranger_worth"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="4dp"
-                                android:text="25"
-                                android:textColor="@color/two_black" />
-                        </LinearLayout>
-
-                        <LinearLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="13dp"
-                            android:gravity="center"
-                            android:orientation="horizontal" >
-
-                            <ImageView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/me_location" />
-
-                            <TextView
-                                android:id="@+id/item_nearby_stranger_location"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginLeft="4dp"
-                                android:text="25"
-                                android:textColor="@color/two_black" />
-                        </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/item_nearby_stranger_work"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/ll_msg"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="15dp"
-                    android:text=""
-                    android:textColor="@color/two_black"
-                    android:textSize="@dimen/new_textsize_12sp" />
-
-                <TextView
-                    android:id="@+id/tv_user_detail_info_sign"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@+id/item_nearby_stranger_work"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginTop="15dp"
-                    android:text=""
-                    android:textColor="@color/two_black"
-                    android:textSize="@dimen/new_textsize_12sp" />
+                <include layout="@layout/top_title" />
             </RelativeLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginTop="5dp"
+                android:orientation="vertical" >
+
+                <include layout="@layout/layout_info" />
 
                 <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="0.5px"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_weight="1"
-                    android:background="@color/three_black" />
-
-                <TextView
+                    android:id="@+id/iv_add_friend"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="我的"
-                    android:textColor="@color/two_black"
-                    android:textSize="@dimen/new_textsize_16sp" />
+                    android:layout_gravity="right"
+                    android:layout_marginTop="16dp"
+                    android:src="@drawable/iv_add_selector" />
 
-                <ImageView
-                    android:layout_width="0dp"
-                    android:layout_height="0.5px"
-                    android:layout_marginLeft="20dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_weight="1"
-                    android:background="@color/three_black" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:weightSum="1" >
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.4"
+                        android:background="@drawable/bg_line_press" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.2"
+                        android:gravity="center"
+                        android:text="他的"
+                        android:textColor="@color/three_black"
+                        android:textSize="@dimen/new_textsize_18sp" />
+
+                    <ImageView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.4"
+                        android:background="@drawable/bg_line_press" />
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal" >
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
 
-                <LinearLayout
-                    android:id="@+id/ll_detail"
-                    android:layout_width="0px"
+                <RadioGroup
+                    android:id="@+id/rg_per_data"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical" >
+                    android:orientation="horizontal" >
 
-                    <TextView
-                        android:id="@+id/tv_detail"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="详情"
-                        android:textColor="@color/two_black"
-                        android:textSize="@dimen/new_textsize_16sp" />
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
 
-                    <ImageView
-                        android:id="@+id/line_iv_detail"
-                        android:layout_width="match_parent"
-                        android:layout_height="1px"
-                        android:layout_marginTop="6dp"
-                        android:background="@color/new_blue" />
-                </LinearLayout>
+                    <RadioButton
+                        android:id="@+id/rb_info"
+                        style="@style/info_radioButton"
+                        android:checked="true"
+                        android:text="天生" />
 
-                <LinearLayout
-                    android:id="@+id/ll_works"
-                    android:layout_width="0px"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center_horizontal"
-                    android:orientation="vertical" >
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
 
-                    <TextView
-                        android:id="@+id/tv_works"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center"
-                        android:text="作品"
-                        android:textColor="@color/two_black"
-                        android:textSize="@dimen/new_textsize_16sp" />
+                    <RadioButton
+                        android:id="@+id/rb_achievement"
+                        style="@style/info_radioButton"
+                        android:text="成就" />
 
-                    <ImageView
-                        android:id="@+id/line_iv_works"
-                        android:layout_width="match_parent"
-                        android:layout_height="1px"
-                        android:layout_marginTop="6dp"
-                        android:background="@color/new_blue" />
-                </LinearLayout>
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <RadioButton
+                        android:id="@+id/rb_works"
+                        style="@style/info_radioButton"
+                        android:text="作品" />
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+                </RadioGroup>
+
+                <FrameLayout
+                    android:id="@+id/fl_fragment_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+                </FrameLayout>
             </LinearLayout>
-
-            <FrameLayout
-                android:id="@+id/fl_detail_works"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
-
-                <!-- 作品圈信息 -->
-
-                <include layout="@layout/fragment_work_circle" />
-                <!-- 用户详细信息 -->
-
-                <include layout="@layout/user_detail_info" />
-            </FrameLayout>
         </LinearLayout>
-    </ScrollView>
+    </com.handmark.pulltorefresh.library.PullToRefreshScrollView>
 
 </LinearLayout>

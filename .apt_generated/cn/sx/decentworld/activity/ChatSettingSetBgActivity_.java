@@ -11,8 +11,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ChoceAndTakePictureComponent_;
@@ -32,73 +33,17 @@ public final class ChatSettingSetBgActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        picture = ChoceAndTakePictureComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        picture = ChoceAndTakePictureComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        {
-            View view = findViewById(id.chat_setting_set_bg_fromlocal);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingSetBgActivity_.this.selectBgFromLocal(view);
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.chat_setting_set_bg_choice_picture);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingSetBgActivity_.this.chat_setting_set_bg_choice_picture();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.chat_setting_set_bg_take_picture);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingSetBgActivity_.this.chat_setting_set_bg_take_picture();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatSettingSetBgActivity_.this.setBack();
-                    }
-
-                }
-                );
-            }
-        }
-        ((ChoceAndTakePictureComponent_) picture).afterSetContentView_();
+        chat_setting_set_bg_take_picture = ((RelativeLayout) findViewById(id.chat_setting_set_bg_take_picture));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
+        chat_setting_set_bg_choice_picture = ((RelativeLayout) findViewById(id.chat_setting_set_bg_choice_picture));
+        chat_setting_set_bg_fromlocal = ((RelativeLayout) findViewById(id.chat_setting_set_bg_fromlocal));
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((ChoceAndTakePictureComponent_) picture).afterSetContentView_();
         init();
     }
 
@@ -130,16 +75,6 @@ public final class ChatSettingSetBgActivity_
 
     public static ChatSettingSetBgActivity_.IntentBuilder_ intent(Context context) {
         return new ChatSettingSetBgActivity_.IntentBuilder_(context);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        ChatSettingSetBgActivity_.super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case  1 :
-                ChatSettingSetBgActivity_.this.onResult(resultCode, data);
-                break;
-        }
     }
 
     public static class IntentBuilder_ {

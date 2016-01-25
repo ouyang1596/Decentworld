@@ -27,7 +27,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.jivesoftware.smack.packet.Message;
 
-import cn.sx.decentworld.utils.XmppHelper;
+import cn.sx.decentworld.common.XmppHelper;
 
 /**
  * A chat is a series of messages sent between two users. Each chat has a unique

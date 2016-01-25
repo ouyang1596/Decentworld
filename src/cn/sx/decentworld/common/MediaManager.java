@@ -62,7 +62,8 @@ public class MediaManager {
 			mMediaPlayer.setOnPreparedListener(new OnPreparedListener() {
 
 				@Override
-				public void onPrepared(MediaPlayer arg0) {
+				public void onPrepared(MediaPlayer arg0) 
+				{
 					mMediaPlayer.start();
 				}
 			});
@@ -77,8 +78,13 @@ public class MediaManager {
 	}
 
 	public static void stop() {
-		if (null != mMediaPlayer) {
-			mMediaPlayer.stop();
+		if (null != mMediaPlayer) 
+		{
+		    if(mMediaPlayer.isPlaying())
+		    {
+		        mMediaPlayer.stop();
+		    }
+			
 			mMediaPlayer.release();
 			mMediaPlayer = null;
 		}

@@ -37,13 +37,13 @@ public final class ShareActivity_
     }
 
     private void afterSetContentView_() {
+        llWechat = ((LinearLayout) findViewById(id.ll_wechat));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
         ivShortMessage = ((ImageView) findViewById(id.iv_shortmessage));
-        ivWeChat = ((ImageView) findViewById(id.iv_wechat));
         ivSina = ((ImageView) findViewById(id.iv_sina));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        llWechat = ((LinearLayout) findViewById(id.ll_wechat));
         llWechatMoments = ((LinearLayout) findViewById(id.ll_wechat_moments));
+        ivWeChat = ((ImageView) findViewById(id.iv_wechat));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

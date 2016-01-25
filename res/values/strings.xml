@@ -365,16 +365,10 @@
     <string name="activity_modification_password_two_new_password">请设置新的密码</string>
 
     <!-- AdvanceSettingActivity.java 高级设置 -->
-    <string name="activity_advance_setting_dw">通过DW号搜索到我</string>
-    <string name="activity_advance_setting_phone">通过手机号搜索到我</string>
-    <string name="activity_advance_setting_nickname">通过昵称搜索到我</string>
-    <string name="activity_advance_setting_realname">通过实名搜索到我</string>
-    <string name="activity_advance_setting_unsee_other">不看他(她)的作品圈</string>
-    <string name="activity_advance_setting_unsee_me">不让他(她)看我的作品圈</string>
-    <string name="activity_advance_setting_1">陌生人消息提醒 </string>
+    <string name="activity_advance_setting_stranger_msg">陌生人消息提醒 </string>
     <string name="activity_advance_setting_push_system">接受系统推送信息 </string>
-    <string name="activity_advance_setting_push_appearance">接受系统推送貌信息 </string>
-    <string name="activity_advance_setting_autoTransfer">自动转账 </string>
+    <string name="activity_advance_setting_autoTransfer">推荐收益是否自动到账 </string>
+    <string name="activity_advance_setting_push_acceptCheckPush">接受系统推送审核信息 </string>
 
     <!-- CashIncomeActivity.java -->
     <string name="activity_cash_income_total_revenue">总金额:</string>
@@ -589,5 +583,16 @@
     <string name="software_version_name">软件版本名：</string>
     <string name="check_new_version">检查新版本</string>
     <string name="title_activity_recharge_pay_function">RechargePayFunctionActivity</string>
+    <string name="title_activity_contact">ContactActivity</string>
+    <string name="title_activity_occupation">OccupationActivity</string>
+    <string name="title_activity_doubt">DoubtActivity</string>
+    <string name="title_activity_doubt_verify">DoubtVerifyActivity</string>
+    <string name="title_activity_doubt_wan">DoubtWanActivity</string>
+    <string name="title_activity_achievement">AchievementActivity</string>
+    <string name="title_activity_templet">TempletActivity</string>
+    <!-- 当没有设置年龄时显示的文字 -->
+    <string name="default_age_description">最好的年龄</string>
+    <!-- 当没有设置个性签名时显示的文字 -->
+    <string name="default_sign_description">未设置个性签名</string>
 
 </resources>

@@ -24,6 +24,7 @@ import android.widget.Toast;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.UserExtraInfo;
 import cn.sx.decentworld.bean.UserInfo;
 import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.Constants;
@@ -51,25 +52,25 @@ public class FragmentContactAdapter extends BaseAdapter implements SectionIndexe
 		this.list = list;
 	}
 
-	/**
-	 * 废弃
-	 * @param mContext
-	 * @param list
-	 * @param index
-	 */
-	public FragmentContactAdapter(Context mContext, List<ContactUser> list, int index)
-	{
-		this.mContext = mContext;
-		this.list = list;
-		this.index = index;
-	}
-
-	public FragmentContactAdapter(Context mContext, List<ContactUser> list, String type)
-	{
-		this.mContext = mContext;
-		this.list = list;
-		this.type = type;
-	}
+//	/**
+//	 * 废弃
+//	 * @param mContext
+//	 * @param list
+//	 * @param index
+//	 */
+//	public FragmentContactAdapter(Context mContext, List<ContactUser> list, int index)
+//	{
+//		this.mContext = mContext;
+//		this.list = list;
+//		this.index = index;
+//	}
+//
+//	public FragmentContactAdapter(Context mContext, List<ContactUser> list, String type)
+//	{
+//		this.mContext = mContext;
+//		this.list = list;
+//		this.type = type;
+//	}
 
 	/**
 	 * 当ListView数据发生变化时,调用此方法来更新ListView
@@ -117,8 +118,8 @@ public class FragmentContactAdapter extends BaseAdapter implements SectionIndexe
 		}
 		
 		final ContactUser mContent = list.get(position);
-		viewHolder.tvTitle.setTag(Constants.ITEM_KEY, position);
-		viewHolder.icon.setTag(Constants.ITEM_KEY, position);
+		viewHolder.tvTitle.setTag(Constants.ITEM_POSITION, position);
+		viewHolder.icon.setTag(Constants.ITEM_POSITION, position);
 		// 根据position获取分类的首字母的Char ascii值
 		int section = getSectionForPosition(position);
 		int f = getPositionForSection(section);
@@ -144,61 +145,56 @@ public class FragmentContactAdapter extends BaseAdapter implements SectionIndexe
 			}
 		});
 
-		if (type.equals("pick"))
-		{
-			viewHolder.tvTitle.setOnClickListener(new OnClickListener()
-			{
-
-				@Override
-				public void onClick(View arg0)
-				{
-					UserInfo userInfo = UserInfo.queryByDwID(DecentWorldApp.getInstance().getDwID());
-					if (userInfo != null)
-					{
-						String grId = mContent.getDwID();
-						userInfo.setGrId(grId);
-						userInfo.save();
-						((Activity) mContext).runOnUiThread(new Runnable()
-						{
-
-							@Override
-							public void run()
-							{
-								Toast.makeText(mContext, "选择" + mContent.getNickName() + "作为贵人", Toast.LENGTH_SHORT).show();
-
-							}
-						});
-						LogUtils.i(TAG, "选择的dwID=" + grId + "的用户作为自己的贵人");
-						// 返回
-						((Activity) mContext).setResult(Activity.RESULT_OK);
-						((Activity) mContext).finish();
-					}
-					else
-					{
-						((Activity) mContext).runOnUiThread(new Runnable()
-						{
-
-							@Override
-							public void run()
-							{
-								Toast.makeText(mContext, "数据库中用户信息为空", Toast.LENGTH_SHORT).show();
-
-							}
-						});
-						LogUtils.i(TAG, "数据库中用户信息为空");
-					}
-
-				}
-			});
-
-		}
+//		if (type.equals("pick"))
+//		{
+//			viewHolder.tvTitle.setOnClickListener(new OnClickListener()
+//			{
+//				@Override
+//				public void onClick(View arg0)
+//				{
+//				    UserExtraInfo userInfo = UserExtraInfo.queryBy(DecentWorldApp.getInstance().getDwID());
+//					if (userInfo != null)
+//					{
+//						String grId = mContent.getFriendID();
+//						userInfo.setGrId(grId);
+//						userInfo.save();
+//						((Activity) mContext).runOnUiThread(new Runnable()
+//						{
+//							@Override
+//							public void run()
+//							{
+//								Toast.makeText(mContext, "选择" + mContent.getShowName() + "作为贵人", Toast.LENGTH_SHORT).show();
+//							}
+//						});
+//						LogUtils.i(TAG, "选择的dwID=" + grId + "的用户作为自己的贵人");
+//						// 返回
+//						((Activity) mContext).setResult(Activity.RESULT_OK);
+//						((Activity) mContext).finish();
+//					}
+//					else
+//					{
+//						((Activity) mContext).runOnUiThread(new Runnable()
+//						{
+//							@Override
+//							public void run()
+//							{
+//								Toast.makeText(mContext, "数据库中用户信息为空", Toast.LENGTH_SHORT).show();
+//							}
+//						});
+//						LogUtils.i(TAG, "数据库中用户信息为空");
+//					}
+//
+//				}
+//			});
+//
+//		}
 
 		/**
 		 * 设置联系人列表的显示信息
 		 */
 		ContactUser contactUser = list.get(position);
-		viewHolder.tvTitle.setText(contactUser.getNickName());
-		String icon = ImageUtils.getIconByDwID(contactUser.getDwID(), ImageUtils.ICON_SMALL);
+		viewHolder.tvTitle.setText(contactUser.getShowName());
+		String icon = ImageUtils.getIconByDwID(contactUser.getFriendID(), ImageUtils.ICON_SMALL);
 		if (CommUtil.isNotBlank(icon))
 		{
 			ImageLoaderHelper.mImageLoader.displayImage(icon, viewHolder.icon, ImageLoaderHelper.mOptions);

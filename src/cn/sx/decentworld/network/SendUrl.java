@@ -2,7 +2,6 @@ package cn.sx.decentworld.network;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -12,21 +11,15 @@ import org.apache.http.Header;
 import org.apache.http.cookie.Cookie;
 import org.apache.http.protocol.HTTP;
 
-import android.app.Activity;
 import android.content.Context;
-import android.util.Log;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.network.entity.ResultBean;
-import cn.sx.decentworld.network.security.AES;
 import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.AES;
 import cn.sx.decentworld.utils.CookieUtils;
+import cn.sx.decentworld.utils.SPUtils;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.PersistentCookieStore;
 import com.loopj.android.http.RequestParams;
@@ -59,36 +52,32 @@ public class SendUrl {
 	 *            请求方式 Method.POST or Method.GET(Volley)
 	 * @param httpCallBack
 	 *            回调接口
-	 * 
-	 * 
 	 */
 	public void httpRequestWithParams(final HashMap<String, String> requestMap,
 			String url, int method, final HttpCallBack httpCallBack) {
-		// String time = String.valueOf(System.currentTimeMillis());
-		// char[] timestampChar = time.toCharArray();
-		// String key = AES.getAesKey(timestampChar);
-		// String privateKey = AES.Encrypt(AES.PRIVATE_KEY, key);
-		// requestMap.put("privateKey", privateKey);
-		// requestMap.put("timestamp", time);
+		/** 增强接口的安全性 **/
+		String randomStr = (String) SPUtils.get(context, SPUtils.randomStr, "");
+		if (CommUtil.isBlank(randomStr)) {
+			requestMap.put("randomStr", "");
+			requestMap.put("token", "");
+			requestMap.put("id", "");
+		} else {
+			String time = String.valueOf(System.currentTimeMillis());
+			requestMap.put("randomStr", time);
+			String token = AES.encode(time, randomStr);
+			requestMap.put("token", token);
+			requestMap.put("id", DecentWorldApp.getInstance().getDwID());
+		}
+		// String apiKey = DecentWorldApp.getInstance().getApiKey();
+
 		AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 		asyncHttpClient.addHeader("http-equiv", "content-type");
 		asyncHttpClient.addHeader("content", "text/html");
 		asyncHttpClient.addHeader("charset", "utf-8");
 		saveCookie(asyncHttpClient);
 		RequestParams requestparams = null;
-
 		requestparams = IteratorMap(requestMap);
 		requestparams.setContentEncoding(HTTP.UTF_8);
-
-		// try
-		// {
-		// String url8 = new String(url.getBytes(), "utf-8");
-		// }
-		// catch (UnsupportedEncodingException e1)
-		// {
-		// // TODO Auto-generated catch block
-		// e1.printStackTrace();
-		// }
 
 		asyncHttpClient.get(url, requestparams, new TextHttpResponseHandler() {
 			ResultBean resultBean = new ResultBean();
@@ -205,6 +194,22 @@ public class SendUrl {
 	 */
 	public void httpRequestWithImage(HashMap<String, String> params,
 			File[] images, String url, final HttpCallBack httpCallBack) {
+
+		/** 增强接口的安全性 **/
+		String randomStr = (String) SPUtils.get(context, SPUtils.randomStr, "");
+		if (CommUtil.isBlank(randomStr)) {
+			params.put("randomStr", "");
+			params.put("token", "");
+			params.put("id", "");
+		} else {
+			String time = String.valueOf(System.currentTimeMillis());
+			String token = AES.encode(time, randomStr);
+			StringBuffer sb = new StringBuffer();
+			sb.append("?randomStr=").append(time).append("&token=")
+					.append(token).append("&id=")
+					.append(DecentWorldApp.getInstance().getDwID());
+			url = url + sb.toString();
+		}
 		AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 		saveCookie(asyncHttpClient);
 		RequestParams requestparams = null;
@@ -264,6 +269,20 @@ public class SendUrl {
 	 */
 	public void httpRequestWithImageMulti(HashMap<String, String> params,
 			File[] images, String url, final HttpCallBack httpCallBack) {
+		/** 增强接口的安全性 **/
+		String randomStr = (String) SPUtils.get(context, SPUtils.randomStr, "");
+		if (CommUtil.isBlank(randomStr)) {
+			params.put("randomStr", "");
+			params.put("token", "");
+			params.put("id", "");
+		} else {
+			String time = String.valueOf(System.currentTimeMillis());
+			params.put("randomStr", time);
+			String token = AES.encode(time, randomStr);
+			params.put("token", token);
+			params.put("id", DecentWorldApp.getInstance().getDwID());
+		}
+
 		AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
 		saveCookie(asyncHttpClient);
 		RequestParams requestparams = null;
@@ -273,7 +292,7 @@ public class SendUrl {
 		try {
 			if (null != images) {
 				requestparams.put("file", images);
-				
+
 			}
 		} catch (FileNotFoundException e1) {
 		}

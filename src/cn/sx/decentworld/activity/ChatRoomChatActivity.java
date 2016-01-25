@@ -56,9 +56,12 @@ import cn.sx.decentworld.bean.OccupantList;
 import cn.sx.decentworld.bean.manager.DWMMessageManager;
 import cn.sx.decentworld.bean.manager.DWSMessageManager;
 import cn.sx.decentworld.bean.manager.UserInfoManager;
+import cn.sx.decentworld.callback.MsgProCallBack;
 import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.MsgProThread;
 import cn.sx.decentworld.common.SmileUtils;
+import cn.sx.decentworld.common.XmppHelper;
 import cn.sx.decentworld.component.ChoceAndTakePictureComponent;
 import cn.sx.decentworld.component.KeyboardComponent;
 import cn.sx.decentworld.component.TitleBar;
@@ -71,12 +74,13 @@ import cn.sx.decentworld.network.request.GetRoomInfo;
 import cn.sx.decentworld.network.request.GetUserInfo;
 import cn.sx.decentworld.network.request.SetRoomInfo;
 import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.AES;
 import cn.sx.decentworld.utils.FileUtils;
 import cn.sx.decentworld.utils.HttpDownloader;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.LogUtils;
-import cn.sx.decentworld.utils.XmppHelper;
+import cn.sx.decentworld.utils.SPUtils;
 import cn.sx.decentworld.widget.CircularImage;
 import cn.sx.decentworld.widget.ExpandGridView;
 import cn.sx.decentworld.widget.HorizontalListView;
@@ -993,12 +997,10 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 		if (id == R.id.btn_send)
 		{
 			String textContent = mEditTextContent.getText().toString();
-
 			// 构造Message
 			Message message = new Message(roomID + "@conference." + Constants.BACK_SERVER_NAME , Message.Type.groupchat);
 			message.setFrom(dwID);
 			message.setSubject("chat");
-
 			// 构造DWMessage
 			DWMessage dwMessage = new DWMessage(DWMessage.TXT , DWMessage.SEND);
 			dwMessage.setTo(roomID);
@@ -1006,10 +1008,28 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 			dwMessage.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
 			dwMessage.setBody(textContent);
 			dwMessage.setTxtMsgID(message.getPacketID());
-			dwMessage.save();
+
 			message.setBody(DWMessage.toJson(dwMessage));
-			// 发送信息
-			XmppHelper.sendMessage(message);
+			
+		     /** 发送Message **/
+	        if (!XmppHelper.getConn().isConnected()) 
+	        {
+	            dwMessage.setSendSuccess(0);
+	        } 
+	        else 
+	        {
+	            /** 添加token **/
+	            long time = System.currentTimeMillis();
+	            dwMessage.setTime(String.valueOf(time));
+	            String randomStr = (String) SPUtils.get(mContext, SPUtils.randomStr, "");
+	            String token = AES.encode(dwID+time, randomStr);
+	            dwMessage.setToken(token);
+	            message.setBody(DWMessage.toJson(dwMessage));
+	            /** 发送信息 **/
+	            XmppHelper.sendMessage(message);
+	            LogUtils.i(TAG, "没有断开连接");
+	        }
+	        dwMessage.save();
 			// 处理界面
 			refreshListView(dwMessage);
 			KeyboardComponent.dismissKeyboard(mEditTextContent);
@@ -1211,7 +1231,8 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 		// 暂时上限为一次上传十张
 		File[] images = new File[]
 		{ file };
-		getRoomInfo.sendFileWithParams(hashmap, images, "/sendPicture", fileProgHandler, txtMsgID);
+		chatComponent.sendFileWithParams(hashmap, images, "/sendPicture", fileProgHandler, txtMsgID);
+
 	}
 
 	/**
@@ -1233,12 +1254,13 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 		// 语音文件
 		File[] images = new File[]
 		{ new File(FilePath) };
-		getRoomInfo.sendFileWithParams(hashmap, images, "/sendAudio", fileProgHandler, txtMsgID);
+	    chatComponent.sendFileWithParams(hashmap, images, "/sendAudio",fileProgHandler, txtMsgID);
 	}
 
-	/**
-	 * 更新DWMessage的传输状态
-	 */
+    /**
+     * 发送语音和图片消息回调 更新DWMessage的传输状态,这一步可以确保在没有收到身家消息回执时也能改变数据库，
+     * 正常情况下，发送语音和图片成功后，服务器会回执一条subject = wealth的消息。
+     */
 	private Handler fileProgHandler = new Handler()
 	{
 		public void handleMessage(android.os.Message msg)
@@ -1259,10 +1281,27 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 				case Constants.FAILURE:
 					dwMessage.setSendSuccess(0);// 0代表失败
 					dwMessage.save();
+					sendFailure(txtMsgID);
 					break;
 			}
+			KeyboardComponent.dismissKeyboard(null);
 		};
 	};
+	   /**
+     * 发送消息失败后将内存中的消息状态设置为发送失败
+     * @param txtMsgID
+     */
+    public void sendFailure(String txtMsgID) {
+        LogUtils.i(TAG, "根据openfire消息id，更新UI，即更新内存中的数据");
+        for (int i = listMsg.size() - 1; i >= 0; i--) {
+            if (listMsg.get(i).getTxtMsgID().equals(txtMsgID)) {
+                listMsg.get(i).setSendSuccess(0);
+                listMsg.get(i).setMid(0);
+                adapter.notifyDataSetChanged();
+                return;
+            }
+        }
+    }
 
 	/**
 	 * 发送位置信息
@@ -1412,10 +1451,36 @@ public class ChatRoomChatActivity extends BaseFragmentActivity implements OnClic
 	{
 		listMsg.add(dwMessage);
 		dwMessageAdapter.notifyDataSetChanged();
-		// 滚动到最后一项
 		listView.getRefreshableView().setSelection(listView.getRefreshableView().getCount() - 1);
+	      /** 启动一个线程去检查是否收到回执，即success == 2，那么设置为 1**/
+        if(dwMessage.getDirect() == DWMessage.SEND)
+        {
+            //将消息传入到线程中，该线程等等4s去检查是否有消息回执，如果4s后还没有回执，则设置为1；
+            LogUtils.i(TAG, "线程外：dwMessage.hashCode="+dwMessage.hashCode());
+            MsgProThread msgProThread = new MsgProThread(dwMessage,new MsgProCallBack()
+            {
+                @Override
+                public void finish()
+                {
+                    msgProHandler.sendEmptyMessage(1);
+                }
+            });
+            msgProThread.setName(dwMessage.hashCode()+"");
+            msgProThread.start();
+        }
 		LogUtils.i(TAG, "界面更新");
 	}
+	
+	   /**
+     * 线程处理完消息后更新界面
+     */
+    Handler msgProHandler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            dwMessageAdapter.notifyDataSetChanged();
+        }
+    };
 
 	/**
 	 * 聊天室新成员上线通知

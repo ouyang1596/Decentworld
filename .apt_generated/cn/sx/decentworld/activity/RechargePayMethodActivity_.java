@@ -40,9 +40,9 @@ public final class RechargePayMethodActivity_
     }
 
     private void afterSetContentView_() {
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        llWX = ((LinearLayout) findViewById(id.ll_wx));
         llAliPay = ((LinearLayout) findViewById(id.ll_ali_pay));
+        llWX = ((LinearLayout) findViewById(id.ll_wx));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
         ivBack = ((ImageView) findViewById(id.iv_back));
         {
             View view = findViewById(id.iv_back);

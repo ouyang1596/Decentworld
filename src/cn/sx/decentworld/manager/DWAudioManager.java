@@ -30,6 +30,7 @@ public class DWAudioManager
 	 * 声音种类
 	 */
 	public static final int RECEIVE_MESSAGE = 1;//接收消息
+	
 	/**
 	 * 构造函数
 	 */
@@ -43,7 +44,7 @@ public class DWAudioManager
 	{
 		pool = new SoundPool(10, AudioManager.STREAM_SYSTEM, 5);
 		spMap = new HashMap<Integer, Integer>();
-		spMap.put(RECEIVE_MESSAGE, pool.load(context, R.raw.received_message, 1));
+		spMap.put(RECEIVE_MESSAGE, pool.load(context, R.raw.child_voice, 1));
 	}
 	
 	/**

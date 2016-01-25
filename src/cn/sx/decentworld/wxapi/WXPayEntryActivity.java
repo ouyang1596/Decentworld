@@ -7,8 +7,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.SocialStatusActivity_;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
 
 import com.tencent.mm.sdk.constants.ConstantsAPI;
 import com.tencent.mm.sdk.modelbase.BaseReq;
@@ -60,6 +62,8 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 		switch (resp.errCode) {
 		case 0:
 			msg = "支付成功";
+			// 跳到修改身价页面
+			startActivity(new Intent(this, SocialStatusActivity_.class));
 			break;
 		case -1:
 			msg = "支付失败";
@@ -68,7 +72,7 @@ public class WXPayEntryActivity extends Activity implements IWXAPIEventHandler {
 			msg = "取消支付";
 			break;
 		}
-		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+		ToastUtil.showToast(msg);
 		finish();
 	}
 }

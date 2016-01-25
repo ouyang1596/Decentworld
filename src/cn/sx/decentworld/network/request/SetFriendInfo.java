@@ -15,6 +15,7 @@ import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
 import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtils;
 
 import com.android.volley.Request.Method;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -136,15 +137,7 @@ public class SetFriendInfo
 				if(msg.getResultCode()==3333)
 				{
 					LogUtils.i(TAG, "deleteContact...failure,cause by:"+msg.getMsg());
-					((Activity)context).runOnUiThread(new Runnable()
-					{
-						
-						@Override
-						public void run()
-						{
-							toast.show("删除好友失败");
-						}
-					});
+					ToastUtils.toast(context, "删除好友失败");
 				}
 			}
 			
@@ -152,14 +145,7 @@ public class SetFriendInfo
 			public void onFailure(String e)
 			{
 				LogUtils.i(TAG, "deleteContact...onFailure,cause by:"+e);
-				((Activity)context).runOnUiThread(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						toast.show("删除好友失败，网络错误");
-					}
-				});
+				ToastUtils.toast(context, "删除好友失败，网络错误");
 			}
 		});
 	}

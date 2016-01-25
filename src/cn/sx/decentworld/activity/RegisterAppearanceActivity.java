@@ -25,7 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.bean.RegisterInfo;
+import cn.sx.decentworld.bean.RegisterInfoUseless;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.component.ui.RegisterComponent;
@@ -404,7 +404,7 @@ public class RegisterAppearanceActivity extends BaseFragmentActivity implements
 	@Override
 	public void backClick(int state) {
 		if (state == Constants.SAVE) {
-			RegisterInfo info = RegisterInfo
+			RegisterInfoUseless info = RegisterInfoUseless
 					.queryByDwID(DecentWorldApp.MAIN_KEY);
 			if (info == null) {
 				toast.show("保存失败");
@@ -456,9 +456,9 @@ public class RegisterAppearanceActivity extends BaseFragmentActivity implements
 		picPathList = new ArrayList<String>();
 		imageViews = new ArrayList<ImageView>();
 		dots = new ArrayList<View>();
-		RegisterInfo info = RegisterInfo.queryByDwID(registerComponent.tel);
+		RegisterInfoUseless info = RegisterInfoUseless.queryByDwID(registerComponent.tel);
 		if (null == info) {
-			info = new RegisterInfo(registerComponent.tel);
+			info = new RegisterInfoUseless(registerComponent.tel);
 		}
 		String picbeautyOnePath = info.picbeautyOnePath;
 		String picbeautyTwoPath = info.picbeautyTwoPath;
@@ -563,8 +563,6 @@ public class RegisterAppearanceActivity extends BaseFragmentActivity implements
 					dots.remove(position);
 					llDots.removeViewAt(position);
 					customPageAdapter.notifyDataSetChanged();
-					LogUtils.i("bm",
-							"--------size=" + DecentWorldApp.mPicList.size());
 					break;
 				case Constants.CANCEL:
 					dp.dismiss();

@@ -18,7 +18,10 @@ import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.AES;
 import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.MsgVerify;
+import cn.sx.decentworld.utils.SPUtils;
 import cn.sx.decentworld.widget.HorizontalListView;
 
 import com.android.volley.Request.Method;
@@ -109,6 +112,14 @@ public class ChatComponent {
 	 */
 	public void sendFileWithParams(HashMap<String, String> hashmap, File[] images, String api, final Handler handler, final String txtMsgID)
 	{
+	    /** token = dwID + randomStr +key**/
+	    String dwID = hashmap.get("dwID");
+	    long time = System.currentTimeMillis();
+	    String randomStr = (String) SPUtils.get(context, SPUtils.randomStr, "");
+	    String token = AES.encode(dwID+time, randomStr);
+	    hashmap.put("randomStr", String.valueOf(time));
+	    hashmap.put("token", token);
+	    
 		sendUrl.httpRequestWithImage(hashmap, images, Constants.CONTEXTPATH_OPENFIRE + api, new HttpCallBack()
 		{
 			@Override
@@ -119,11 +130,13 @@ public class ChatComponent {
 				if (msg.getResultCode() == 2222)
 				{
 					mssg.what = Constants.SUCC;
+					LogUtils.i(TAG, "sendFileWithParams...success");
 					showToast("发送成功");
 				}
 				else
 				{
 					mssg.what = Constants.FAILURE;
+					LogUtils.i(TAG, "sendFileWithParams...failure,cause by:"+msg.getMsg());
 					showToast("发送失败");
 				}
 				mssg.obj = txtMsgID;
@@ -150,13 +163,14 @@ public class ChatComponent {
 				+ Constants.RESEND, Method.GET, new HttpCallBack() {
 
 			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				showToast("succ--" + msg.getMsg());
+			public void onSuccess(String response, ResultBean msg) 
+			{
+			    showToast("" + msg.getMsg());
 			}
 
 			@Override
 			public void onFailure(String e) {
-				showToast("网络错误");
+				showToast(Constants.NET_WRONG);
 			}
 		});
 	}

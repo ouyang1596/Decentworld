@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
@@ -39,21 +40,22 @@ public final class RegisterNickActivity_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
-        registerComponent = RegisterComponent_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
+        registerComponent = RegisterComponent_.getInstance_(this);
         getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        btnOk = ((Button) findViewById(id.btn_OK));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        etvNickName = ((EditText) findViewById(id.et_nickname));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        etNickName = ((EditText) findViewById(id.et_nickname));
+        btnOk = ((Button) findViewById(id.btn_OK));
         llRegisterNick = ((LinearLayout) findViewById(id.root_activity_register_nick));
-        ivNickName = ((ImageView) findViewById(id.iv_nickname));
+        tvOccupation = ((TextView) findViewById(id.tv_occupation));
+        rgSex = ((RadioGroup) findViewById(id.rg_sex));
         ((ToastComponent_) toast).afterSetContentView_();
-        ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
+        ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }

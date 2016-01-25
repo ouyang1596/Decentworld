@@ -10,15 +10,19 @@ import org.simple.eventbus.EventBus;
 
 import android.content.Context;
 import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.ContactUser;
 import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.MsgAndInfo;
 import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.bean.UserSessionInfo;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.manager.MsgNotifyManager;
+import cn.sx.decentworld.network.utils.JsonUtils;
 import cn.sx.decentworld.utils.FileUtils;
 import cn.sx.decentworld.utils.HttpDownloader;
 import cn.sx.decentworld.utils.LogUtils;
-import cn.sx.decentworld.utils.SoundPoolUtils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 
 /**
@@ -27,121 +31,102 @@ import com.alibaba.fastjson.JSONObject;
  * @author: cj
  * @date: 2015年11月28日 下午6:36:49
  */
-public class ProcessAudioThread extends DWPacketHandler {
-	public static final String TAG = "ProcessAudioThread";
+public class ProcessAudioThread extends DWPacketHandler
+{
+    public static final String TAG = "ProcessAudioThread";
 
-	public ProcessAudioThread(Message message, Context context) {
-		super(message, context);
-	}
+    public ProcessAudioThread(Message message, Context context)
+    {
+        super(message, context);
+    }
 
-	public ProcessAudioThread() {
-	};
+    public ProcessAudioThread()
+    {
+    };
 
-	@Override
-	public void run() {
-		Message message = (Message) packet;
-		// 语音消息
-		LogUtils.i(TAG, "收到一条语音：" + message.getBody());
-		/**
-		 * 解析所需参数
-		 */
-		JSONObject jsono = JSONObject.parseObject(message.getBody());
-		String chatType = jsono.getString("chatType");
-		if (Integer.valueOf(chatType) == DWMessage.CHAT_TYPE_MULTI) {
-			// 聊天室的dwID
-			String fromDwID = jsono.getString("fromID");
-			String myDwID = DecentWorldApp.getInstance().getDwID();
-			LogUtils.i(TAG, "fromDwID=" + fromDwID + ",myID=" + myDwID);
-			String roomID = message.getFrom().split("@")[0];
-			if (!myDwID.equals(fromDwID)) {
-				LogUtils.i(TAG, "收到一条来自聊天室的语音");
-				Float length = jsono.getFloat("length");
-				String url = jsono.getString("uri");
-				String wealth = jsono.getString("wealth");
-				long id = jsono.getLongValue("id");
-				// 缺少chatRelationship
-				// 构造DWMessage
-				final DWMessage dwMessage = new DWMessage(DWMessage.VOICE,
-						DWMessage.RECEIVE);
-				dwMessage.setFrom(fromDwID);
-				dwMessage.setTo(roomID);
-				dwMessage.setWealth(wealth);
-				dwMessage.setChatType(Integer.valueOf(chatType));
-				/**
-				 * 下载语音并保存消息
-				 */
-				// String fileName = Constants.HomePath
-				// + Constants.AudioReceivePath
-				// + File.separator
-				// + FileUtils.generateFileName() + ".mp3";
-				// int result = downloadAudio(uri, fileName);
-				dwMessage.setUri(url);
-				dwMessage.ifFromNet = 0;
-				dwMessage.setRemoteUrl(url);
-				dwMessage.setVoiceTime(length);
-				dwMessage.setSendSuccess(1);
-				dwMessage.setTxtMsgID(message.getPacketID());
-				dwMessage.setMid(id);
-				dwMessage.save();
-				EventBus.getDefault().post(dwMessage,
-						NotifyByEventBus.NT_RECEIVE_CHATROOM_AUDIO);
-				//聊天室语音消息通知
-				MsgNotifyManager.getInstance().MultiNotify(dwMessage);
-			}
-		} else {
-			Float length = jsono.getFloat("length");
-			String url = jsono.getString("uri");
-			String wealth = jsono.getString("wealth");
-			String fromDwID = jsono.getString("fromID");
-			long id = jsono.getLongValue("id");
-			// 缺少chatRelationship
-			// 构造DWMessage
-			final DWMessage dwMessage = new DWMessage(DWMessage.VOICE,
-					DWMessage.RECEIVE);
-			dwMessage.setFrom(fromDwID);
-			dwMessage.setWealth(wealth);
-			dwMessage.setChatType(Integer.valueOf(chatType));
-			/**
-			 * 下载语音并保存消息
-			 */
-			String fileName = Constants.HOME_PATH + Constants.AUDIO_RECEIVE_PATH
-					+ File.separator + FileUtils.generateFileName() + ".mp3";
-			// int result = downloadAudio(uri, fileName);
-			// dwMessage.setUri(fileName);
-			dwMessage.ifFromNet = 0;
-			dwMessage.setUri(url);
-			dwMessage.setRemoteUrl(url);
-			dwMessage.setVoiceTime(length);
-			dwMessage.setSendSuccess(1);
-			dwMessage.setTxtMsgID(message.getPacketID());
-			dwMessage.setMid(id);
-			dwMessage.save();
-			processMsg(dwMessage);
-		}
-	}
+    @Override
+    public void run()
+    {
+        Message message = (Message) packet;
+        LogUtils.i(TAG, "监听到一条语音消息：" + message.getBody());
+        JSONObject jsonObject = JSON.parseObject(message.getBody());
+        String s_msg = jsonObject.getString("msg");
+        String s_userSessionInfo = jsonObject.getString("userSessionInfo");
+        UserSessionInfo userSessionInfo = (UserSessionInfo) JsonUtils.json2Bean(s_userSessionInfo, UserSessionInfo.class);
+        /** 添加 FriendID **/
+        JSONObject jsonObject2 = JSONObject.parseObject(s_userSessionInfo);
+        userSessionInfo.setFriendID(jsonObject2.getString("id"));
+        
+        /** 解析所需参数 **/
+        JSONObject jsono = JSONObject.parseObject(s_msg);
+        String chatType = jsono.getString("chatType");
+        if (Integer.valueOf(chatType) == DWMessage.CHAT_TYPE_MULTI)
+        {
+            // 聊天室的dwID
+            String fromDwID = jsono.getString("fromID");
+            String myDwID = DecentWorldApp.getInstance().getDwID();
+            LogUtils.i(TAG, "fromDwID=" + fromDwID + ",myID=" + myDwID);
+            String roomID = message.getFrom().split("@")[0];
+            if (!myDwID.equals(fromDwID))
+            {
+                LogUtils.i(TAG, "监听到一条聊天室语音消息");
+                Float length = jsono.getFloat("length");
+                String url = jsono.getString("uri");
+                String wealth = jsono.getString("wealth");
+                long id = jsono.getLongValue("id");
+                final DWMessage dwMessage = new DWMessage(DWMessage.VOICE , DWMessage.RECEIVE);
+                dwMessage.setFrom(fromDwID);
+                dwMessage.setTo(roomID);
+                dwMessage.setWealth(wealth);
+                dwMessage.setChatType(Integer.valueOf(chatType));
+                dwMessage.setUri(url);
+                dwMessage.ifFromNet = 0;
+                dwMessage.setRemoteUrl(url);
+                dwMessage.setVoiceTime(length);
+                dwMessage.setSendSuccess(1);
+                dwMessage.setTxtMsgID(message.getPacketID());
+                dwMessage.setMid(id);
+                dwMessage.save();
+                EventBus.getDefault().post(dwMessage, NotifyByEventBus.NT_RECEIVE_CHATROOM_AUDIO);
+                // 聊天室语音消息通知
+                MsgNotifyManager.getInstance().MultiNotify(dwMessage);
+            }
+        }
+        else
+        {
+            Float length = jsono.getFloat("length");
+            String url = jsono.getString("uri");
+            String wealth = jsono.getString("wealth");
+            String fromDwID = jsono.getString("fromID");
+            long id = jsono.getLongValue("id");
+            final DWMessage dwMessage = new DWMessage(DWMessage.VOICE , DWMessage.RECEIVE);
+            dwMessage.setFrom(fromDwID);
+            dwMessage.setWealth(wealth);
+            dwMessage.setChatType(Integer.valueOf(chatType));
+            /** 判断好友关系 **/
+            if (ContactUser.isContact(fromDwID))
+                dwMessage.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_FRIEND);
+            else
+                dwMessage.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+            
+            dwMessage.ifFromNet = 0;
+            dwMessage.setUri(url);
+            dwMessage.setRemoteUrl(url);
+            dwMessage.setVoiceTime(length);
+            dwMessage.setSendSuccess(1);
+            dwMessage.setTxtMsgID(message.getPacketID());
+            dwMessage.setMid(id);
+            dwMessage.save();
+            processMsg(new MsgAndInfo(dwMessage , userSessionInfo),dwMessage.getChatRelationship());
+        }
+    }
 
-	private void processMsg(DWMessage dwMessage) 
-	{
-		EventBus.getDefault().post(dwMessage,NotifyByEventBus.NT_RECEIVE_SINGLE_AUDIO);
-		//消息通知
-		MsgNotifyManager.getInstance().SingleNotify(dwMessage);
-	}
+    private void processMsg(MsgAndInfo msgAndInfo,int chatRelationship)
+    {
+        EventBus.getDefault().post(msgAndInfo, NotifyByEventBus.NT_RECEIVE_SINGLE_AUDIO);
+        /** 消息通知 **/
+        if(chatRelationship == DWMessage.CHAT_RELATIONSHIP_FRIEND)
+            MsgNotifyManager.getInstance().SingleNotify(msgAndInfo);
+    }
 
-	/**
-	 * 下载语音
-	 */
-	private int downloadAudio(String uri, String fileName) {
-		// InputStream inputStream = null;
-		int result = Constants.SUCC;
-		if (!FileUtils.isFileExist(Constants.HOME_PATH)) {
-			FileUtils.createSDDir(Constants.HOME_PATH);
-		}
-		if (!FileUtils.isFileExist(Constants.HOME_PATH
-				+ Constants.AUDIO_RECEIVE_PATH)) {
-			FileUtils.createSDDir(Constants.HOME_PATH
-					+ Constants.AUDIO_RECEIVE_PATH);
-		}
-		result = HttpDownloader.downFile(uri, fileName);
-		return result;
-	}
 }

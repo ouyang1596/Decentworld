@@ -38,25 +38,25 @@ public final class RegisterStudentGreenPassActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         registerComponent = RegisterComponent_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ivUpload = ((ImageView) findViewById(id.iv_upload_oic));
-        btnOk = ((Button) findViewById(id.btn_OK));
-        etvCollege = ((EditText) findViewById(id.etv_college));
         etvClassroom = ((EditText) findViewById(id.etv_classroom));
-        llRegisterStudentPass = ((LinearLayout) findViewById(id.root_activity_register_student_green_pass));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         llUploadPic = ((LinearLayout) findViewById(id.ll_upload_pic));
+        etvCollege = ((EditText) findViewById(id.etv_college));
+        ivUpload = ((ImageView) findViewById(id.iv_upload_oic));
         ivUploadPhoto = ((ImageView) findViewById(id.iv_upload_oic));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         actUniversity = ((AutoCompleteTextView) findViewById(id.act_university));
-        ((ToastComponent_) toast).afterSetContentView_();
+        llRegisterStudentPass = ((LinearLayout) findViewById(id.root_activity_register_student_green_pass));
+        btnOk = ((Button) findViewById(id.btn_OK));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

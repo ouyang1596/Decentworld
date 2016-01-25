@@ -1,4 +1,4 @@
-DROP TABLE msgTop;
-DROP TABLE noDisturb;
-DROP TABLE chatbg;
-CREATE TABLE chatSetting (Id INTEGER PRIMARY KEY AUTOINCREMENT, msgTopTime TEXT, chatBg TEXT, isMsgNoDisturb INTEGER, otherID TEXT, isMsgTop INTEGER, userID TEXT);
+DROP TABLE myProteges;
+CREATE TABLE myProteges (Id INTEGER PRIMARY KEY AUTOINCREMENT, userType TEXT, worth TEXT, otherID TEXT, gender TEXT, showName TEXT, occupation TEXT, userID TEXT);
+
+

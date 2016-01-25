@@ -18,10 +18,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.activity.MagnateToOtherDetailActivity_;
-import cn.sx.decentworld.bean.MyProtege;
+import cn.sx.decentworld.bean.NoblePerson;
+import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.dialog.ReminderDialog;
 import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.ViewUtil;
 
 /**
@@ -34,16 +36,14 @@ public class MagnateToOtherAdapter extends BaseAdapter
 {
 	private Context context;
 	private LayoutInflater inflater;
-	// private int[] avatars;
-	// private List<String> names;
-	private List<MyProtege> mDatas;
+	private List<NoblePerson> mDatas;
 	private FragmentManager fm;
 	private ReminderDialog reminderDialog;
 
 	/**
 	 * 
 	 */
-	public MagnateToOtherAdapter(Context context, List<MyProtege> mDatas, FragmentManager fm)
+	public MagnateToOtherAdapter(Context context, List<NoblePerson> mDatas, FragmentManager fm)
 	{
 		this.context = context;
 		this.inflater = LayoutInflater.from(context);
@@ -90,7 +90,7 @@ public class MagnateToOtherAdapter extends BaseAdapter
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
 
-		MyProtege myProtege = mDatas.get(position);
+		NoblePerson myProtege = mDatas.get(position);
 		viewHolder.linearLayout.setOnClickListener(new OnClickListener()
 		{
 			@Override
@@ -104,16 +104,16 @@ public class MagnateToOtherAdapter extends BaseAdapter
 			}
 		});
 
-		if (myProtege.getIcon().equals("") || (myProtege.getIcon() == null))
+		String icon = ImageUtils.getIconByDwID(myProtege.getOtherID(), ImageUtils.ICON_SMALL);
+		if (CommUtil.isBlank(icon))
 		{
 			viewHolder.avater.setImageResource(R.drawable.ic_launcher);
 		}
 		else
 		{
-			ImageLoaderHelper.mImageLoader.displayImage(myProtege.getIcon(), viewHolder.avater, ImageLoaderHelper.mOptions);
+			ImageLoaderHelper.mImageLoader.displayImage(icon, viewHolder.avater, ImageLoaderHelper.mOptions);
 		}
-
-		viewHolder.name.setText(myProtege.getNickName());
+		viewHolder.name.setText(myProtege.getShowName());
 		return convertView;
 	}
 
@@ -131,7 +131,7 @@ public class MagnateToOtherAdapter extends BaseAdapter
 		{
 			int position = reminderDialog.getExtraParam();
 			Intent intent = new Intent(context , MagnateToOtherDetailActivity_.class);
-			intent.putExtra("otherID", mDatas.get(position).getDwID());
+			intent.putExtra("otherID", mDatas.get(position).getOtherID());
 			context.startActivity(intent);
 		}
 	};

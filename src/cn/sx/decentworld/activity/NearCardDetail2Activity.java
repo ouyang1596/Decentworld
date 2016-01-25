@@ -23,6 +23,7 @@ import cn.sx.decentworld.R;
 import cn.sx.decentworld.bean.AnonymousBean;
 import cn.sx.decentworld.bean.ContactUser;
 import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.UserExtraInfo;
 import cn.sx.decentworld.bean.UserInfo;
 import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.Constants;
@@ -39,7 +40,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 /**
  * @ClassName: NearCardDetailActivity.java
- * @Description:
+ * @Description:匿名聊天界面
  * @author: yj
  * @date: 2015年10月7日 下午7:05:47
  */
@@ -90,29 +91,28 @@ public class NearCardDetail2Activity extends BaseFragmentActivity {
 	private Handler mHandler = new Handler() {
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
-			case GET_ANONYMOUSINFO:
-				anonymousBeanDatas = (List<AnonymousBean>) JsonUtils
-						.json2BeanArray(msg.obj.toString(), AnonymousBean.class);
-				selectIcon(anonymousBeanDatas);
-				mAdapter.notifyDataSetChanged();
-				break;
-			case CREATE_ANONYMOUS_OBJ:
-				toast.show("succ");
-				Intent intent = new Intent(mContext, ChatActivity_.class);
-				intent.putExtra("user_dwID", strangerDwID);
-				intent.putExtra("user_nickname", user_nickname + "[匿名聊天]");
-				intent.putExtra("chatType",
-						DWMessage.CHAT_TYPE_SINGLE_ANONYMITY);
-				if (ContactUser.isContact(strangerDwID)) {
-					intent.putExtra("chatRelationship",
-							DWMessage.CHAT_RELATIONSHIP_FRIEND);
-				} else {
-					intent.putExtra("chatRelationship",
-							DWMessage.CHAT_RELATIONSHIP_STRANGER);
-				}
-				intent.putExtra("user_worth", user_worth);
-				startActivity(intent);
-				break;
+                case GET_ANONYMOUSINFO:
+                    anonymousBeanDatas = (List<AnonymousBean>) JsonUtils.json2BeanArray(msg.obj.toString(), AnonymousBean.class);
+                    selectIcon(anonymousBeanDatas);
+                    mAdapter.notifyDataSetChanged();
+                    break;
+                case CREATE_ANONYMOUS_OBJ:
+                    toast.show("succ");
+                    Intent intent = new Intent(mContext , ChatActivity_.class);
+                    intent.putExtra(ChatActivity.OTHER_ID, strangerDwID);
+                    intent.putExtra(ChatActivity.OTHER_NICKNAME, user_nickname + "[匿名聊天]");
+                    intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE_ANONYMITY);
+                    if (ContactUser.isContact(strangerDwID))
+                    {
+                        intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+                    }
+                    else
+                    {
+                        intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_STRANGER);
+                    }
+                    intent.putExtra(ChatActivity.OTHER_WORTH, Float.valueOf(user_worth));
+                    startActivity(intent);
+                    break;
 			}
 		}
 	};
@@ -219,8 +219,8 @@ public class NearCardDetail2Activity extends BaseFragmentActivity {
 	}
 
 	private void initImage() {
-		UserInfo userInfo = UserInfo.queryByDwID(DecentWorldApp.getInstance()
-				.getDwID());
+	    UserExtraInfo userInfo = UserExtraInfo.queryBy(DecentWorldApp.getInstance()
+                .getDwID());
 		if (null == userInfo) {
 			return;
 		}
@@ -250,6 +250,7 @@ public class NearCardDetail2Activity extends BaseFragmentActivity {
 				NearCardDetailActivity.USER_NICKNAME);
 		user_worth = getIntent().getStringExtra(
 				NearCardDetailActivity.USER_WORTH);
+		LogUtils.i(TAG, "strangerDwID="+strangerDwID+",user_nickname="+user_nickname+",user_worth="+user_worth);
 	}
 
 	class GetAnonymouAdapter extends BaseAdapter implements OnClickListener {
@@ -357,6 +358,7 @@ public class NearCardDetail2Activity extends BaseFragmentActivity {
 		ifShowMap.put("showIcon", "false");
 		ifShowMap.put("showMotto", "false");
 		ifShowMap.put("showNickName", "false");
+		ifShowMap.put("showReligion", "false");
 	}
 
 	private void initMap() {
@@ -399,5 +401,6 @@ public class NearCardDetail2Activity extends BaseFragmentActivity {
 		map.put("showIcon", "图片");
 		map.put("showMotto", "座右铭");
 		map.put("showNickName", "昵称");
+		map.put("showReligion", "宗教");
 	}
 }

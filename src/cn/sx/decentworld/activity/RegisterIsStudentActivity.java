@@ -83,7 +83,7 @@ public class RegisterIsStudentActivity extends BaseFragmentActivity {
 	}
 
 	private void backAction() {
-		startActivity(new Intent(mContext, RegisterPersonalMsgActivity_.class));
+		startActivity(new Intent(mContext, RegisterMobileActivity_.class));
 		finish();
 	}
 }

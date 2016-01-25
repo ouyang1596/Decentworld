@@ -4,480 +4,220 @@
 package cn.sx.decentworld.activity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
+import android.view.View.OnClickListener;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.adapter.FragmentContactAdapter;
 import cn.sx.decentworld.adapter.PickContactAdapter;
 import cn.sx.decentworld.bean.ContactUser;
-import cn.sx.decentworld.bean.PickContactUser;
-import cn.sx.decentworld.bean.PickUser;
-import cn.sx.decentworld.bean.UserInfo;
-import cn.sx.decentworld.bean.manager.UserInfoManager;
-import cn.sx.decentworld.common.CharacterParser;
-import cn.sx.decentworld.common.PinyinComparatorOfPickUser;
 import cn.sx.decentworld.component.TitleBar;
 import cn.sx.decentworld.component.ToastComponent;
-import cn.sx.decentworld.component.ui.MainFragmentComponent;
-import cn.sx.decentworld.fragment.ChatFragment;
 import cn.sx.decentworld.network.request.SetUserInfo;
 import cn.sx.decentworld.utils.LogUtils;
-import cn.sx.decentworld.widget.HorizontalListView;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
-import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 /**
+ * 
  * @ClassName: PickContactActivity.java
- * @Description:
+ * @Description: 选择联系人
+ * 启动：
+ *      Intent intent = new Intent(MagnateWindowActivity.this , PickContactActivity_.class);
+        intent.putExtra(PickContactActivity.PICK_TYPE, PickContactActivity.PICK_TYPE_SINGLE);
+        startActivityForResult(intent, RequestCode);
+        接收返回结果：
+ * // 转发名片,被转发人的dwID如下
+        ArrayList<String> result = data.getStringArrayListExtra(PickContactActivity.CONTACT_DWID);
+        String forwardDwId = result.get(0);
  * @author: cj
- * @date: 2015年7月29日 下午3:32:20
+ * @date: 2016年1月4日 下午5:14:17
  */
 @EActivity(R.layout.activity_pick_contact)
-public class PickContactActivity extends BaseFragmentActivity {
-	private static final String TAG = "PickContactActivity";
-	@Bean
-	TitleBar titleBar;
-	ArrayList<String> usernames = new ArrayList<String>();
-	ArrayList<String> usernames_now_click = new ArrayList<String>();
-	@Bean
-	ToastComponent toast;
+public class PickContactActivity extends BaseFragmentActivity implements OnClickListener
+{
+    private static final String TAG = "PickContactActivity";
+    /**
+     * 工具类
+     */
+    @Bean
+    TitleBar titleBar;
+    @Bean
+    ToastComponent toast;
+    @Bean
+    SetUserInfo setUserInfo;
+    
+    /** 接收结果的关键字**/
+    public static final String CONTACT_DWID = "contactDwID";
+    
+    /**
+     * 选择类型
+     */
+    public static final String PICK_TYPE = "pickType";
+    /** 单人 **/
+    public static final int PICK_TYPE_SINGLE = 1;
+    /** 多人 **/
+    public static final int PICK_TYPE_MULTI = 2;
+    
+    
+    /**
+     * 界面资源
+     */
+    /** 返回 **/
+    @ViewById(R.id.main_header_left)
+    LinearLayout main_header_left;
+    /** 确定 **/
+    @ViewById(R.id.main_header_right)
+    RelativeLayout main_header_right;
+    /** 联系人列表 **/
+    @ViewById(R.id.lv_contact)
+    ListView lv_contact;
+    
+    
+    /**
+     * 变量
+     */
+    /** 选择类型 **/
+    private int mPickType;
+    private String userID;
+    /** 所有联系人 **/
+    private List<ContactUser> mContancts;
+    /** 已经选择的联系人 **/
+    private PickContactAdapter contactAdapter;
 
-	@ViewById(R.id.ll_listview_all_picked)
-	LinearLayout ll_listview_all_picked;
 
-	@Bean
-	MainFragmentComponent maincompon;
 
-	@ViewById(R.id.lv_pick_contact_person)
-	ListView lv_pick_contact_person;
-	@ViewById(R.id.imgList)
-	HorizontalListView gv_people_had_added;
+    /**
+     * 创建群聊的线程
+     */
+    @AfterViews
+    public void init()
+    {
+        parseIntent();
+        initData();
+        initView();
+        initVar();
+        initListener();
+    }
 
-//	@Bean
-//	BuildGroupComponent theBuildGroupComponent;
-	public final static int EXECUTE_NOW = 1;
-	public final static int EXECUTE_LATER = 2;
+    /**
+     * 解析传递过来的参数
+     */
+    private void parseIntent()
+    {
+        mPickType = getIntent().getIntExtra(PICK_TYPE, -1);
+        if(mPickType == PICK_TYPE_SINGLE)
+        {
+            LogUtils.i(TAG, "单选");
+        }else if(mPickType == PICK_TYPE_MULTI)
+        {
+            LogUtils.i(TAG, "多选");
+        }else
+        {
+            LogUtils.i(TAG, "请传入选择类型");
+        }
+    }
+    
+    /**
+     * 初始化数据
+     */
+    private void initData()
+    {
+        userID = DecentWorldApp.getInstance().getDwID();
+        mContancts = new ArrayList<ContactUser>();
+        List<ContactUser> temp = ContactUser.queryAll();
+        if(temp.size()>0)
+        {
+            mContancts.addAll(temp);
+        }
+    }
 
-	private int when_execute;
-	private CharacterParser characterParser;
-	private PinyinComparatorOfPickUser pinyinComparator;
+    /**
+     * 初始化界面资源
+     */
+    private void initView()
+    {
+        /** 初始化标题栏 **/
+        if(mPickType == PICK_TYPE_SINGLE)
+        {
+            titleBar.setTitleBar("取消", "选择联系人");
+        }else if(mPickType == PICK_TYPE_MULTI)
+        {
+            titleBar.setTitleBar("取消", "选择联系人", "确定");
+        }
+    }
 
-	private List<PickUser> Data;
+    /**
+     * 初始化变量
+     */
+    private void initVar()
+    {
+        contactAdapter = new PickContactAdapter(this , mContancts,mPickType);
+        lv_contact.setAdapter(contactAdapter);
+    }
 
-	public static final int ADD_PEOPLE = 3;
-	public static final int DELETE_PEOPLE = 4;
-	private IconAdapter gadapter;
+    /**
+     * 初始化监听
+     */
+    private void initListener()
+    {
+        main_header_left.setOnClickListener(this);
+        main_header_right.setOnClickListener(this);
+    }
+  
 
-	// gridview中数据源
-	private List<PickUser> people_haved_added = new ArrayList<PickUser>();
-	// listview中checked的数据源，bundle传过来的数据
-	public List<String> members_had_included = new ArrayList<String>();
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.main_header_left:
+                finish();
+                break;
+            case R.id.main_header_right:
+                confirm();
+                break;
+            default:
+                break;
+        }
+    }
 
-	PickUser person;
-
-	private boolean turn_another_activity = false;
-	/**
-	 * 若为单聊转发信息进入，该String为转发的内容
-	 */
-	private String forward_msg_id = null;
-	/**
-	 * 若为单聊转发信息进入，该String为点击转发的去向（昵称）
-	 */
-	private String name_clicked;
-
-	// 群聊或者聊天室，输入@后，来此activitiy选人，chatRoomId为该群聊或者聊天室的唯一标示
-	private String groupId;
-
-	/**
-	 * 选择联系人的类型
-	 */
-
-	public static final String PICK_TYPE = "pickType";// 单选
-	public static final int TYPE_SINGLE_PICK = 1;// 单选
-	public static final int TYPE_MULTI_PICK = 2;// 多选
-
-	private List<ContactUser> contactUser;// 单个联系人的数据
-	private PickContactAdapter contactAdapter;
-	private String dwID;
-
-	@Bean
-	SetUserInfo setUserInfo;
-
-	/**
-	 * 创建群聊的线程
-	 */
-	@AfterViews
-	public void init() {
-		titleBar.setTitleBar("取消", "选择联系人", "确定");
-		dwID = DecentWorldApp.getInstance().getDwID();
-		int pickType = getIntent().getIntExtra(PICK_TYPE, -1);
-		if (pickType == TYPE_SINGLE_PICK) {
-			contactUser = ChatFragment.mDatas;
-			contactAdapter = new PickContactAdapter(this, contactUser);
-			lv_pick_contact_person.setAdapter(contactAdapter);
-			lv_pick_contact_person.setOnItemClickListener(new OnItemClickListener()
-			{
-				@Override
-				public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-				{
-					String dwID = contactUser.get(position).getDwID();
-					// 返回
-					Intent intent = new Intent();
-					intent.putExtra("dwID", dwID);
-					setResult(RESULT_OK, intent);
-					finish();
-				}
-			});
-			LogUtils.i(TAG, "选择单个联系人");
-		} else if (pickType == TYPE_MULTI_PICK) {
-
-			LogUtils.i(TAG, "选择多个联系人");
-		} else {
-			LogUtils.i(TAG, "请指定选择联系人的种类");
-		}
-
-	}
-
-	/**
-	 * 初始化数据
-	 */
-	private void initDatas() {
-		characterParser = CharacterParser.getInstance();
-		pinyinComparator = new PinyinComparatorOfPickUser();
-		Collections.sort(Data, pinyinComparator);
-	}
-
-	/**
-	 * 获取联系人列表，并过滤掉黑名单和排序
-	 */
-	private void getContactList() {
-		Data.clear();
-		List<ContactUser> contactUsers = ContactUser.queryAllList();
-
-		if ((contactUsers != null) && (contactUsers.size() > 0)) {
-			for (ContactUser user : contactUsers) {
-				PickUser pickUser = new PickUser();
-				pickUser.setDwID(user.getDwID());
-				pickUser.setNickName(user.getNickName());
-				pickUser.setIcon(user.getIcon());
-				pickUser.setChecked(false);
-				Data.add(pickUser);
-			}
-		}
-
-		/**
-		 * 判断联系人个数是否大于0，如果小于0，则不排序
-		 */
-		if (Data.size() > 0 && Data != null) {
-			LogUtils.i(TAG, "联系人不为空，进行排序");
-			pinyinComparator = new PinyinComparatorOfPickUser();
-			Data = (List<PickUser>) maincompon.filledData(Data);
-			Collections.sort(Data, pinyinComparator);
-		}
-
-	}
-
-	/**
-	 * 初始化列表
-	 */
-	private void initListView() {
-		if (turn_another_activity) {
-			// contactAdapter = new PickContactAdapter(getApplicationContext() ,
-			// Data , true , members_had_included);
-		} else {
-			// contactAdapter = new PickContactAdapter(getApplicationContext() ,
-			// Data , false);
-		}
-		lv_pick_contact_person.setAdapter(contactAdapter);
-		if (turn_another_activity) {
-			lv_pick_contact_person
-					.setOnItemClickListener(new OnItemClickListener() {
-
-						@Override
-						public void onItemClick(AdapterView<?> parent,
-								View view, int position, long id) {
-							boolean can_change = true;
-							if (members_had_included != null) {
-								// 判断是否能更改，即点击的选项是否在传过来members_had_included链表当中，若再则不能更改
-								for (int i = 0; i < members_had_included.size(); i++) {
-									if (members_had_included.get(i).equals(
-											Data.get(position).getNickName())) {
-										can_change = false;
-										break;
-									}
-								}
-							}
-							if (can_change) {
-								boolean checked = Data.get(position)
-										.getChecked();
-								if (!checked) {
-									Data.get(position).setChecked(true);
-									usernames.add(Data.get(position)
-											.getNickName());
-									usernames_now_click.add(Data.get(position)
-											.getNickName());
-									gv_people_had_added.setSelection(gadapter
-											.getCount() - 1);
-									Message msg = new Message();
-									msg.what = ADD_PEOPLE;
-									msg.obj = Data.get(position);
-									handler.sendMessage(msg);
-								} else {
-									Data.get(position).setChecked(false);
-									usernames.remove(Data.get(position)
-											.getNickName());
-									usernames_now_click.remove(Data.get(
-											position).getNickName());
-									Message msg = new Message();
-									msg.what = DELETE_PEOPLE;
-									msg.obj = Data.get(position);
-									handler.sendMessage(msg);
-								}
-								contactAdapter.notifyDataSetChanged();
-							}
-						}
-					});
-		} else {
-			lv_pick_contact_person
-					.setOnItemClickListener(new OnItemClickListener() {
-
-						@Override
-						public void onItemClick(AdapterView<?> parent,
-								View view, int position, long id) {
-							name_clicked = contactAdapter.getItem(position)
-									.getNickName();
-							// 只获取选择的人名
-							if (forward_msg_id == null) {
-								Intent intent = new Intent();
-								intent.putExtra("the_object", name_clicked);
-								setResult(RESULT_OK, intent);
-								finish();
-							}
-							// 出现dialog确认框
-							else {
-								Intent intent = new Intent();// = new
-																// Intent(PickContactActivity.this,
-																// AlertDialogHx.class);
-								intent.putExtra("cancel", true);
-								intent.putExtra("titleIsCancel", true);
-								intent.putExtra(
-										"msg",
-										getString(R.string.confirm_forward_to,
-												name_clicked));
-								startActivityForResult(intent, 1);
-							}
-						}
-					});
-		}
-	}
-
-	/**
-	 * 设置gridView
-	 */
-	private void initGridView() {
-		gadapter = new IconAdapter(this, people_haved_added);
-		gv_people_had_added.setAdapter(gadapter);
-	}
-
-	private Handler handler = new Handler() {
-		public void handleMessage(android.os.Message msg) {
-			switch (msg.what) {
-			case ADD_PEOPLE:
-				person = (PickUser) msg.obj;
-				people_haved_added.add(person);
-				if (people_haved_added.size() > 0) {
-					gv_people_had_added.setVisibility(View.VISIBLE);
-
-				}
-				runOnUiThread(new Runnable() {
-					public void run() {
-						gadapter.notifyDataSetChanged();
-					}
-				});
-
-				break;
-			case DELETE_PEOPLE:
-				person = (PickUser) msg.obj;
-				people_haved_added.remove(person);
-				if (people_haved_added.size() == 0) {
-					gv_people_had_added.setVisibility(View.GONE);
-				}
-				runOnUiThread(new Runnable() {
-					public void run() {
-						gadapter.notifyDataSetChanged();
-					}
-				});
-				break;
-
-			default:
-				break;
-			}
-
-		};
-	};
-
-	private class IconAdapter extends BaseAdapter {
-		private Context context;
-		private List<PickUser> people_haved_added;
-		private LayoutInflater inflater;
-
-		public IconAdapter(Context context, List<PickUser> people_haved_added2) {
-			super();
-			this.context = context;
-			this.people_haved_added = people_haved_added2;
-			inflater = LayoutInflater.from(context);
-		}
-
-		@Override
-		public int getCount() {
-			return people_haved_added.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return people_haved_added.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			Holder holder = null;
-			if (convertView == null) {
-				holder = new Holder();
-				convertView = inflater.inflate(R.layout.add_person_gv_item,
-						null);
-				holder.icon = (ImageView) convertView
-						.findViewById(R.id.person_icon_gv_item);
-				convertView.setTag(holder);
-			} else {
-				holder = (Holder) convertView.getTag();
-			}
-			holder.icon.setImageResource(R.drawable.ic_launcher);
-			return convertView;
-		}
-
-	}
-
-	private static class Holder {
-		ImageView icon;
-	}
-
-	/**
-	 * 确认按钮
-	 */
-	@Click(R.id.main_header_right_tv)
-	void Confirm() {
-		if (!turn_another_activity) {
-			Intent intent = new Intent();
-			Bundle bundle = new Bundle();
-			bundle.putStringArrayList("the_object", usernames);
-			intent.putExtras(bundle);
-			setResult(RESULT_OK, intent);
-			toast.show("选取联系人成功");
-			finish();
-		} else {
-			switch (when_execute) {
-			case EXECUTE_NOW:
-//				if (usernames.size() > 1) {
-//					theBuildGroupComponent.buildGroup(usernames);
-//				} else {
-//					toast.show("人数不够");
-//				}
-				break;
-			case EXECUTE_LATER:
-				Intent intent = new Intent();
-				Bundle bundle = new Bundle();
-				bundle.putStringArrayList("the_object", usernames_now_click);
-				intent.putExtras(bundle);
-				setResult(RESULT_OK, intent);
-				finish();
-				break;
-			default:
-				break;
-			}
-		}
-	}
-
-	/**
-	 * 返回
-	 */
-	@Click(R.id.main_header_left)
-	void back() {
-		finish();
-	}
-
-	/**
-	 * 为ListView填充数据
-	 * 
-	 * @param date
-	 * @return
-	 */
-	private List<PickContactUser> filledData(String[] date) {
-		List<PickContactUser> mSortList = new ArrayList<PickContactUser>();
-
-		for (int i = 0; i < date.length; i++) {
-			PickContactUser sortModel = new PickContactUser();
-			sortModel.setNickName(date[i]);
-			// 汉字转换成拼音
-			String pinyin = characterParser.getSelling(date[i]);
-			String sortString = pinyin.substring(0, 1).toUpperCase();
-
-			// 正则表达式，判断首字母是否是英文字母
-			if (sortString.matches("[A-Z]")) {
-				sortModel.setSortLetters(sortString.toUpperCase());
-			} else {
-				sortModel.setSortLetters("#");
-			}
-
-			mSortList.add(sortModel);
-		}
-		return mSortList;
-
-	}
-
-	/**
-	 * （转发）点击某人产生对话框，返回结果
-	 */
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (resultCode == RESULT_OK) {
-			// try {
-			// ChatActivity.activityInstance.finish();
-			// } catch (Exception e) {
-			// }
-			// Intent intent = new Intent(this, ChatActivity_.class);
-			// // it is single chat
-			// intent.putExtra("userId", name_clicked);
-			// intent.putExtra("forward_msg_id", forward_msg_id);
-			// startActivity(intent);
-			// finish();
-
-		}
-
-		super.onActivityResult(requestCode, resultCode, data);
-	}
+    /**
+     * 确定
+     */
+    private void confirm()
+    {
+        if(mContancts.size()>0)
+        {
+            ArrayList<String> mCheckedContacts = new ArrayList<String>();
+            for(ContactUser user:mContancts)
+            {
+                if(user.isChecked())
+                {
+                    mCheckedContacts.add(user.getFriendID());
+                }
+            }
+            
+            if(mCheckedContacts.size()>0)
+            {
+                Intent intent = new Intent();
+                intent.putStringArrayListExtra(CONTACT_DWID, mCheckedContacts);
+                setResult(RESULT_OK,intent);
+                finish();
+            }
+            else
+            {
+                toast.show("请选择联系人");
+            }
+        }
+       
+    }
 }

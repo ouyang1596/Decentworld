@@ -33,13 +33,13 @@ public final class AboutUsActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        titleBar = TitleBar_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tv_about_us_software_version_name = ((TextView) findViewById(id.tv_about_us_software_version_name));
         tv_about_us_database_version_code = ((TextView) findViewById(id.tv_about_us_database_version_code));
+        tv_about_us_software_version_name = ((TextView) findViewById(id.tv_about_us_software_version_name));
         tv_about_us_software_version_code = ((TextView) findViewById(id.tv_about_us_software_version_code));
         {
             View view = findViewById(id.tv_about_us_check_new_version);
@@ -71,8 +71,8 @@ public final class AboutUsActivity_
                 );
             }
         }
-        ((TitleBar_) titleBar).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

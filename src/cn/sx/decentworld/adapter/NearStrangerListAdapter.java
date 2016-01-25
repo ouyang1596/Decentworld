@@ -17,11 +17,9 @@ import cn.sx.decentworld.bean.NearbyStrangerInfo;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
-import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.widget.CircularImageView;
 
-public class NearStrangerListAdapter extends BaseAdapter implements
-		OnClickListener {
+public class NearStrangerListAdapter extends BaseAdapter implements OnClickListener {
 	private Context mContext;
 	private List<NearbyStrangerInfo> datas;
 
@@ -51,8 +49,7 @@ public class NearStrangerListAdapter extends BaseAdapter implements
 		if (con == null) {
 			con = View.inflate(mContext, R.layout.item_stranger, null);
 			vh = new ViewHolder();
-			vh.ivStrangerPic = (CircularImageView) con
-					.findViewById(R.id.iv_stranger_detail);
+			vh.ivStrangerPic = (CircularImageView) con.findViewById(R.id.iv_stranger_detail);
 			vh.ivStrangerPic.setOnClickListener(this);
 			vh.ivAgreement = (ImageView) con.findViewById(R.id.iv_sex_girl_boy);
 			vh.ivHeart = (ImageView) con.findViewById(R.id.iv_heart);
@@ -68,27 +65,26 @@ public class NearStrangerListAdapter extends BaseAdapter implements
 		} else {
 			vh = (ViewHolder) con.getTag();
 		}
-		vh.ivStrangerPic.setTag(Constants.ITEM_KEY, position);
-		vh.ivHeart.setTag(Constants.ITEM_KEY, position);
+		vh.ivStrangerPic.setTag(Constants.ITEM_POSITION, position);
+		vh.ivHeart.setTag(Constants.ITEM_POSITION, position);
 		NearbyStrangerInfo info = datas.get(position);
-		vh.ivSex.setImageResource("0".equals(info.getSex()) ? R.drawable.me_sex_women
-				: R.drawable.me_sex_man);
+		vh.ivSex.setImageResource("0".equals(info.getSex()) ? R.drawable.me_sex_women : R.drawable.me_sex_man);
 		vh.tvAgeCount.setText(info.getAge());
 		Double distance = Double.valueOf(info.getDistance());
 		distance = ((int) (distance * 100)) / 100.0;
 		vh.tvDistance.setText("(" + distance + "km)");
-		vh.tvNickName.setText(info.getNickName());
-		if (null != info.getRealName() && !"".equals(info.getRealName())) {
-			vh.tvNickName.setText(info.getRealName());
-		}
+		vh.tvNickName.setText(info.getName());
 		vh.tvWorth.setText(info.getWorth());
-		vh.tvOccupation.setText(info.getJob());
-		LogUtils.i("bm", "icon----" + info.getIcon());
+		vh.tvOccupation.setText(info.getOccupation());
 		// Glide.with(mContext).load(info.getIcon()).into(vh.ivStrangerPic);
-		ImageLoaderHelper.mImageLoader.displayImage(
-				ImageUtils.getIconByDwID(info.getDwID(), ImageUtils.ICON_MAIN),
+		ImageLoaderHelper.mImageLoader.displayImage(ImageUtils.getIconByDwID(info.getDwID(), ImageUtils.ICON_MAIN),
 				vh.ivStrangerPic, ImageLoaderHelper.mOptions);
-		if (info.getIfLike()) {
+		// if (info.getIfLike()) {
+		// vh.ivHeart.setImageResource(R.drawable.iv_new_heart_like_);
+		// } else {
+		// vh.ivHeart.setImageResource(R.drawable.iv_new_heart_);
+		// }
+		if ("1".equals(info.getLiked())) {
 			vh.ivHeart.setImageResource(R.drawable.iv_new_heart_like_);
 		} else {
 			vh.ivHeart.setImageResource(R.drawable.iv_new_heart_);
@@ -99,8 +95,7 @@ public class NearStrangerListAdapter extends BaseAdapter implements
 	class ViewHolder {
 		ImageView ivAgreement, ivHeart, ivSex;
 		CircularImageView ivStrangerPic;
-		TextView tvAddr, tvDistance, tvAgeCount, tvNickName, tvWorth,
-				tvOccupation;
+		TextView tvAddr, tvDistance, tvAgeCount, tvNickName, tvWorth, tvOccupation;
 	}
 
 	@Override

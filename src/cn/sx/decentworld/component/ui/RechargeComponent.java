@@ -58,7 +58,8 @@ public class RechargeComponent {
 			public void onSuccess(String response, ResultBean msg) {
 				hideProgressDialog();
 				if (2222 == msg.getResultCode()) {
-					LogUtils.i(Constants.TAG, "bm--" + msg.getData().toString());
+					LogUtils.i(Constants.TAG, "--bm--"
+							+ msg.getData().toString());
 					Message message = handler.obtainMessage();
 					message.obj = msg.getData().toString();
 					message.what = msg.getResultCode();
@@ -125,27 +126,6 @@ public class RechargeComponent {
 					handler.sendEmptyMessage(msg.getResultCode());
 					showToast(msg.getMsg());
 				}
-				// LogUtils.i(TAG, "getRecommendCharge......success," +
-				// "response"
-				// + response);
-				// LogUtils.i(TAG, "getRecommendCharge......success,"
-				// + "msg.getResultCode=" + msg.getResultCode());
-				// if (msg.getResultCode() == 2222) {
-				// LogUtils.i(TAG, "getRecommendCharge......success");
-				// Message message = new Message();
-				// // message.what = RechargeActivity.REQUEST_CHARGE_SUCCESS;
-				// JSONObject jsonObject = JSON.parseObject(msg.getData()
-				// .toString());
-				// String charge = jsonObject.getString("charge");
-				// LogUtils.i(TAG, "charge=" + charge);
-				// message.obj = charge;
-				// handler.sendMessage(message);
-				// } else if (msg.getResultCode() == 3333) {
-				// LogUtils.i(TAG, "getRecommendCharge......failure");
-				// Message message = new Message();
-				// //
-				// handler.sendEmptyMessage(RechargeActivity.REQUEST_CHARGE_FAIL);
-				// }
 			}
 
 			@Override
@@ -156,6 +136,41 @@ public class RechargeComponent {
 			}
 		});
 		LogUtils.i(TAG, "getRecommendCharge......end");
+	}
+
+	/**
+	 * 去疑支付
+	 * */
+	public void getDoubtWanCharge(HashMap<String, String> map, String api,
+			final Handler handler) {
+
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + api,
+				Method.GET, new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						hideProgressDialog();
+						if (2222 == msg.getResultCode()) {
+							LogUtils.i(Constants.TAG, "bm--"
+									+ msg.getData().toString());
+							Message message = handler.obtainMessage();
+							message.obj = msg.getData().toString();
+							message.what = msg.getResultCode();
+							handler.sendMessage(message);
+						} else {
+							handler.sendEmptyMessage(msg.getResultCode());
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String error) {
+						hideProgressDialog();
+						LogUtils.i(TAG,
+								"getRecommendCharge......failure,caused by:"
+										+ error);
+					}
+				});
 	}
 
 	/**
@@ -190,28 +205,6 @@ public class RechargeComponent {
 					handler.sendEmptyMessage(msg.getResultCode());
 					showToast(msg.getMsg());
 				}
-				// hideProgressDialog();
-				// LogUtils.i(TAG, "getGuaranteeCharge......success," +
-				// "response"
-				// + response);
-				// LogUtils.i(TAG, "getGuaranteeCharge......success,"
-				// + "msg.getResultCode=" + msg.getResultCode());
-				// if (msg.getResultCode() == 2222) {
-				// LogUtils.i(TAG, "getGuaranteeCharge......success");
-				// Message message = new Message();
-				// // message.what = RechargeActivity.REQUEST_CHARGE_SUCCESS;
-				// JSONObject jsonObject = JSON.parseObject(msg.getData()
-				// .toString());
-				// String charge = jsonObject.getString("charge");
-				// LogUtils.i(TAG, "charge=" + charge);
-				// message.obj = charge;
-				// handler.sendMessage(message);
-				// } else if (msg.getResultCode() == 3333) {
-				// LogUtils.i(TAG, "getGuaranteeCharge......failure");
-				// Message message = new Message();
-				// //
-				// handler.sendEmptyMessage(RechargeActivity.REQUEST_CHARGE_FAIL);
-				// }
 			}
 
 			@Override
@@ -221,7 +214,6 @@ public class RechargeComponent {
 						+ error);
 			}
 		});
-		LogUtils.i(TAG, "getGuaranteeCharge......end");
 	}
 
 	/**

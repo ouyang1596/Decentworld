@@ -1,5 +1,7 @@
 package cn.sx.decentworld.listener;
 
+import java.io.IOException;
+
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -14,12 +16,15 @@ import cn.sx.decentworld.bean.NotifyByEventBus;
 import cn.sx.decentworld.utils.LogUtils;
 
 /**
- * Created by HH on 2015/11/8. openfire连接监听
+ * 
+ * @ClassName: ViConnectionListener.java
+ * @Description: 目前仅用于监听挤下线的消息
+ * @author: cj
+ * @date: 2016年1月19日 下午7:46:10
  */
-public class ViConnectionListener extends Handler implements ConnectionListener
+public class ViConnectionListener implements ConnectionListener
 {
 	private static final String TAG = "ViConnectionListener";
-
 	/**
 	 * 关闭连接
 	 */
@@ -27,7 +32,7 @@ public class ViConnectionListener extends Handler implements ConnectionListener
 	public void connectionClosed()
 	{
 		LogUtils.i(TAG, "connectionClosed");
-		first_connect_error_time = 0;
+		//此处也要加页面提示
 	}
 
 	/**
@@ -41,12 +46,10 @@ public class ViConnectionListener extends Handler implements ConnectionListener
 		{
 			XMPPException xmppEx = (XMPPException) e;
 			StreamError error = xmppEx.getStreamError();
-
 			// Make sure the error is not null
 			if (error != null)
 			{
 				String reason = error.getCode();
-
 				if ("conflict".equals(reason))
 				{
 					LogUtils.i(TAG, "被挤下线");
@@ -55,16 +58,9 @@ public class ViConnectionListener extends Handler implements ConnectionListener
 				}
 			}
 		}
-		 
-		if (e.getMessage().contains("Connection timed out"))
-		{
-			// 连接超时
-			LogUtils.i(TAG, "连接超时");
-			if (first_connect_error_time == 0)
-			{
-				first_connect_error_time = System.currentTimeMillis();
-			}
-			sendEmptyMessage(REQUEST_RECONNECT);
+		/** 发生IO异常时将消息路由到 **/
+		if(e instanceof IOException){
+			EventBus.getDefault().post("连接断开，即将重连，或手动点击重连！", NotifyByEventBus.NT_OFF_LINE);
 		}
 	}
 
@@ -76,6 +72,7 @@ public class ViConnectionListener extends Handler implements ConnectionListener
 	{
 		LogUtils.i(TAG, "reconnectingIn");
 	}
+	
 
 	/**
 	 * 重连成功
@@ -84,8 +81,8 @@ public class ViConnectionListener extends Handler implements ConnectionListener
 	public void reconnectionSuccessful()
 	{
 		LogUtils.i(TAG, "reconnectionSuccessful");
-		first_connect_error_time = 0;
-		// 处理未发送的信息
+//		EventBus.getDefault().post("重连成功！", NotifyByEventBus.NT_RECONNECT);
+		//此处应写代码提示
 	}
 
 	/**
@@ -95,52 +92,8 @@ public class ViConnectionListener extends Handler implements ConnectionListener
 	public void reconnectionFailed(Exception e)
 	{
 		LogUtils.i(TAG, "reconnectionFailed");
-		if (first_connect_error_time == 0)
-		{
-			first_connect_error_time = System.currentTimeMillis();
-		}
-		sendEmptyMessage(REQUEST_RECONNECT);
+//		sendEmptyMessage(REQUEST_RECONNECT);
 	}
 
-	public static final int RECONNECT = 0;
-	public static final int REQUEST_RECONNECT = 1;
-	public static final int RECONNECT_INTERVAL = 10000;// 10秒钟
-	public static long first_connect_error_time = 0;
 
-	@Override
-	public void handleMessage(Message msg)
-	{
-		switch (msg.what)
-		{
-			case RECONNECT:
-				removeMessages(RECONNECT);
-				EventBus.getDefault().post(null, NotifyByEventBus.NT_CONNECTION);
-				break;
-			case REQUEST_RECONNECT:
-				if (first_connect_error_time == 0)
-				{
-					break;
-				}
-				long curr = System.currentTimeMillis();
-				if (curr - first_connect_error_time < 120000)
-				{
-					// 两分钟内延迟10秒钟发一次重新链接请求
-					sendEmptyMessageDelayed(RECONNECT, RECONNECT_INTERVAL);
-					Log.w(ViConnectionListener.class.getName(), "两分钟内延迟10秒钟发一次重新链接请求");
-				}
-				else if (curr - first_connect_error_time < 300000)
-				{
-					// 两分钟到五分钟延迟30秒发一次
-					sendEmptyMessageDelayed(RECONNECT, 3 * RECONNECT_INTERVAL);
-					Log.w(ViConnectionListener.class.getName(), "两分钟到五分钟延迟30秒发一次");
-				}
-				else
-				{
-					// 五分钟以后延迟2分钟发一次
-					sendEmptyMessageDelayed(RECONNECT, 12 * RECONNECT_INTERVAL);
-					Log.w(ViConnectionListener.class.getName(), "五分钟以后延迟2分钟发一次");
-				}
-				break;
-		}
-	}
 }

@@ -1,7 +1,7 @@
 <resources>
 
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="text_size_32px">32px</dimen>
+
     <dimen name="text_size_36">36sp</dimen>
     <dimen name="text_size_30">30sp</dimen>
     <dimen name="text_size_28">28sp</dimen>
@@ -39,7 +39,7 @@
     <dimen name="image_thumbnail_spacing">1dp</dimen>
 
     <!-- 我的设置 -->
-    <dimen name="text_margin_left">20px</dimen>
+    <dimen name="text_margin_left">16dp</dimen>
     <dimen name="image_margin_right">20px</dimen>
     <dimen name="image_text_interval">12px</dimen>
 
@@ -88,6 +88,7 @@
     <dimen name="new_textsize_19sp">19sp</dimen>
     <dimen name="new_textsize_20sp">20sp</dimen>
     <dimen name="new_textsize_24sp">24sp</dimen>
+    <dimen name="new_textsize_35sp">35sp</dimen>
     <dimen name="new_textsize_40sp">40sp</dimen>
     <dimen name="new_textsize_60sp">60sp</dimen>
     <dimen name="picture_show_size">300px</dimen>

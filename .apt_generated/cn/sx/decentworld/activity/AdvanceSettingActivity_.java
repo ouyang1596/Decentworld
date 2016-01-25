@@ -18,6 +18,9 @@ import android.widget.LinearLayout;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.TitleBar_;
+import cn.sx.decentworld.component.ToastComponent_;
+import cn.sx.decentworld.network.request.GetUserInfo_;
+import cn.sx.decentworld.network.request.SetUserInfo_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class AdvanceSettingActivity_
@@ -34,18 +37,16 @@ public final class AdvanceSettingActivity_
 
     private void init_(Bundle savedInstanceState) {
         titleBar = TitleBar_.getInstance_(this);
+        setUserInfo = SetUserInfo_.getInstance_(this);
+        getUserInfo = GetUserInfo_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        iv_advance_setting_2 = ((ImageView) findViewById(id.iv_advance_setting_2));
+        iv_advance_setting_stranger_msg = ((ImageView) findViewById(id.iv_advance_setting_stranger_msg));
+        iv_advance_setting_push_system = ((ImageView) findViewById(id.iv_advance_setting_push_system));
         ll_advance_setting_root = ((LinearLayout) findViewById(id.ll_advance_setting_root));
-        iv_advance_setting_phone = ((ImageView) findViewById(id.iv_advance_setting_phone));
-        iv_advance_setting_push_appearance = ((ImageView) findViewById(id.iv_advance_setting_push_appearance));
-        iv_advance_setting_realname = ((ImageView) findViewById(id.iv_advance_setting_realname));
-        iv_advance_setting_nickname = ((ImageView) findViewById(id.iv_advance_setting_nickname));
-        iv_advance_setting_autoTransfer = ((ImageView) findViewById(id.iv_advance_setting_autoTransfer));
-        iv_advance_setting_1 = ((ImageView) findViewById(id.iv_advance_setting_1));
-        iv_advance_setting_dw = ((ImageView) findViewById(id.iv_advance_setting_dw));
+        iv_advance_setting_acceptCheckPush = ((ImageView) findViewById(id.iv_advance_setting_acceptCheckPush));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -62,6 +63,9 @@ public final class AdvanceSettingActivity_
             }
         }
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((SetUserInfo_) setUserInfo).afterSetContentView_();
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

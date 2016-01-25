@@ -3,11 +3,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
-    <include
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        layout="@layout/main_header" />
+        android:layout_height="48dp"
+        android:background="@drawable/rb_title_bg" >
+
+        <LinearLayout
+            android:id="@+id/ll_band_alipay_back"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/rb_back" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="绑定支付宝"
+            android:textSize="24sp" />
+    </RelativeLayout>
 
     <EditText
         android:id="@+id/et_bind_account_alipay"

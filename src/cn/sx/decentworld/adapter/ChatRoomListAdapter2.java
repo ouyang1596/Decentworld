@@ -77,8 +77,8 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 			vh = new ViewHolder();
 			vh.ivBg = (ImageView) con.findViewById(R.id.iv_bg);
 			vh.ivDetail = (CircularImageView) con.findViewById(R.id.iv_detail);
-			vh.tvChatRoomEnter = (TextView) con
-					.findViewById(R.id.tv_chatroom_enter);
+			vh.ivChatRoomEnter = (ImageView) con
+					.findViewById(R.id.iv_chatroom_enter);
 			vh.tvChatRoomName = (TextView) con
 					.findViewById(R.id.tv_subject_name);
 			vh.tvSelfIntroduce = (TextView) con
@@ -115,12 +115,12 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 		LogUtils.i(TAG, info.getSubjectName());
 		vh.tvChatRoomName.setText(info.getSubjectName());
 		vh.tvSelfIntroduce.setText(info.getOwnerIntroduction());
-		vh.tvOnLineCount.setText("在线人数  " + info.getOnLineNum());
-		vh.tvChargeAmount.setText("¥ " + info.getChargeAmount());
-		vh.ivDetail.setTag(Constants.ITEM_KEY, position);
+		vh.tvOnLineCount.setText(info.getOnLineNum() + " 在线");
+		vh.tvChargeAmount.setText(info.getChargeAmount() + " 价格");
+		vh.ivDetail.setTag(Constants.ITEM_POSITION, position);
 		vh.ivDetail.setOnClickListener(mOnlcClickListener);
-		vh.tvChatRoomEnter.setTag(Constants.ITEM_KEY, position);
-		vh.tvChatRoomEnter.setOnClickListener(mOnlcClickListener);
+		vh.ivChatRoomEnter.setTag(Constants.ITEM_POSITION, position);
+		vh.ivChatRoomEnter.setOnClickListener(mOnlcClickListener);
 		return con;
 	}
 
@@ -136,10 +136,10 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 
 		@Override
 		public void onClick(View view) {
-			int position = (Integer) view.getTag(Constants.ITEM_KEY);
+			int position = (Integer) view.getTag(Constants.ITEM_POSITION);
 			ChatRoomInfo info = getItem(position);
 			switch (view.getId()) {
-			case R.id.tv_chatroom_enter:
+			case R.id.iv_chatroom_enter:
 				if (null != info) {
 					requestEnterChatRoom(info);
 				}
@@ -221,9 +221,9 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 	}
 
 	class ViewHolder {
-		ImageView ivBg;
+		ImageView ivBg, ivChatRoomEnter;
 		CircularImageView ivDetail;
-		TextView tvSelfIntroduce, tvChatRoomName, tvChatRoomEnter,
-				tvOnLineCount, tvChargeAmount, tvSelfNickName;
+		TextView tvSelfIntroduce, tvChatRoomName, tvOnLineCount,
+				tvChargeAmount, tvSelfNickName;
 	}
 }

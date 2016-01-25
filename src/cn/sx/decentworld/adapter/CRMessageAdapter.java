@@ -544,7 +544,7 @@ public class CRMessageAdapter extends BaseAdapter {
 
 	private void setIconVoice(int position, final ViewHolder holder,
 			ImageView ivVoice) {
-		holder.icon_voice.setTag(Constants.ITEM_KEY, position);
+		holder.icon_voice.setTag(Constants.ITEM_POSITION, position);
 		holder.icon_voice.setOnClickListener(mOnClickListener);
 	}
 
@@ -600,7 +600,7 @@ public class CRMessageAdapter extends BaseAdapter {
 		@Override
 		public void onClick(View view) {
 
-			int position = (Integer) view.getTag(Constants.ITEM_KEY);
+			int position = (Integer) view.getTag(Constants.ITEM_POSITION);
 			if (isClickPosition == -1) {
 				startAudio(position);
 			} else {

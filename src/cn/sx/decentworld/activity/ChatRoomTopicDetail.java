@@ -7,7 +7,6 @@ import android.widget.Button;
 import android.widget.RelativeLayout;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.component.TitleBar;
-import cn.sx.decentworld.component.ui.MainFragmentComponent;
 import cn.sx.decentworld.utils.ViewUtil;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -27,8 +26,6 @@ public class ChatRoomTopicDetail extends BaseFragmentActivity {
 	private static final String TAG = "ChatRoomTopicDetail";
 	@Bean
 	TitleBar titleBar;
-	@Bean
-	MainFragmentComponent compont;
 
 	@ViewById(R.id.chat_rooom_detail_bt_join)
 	Button chat_rooom_detail_bt_join;

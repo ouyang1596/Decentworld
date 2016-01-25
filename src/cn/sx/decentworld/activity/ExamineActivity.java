@@ -5,20 +5,24 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.app.NotificationManager;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.AppearanceBean;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.component.ui.RegisterComponent;
+import cn.sx.decentworld.network.utils.JsonUtils;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.LogUtils;
@@ -38,11 +42,26 @@ public class ExamineActivity extends BaseFragmentActivity implements
 	ImageView ivPass;
 	@ViewById(R.id.iv_no_pass)
 	ImageView ivNoPass;
+	@ViewById(R.id.tv_name)
+	TextView tvName;
+	@ViewById(R.id.tv_introduce)
+	TextView tvIntroduce;
+	@ViewById(R.id.tv_sex)
+	TextView tvSex;
+	@ViewById(R.id.tv_occupation)
+	TextView tvOccupation;
+	@ViewById(R.id.ll_dots)
+	LinearLayout llDots;
+	private int currentItem = 0; // 当前图片的索引号
+	private List<View> dots;
 	@Bean
 	ToastComponent toast;
 	ArrayList<String> mUrls = new ArrayList<String>();
 	List<ImageView> imgvs = new ArrayList<ImageView>();
-	private String name, sex, amount, dwID;
+	// private String name, sex, amount, dwID;
+	private String checkJson;
+	private AppearanceBean bean;
+	private boolean isTrue;
 	@Bean
 	RegisterComponent registerComponent;
 	private Handler mHandler = new Handler() {
@@ -52,7 +71,6 @@ public class ExamineActivity extends BaseFragmentActivity implements
 				toast.show("审核结束");
 				finish();
 				break;
-
 			default:
 				finish();
 				break;
@@ -62,27 +80,31 @@ public class ExamineActivity extends BaseFragmentActivity implements
 
 	@AfterViews
 	public void init() {
-		new InitAsyn().execute();
+		EGetIntent();
+		cancelNotify();
+		initView();
 	}
 
 	private void initView() {
-		// ImageLoaderHelper.initImageLoader(mContext);
-		Integer count = 0;
-		if (null != amount && !("".equals(amount))) {
-			count = Integer.valueOf(amount);
-		}
-		if (count > 0) {
-			for (int i = 0; i < count; i++) {
+		tvName.setText(bean.showName);
+		tvOccupation.setText(bean.occupation);
+		tvSex.setText(bean.gender);
+		tvIntroduce.setText(bean.introduce);
+		dots = new ArrayList<View>();
+		if (bean.picAmount > 0) {
+			for (int i = 0; i < bean.picAmount; i++) {
 				if (i == 0) {
-					mUrls.add(ImageUtils.getExamineByDwID(dwID, ""));
+					mUrls.add(ImageUtils.getExamineByDwID(bean.dwID, ""));
 				} else {
-					mUrls.add(ImageUtils.getExamineByDwID(dwID, "" + i));
+					mUrls.add(ImageUtils.getExamineByDwID(bean.dwID, "" + i));
 				}
 				imgvs.add(new ImageView(mContext));
+				addDot();
 			}
 		}
 		CustomPageAdapter pageAdapter = new CustomPageAdapter();
 		vpExamine.setAdapter(pageAdapter);
+		vpExamine.setOnPageChangeListener(new CustomPageChangeListener());
 		ivPass.setOnClickListener(this);
 		ivNoPass.setOnClickListener(this);
 	}
@@ -94,59 +116,82 @@ public class ExamineActivity extends BaseFragmentActivity implements
 	}
 
 	private void EGetIntent() {
-		name = getIntent().getStringExtra("name");
-		sex = getIntent().getStringExtra("sex");
-		amount = getIntent().getStringExtra("amount");
-		LogUtils.e("bm", "--amount--" + amount);
-		dwID = getIntent().getStringExtra("dwID");
-		LogUtils.i("bm", "--name--" + name + "--sex--" + sex + "--amount--"
-				+ amount + "--dwID--" + dwID);
+		checkJson = getIntent().getStringExtra("check");
+		bean = JsonUtils.json2Bean(checkJson, AppearanceBean.class);
+		LogUtils.i("bm", "examineActivity--" + bean.toString());
 	}
 
 	@Override
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.iv_pass:
-			handPass();
+			if (isTrue) {
+				handPass();
+			} else {
+				handleIsTrue();
+			}
 			break;
-
 		case R.id.iv_no_pass:
-			handNoPass();
+			if (isTrue) {
+				handleNoPass();
+			} else {
+				handleFake();
+			}
 			break;
 		}
+	}
+
+	private void handleIsTrue() {
+		isTrue = true;
+		vpExamine.setVisibility(View.GONE);
+		tvIntroduce.setVisibility(View.VISIBLE);
 	}
 
 	private void handPass() {
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("supporterID", DecentWorldApp.getInstance().getDwID());
-		map.put(Constants.DW_ID, dwID);
+		map.put(Constants.DW_ID, bean.dwID);
 		registerComponent.examinePass(map, mHandler);
 	}
 
-	private void handNoPass() {
+	private void handleNoPass() {
 		HashMap<String, String> map = new HashMap<String, String>();
-		map.put(Constants.DW_ID, dwID);
+		map.put("unpassID", DecentWorldApp.getInstance().getDwID());
+		map.put(Constants.DW_ID, bean.dwID);
 		registerComponent.examineNoPass(map, mHandler);
 	}
 
-	class InitAsyn extends AsyncTask<Void, Void, Void> {
+	private void handleFake() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("fakeVoteID", DecentWorldApp.getInstance().getDwID());
+		map.put(Constants.DW_ID, bean.dwID);
+		registerComponent.examineFake(map, mHandler);
+	}
 
-		@Override
-		protected Void doInBackground(Void... params) {
-			try {
-				Thread.sleep(10);
-			} catch (InterruptedException e) {
+	/**
+	 * 当ViewPager中页面的状态发生改变时调用
+	 */
+	private class CustomPageChangeListener implements OnPageChangeListener {
+		private int oldPosition = 0;
 
+		public void onPageSelected(int position) {
+			currentItem = position;
+			if (dots.size() > oldPosition && dots.size() > position) {
+				dots.get(oldPosition).setBackgroundResource(
+						R.drawable.dot_normal);
+				dots.get(position)
+						.setBackgroundResource(R.drawable.dot_focused);
 			}
-			return null;
+
+			oldPosition = position;
 		}
 
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			EGetIntent();
-			cancelNotify();
-			initView();
+		public void onPageScrollStateChanged(int arg0) {
+
+		}
+
+		public void onPageScrolled(int arg0, float arg1, int arg2) {
+
 		}
 	}
 
@@ -180,11 +225,37 @@ public class ExamineActivity extends BaseFragmentActivity implements
 		@Override
 		public void finishUpdate(ViewGroup container) {
 			super.finishUpdate(container);
+			setCurrentDot();
 		}
 
 		@Override
 		public int getItemPosition(Object object) {
 			return POSITION_NONE;
+		}
+	}
+
+	private void addDot() {
+		View dot = createDot();
+		llDots.addView(dot);
+		dots.add(dot);
+	}
+
+	public View createDot() {
+		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(10, 10);
+		lp.setMargins(10, 0, 10, 0);
+		View view = new View(this);
+		view.setLayoutParams(lp);
+		view.setBackgroundResource(R.drawable.dot_normal);
+		return view;
+	}
+
+	/**
+	 * 设置默认的选中点
+	 * */
+	private void setCurrentDot() {
+		if (bean.picAmount > 0 && currentItem >= 0 && dots.size() > currentItem) {
+			currentItem = vpExamine.getCurrentItem();
+			dots.get(currentItem).setBackgroundResource(R.drawable.dot_focused);
 		}
 	}
 }

@@ -35,19 +35,19 @@ public final class FriendDetailSettingActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        friend_detail_Component = FriendDetailComponent_.getInstance_(this);
-        titleBar = TitleBar_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
+        friend_detail_Component = FriendDetailComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        iv_friend_detail_setting_1 = ((ImageView) findViewById(id.iv_friend_detail_setting_1));
         ll_friend_detail_whistle_blowing = ((LinearLayout) findViewById(id.ll_friend_detail_whistle_blowing));
-        ll_friend_detail_root = ((LinearLayout) findViewById(id.ll_friend_detail_root));
+        iv_friend_detail_setting_1 = ((ImageView) findViewById(id.iv_friend_detail_setting_1));
         iv_friend_detail_setting_2 = ((ImageView) findViewById(id.iv_friend_detail_setting_2));
+        ll_friend_detail_set_remark = ((LinearLayout) findViewById(id.ll_friend_detail_set_remark));
+        ll_friend_detail_root = ((LinearLayout) findViewById(id.ll_friend_detail_root));
         ll_friend_detail_delete_contact = ((LinearLayout) findViewById(id.ll_friend_detail_delete_contact));
         iv_friend_detail_setting_3 = ((ImageView) findViewById(id.iv_friend_detail_setting_3));
-        ll_friend_detail_set_remark = ((LinearLayout) findViewById(id.ll_friend_detail_set_remark));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -63,9 +63,9 @@ public final class FriendDetailSettingActivity_
                 );
             }
         }
-        ((FriendDetailComponent_) friend_detail_Component).afterSetContentView_();
-        ((TitleBar_) titleBar).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
+        ((FriendDetailComponent_) friend_detail_Component).afterSetContentView_();
         init();
     }
 

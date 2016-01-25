@@ -86,6 +86,7 @@ public class JsonUtils
 	 *            简单bean
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T> T json2Bean(String json, Class<?> type)
 	{
 		return (T) JSON.parseObject(json, type);

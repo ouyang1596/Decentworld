@@ -16,6 +16,7 @@ import android.widget.Button;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
+import cn.sx.decentworld.network.request.GetUserInfo_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class JackTest_
@@ -32,14 +33,17 @@ public final class JackTest_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
+        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        btn_play_audio = ((Button) findViewById(id.btn_play_audio));
         btn_current_thread = ((Button) findViewById(id.btn_current_thread));
-        btn_remove_cache = ((Button) findViewById(id.btn_remove_cache));
+        btn_play_audio = ((Button) findViewById(id.btn_play_audio));
+        btn_get_contact = ((Button) findViewById(id.btn_get_contact));
         btn_current_service = ((Button) findViewById(id.btn_current_service));
+        btn_remove_cache = ((Button) findViewById(id.btn_remove_cache));
         ((ToastComponent_) toast).afterSetContentView_();
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

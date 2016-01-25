@@ -43,6 +43,8 @@ public class NetStateReceiver extends BroadcastReceiver {
         //
         //			}
         //		}
+        
+        LogUtils.i(TAG, "");
 
         State wifiState = null;
         State mobileState = null;
@@ -55,17 +57,22 @@ public class NetStateReceiver extends BroadcastReceiver {
             if (null != mChangeListener) {
                 mChangeListener.onNetConnected();
             }
-        } else if (wifiState != null && mobileState != null && State.CONNECTED != wifiState
-                && State.CONNECTED != mobileState) {
-            // 手机没有任何的网络  
+        }
+        else if (wifiState != null && mobileState != null && State.CONNECTED != wifiState && State.CONNECTED != mobileState)
+        {
+            // 手机没有任何的网络
             LogUtils.i(TAG, "network disconnected");
-            if (null != mChangeListener) {
+            if (null != mChangeListener)
+            {
                 mChangeListener.onNetDisconnected();
             }
-        } else if (wifiState != null && State.CONNECTED == wifiState) {
-            // 无线网络连接成功  
+        }
+        else if (wifiState != null && State.CONNECTED == wifiState)
+        {
+            // 无线网络连接成功
             LogUtils.i(TAG, "wifi connected");
-            if (null != mChangeListener) {
+            if (null != mChangeListener)
+            {
                 mChangeListener.onNetConnected();
             }
         }

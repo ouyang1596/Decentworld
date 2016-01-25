@@ -1,1 +1,2 @@
-ALTER TABLE userInfo ADD autoTransfer INTEGER;
+ALTER TABLE userExtraInfo ADD recomTotalBenefit REAL;
+ALTER TABLE userExtraInfo ADD grTotalBenefit REAL;

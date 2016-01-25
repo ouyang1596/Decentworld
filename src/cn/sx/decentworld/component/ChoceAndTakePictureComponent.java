@@ -36,11 +36,8 @@ public class ChoceAndTakePictureComponent
 	ToastComponent toastComponent;
 
 	public static String localTempImageFileName;
-
-	public static final int TAKE_PICKTURE = 1;
-
-	public static final int CHOICE_PICTURE = 2;
-
+	public static final int CHOICE_PICTURE = 1001;
+	public static final int TAKE_PICKTURE = 1002;
 	public static File f;
 
 	public void takePicture()
@@ -51,8 +48,6 @@ public class ChoceAndTakePictureComponent
 			try
 			{
 				long filename = (new Date()).getTime();
-				
-
 				localTempImageFileName = String.valueOf(filename) + ".jpg";
 				File filePath = Constants.FILE_PIC_SCREENSHOT;
 				if (!filePath.exists())
@@ -88,53 +83,6 @@ public class ChoceAndTakePictureComponent
 		intent.putExtra("which", activity.getLocalClassName());
 		activity.startActivityForResult(intent, requestCode);
 	}
-
-	// public void showDialog(){
-	// AlertDialog.Builder builder = new AlertDialog.Builder(context,3);
-	// builder.setTitle("选择相片").setItems(R.array.choicepicture_method, new
-	// OnClickListener() {
-	// @Override
-	// public void onClick(DialogInterface dialog, int which) {
-	// if(which==0){
-	// String status = Environment.getExternalStorageState();
-	// if (status.equals(Environment.MEDIA_MOUNTED)) {
-	// try {
-	// long filename = (new Date()).getTime();
-	//
-	// localTempImageFileName = String.valueOf(filename)
-	// + ".jpg";
-	// File filePath = Constants.FILE_PIC_SCREENSHOT;
-	// if (!filePath.exists()) {
-	// filePath.mkdirs();
-	// }
-	// Intent intent = new Intent(
-	// android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-	// File f = new File(filePath, localTempImageFileName);
-	// Uri u = Uri.fromFile(f);
-	// intent.putExtra(MediaStore.EXTRA_OUTPUT, u);
-	//
-	// activity.startActivityForResult(intent, TAKE_PICKTURE);
-	//
-	// } catch (ActivityNotFoundException e) {
-	// }
-	// } else {
-	// toastComponent.show("请检查内存卡！");
-	// }
-	// }else {
-	// Intent intent = new Intent(context,PictureChoiceActivity.class);
-	// intent.putExtra("which", activity.getLocalClassName());
-	// activity.startActivityForResult(intent, 22);
-	// }
-	// }
-	// });
-	// builder.setNegativeButton("取消", new OnClickListener() {
-	//
-	// @Override
-	// public void onClick(DialogInterface dialog, int which) {
-	// dialog.dismiss();
-	// }
-	// }).show();
-	// }
 
 	public String getImageName()
 	{

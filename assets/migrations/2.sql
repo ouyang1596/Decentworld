@@ -1,1 +1,4 @@
-ALTER TABLE newFriend ADD userID TEXT;
+ALTER TABLE userInfo RENAME TO _temp_userInfo;
+CREATE TABLE userInfo (ifStudent TEXT, vehicle TEXT, likebook TEXT, department TEXT, ln REAL, position TEXT, likemusic TEXT, cate TEXT, corporation TEXT, maritalStatus TEXT, blog TEXT, userType INTEGER, lt REAL, footprint TEXT, nickname TEXT, age INTEGER, userId TEXT, religion TEXT, height REAL, phoneNum TEXT, worth REAL, likemovie TEXT, qq TEXT, gender TEXT, card TEXT, idol TEXT, speciality TEXT, classes TEXT, hometown TEXT, occupation TEXT, nation TEXT, job TEXT, email TEXT, Id INTEGER PRIMARY KEY AUTOINCREMENT, bloodType TEXT, sign TEXT, school TEXT, constellatory TEXT, wealth REAL, activeTime INTEGER, motto TEXT, wechat TEXT, realName TEXT, likesport TEXT);
+DROP TABLE _temp_userInfo;
+CREATE TABLE userExtraInfo (iconSmall TEXT, icon TEXT, canFindByNickName INTEGER, grId TEXT, icon3 TEXT, acceptPush INTEGER, icon2 TEXT, autoTransfer INTEGER, Id INTEGER PRIMARY KEY AUTOINCREMENT, userID TEXT, canFindByRealName INTEGER, canFindByID INTEGER, isgrId TEXT, canFindByPhoneNum INTEGER, acceptBeautyPush INTEGER, noticeStrangerMessage INTEGER, accountType INTEGER, accountName TEXT);

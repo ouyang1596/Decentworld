@@ -20,22 +20,18 @@
 
 package org.jivesoftware.smack;
 
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.IQ.Type;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smack.Connection.InterceptorWrapper;
-import org.jivesoftware.smack.Connection.ListenerWrapper;
-
-import android.content.SharedPreferences;
-import android.widget.Toast;
-import cn.sx.decentworld.DecentWorldApp;
-import cn.sx.decentworld.common.Constants;
-import cn.sx.decentworld.utils.LogUtils;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.IQ.Type;
+import org.jivesoftware.smack.packet.Packet;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.utils.LogUtils;
 
 /**
  * Writes packets to a XMPP server. Packets are sent using a dedicated thread. Packet
@@ -51,10 +47,12 @@ public class PacketWriter {
 	private static final String TAG = "PacketWriter";
     private Thread writerThread;
     private Thread keepAliveThread;
-    private Writer writer;
     private XMPPConnection connection;
-    private final BlockingQueue<Packet> queue;
     private boolean done;
+    
+    private Writer writer;
+    private final BlockingQueue<Packet> queue;
+    
 
     /**
 	 * @return the done
@@ -127,7 +125,6 @@ public class PacketWriter {
             synchronized (queue) {
                 queue.notifyAll();
             }
-
             // Process packet writer listeners. Note that we're using the sending
             // thread so it's expected that listeners are fast.
             connection.firePacketSendingListeners(packet);
@@ -165,7 +162,10 @@ public class PacketWriter {
             task.setThread(keepAliveThread);
             keepAliveThread.setDaemon(true);
             keepAliveThread.setName("Smack Keep Alive (" + connection.connectionCounterValue + ")");
-            keepAliveThread.start();
+           
+            if(!keepAliveThread.isAlive()){
+                keepAliveThread.start();
+            }
         }
     }
 
@@ -218,6 +218,7 @@ public class PacketWriter {
 
 	private void writePackets(Thread thisThread)
 	{
+		Packet packet =null;
 		try
 		{
 			// Open the stream.
@@ -225,7 +226,7 @@ public class PacketWriter {
 			// Write out packets from the queue.
 			while (!done && (writerThread == thisThread))
 			{
-				Packet packet = nextPacket();
+				packet= nextPacket();
 				if (packet != null)
 				{
 					synchronized (writer)
@@ -253,8 +254,8 @@ public class PacketWriter {
 				{
 					while (!queue.isEmpty())
 					{
-						Packet packet = queue.remove();
-						writer.write(packet.toXML());
+						Packet packet_ = queue.remove();
+						writer.write(packet_.toXML());
 					}
 					writer.flush();
 				}
@@ -303,7 +304,13 @@ public class PacketWriter {
 		finally
 		{
 			//将消息保存到队列中
-			
+			if(packet!=null){
+				boolean status=queue.offer(packet);	
+				if(!status){
+					//notify
+					
+				}
+			}
 		}
 	}
 
@@ -355,18 +362,21 @@ public class PacketWriter {
                 synchronized (writer) {
                     // Send heartbeat if no packet has been sent to the server for a given time
                     if (System.currentTimeMillis() - lastActive >= delay) {
-                        try {
-                        	IQ ping=new IQ(){
-                        		@Override
-                        		public String getChildElementXML() {
-                        			return "<ping xmlns=\"urn:xmpp:ping\"/>";
-                        		}
-                        	};
-                        	ping.setFrom(DecentWorldApp.getInstance().getDwID()+Constants.SERVER_NAME+"/Smack");
-                        	ping.setType(Type.GET);
+                        try
+                        {
+                            IQ ping = new IQ()
+                            {
+                                @Override
+                                public String getChildElementXML()
+                                {
+                                    return "<ping xmlns=\"urn:xmpp:ping\"/>";
+                                }
+                            };
+                            ping.setFrom(DecentWorldApp.getInstance().getDwID() + Constants.SERVER_NAME + "/Smack");
+                            ping.setType(Type.GET);
                             writer.write(ping.toXML());
                             writer.flush();
-                            LogUtils.i(TAG, System.currentTimeMillis()+":写一个空字符串到服务器");
+                            LogUtils.i(TAG, System.currentTimeMillis()+":"+ping.toXML());
                         }
                         catch (Exception e) 
                         {

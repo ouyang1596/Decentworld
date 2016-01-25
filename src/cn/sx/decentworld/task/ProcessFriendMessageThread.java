@@ -9,6 +9,7 @@ import org.jivesoftware.smack.packet.Message;
 import org.simple.eventbus.EventBus;
 
 import android.app.Activity;
+import android.app.NotificationManager;
 import android.content.Context;
 
 import com.alibaba.fastjson.JSON;
@@ -21,6 +22,7 @@ import cn.sx.decentworld.bean.DWMessage;
 import cn.sx.decentworld.bean.NewFriend;
 import cn.sx.decentworld.bean.NotifyByEventBus;
 import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.manager.MsgNotifyManager;
 import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.LogUtils;
 
@@ -39,6 +41,10 @@ public class ProcessFriendMessageThread extends DWPacketHandler
 		super(msg, context);
 	}
 
+	public ProcessFriendMessageThread(){
+	    
+	}
+	
 	@Override
 	public void run()
 	{
@@ -59,32 +65,33 @@ public class ProcessFriendMessageThread extends DWPacketHandler
 			JSONObject jsonObject = JSON.parseObject(message.getBody());
 			String reason = jsonObject.getString("addReason");
 			String nickname = jsonObject.getString("nickName");
-			String worth = jsonObject.getString("worth");
 			String searchType = jsonObject.getString("searchType");
-			
+			float worth = Float.valueOf(jsonObject.getString("worth"));
+			LogUtils.i(TAG, "reason="+reason+",nickname="+nickname+",searchType="+searchType+",worth="+worth);
 			String icon = ImageUtils.getIconByDwID(fromDwId, ImageUtils.ICON_SMALL);
 			// 转化成Bean类
 			NewFriend newFriend = NewFriend.queryByDwID(fromDwId);
 			if (newFriend != null)
 			{
-				newFriend.setMessage_type(NewFriend.message_be_add);
-				newFriend.setInfo_detail(reason);
+				newFriend.setMessageType(NewFriend.message_be_add);
+				newFriend.setAddReason(reason);
 				newFriend.setIsShown(0);
 			}
 			else
 			{
 				newFriend = new NewFriend();
 				newFriend.setUsername(nickname);
-				newFriend.setDw_id(fromDwId);
-				newFriend.setAvatar(icon);
+				newFriend.setOtherID(fromDwId);
+				newFriend.setIcon(icon);
 				newFriend.setWorth(worth);
-				newFriend.setInfo_detail(reason);
-				newFriend.setMessage_type(NewFriend.message_be_add);//被添加
+				newFriend.setAddReason(reason);
+				newFriend.setMessageType(NewFriend.message_be_add);//被添加
 				newFriend.setIsShown(0);
 			}
 			newFriend.save();
 			// 将消息路由到ChatFragment
 			EventBus.getDefault().post("申请加为好友", NotifyByEventBus.NT_SHOW_FRIENDS_ADDED);
+			MsgNotifyManager.getInstance().addFriend(MsgNotifyManager.NOTIFY_ADD_FRIEND_APPLY,nickname);
 		}
 		else if ("accept_Friend".equals(subject))
 		{
@@ -95,19 +102,18 @@ public class ProcessFriendMessageThread extends DWPacketHandler
 			if(newFriend!=null)
 			{
 				newFriend.setIsShown(1);
-				newFriend.setMessage_type(NewFriend.message_add_success);
+				newFriend.setMessageType(NewFriend.message_add_success);
 				newFriend.save();
 				/** 生成一个联系人记录 **/
 				ContactUser cc = new ContactUser();
 				cc.setUserID(DecentWorldApp.getInstance().getDwID());
-				cc.setDwID(newFriend.getDw_id());
-				cc.setIcon(newFriend.getAvatar());
-				cc.setWorth(newFriend.getWorth());
-				cc.setNickName(newFriend.getUsername());
+				cc.setFriendID(newFriend.getOtherID());
+				cc.setWorth(Float.valueOf(newFriend.getWorth()));
+				cc.setShowName(newFriend.getUsername());
 				cc.save();
 				/** 将陌生人处的会话列表移动到好友处（可能有陌生人单聊、陌生人匿名消息）**/
 				List<ConversationList> conversationList = ConversationList.queryByDwID(fromDwId, DWMessage.CHAT_RELATIONSHIP_STRANGER);
-				if(conversationList!=null)
+				if(conversationList.size()>0)
 				{
 					for(ConversationList temp:conversationList)
 					{
@@ -123,25 +129,27 @@ public class ProcessFriendMessageThread extends DWPacketHandler
 				EventBus.getDefault().post(fromDwId, NotifyByEventBus.NT_REFRESH_CONTACT);
 				/** 已经添加对方为好友，生成一条通知消息记录（DWMessage）保存到数据库 **/
 				DWMessage dwMessage = new DWMessage(DWMessage.NOTIFY, DWMessage.RECEIVE);
-				dwMessage.setFrom(newFriend.getDw_id());
+				dwMessage.setFrom(newFriend.getOtherID());
 				dwMessage.setBody("已经添加对方为好友，,扣费方式改变，以自己的身价为标准");
 				dwMessage.save();
+				MsgNotifyManager.getInstance().addFriend(MsgNotifyManager.NOTIFY_ADD_FRIEND_AGREE,newFriend.getUsername());
 			}
 		}
 		else if ("refuse_Friend".equals(subject))
 		{
 			// 拒绝加为好友
+		    //{"nickName":"陈杰"}
 			LogUtils.i(TAG, "监听到一条消息【拒绝加为好友】，" + message.getBody());
 			JSONObject json = (JSONObject) JSON.parse(message.getBody().toString());
-			//代码有点问题
-			NewFriend newFriend = NewFriend.queryByDwID((json.getString("from")));
-			if(CommUtil.isNotBlank(newFriend))
+			NewFriend newFriend = NewFriend.queryByDwID(fromDwId);
+			if(newFriend!=null)
 			{
-				newFriend.setIsShown(0);
-				newFriend.setMessage_type(NewFriend.message_add_fail);
+				newFriend.setIsShown(1);
+				newFriend.setMessageType(NewFriend.message_add_fail);
 				newFriend.save();
 				// 路由到ChatFragment(更新新的朋友Item)
 				EventBus.getDefault().post("", NotifyByEventBus.NT_SHOW_FRIENDS_ADDED);
+				MsgNotifyManager.getInstance().addFriend(MsgNotifyManager.NOTIFY_ADD_FRIEND_REFUSE,newFriend.getUsername());
 			}
 		}
 		else if ("delete_Friend".equals(subject))
@@ -152,8 +160,6 @@ public class ProcessFriendMessageThread extends DWPacketHandler
 			ContactUser contactUser = ContactUser.queryByDwID(fromDwId);
 			if(contactUser!=null)
 			{
-				contactUser.delete();
-				EventBus.getDefault().post(fromDwId, NotifyByEventBus.NT_REFRESH_CONTACT);
 				/** 将好友处的会话列表移动到陌生人处 **/
 				List<ConversationList> conversationList = ConversationList.queryByDwID(fromDwId, DWMessage.CHAT_RELATIONSHIP_FRIEND);
 				if(conversationList.size()>0)
@@ -166,7 +172,12 @@ public class ProcessFriendMessageThread extends DWPacketHandler
 					EventBus.getDefault().post("【被人删除，更新好友会话列表】", NotifyByEventBus.NT_INIT_FRIEND_CONVERSATION);
 					EventBus.getDefault().post("【被人删除，更新陌生人会话列表】", NotifyByEventBus.NT_INIT_STRANGER_CONVERSATION);
 				}
+				contactUser.delete();
+				EventBus.getDefault().post(fromDwId, NotifyByEventBus.NT_REFRESH_CONTACT);
 			}
+			
+			/** 删除该人的消息列表  **/
+//			DWMessage.deleteByDwID(fromDwId);
 		}
 	}
 }

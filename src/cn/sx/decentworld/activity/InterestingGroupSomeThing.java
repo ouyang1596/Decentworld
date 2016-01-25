@@ -151,7 +151,7 @@ public class InterestingGroupSomeThing extends BaseFragmentActivity {
 		url.add("http://pic.nipic.com/2008-01-08/2008189404327_2.jpg");
 
 		ContactUser user = new ContactUser();
-		user.setNickName("ddd");
+		user.setShowName("ddd");
 		user.setIcon("");
 		user.save();
 

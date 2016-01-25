@@ -122,7 +122,7 @@ public class TimeUtils
 	}
 	
 	/**
-	 * 显示时间格式为今天、昨天、yyyy-MM-dd hh:mm
+	 * 显示时间格式为今天、昨天、yyyy年MM月dd日 hh:mm
 	 * @param context
 	 * @param when
 	 * @return String
@@ -139,12 +139,12 @@ public class TimeUtils
 		String formatStr;
 		if (then.year != now.year)
 		{
-			formatStr = "yyyy-MM-dd";
+			formatStr = "yyyy年MM月dd日";
 		}
 		else if (then.yearDay != now.yearDay)
 		{
 			// If it is from a different day than today, show only the date.
-			formatStr = "MM-dd";
+			formatStr = "MM月dd日  HH:MM";
 		}
 		else
 		{
@@ -173,17 +173,6 @@ public class TimeUtils
 			return temp;
 		}
 	}
-	
-	
-	// public static final SimpleDateFormat COMM_DATETIME_FMT = new
-	// SimpleDateFormat(
-	// "yyyy-MM-dd HH:mm:ss");
-	// public static final SimpleDateFormat COMM_DATE_FMT = new
-	// SimpleDateFormat(
-	// "yyyy-MM-dd");
-	// public static final SimpleDateFormat COMM_TIME_FMT = new
-	// SimpleDateFormat(
-	// "HH:mm:ss");
 
     public static String weekHandle(int WeekOfMonth) {
         String week = null;

@@ -6,19 +6,11 @@ package cn.sx.decentworld.task;
 import org.jivesoftware.smack.packet.Message;
 import org.simple.eventbus.EventBus;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import cn.sx.decentworld.DecentWorldApp;
-import cn.sx.decentworld.R;
-import cn.sx.decentworld.activity.ExamineActivity_;
 import cn.sx.decentworld.bean.ContactUser;
 import cn.sx.decentworld.bean.DWMessage;
 import cn.sx.decentworld.bean.NotifyByEventBus;
 import cn.sx.decentworld.bean.manager.DWSMessageManager;
-import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.manager.MsgNotifyManager;
 import cn.sx.decentworld.utils.LogUtils;
 
@@ -49,20 +41,28 @@ public class ProcessSystemMessageThread extends DWPacketHandler
 	{
 		Message message=(Message)packet;
 		String subject = message.getSubject();
+		/** 暂时有两种情况 **/
 		if ("error".equals(subject))
 		{
-			//发送消息时身价不足，服务器提示
-			print(message, "【身家不足】");
-			String packetId = message.getPacketID();
-			//改变数据库中信息的发送状态
-			DWMessage msg = DWSMessageManager.queryItem(packetId);
-			if (msg != null)
-			{
-				msg.setSendSuccess(0);
-				msg.save();
-			}
-			// 将消息路由到ChatActivity和ChatRoomChatActivity，将刚才发送的消息的状态改为发送失败
-			EventBus.getDefault().post(packetId, NotifyByEventBus.NT_WEALTH_SHORTAGE);
+		    if(message.getBody().equals("找不到用户"))
+		    {
+		        print(message, "【找不到用户】");
+		    }
+		    else
+		    {
+		      //发送消息时身价不足，服务器提示
+	            print(message, "【身家不足】");
+	            String packetId = message.getPacketID();
+	            //改变数据库中信息的发送状态
+	            DWMessage msg = DWSMessageManager.queryItem(packetId);
+	            if (msg != null)
+	            {
+	                msg.setSendSuccess(0);
+	                msg.save();
+	            }
+	            // 将消息路由到ChatActivity和ChatRoomChatActivity，将刚才发送的消息的状态改为发送失败
+	            EventBus.getDefault().post(packetId, NotifyByEventBus.NT_WEALTH_SHORTAGE);
+		    }
 		}
 		else if ("broadcast_benefit".equals(subject))
 		{
@@ -81,10 +81,6 @@ public class ProcessSystemMessageThread extends DWPacketHandler
 			//弹出界面
 			StringBuffer msgBuffer = new StringBuffer();
 			msgBuffer.append("新的收益提示内容：");
-//			if()
-//			{
-//				
-//			}
 			msgBuffer.append("");
 			//消息通知
 			MsgNotifyManager.getInstance().newBenefit(msgBuffer.toString());
@@ -99,7 +95,7 @@ public class ProcessSystemMessageThread extends DWPacketHandler
 			ContactUser user = ContactUser.queryByDwID(dwID);
 			if (user != null)
 			{
-				user.setWorth(worth);
+				user.setWorth(Float.valueOf(worth));;
 				user.save();
 			}
 			// 消息路由到ChatActivity中；

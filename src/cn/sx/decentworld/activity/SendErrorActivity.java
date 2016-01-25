@@ -1,6 +1,11 @@
 package cn.sx.decentworld.activity;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.zip.ZipOutputStream;
 
 import android.app.Activity;
@@ -15,12 +20,11 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.common.AppManager;
 import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.common.CrashHandler;
+import cn.sx.decentworld.utils.ExitAppUtils;
 import cn.sx.decentworld.utils.FileUtils;
 import cn.sx.decentworld.utils.LogUtils;
 
@@ -61,7 +65,8 @@ public class SendErrorActivity extends Activity implements View.OnClickListener
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		AppManager.getAppManager().addActivity(this);
+		ExitAppUtils.getInstance().addActivity(this);
+//		AppManager.getAppManager().addActivity(this);
 		setContentView(R.layout.activity_exception_info);
 		ViewUtils.inject(this);
 		mSharedPreferences = CommUtil.getPreferences(mContext);
@@ -251,7 +256,7 @@ public class SendErrorActivity extends Activity implements View.OnClickListener
 	{
 		startActivity(new Intent(mContext , DefaultActivity_.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 		SendErrorActivity.this.finish();
-		AppManager.getAppManager().AppExit();
+		ExitAppUtils.getInstance().delActivity(this);
 	}
 
 }

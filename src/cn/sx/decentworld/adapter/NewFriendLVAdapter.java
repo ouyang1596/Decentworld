@@ -107,7 +107,7 @@ public class NewFriendLVAdapter extends BaseAdapter implements OnClickListener {
 		}
 
 		// 被添加
-		if (ff.getMessage_type() == NewFriend.message_be_add) {
+		if (ff.getMessageType() == NewFriend.message_be_add) {
 			holder.bt_to_add.setVisibility(View.VISIBLE);
 			holder.bt_to_refuse.setVisibility(View.VISIBLE);
 			holder.tv_had_added.setVisibility(View.INVISIBLE);
@@ -147,20 +147,20 @@ public class NewFriendLVAdapter extends BaseAdapter implements OnClickListener {
 					 */
 					@Override
 					public void onClick(View v) {
-						acceptFriend(my_dwid, ff.getDw_id());
+						acceptFriend(my_dwid, ff.getOtherID());
 					}
 
 				});
 				holder.bt_to_refuse.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						refuseFriend(my_dwid, ff.getDw_id());
+						refuseFriend(my_dwid, ff.getOtherID());
 					}
 				});
 			}
 		}
 		// 主动添加后
-		else if (ff.getMessage_type() == NewFriend.message_had_apply) {
+		else if (ff.getMessageType() == NewFriend.message_had_apply) {
 			holder.bt_to_add.setVisibility(View.INVISIBLE);
 			holder.bt_to_refuse.setVisibility(View.INVISIBLE);
 			holder.tv_had_apply.setVisibility(View.VISIBLE);
@@ -171,7 +171,7 @@ public class NewFriendLVAdapter extends BaseAdapter implements OnClickListener {
 			holder.tv_add_fail.setVisibility(View.INVISIBLE);
 		}
 		// 已经添加
-		else if (ff.getMessage_type() == NewFriend.message_had_add) {
+		else if (ff.getMessageType() == NewFriend.message_had_add) {
 			holder.bt_to_add.setVisibility(View.INVISIBLE);
 			holder.bt_to_refuse.setVisibility(View.INVISIBLE);
 			holder.tv_had_added.setVisibility(View.VISIBLE);
@@ -182,7 +182,7 @@ public class NewFriendLVAdapter extends BaseAdapter implements OnClickListener {
 			holder.tv_add_fail.setVisibility(View.INVISIBLE);
 		}
 		// 被拒绝
-		else if (ff.getMessage_type() == NewFriend.message_had_refused) {
+		else if (ff.getMessageType() == NewFriend.message_had_refused) {
 			holder.bt_to_add.setVisibility(View.INVISIBLE);
 			holder.bt_to_refuse.setVisibility(View.INVISIBLE);
 			holder.tv_had_refused.setVisibility(View.VISIBLE);
@@ -193,7 +193,7 @@ public class NewFriendLVAdapter extends BaseAdapter implements OnClickListener {
 			holder.tv_add_fail.setVisibility(View.INVISIBLE);
 		}
 		// 添加成功
-		else if (ff.getMessage_type() == NewFriend.message_add_success) {
+		else if (ff.getMessageType() == NewFriend.message_add_success) {
 			holder.bt_to_add.setVisibility(View.INVISIBLE);
 			holder.bt_to_refuse.setVisibility(View.INVISIBLE);
 			holder.tv_add_success.setVisibility(View.VISIBLE);
@@ -204,7 +204,7 @@ public class NewFriendLVAdapter extends BaseAdapter implements OnClickListener {
 			holder.tv_add_fail.setVisibility(View.INVISIBLE);
 		}
 		// 添加失败
-		else if (ff.getMessage_type() == NewFriend.message_add_fail) {
+		else if (ff.getMessageType() == NewFriend.message_add_fail) {
 			holder.bt_to_add.setVisibility(View.INVISIBLE);
 			holder.bt_to_refuse.setVisibility(View.INVISIBLE);
 			holder.tv_add_fail.setVisibility(View.VISIBLE);
@@ -214,14 +214,14 @@ public class NewFriendLVAdapter extends BaseAdapter implements OnClickListener {
 			holder.tv_had_apply.setVisibility(View.INVISIBLE);
 			holder.tv_add_success.setVisibility(View.INVISIBLE);
 		}
-		if (!CommUtil.isBlank(ff.getAvatar())) {
+		if (!CommUtil.isBlank(ff.getIcon())) {
 			// Picasso.with(context).load(ff.getAvatar()).config(Config.RGB_565).placeholder(R.drawable.work_default).resize(120,
 			// 120).into(holder.avatar);
-			ImageLoaderHelper.mImageLoader.displayImage(ff.getAvatar(),
+			ImageLoaderHelper.mImageLoader.displayImage(ff.getIcon(),
 					holder.avatar, ImageLoaderHelper.mOptions);
 		}
 		holder.name.setText(ff.getUsername());
-		holder.info.setText(ff.getInfo_detail());
+		holder.info.setText(ff.getAddReason());
 		return convertView;
 	}
 
@@ -268,7 +268,7 @@ public class NewFriendLVAdapter extends BaseAdapter implements OnClickListener {
 				if (msg.getResultCode() == 2222) {
 					LogUtils.i(TAG, "acceptFriend...success");
 					NewFriend friend = NewFriend.queryByDwID(friendID);
-					friend.setMessage_type(NewFriend.message_had_add);
+					friend.setMessageType(NewFriend.message_had_add);
 					friend.setIsShown(1);
 					friend.save();
 					EventBus.getDefault().post(friend,
@@ -312,7 +312,7 @@ public class NewFriendLVAdapter extends BaseAdapter implements OnClickListener {
 				if (msg.getResultCode() == 2222) {
 					LogUtils.i(TAG, "refuseFriend...success");
 					NewFriend friend = NewFriend.queryByDwID(friendID);
-					friend.setMessage_type(NewFriend.message_had_refused);
+					friend.setMessageType(NewFriend.message_had_refused);
 					friend.save();
 					EventBus.getDefault().post(friend,
 							NotifyByEventBus.NT_UPDATE_NEW_FRIEND_LIST);

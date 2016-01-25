@@ -37,8 +37,8 @@ public final class ChatRoomAddContentActivity_
     }
 
     private void afterSetContentView_() {
-        et_chat_room_add_content_decription = ((EditText) findViewById(id.et_chat_room_add_content_decription));
         ll_chat_room_add_content_root = ((LinearLayout) findViewById(id.ll_chat_room_add_content_root));
+        et_chat_room_add_content_decription = ((EditText) findViewById(id.et_chat_room_add_content_decription));
         {
             View view = findViewById(id.main_header_right);
             if (view!= null) {

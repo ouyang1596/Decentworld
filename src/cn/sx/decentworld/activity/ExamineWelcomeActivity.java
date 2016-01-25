@@ -1,10 +1,5 @@
 package cn.sx.decentworld.activity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.simple.eventbus.EventBus;
 import org.simple.eventbus.Subscriber;
 
@@ -19,16 +14,16 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.CheckResultBean;
 import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.bean.SupporterBean;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.request.GetUserInfo;
-import cn.sx.decentworld.service.PacketListenerService;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
-import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.widget.VerticalSeekBar;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -60,19 +55,17 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 	GetUserInfo getUserInfo;
 	@Bean
 	ToastComponent toast;
-	List<Supportbean> supportbeans = new ArrayList<Supportbean>();
-	Intent intent;
+	private SendUrl mSendUrl;
+	private CheckResultBean checkResultBean;
 
 	@AfterViews
 	public void init() {
 		EventBus.getDefault().register(this);
-		// ImageLoaderHelper.initImageLoader(mContext);
 		vsSupport.setEnabled(false);
 		vsNoSupport.setEnabled(false);
-		initList();
-		intent = new Intent(this, PacketListenerService.class);
-		startService(intent);
+		mSendUrl = new SendUrl(this);
 		EGetIntent();
+		initList();
 		tvTryAgain.setOnClickListener(this);
 		tvAnotherMethod.setOnClickListener(this);
 		tvBackLogin.setOnClickListener(this);
@@ -83,48 +76,59 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 		lvExamineSupport.setAdapter(adapter);
 	}
 
-	private String beginTime, support, unsupport, standard, retryTimes;
+	private void showToast(final String data) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+
+			}
+		});
+	}
+
+	// private String beginTime, support, unsupport, standard, retryTimes;
 
 	private void EGetIntent() {
-		beginTime = getIntent().getStringExtra("beginTime");
-		support = getIntent().getStringExtra("support");
-		// support = "5";
-		unsupport = getIntent().getStringExtra("unsupport");
-		// unsupport = "21";
-		standard = getIntent().getStringExtra("standard");
-		// standard = "20";
-		retryTimes = getIntent().getStringExtra("retryTimes");
-		retryTimes = retryTimes.substring(0, retryTimes.indexOf("."));
-		LogUtils.i("bm", "retryTimes--" + retryTimes);
-		setView();
+		// beginTime = getIntent().getStringExtra("beginTime");
+		// support = getIntent().getStringExtra("support");
+		// // support = "5";
+		// unsupport = getIntent().getStringExtra("unsupport");
+		// // unsupport = "21";
+		// standard = getIntent().getStringExtra("standard");
+		// // standard = "20";
+		// retryTimes = getIntent().getStringExtra("retryTimes");
+		// setView();
+		checkResultBean = (CheckResultBean) getIntent().getSerializableExtra(
+				"checkResult");
 	}
 
-	private void setView() {
-		if (null != standard) {
-			vsNoSupport.setMax(Integer.valueOf(standard));
-		}
-		vsNoSupport.setProgress(Integer.valueOf(unsupport));
-		vsSupport.setMax(Integer.valueOf(standard));
-		vsSupport.setProgress(Integer.valueOf(support));
-		ifCheckedPassForIntentAndRequest();
-	}
+	// private void setView() {
+	// if (null == checkResultBean) {
+	// return;
+	// }
+	// vsNoSupport.setMax(Integer.valueOf(checkResultBean.standard));
+	// vsNoSupport.setProgress(Integer.valueOf(unsupport));
+	// vsSupport.setMax(Integer.valueOf(checkResultBean.standard));
+	// vsSupport.setProgress(Integer.valueOf(support));
+	// ifCheckedPassForIntentAndRequest();
+	// }
 
-	private void ifCheckedPassForIntentAndRequest() {
-		if (null == standard) {
-			return;
-		}
-		if (null != support
-				&& Integer.valueOf(support) >= Integer.valueOf(standard)) {
-			toast.show("审核已通过");
-			showSuccessRel();
-		} else if (null != unsupport
-				&& Integer.valueOf(unsupport) >= Integer.valueOf(standard)) {
-			toast.show("审核没通过");
-			showFailureLl();
-		} else {
-			hideView();
-		}
-	}
+	// private void ifCheckedPassForIntentAndRequest() {
+	// if (null == standard) {
+	// return;
+	// }
+	// if (null != support
+	// && Integer.valueOf(support) >= Integer.valueOf(standard)) {
+	// toast.show("审核已通过");
+	// showSuccessRel();
+	// } else if (null != unsupport
+	// && Integer.valueOf(unsupport) >= Integer.valueOf(standard)) {
+	// toast.show("审核没通过");
+	// showFailureLl();
+	// } else {
+	// hideView();
+	// }
+	// }
 
 	private void showSuccessRel() {
 		relCheckedSuccess.setVisibility(View.VISIBLE);
@@ -142,61 +146,63 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 	}
 
 	private String supportAmount;
+
 	// {"nickName":"test22","supportAmount":"28","supportID":"153344"}
-	@Subscriber(tag = NotifyByEventBus.NT_APPEARANCE_CHECK_SUPPORT)
+	@Subscriber(tag = NotifyByEventBus.NT_CHECK_RESULT)
 	public void receiveSupport(String data) {
-		try {
-			JSONObject object = new JSONObject(data);
-			Supportbean bean = new Supportbean();
-			bean.nickName = object.getString("nickName");
-			supportAmount = object.getString("supportAmount");
-			vsSupport.setProgress(Integer.valueOf(supportAmount));
-			bean.supportID = object.getString("supportID");
-			supportbeans.add(bean);
-			LogUtils.e("bm", "supportAmount--" + supportAmount);
-			ifCheckedPass();
-			adapter.notifyDataSetChanged();
-		} catch (JSONException e) {
-			toast.show("解析错误");
-		}
+		// try {
+		// JSONObject object = new JSONObject(data);
+		// Supportbean bean = new Supportbean();
+		// bean.nickName = object.getString("nickName");
+		// supportAmount = object.getString("supportAmount");
+		// vsSupport.setProgress(Integer.valueOf(supportAmount));
+		// bean.supportID = object.getString("supportID");
+		// supportbeans.add(bean);
+		// LogUtils.e("bm", "supportAmount--" + supportAmount);
+		// // ifCheckedPass();
+		// adapter.notifyDataSetChanged();
+		// } catch (JSONException e) {
+		// toast.show("解析错误");
+		// }
 	}
 
 	private String unSupportAmount;
 
 	// 不支持只返回一个数字
-	@Subscriber(tag = NotifyByEventBus.NT_APPEARANCE_CHECK_UNSUPPORT)
-	public void receiveUnSupport(String data) {
-		unSupportAmount = data;
-		vsNoSupport.setProgress(Integer.valueOf(unSupportAmount));
-		ifCheckedPass();
-	}
+	// @Subscriber(tag = NotifyByEventBus.NT_APPEARANCE_CHECK_UNSUPPORT)
+	// public void receiveUnSupport(String data) {
+	// unSupportAmount = data;
+	// vsNoSupport.setProgress(Integer.valueOf(unSupportAmount));
+	// ifCheckedPass();
+	// }
 
-	private void ifCheckedPass() {
-		if (null == standard) {
-			return;
-		}
-		if (null != supportAmount
-				&& Integer.valueOf(supportAmount) >= Integer.valueOf(standard)) {
-			toast.show("审核已通过");
-			showSuccessRel();
-		} else if (null != unSupportAmount
-				&& Integer.valueOf(unSupportAmount) >= Integer
-						.valueOf(standard)) {
-			toast.show("审核没通过");
-			showFailureLl();
-		}
-	}
+	// private void ifCheckedPass() {
+	// if (null == standard) {
+	// return;
+	// }
+	// if (null != supportAmount
+	// && Integer.valueOf(supportAmount) >= Integer.valueOf(standard)) {
+	// toast.show("审核已通过");
+	// showSuccessRel();
+	// } else if (null != unSupportAmount
+	// && Integer.valueOf(unSupportAmount) >= Integer
+	// .valueOf(standard)) {
+	// toast.show("审核没通过");
+	// showFailureLl();
+	// }
+	// }
 
 	class ExamineSupportAdapter extends BaseAdapter {
 
 		@Override
 		public int getCount() {
-			return supportbeans == null ? 0 : supportbeans.size();
+			return checkResultBean == null ? 0 : checkResultBean.supporters
+					.size();
 		}
 
 		@Override
-		public Supportbean getItem(int position) {
-			return supportbeans.get(position);
+		public SupporterBean getItem(int position) {
+			return checkResultBean.supporters.get(position);
 		}
 
 		@Override
@@ -218,9 +224,9 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 			} else {
 				vh = (ViewHolder) con.getTag();
 			}
-			Supportbean bean = supportbeans.get(position);
-			vh.tvNickName.setText(bean.nickName);
-			String supportID = bean.supportID;
+			SupporterBean bean = checkResultBean.supporters.get(position);
+			vh.tvNickName.setText(bean.showName);
+			String supportID = bean.id;
 			if (null != supportID) {
 				ImageLoaderHelper.mImageLoader.displayImage(ImageUtils
 						.getIconByDwID(supportID, ImageUtils.ICON_MAIN),
@@ -237,10 +243,6 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 		}
 	}
 
-	class Supportbean {
-		String nickName, supportID;
-	}
-
 	@Override
 	protected void onStop() {
 		super.onStop();
@@ -253,7 +255,7 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 		switch (view.getId()) {
 		case R.id.tv_try_again:
 			intent = new Intent(mContext, PayDialogActivity_.class);
-			intent.putExtra("retryTimes", retryTimes);
+			// intent.putExtra("retryTimes", retryTimes);
 			intent.putExtra(Constants.CHECK, Constants.CHECK_TRY_AGAIN);
 			startActivityForResult(intent, Constants.REQUEST_CODE);
 			break;
@@ -273,65 +275,59 @@ public class ExamineWelcomeActivity extends BaseFragmentActivity implements
 
 	private Handler mHandler = new Handler() {
 		public void handleMessage(android.os.Message msg) {
-			switch (msg.what) {
-			// case 2222:
+			// switch (msg.what) {
+			// // case 2222:
+			// // try {
+			// // LogUtils.e("bm", "2222--" + msg.obj.toString());
+			// // JSONObject object = new JSONObject(msg.obj.toString());
+			// // String dwID = object.getString("dwID");
+			// // String token = object.getString("token");
+			// // } catch (JSONException e) {
+			// // toast.show("解析错误");
+			// // }
+			// // break;
+			// case 2010:
 			// try {
-			// LogUtils.e("bm", "2222--" + msg.obj.toString());
-			// JSONObject object = new JSONObject(msg.obj.toString());
-			// String dwID = object.getString("dwID");
-			// String token = object.getString("token");
+			// LogUtils.e("bm", "2010--" + msg.obj.toString());
+			// JSONObject jsonObject = new JSONObject(msg.obj.toString());
+			// String dwID = jsonObject.getString("dwID");
+			// String token = jsonObject.getString("token");
+			// beginTime = jsonObject.getString("beginTime");
+			// support = jsonObject.getString("support");
+			// unsupport = jsonObject.getString("unsupport");
+			// standard = jsonObject.getString("standard");
 			// } catch (JSONException e) {
 			// toast.show("解析错误");
 			// }
 			// break;
-			case 2010:
-				try {
-					LogUtils.e("bm", "2010--" + msg.obj.toString());
-					JSONObject jsonObject = new JSONObject(msg.obj.toString());
-					String dwID = jsonObject.getString("dwID");
-					String token = jsonObject.getString("token");
-					beginTime = jsonObject.getString("beginTime");
-					support = jsonObject.getString("support");
-					unsupport = jsonObject.getString("unsupport");
-					standard = jsonObject.getString("standard");
-				} catch (JSONException e) {
-					toast.show("解析错误");
-				}
-				break;
-			case 2011:
-				try {
-					LogUtils.e("bm", "2011--" + msg.obj.toString());
-					JSONObject jsonObject = new JSONObject(msg.obj.toString());
-					String dwID = jsonObject.getString("dwID");
-					String token = jsonObject.getString("token");
-					beginTime = jsonObject.getString("beginTime");
-					support = jsonObject.getString("support");
-					unsupport = jsonObject.getString("unsupport");
-					standard = jsonObject.getString("standard");
-					String retryTimes = jsonObject.getString("retryTimes");
-				} catch (JSONException e) {
-					toast.show("解析错误");
-				}
-				break;
-			}
-			setView();
-			supportbeans.clear();
+			// case 2011:
+			// try {
+			// LogUtils.e("bm", "2011--" + msg.obj.toString());
+			// JSONObject jsonObject = new JSONObject(msg.obj.toString());
+			// String dwID = jsonObject.getString("dwID");
+			// String token = jsonObject.getString("token");
+			// beginTime = jsonObject.getString("beginTime");
+			// support = jsonObject.getString("support");
+			// unsupport = jsonObject.getString("unsupport");
+			// standard = jsonObject.getString("standard");
+			// String retryTimes = jsonObject.getString("retryTimes");
+			// } catch (JSONException e) {
+			// toast.show("解析错误");
+			// }
+			// break;
+			// }
+			// setView();
 			adapter.notifyDataSetChanged();
 		};
 	};
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		if (requestCode == Constants.REQUEST_CODE) {
-			getUserInfo.getUserdwID(DecentWorldApp.getInstance().getUserName(),
-					mHandler);
-		}
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-		stopService(intent);
-	}
+	// @Override
+	// protected void onActivityResult(int requestCode, int resultCode, Intent
+	// data) {
+	// super.onActivityResult(requestCode, resultCode, data);
+	// if (requestCode == Constants.REQUEST_CODE) {
+	// getUserInfo.getUserdwID(DecentWorldApp.getInstance().getUserName(),
+	// mHandler);
+	// }
+	// }
 }

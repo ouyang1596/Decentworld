@@ -118,7 +118,7 @@ public class SocialStatusActivity extends BaseFragmentActivity {
 						@Override
 						public void run() {
 							UserInfo userInfo = UserInfo.queryByDwID(dwID);
-							userInfo.setWorth(worth);
+							userInfo.setWorth(Float.valueOf(worth));
 							userInfo.save();
 							Intent intent = new Intent(mContext,
 									MainActivity_.class);

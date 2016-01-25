@@ -43,10 +43,10 @@ public final class ChatRoomChatComponent_
         if (context_ instanceof Activity) {
             Activity activity = ((Activity) context_);
         }
+        context = context_;
         if (context_ instanceof Activity) {
             activity = ((Activity) context_);
         }
-        context = context_;
         toast = ToastComponent_.getInstance_(context_);
     }
 

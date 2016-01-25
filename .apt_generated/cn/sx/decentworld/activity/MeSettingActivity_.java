@@ -12,13 +12,14 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.LinearLayout;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.Common_;
 import cn.sx.decentworld.component.TitleBar_;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.component.ui.MainFragmentComponent_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class MeSettingActivity_
@@ -35,8 +36,8 @@ public final class MeSettingActivity_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
-        mainComponent = MainFragmentComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        common = Common_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
@@ -72,14 +73,14 @@ public final class MeSettingActivity_
             }
         }
         {
-            View view = findViewById(id.ll_me_setting_recommend_benefit);
+            View view = findViewById(id.ll_me_setting_exit);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        MeSettingActivity_.this.cashIncome();
+                        MeSettingActivity_.this.exit();
                     }
 
                 }
@@ -102,36 +103,6 @@ public final class MeSettingActivity_
             }
         }
         {
-            View view = findViewById(id.ll_me_setting_exit);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        MeSettingActivity_.this.exit();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.ll_me_setting_magnate_window);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        MeSettingActivity_.this.magnateWindow();
-                    }
-
-                }
-                );
-            }
-        }
-        {
             View view = findViewById(id.ll_me_setting_advance_setting);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
@@ -146,9 +117,25 @@ public final class MeSettingActivity_
                 );
             }
         }
+        {
+            View view = findViewById(id.ll_setting_voice);
+            if (view!= null) {
+                view.setOnLongClickListener(new OnLongClickListener() {
+
+
+                    @Override
+                    public boolean onLongClick(View view) {
+                        MeSettingActivity_.this.setVoice();
+                        return true;
+                    }
+
+                }
+                );
+            }
+        }
         ((ToastComponent_) toast).afterSetContentView_();
-        ((MainFragmentComponent_) mainComponent).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((Common_) common).afterSetContentView_();
         init();
     }
 

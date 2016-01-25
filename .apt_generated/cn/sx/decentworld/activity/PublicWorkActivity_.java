@@ -43,15 +43,15 @@ public final class PublicWorkActivity_
     }
 
     private void afterSetContentView_() {
+        tv_public_work_confirm = ((TextView) findViewById(id.tv_public_work_confirm));
         rb_public_work_friend = ((RadioButton) findViewById(id.rb_public_work_friend));
-        rb_public_work_stranger = ((RadioButton) findViewById(id.rb_public_work_stranger));
-        rl_public_work_see = ((RelativeLayout) findViewById(id.rl_public_work_see));
         tv_public_work_description = ((TextView) findViewById(id.tv_public_work_description));
-        ll_public_work_stranger = ((LinearLayout) findViewById(id.ll_public_work_stranger));
         gv_public_work_pictures = ((ImageViewForGridView) findViewById(id.gv_public_work_pictures));
         ll_public_work_root = ((LinearLayout) findViewById(id.ll_public_work_root));
-        tv_public_work_confirm = ((TextView) findViewById(id.tv_public_work_confirm));
         ll_public_work_friend = ((LinearLayout) findViewById(id.ll_public_work_friend));
+        rb_public_work_stranger = ((RadioButton) findViewById(id.rb_public_work_stranger));
+        ll_public_work_stranger = ((LinearLayout) findViewById(id.ll_public_work_stranger));
+        rl_public_work_see = ((RelativeLayout) findViewById(id.rl_public_work_see));
         rl_public_work_no_see = ((RelativeLayout) findViewById(id.rl_public_work_no_see));
         ((PublicWorkComponent_) publicWorkComponent).afterSetContentView_();
         ((ChoceAndTakePictureComponent_) c).afterSetContentView_();

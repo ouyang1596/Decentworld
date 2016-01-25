@@ -40,28 +40,13 @@ public final class InterestingGroupJoinedInfoActivity_
     }
 
     private void afterSetContentView_() {
-        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
-        main_header_title = ((TextView) findViewById(id.tv_header_title));
         main_header_left = ((LinearLayout) findViewById(id.main_header_left));
+        main_header_title = ((TextView) findViewById(id.tv_header_title));
+        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
         inter_group_joined_no_interrupt = ((ImageView) findViewById(id.inter_group_joined_no_interrupt));
-        main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
         interesting_group_joined_info_gridview = ((ExpandGridView) findViewById(id.interesting_group_joined_info_gridview));
+        main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
         inter_group_joined_settop = ((ImageView) findViewById(id.inter_group_joined_settop));
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        InterestingGroupJoinedInfoActivity_.this.doback();
-                    }
-
-                }
-                );
-            }
-        }
         {
             View view = findViewById(id.inter_group_joined_no_interrupt);
             if (view!= null) {
@@ -71,6 +56,21 @@ public final class InterestingGroupJoinedInfoActivity_
                     @Override
                     public void onClick(View view) {
                         InterestingGroupJoinedInfoActivity_.this.change_icon2();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        InterestingGroupJoinedInfoActivity_.this.doback();
                     }
 
                 }

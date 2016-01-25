@@ -1,2 +1,2 @@
-ALTER TABLE newFriend ADD searchType INTEGER;
-ALTER TABLE newFriend ADD time TEXT;
+DROP TABLE userExtraInfo;
+CREATE TABLE userExtraInfo (iconSmall TEXT, icon TEXT, grId TEXT, icon3 TEXT, acceptPush INTEGER, icon2 TEXT, autoTransfer INTEGER, Id INTEGER PRIMARY KEY AUTOINCREMENT, userID TEXT, accountName TEXT, accountType INTEGER, isgrId TEXT, acceptCheckPush INTEGER, noticeStrangerMessage INTEGER);

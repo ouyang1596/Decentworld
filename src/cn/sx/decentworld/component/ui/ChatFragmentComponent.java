@@ -4,35 +4,23 @@
 package cn.sx.decentworld.component.ui;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-import cn.sx.decentworld.DecentWorldApp;
-import cn.sx.decentworld.activity.ChatActivity;
-import cn.sx.decentworld.bean.ContactUser;
-import cn.sx.decentworld.bean.UserDetailInfo;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
-import cn.sx.decentworld.fragment.ChatFragment;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
-import cn.sx.decentworld.network.utils.JsonUtils;
 import cn.sx.decentworld.utils.LogUtils;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.android.volley.Request.Method;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EBean;
-import com.googlecode.androidannotations.annotations.OnActivityResult;
 import com.googlecode.androidannotations.annotations.RootContext;
 
 /**

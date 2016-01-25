@@ -41,9 +41,9 @@ public final class RechargeAliPayWXActivity_
     }
 
     private void afterSetContentView_() {
+        ivBack = ((ImageView) findViewById(id.iv_back));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
         llpayMethod = ((LinearLayout) findViewById(id.ll_pay_method));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         etMoney = ((EditText) findViewById(id.et_money));
         {
             View view = findViewById(id.iv_back);

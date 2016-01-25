@@ -14,6 +14,7 @@ import com.lidroid.xutils.http.ResponseInfo;
 import com.lidroid.xutils.http.callback.RequestCallBack;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.util.Log;
 import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.Constants;
@@ -26,7 +27,7 @@ import cn.sx.decentworld.common.Constants;
  */
 public class FileUtils {
 	private static final String TAG = "FileUtils";
-    private static final int BUFF_SIZE = 1024; // 1k Byte
+	private static final int BUFF_SIZE = 1024; // 1k Byte
 
 	/**
 	 * 在SD卡上创建文件
@@ -225,61 +226,104 @@ public class FileUtils {
 		}
 	}
 
-    public static void closeInputStream(InputStream... ins) {
-        if (ins == null) {
-            return;
-        }
-        for (InputStream in : ins) {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    //
-                }
-            }
-        }
-    }
+	public static void closeInputStream(InputStream... ins) {
+		if (ins == null) {
+			return;
+		}
+		for (InputStream in : ins) {
+			if (in != null) {
+				try {
+					in.close();
+				} catch (IOException e) {
+					//
+				}
+			}
+		}
+	}
 
+	/**
+	 * 压缩文件
+	 *
+	 * @param resFile
+	 *            需要压缩的文件（夹）
+	 * @param zipout
+	 *            压缩的目的文件
+	 * @param rootpath
+	 *            压缩的文件路径
+	 */
+	public static void zipFile(File resFile, ZipOutputStream zipout,
+			String rootpath) {
+		try {
+			if (CommUtil.isBlank(rootpath)) {
+				rootpath = resFile.getName();
+			} else {
+				rootpath = rootpath
+						+ (rootpath.endsWith("/") ? Constants.DEFAULT_BLANK
+								: File.separator) + resFile.getName();
+			}
 
+			rootpath = new String(rootpath.getBytes("8859_1"), "UTF-8");
+
+			if (resFile.isDirectory()) {
+				File[] fileList = resFile.listFiles();
+				for (File file : fileList) {
+					zipFile(file, zipout, rootpath);
+				}
+			} else {
+				byte buffer[] = new byte[BUFF_SIZE];
+				BufferedInputStream in = new BufferedInputStream(
+						new FileInputStream(resFile), BUFF_SIZE);
+				zipout.putNextEntry(new ZipEntry(rootpath));
+				int realLength;
+				while ((realLength = in.read(buffer)) != -1) {
+					zipout.write(buffer, 0, realLength);
+				}
+				in.close();
+				zipout.flush();
+				zipout.closeEntry();
+			}
+			Log.d("TAG", "压缩完成");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 处理文件
+	 * 
+	 * @param filePath
+	 * @return
+	 */
+	public static File handleFile(String filePath) {
+		File file = null;
+		if (ImageUtils.fileLength(filePath) > 2 * 1024 * 1024) {
+			Bitmap bitmap = ImageUtils.scalePic(filePath);
+			String picPath = Constants.HOME_PATH + "/temp"
+					+ ImageUtils.generateFileName() + ".png";
+			ImageUtils.saveBitmap(picPath, bitmap);
+			file = new File(picPath);
+		} else {
+			file = new File(filePath);
+		}
+		return file;
+	}
+	
     /**
-     * 压缩文件
-     *
-     * @param resFile  需要压缩的文件（夹）
-     * @param zipout   压缩的目的文件
-     * @param rootpath 压缩的文件路径
+     * 下载语音
      */
-    public static void zipFile(File resFile, ZipOutputStream zipout, String rootpath) {
-        try {
-            if (CommUtil.isBlank(rootpath)) {
-                rootpath = resFile.getName();
-            } else {
-                rootpath = rootpath + (rootpath.endsWith("/") ? Constants.DEFAULT_BLANK : File.separator) + resFile.getName();
-            }
-
-            rootpath = new String(rootpath.getBytes("8859_1"), "UTF-8");
-
-            if (resFile.isDirectory()) {
-                File[] fileList = resFile.listFiles();
-                for (File file : fileList) {
-                    zipFile(file, zipout, rootpath);
-                }
-            } else {
-                byte buffer[] = new byte[BUFF_SIZE];
-                BufferedInputStream in = new BufferedInputStream(new FileInputStream(resFile), BUFF_SIZE);
-                zipout.putNextEntry(new ZipEntry(rootpath));
-                int realLength;
-                while ((realLength = in.read(buffer)) != -1) {
-                    zipout.write(buffer, 0, realLength);
-                }
-                in.close();
-                zipout.flush();
-                zipout.closeEntry();
-            }
-            Log.d("TAG", "压缩完成");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-
+//    private int downloadAudio(String uri, String fileName)
+//    {
+//        // InputStream inputStream = null;
+//        int result = Constants.SUCC;
+//        if (!FileUtils.isFileExist(Constants.HOME_PATH))
+//        {
+//            FileUtils.createSDDir(Constants.HOME_PATH);
+//        }
+//        if (!FileUtils.isFileExist(Constants.HOME_PATH + Constants.AUDIO_RECEIVE_PATH))
+//        {
+//            FileUtils.createSDDir(Constants.HOME_PATH + Constants.AUDIO_RECEIVE_PATH);
+//        }
+//        result = HttpDownloader.downFile(uri, fileName);
+//        return result;
+//    }
 }

@@ -19,8 +19,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.Common_;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.component.ui.MainFragmentComponent_;
 import cn.sx.decentworld.widget.ExpandGridView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
@@ -37,22 +37,22 @@ public final class InterestingGroupBuildActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        component = MainFragmentComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        common = Common_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        build_group_name = ((TextView) findViewById(id.build_group_name));
-        main_header_right_btn = ((ImageView) findViewById(id.main_header_right_btn));
-        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
-        build_activity_interesting_group_item_info_root = ((LinearLayout) findViewById(id.build_activity_interesting_group_item_info_root));
         build_iv_if_toshow_member = ((ImageView) findViewById(id.build_iv_if_toshow_member));
-        build_tv_place_inter_group = ((TextView) findViewById(id.build_tv_place_inter_group));
-        gridView = ((ExpandGridView) findViewById(id.build_gv_members_inter_group));
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         main_header_title = ((TextView) findViewById(id.tv_header_title));
         main_header_right_tv = ((TextView) findViewById(id.main_header_right_tv));
+        main_header_right_btn = ((ImageView) findViewById(id.main_header_right_btn));
+        gridView = ((ExpandGridView) findViewById(id.build_gv_members_inter_group));
+        build_activity_interesting_group_item_info_root = ((LinearLayout) findViewById(id.build_activity_interesting_group_item_info_root));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
+        build_group_name = ((TextView) findViewById(id.build_group_name));
+        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
         main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
+        build_tv_place_inter_group = ((TextView) findViewById(id.build_tv_place_inter_group));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -62,21 +62,6 @@ public final class InterestingGroupBuildActivity_
                     @Override
                     public void onClick(View view) {
                         InterestingGroupBuildActivity_.this.click_back();
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.rl_toshow_something);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        InterestingGroupBuildActivity_.this.showsomething();
                     }
 
                 }
@@ -98,8 +83,23 @@ public final class InterestingGroupBuildActivity_
                 );
             }
         }
-        ((MainFragmentComponent_) component).afterSetContentView_();
+        {
+            View view = findViewById(id.rl_toshow_something);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        InterestingGroupBuildActivity_.this.showsomething();
+                    }
+
+                }
+                );
+            }
+        }
         ((ToastComponent_) toast).afterSetContentView_();
+        ((Common_) common).afterSetContentView_();
     }
 
     @Override

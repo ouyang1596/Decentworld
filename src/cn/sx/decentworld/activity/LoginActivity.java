@@ -16,9 +16,7 @@ package cn.sx.decentworld.activity;
 import java.lang.ref.WeakReference;
 
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.packet.Presence;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.jivesoftware.smack.XMPPException;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -35,19 +33,23 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.XmppHelper;
 import cn.sx.decentworld.component.KeyboardComponent;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.network.request.GetUserInfo;
 import cn.sx.decentworld.utils.AES;
 import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.utils.LoginHelper;
+import cn.sx.decentworld.utils.ToastUtils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EActivity;
@@ -57,8 +59,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
  * 登陆页面
  */
 @EActivity(R.layout.activity_login)
-public class LoginActivity extends BaseFragmentActivity implements
-		OnClickListener {
+public class LoginActivity extends BaseFragmentActivity implements OnClickListener {
 	private static final String TAG = "LoginActivity";
 	public static final int toNextDialog = 1;
 	public static final int REQUEST_CODE_SETNICK = 1;
@@ -72,7 +73,7 @@ public class LoginActivity extends BaseFragmentActivity implements
 	@ViewById(R.id.btn_login)
 	Button btnLogin;
 	@ViewById(R.id.fl_login)
-	FrameLayout flLogin;
+	LinearLayout flLogin;
 	@ViewById(R.id.iv_forget_password)
 	ImageView ivForgetPwd;
 	@ViewById(R.id.iv_register)
@@ -87,74 +88,11 @@ public class LoginActivity extends BaseFragmentActivity implements
 	private boolean ifNeedCheck;
 	private String dwID;
 	private XMPPConnection con;
-	private LoginHandler handler = new LoginHandler(
-			new WeakReference<LoginActivity>(this));
-	private Handler mHandler = new Handler() {
-		public void handleMessage(android.os.Message msg) {
-			switch (msg.what) {
-			case 2222:
-				try {
-					LogUtils.e("bm", "2222--" + msg.obj.toString());
-					ifNeedCheck = false;
-					JSONObject object = new JSONObject(msg.obj.toString());
-					dwID = object.getString("dwID");
-					String token = object.getString("token");
-					login(dwID, token, mobile, password);
-				} catch (JSONException e) {
-					toast.show("解析错误");
-				}
-				break;
-			case 2010:
-				try {
-					ifNeedCheck = true;
-					LogUtils.e("bm", "2010--" + msg.obj.toString());
-					JSONObject jsonObject = new JSONObject(msg.obj.toString());
-					dwID = jsonObject.getString("dwID");
-					String token = jsonObject.getString("token");
-					beginTime = jsonObject.getString("beginTime");
-					support = jsonObject.getString("support");
-					String retryTime = jsonObject.getString("retryTimes");
-					if (null != retryTime) {
-						retryTimes = Float.valueOf(retryTime);
-					}
-					unsupport = jsonObject.getString("unsupport");
-					standard = jsonObject.getString("standard");
-					login(dwID, token, mobile, password);
-				} catch (JSONException e) {
-				}
-				break;
-			// dwID,token,beginTime,support,unsupport,standard,retryTimes,supporters
-			// （为json数组，里面每个元素有两个key,分别为dwID,nickName）
-			case 2011:
-				try {
-					LogUtils.e("bm", "2011--" + msg.obj.toString());
-					JSONObject jsonObject = new JSONObject(msg.obj.toString());
-					dwID = jsonObject.getString("dwID");
-					String token = jsonObject.getString("token");
-					beginTime = jsonObject.getString("beginTime");
-					support = jsonObject.getString("support");
-					unsupport = jsonObject.getString("unsupport");
-					standard = jsonObject.getString("standard");
-					String retryTimes = jsonObject.getString("retryTimes");
-					Intent intent = new Intent(mContext,
-							ExamineWelcomeActivity_.class);
-					intent.putExtra("beginTime", beginTime);
-					intent.putExtra("support", support);
-					intent.putExtra("unsupport", unsupport);
-					intent.putExtra("standard", standard);
-					intent.putExtra("retryTimes", "" + retryTimes);
-					startActivity(intent);
-					finish();
-				} catch (JSONException e) {
-					toast.show("解析错误");
-				}
-				break;
-			}
-			DecentWorldApp.getInstance().setDwID(dwID);
-			saveResultCode(LoginActivity.this, "" + msg.what);
-		};
-	};
+	private LoginHandler handler = new LoginHandler(new WeakReference<LoginActivity>(this));
 
+	/**
+	 * 入口
+	 */
 	@AfterViews
 	public void init() {
 		setEditTextDraw();
@@ -170,136 +108,15 @@ public class LoginActivity extends BaseFragmentActivity implements
 		etPassword.setCompoundDrawables(drawPwd, null, null, null);// 只放左边
 	}
 
+	/**
+	 * 设置界面控件监听事件
+	 */
 	private void setListener() {
 		btnLogin.setOnClickListener(this);
 		ivForgetPwd.setOnClickListener(this);
 		ivRegister.setOnClickListener(this);
 		flLogin.setOnClickListener(this);
 	}
-
-	/**
-	 * 登录
-	 */
-	void login(final String dwID, final String token, final String username,
-			final String password) {
-		progressShow = true;
-		final ProgressDialog pd = new ProgressDialog(LoginActivity.this);
-		pd.setCanceledOnTouchOutside(false);
-		pd.setOnCancelListener(new OnCancelListener() {
-			@Override
-			public void onCancel(DialogInterface dialog) {
-				progressShow = false;
-			}
-		});
-		pd.setMessage(getString(R.string.Is_landing));
-		pd.show();
-		new Thread(new Runnable() {
-			public void run() {
-				LogUtils.i(TAG, "首次登陆openfire....begin");
-				try {
-					Looper.prepare();
-					con = DecentWorldApp.getInstance().getNewConnectionImpl();
-					if (!con.isAuthenticated()) {
-						con.login(username, dwID, password, "Smack");
-						con.sendPacket(new Presence(Presence.Type.available));
-					}
-					// 登录成功后保存相应的数据到Application和SQLite中
-					LogUtils.i(TAG, "首次登录，将dwID、token 、账号、密码 保存在Application中");
-					LogUtils.i(TAG, "dwID=" + dwID + "\ntoken=" + token
-							+ "\nusername=" + username + "\npassword="
-							+ password);
-					DecentWorldApp.getInstance().setToken(token);
-					DecentWorldApp.getInstance().setDwID(dwID);
-					DecentWorldApp.getInstance().setUserName(username);
-					DecentWorldApp.getInstance().setPassword(password);
-					LoginHelper.saveLoginInfo(LoginActivity.this, token, dwID,
-							username, password);
-					if (!ifNeedCheck) {
-						// 进入主页面
-						Intent intent = new Intent(LoginActivity.this,
-								MainActivity_.class);
-						startActivity(intent);
-						finish();
-						LogUtils.i(TAG, "登录成功");
-					} else {
-						Intent intent = new Intent(mContext,
-								ExamineWelcomeActivity_.class);
-						intent.putExtra("beginTime", beginTime);
-						intent.putExtra("support", support);
-						intent.putExtra("unsupport", unsupport);
-						intent.putExtra("standard", standard);
-						intent.putExtra("retryTimes", "" + retryTimes);
-						startActivity(intent);
-						finish();
-					}
-				} catch (Exception e) {
-					LogUtils.e(TAG, "登录异常，caused by:" + e);
-					if (e.toString().contains("SASL authentication failed")) {
-						LogUtils.e(TAG, "登录验证失败");
-						con.disconnect();
-						con = null;
-						handler.sendEmptyMessage(1);
-						return;
-					} else if (e.toString().contains("Already logged")) {
-					}
-				} finally {
-					pd.dismiss();
-				}
-			}
-		}).start();
-	}
-
-	/**
-	 * 保存返回码，用于验证是否登录过
-	 * 
-	 * @param context
-	 * @param resultCode
-	 */
-	public static void saveResultCode(Context context, String resultCode) {
-		SharedPreferences preferences = context.getSharedPreferences(
-				Constants.SETTING, 0);
-		SharedPreferences.Editor editor = preferences.edit();
-		editor.putString(Constants.RESULT_CODE, resultCode);
-		editor.commit();
-	}
-
-	private static class LoginHandler extends Handler {
-		private WeakReference<LoginActivity> activity;
-
-		public LoginHandler(WeakReference<LoginActivity> activity) {
-			this.activity = activity;
-		}
-
-		@Override
-		public void handleMessage(Message msg) {
-			if (activity == null) {
-				return;
-			}
-			switch (msg.what) {
-			case 0:
-				XMPPConnection conn = DecentWorldApp.getInstance()
-						.getConnectionImpl();
-				if (retryTimes++ >= 5) {
-					toast.show("登录失败");
-				} else if (conn == null || !conn.isConnected()) {
-					Log.i(LoginActivity.class.getName(), "未获取到连接，正在重试第 "
-							+ retryTimes + " 次！");
-					DecentWorldApp.getInstance().getConnectionImpl();
-					sendEmptyMessageDelayed(0, 1000);
-				} else {
-					Intent intent = new Intent(activity.get(),
-							MainActivity_.class);
-					activity.get().startActivity(intent);
-					activity.get().finish();
-				}
-				break;
-			case 1:
-				Toast.makeText(activity.get(), "账号或密码错误", Toast.LENGTH_SHORT)
-						.show();
-				break;
-			}
-		}
-	};
 
 	@Override
 	public void onClick(View view) {
@@ -318,25 +135,216 @@ public class LoginActivity extends BaseFragmentActivity implements
 				toast.show("请输入密码");
 				return;
 			}
+			/** 对明文密码进行AES加密 **/
 			password = AES.encode(etPassword.getText().toString());
 			getUserInfo.getUserdwID(mobile, mHandler);
 			break;
 		case R.id.iv_register:
+			startActivity(new Intent(LoginActivity.this, RegisterMobileActivity_.class));
 			// startActivity(new Intent(LoginActivity.this,
-			// RegisterMobileActivity_.class));
-			startActivity(new Intent(LoginActivity.this,
-					RegisterIsStudentActivity_.class));
+			// RegisterNickActivity_.class));
 			break;
 		case R.id.iv_forget_password:
 			startActivity(new Intent(mContext, ForgetPwdMobileActivity_.class));
-			// startActivity(new Intent(mContext,
-			// RechargePayMethodActivity_.class));
+			// startActivity(new Intent(LoginActivity.this,
+			// RegisterNickActivity_.class));
 			break;
 		case R.id.fl_login:
 			closeKeyBoard();
 			break;
 		}
 	}
+
+	/**
+	 * 获取dwID的回调
+	 */
+	private Handler mHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			String token = "";
+			switch (msg.what) {
+			case 2222:
+				LogUtils.e("bm", "2222--" + msg.obj.toString());
+				ifNeedCheck = false;
+				JSONObject object = JSON.parseObject(msg.obj.toString());
+				dwID = object.getString("dwID");
+				token = object.getString("token");
+				login(dwID, token, mobile, password);
+				break;
+			case 2010:
+				ifNeedCheck = true;
+				LogUtils.e("bm", "2010--" + msg.obj.toString());
+				JSONObject jsonObject = JSON.parseObject(msg.obj.toString());
+				dwID = jsonObject.getString("dwID");
+				token = jsonObject.getString("token");
+				beginTime = jsonObject.getString("beginTime");
+				support = jsonObject.getString("support");
+				String retryTime = jsonObject.getString("retryTimes");
+				if (null != retryTime) {
+					retryTimes = Float.valueOf(retryTime);
+				}
+				unsupport = jsonObject.getString("unsupport");
+				standard = jsonObject.getString("standard");
+				login(dwID, token, mobile, password);
+				break;
+			// dwID,token,beginTime,support,unsupport,standard,retryTimes,supporters
+			// （为json数组，里面每个元素有两个key,分别为dwID,nickName）
+			case 2011:
+				LogUtils.e("bm", "2011--" + msg.obj.toString());
+				JSONObject jsonObject2 = JSON.parseObject(msg.obj.toString());
+				dwID = jsonObject2.getString("dwID");
+				token = jsonObject2.getString("token");
+				beginTime = jsonObject2.getString("beginTime");
+				support = jsonObject2.getString("support");
+				unsupport = jsonObject2.getString("unsupport");
+				standard = jsonObject2.getString("standard");
+				String retryTimes = jsonObject2.getString("retryTimes");
+				Intent intent = new Intent(mContext, ExamineWelcomeActivity_.class);
+				intent.putExtra("beginTime", beginTime);
+				intent.putExtra("support", support);
+				intent.putExtra("unsupport", unsupport);
+				intent.putExtra("standard", standard);
+				intent.putExtra("retryTimes", "" + retryTimes);
+				startActivity(intent);
+				finish();
+				break;
+			}
+			/** 将DwID 保存在Application中 **/
+			DecentWorldApp.getInstance().setDwID(dwID);
+			saveResultCode(LoginActivity.this, "" + msg.what);
+		};
+	};
+
+	/**
+	 * 登录
+	 */
+	private void login(final String dwID, final String token, final String username1, final String password) {
+		/** 统一用ID登录 **/
+		final String username = dwID;
+		/** 显示登录进度 **/
+		progressShow = true;
+		final ProgressDialog pd = new ProgressDialog(LoginActivity.this);
+		pd.setCanceledOnTouchOutside(false);
+		pd.setOnCancelListener(new OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				progressShow = false;
+			}
+		});
+		pd.setMessage(getString(R.string.Is_landing));
+		pd.show();
+		/** 登录openfire **/
+		new Thread(new Runnable() {
+			public void run() {
+				LogUtils.i(TAG, "首次登陆openfire....begin");
+				try {
+					Looper.prepare();
+					con = XmppHelper.getNewConnection();
+					con.login(username, dwID, password, "Smack");
+					XmppHelper.setIsNewCon(false);
+					LogUtils.i(TAG, "首次登录，将dwID、token 、账号、密码 保存在Application中");
+					LogUtils.i(TAG, "dwID=" + dwID + "\ntoken=" + token + "\nusername=" + username + "\npassword=" + password);
+					LoginHelper.saveLoginInfo(LoginActivity.this, token, dwID, username, password);
+					if (!ifNeedCheck) {
+						/** 不需要审核，进入主页面 **/
+						Intent intent = new Intent(LoginActivity.this, MainActivity_.class);
+						startActivity(intent);
+						finish();
+						LogUtils.i(TAG, "登录成功");
+					} else {
+						Intent intent = new Intent(mContext, ExamineWelcomeActivity_.class);
+						intent.putExtra("beginTime", beginTime);
+						intent.putExtra("support", support);
+						intent.putExtra("unsupport", unsupport);
+						intent.putExtra("standard", standard);
+						intent.putExtra("retryTimes", "" + retryTimes);
+						startActivity(intent);
+						finish();
+					}
+				} catch (Exception e) {
+					processLoginException(e);
+				} finally {
+					pd.dismiss();
+				}
+			}
+		}).start();
+	}
+
+	/**
+	 * 处理登录异常
+	 */
+	protected void processLoginException(Exception e) {
+		/** 异常判断 **/
+		LogUtils.e(TAG, "登录异常，caused by:" + e);
+		if (e instanceof IllegalStateException) {
+			if (e.toString().contains("Already logged")) {
+				LogUtils.e(TAG, "已经登录过服务器，不需要重复登录");
+				ToastUtils.toast(LoginActivity.this, "已经登录过");
+			}
+
+		} else if (e instanceof XMPPException) {
+			if (e.toString().contains("SASL authentication failed")) {
+				LogUtils.e(TAG, "登录验证失败");
+			}
+			ToastUtils.toast(LoginActivity.this, "账号或密码错误");
+		} else {
+
+		}
+	}
+
+	/**
+	 * 保存返回码，用于验证是否登录过
+	 * 
+	 * @param context
+	 * @param resultCode
+	 */
+	public static void saveResultCode(Context context, String resultCode) {
+		SharedPreferences preferences = context.getSharedPreferences(Constants.SETTING, 0);
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putString(Constants.RESULT_CODE, resultCode);
+		editor.commit();
+	}
+
+	/**
+	 * 密码错误处理(此段代码暂时没有用到)
+	 * 
+	 * @ClassName: LoginActivity.java
+	 * @Description:
+	 * @author: cj
+	 * @date: 2016年1月19日 下午9:23:25
+	 */
+	private static class LoginHandler extends Handler {
+		private WeakReference<LoginActivity> activity;
+
+		public LoginHandler(WeakReference<LoginActivity> activity) {
+			this.activity = activity;
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			if (activity == null) {
+				return;
+			}
+			switch (msg.what) {
+			case 0:
+				XMPPConnection conn = XmppHelper.getConnection(null);
+				if (retryTimes++ >= 5) {
+					toast.show("登录失败");
+				} else if (conn == null || !conn.isConnected()) {
+					Log.i(LoginActivity.class.getName(), "未获取到连接，正在重试第 " + retryTimes + " 次！");
+					XmppHelper.getConnection(null);
+					sendEmptyMessageDelayed(0, 1000);
+				} else {
+					Intent intent = new Intent(activity.get(), MainActivity_.class);
+					activity.get().startActivity(intent);
+					activity.get().finish();
+				}
+				break;
+			case 1:
+				Toast.makeText(activity.get(), "账号或密码错误", Toast.LENGTH_SHORT).show();
+				break;
+			}
+		}
+	};
 
 	/**
 	 * 关闭软键盘

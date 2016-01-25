@@ -40,19 +40,19 @@ public final class EditUserInfoActivity_
 
     private void init_(Bundle savedInstanceState) {
         getUserInfo = GetUserInfo_.getInstance_(this);
-        choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
         setUserInfo = SetUserInfo_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvFinish = ((TextView) findViewById(id.tv_finish));
-        iv_edit_user_info_icon_3 = ((ImageView) findViewById(id.iv_edit_user_info_icon_3));
-        iv_edit_user_info_icon_2 = ((ImageView) findViewById(id.iv_edit_user_info_icon_2));
         iv_edit_user_info_icon_1 = ((ImageView) findViewById(id.iv_edit_user_info_icon_1));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        ll_edit_user_info_root = ((LinearLayout) findViewById(id.ll_edit_user_info_root));
+        iv_edit_user_info_icon_2 = ((ImageView) findViewById(id.iv_edit_user_info_icon_2));
+        tvFinish = ((TextView) findViewById(id.tv_finish));
         sl_edit_user_info = ((ScrollView) findViewById(id.sl_edit_user_info));
+        ll_edit_user_info_root = ((LinearLayout) findViewById(id.ll_edit_user_info_root));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        iv_edit_user_info_icon_3 = ((ImageView) findViewById(id.iv_edit_user_info_icon_3));
         lv_edit_user_info = ((ListViewForScrollView) findViewById(id.lv_edit_user_info));
         {
             View view = findViewById(id.tv_finish);
@@ -70,9 +70,9 @@ public final class EditUserInfoActivity_
             }
         }
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
         ((SetUserInfo_) setUserInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
         init();
     }
 

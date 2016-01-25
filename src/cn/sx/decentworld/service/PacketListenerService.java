@@ -5,6 +5,7 @@ package cn.sx.decentworld.service;
 
 import java.util.Collection;
 
+import org.jivesoftware.smack.ConnectionListener;
 import org.jivesoftware.smack.PacketCollector;
 import org.jivesoftware.smack.XMPPConnection;
 
@@ -13,7 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import cn.sx.decentworld.DecentWorldApp;
-import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.XmppHelper;
 import cn.sx.decentworld.task.CollectorThreadStarter;
 import cn.sx.decentworld.utils.LogUtils;
 
@@ -23,10 +24,11 @@ import cn.sx.decentworld.utils.LogUtils;
  * @author: cj
  * @date: 2015年9月22日 下午4:05:47
  */
-public class PacketListenerService extends Service {
+public class PacketListenerService extends Service implements ConnectionListener {
 	public static final String TAG = "PacketListenerService";
-	private XMPPConnection con;
-	private static final PacketListenerService instance = new PacketListenerService();
+	// private static final PacketListenerService instance = new
+	// PacketListenerService();
+	private boolean listening = false;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -37,11 +39,21 @@ public class PacketListenerService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		LogUtils.i(TAG, "onCreate");
-		con = DecentWorldApp.getInstance().getConnectionImpl();
-		if (con.isConnected()) {
-			LogUtils.i(Constants.TAG,
-					"con is connected,开启一个Packet监听的服务...onStartCommand");
-			startCollectorHandlerThread();
+		if (XmppHelper.isNewCon()) {
+			// conn=null do not connect
+			LogUtils.i(TAG, "new conn waiting for notify");
+			// 暂时设定如果被关闭进程，xmpphelper清空重建的话，把该监听服务该关闭
+			// 日后可以再考虑守护进程之类的，主要是在调用connection.login()方法后，要【通知】该监听服务，开启监听
+			// 测试eventBUS通知貌似无效
+			stopSelf();
+		} else {
+			XMPPConnection conn = XmppHelper.getConnection(null);
+			Collection<PacketCollector> collectors = conn.getPacketCollectors();
+			Context context = DecentWorldApp.getGlobalContext();
+			for (PacketCollector packetCollector : collectors) {
+				new CollectorThreadStarter(packetCollector, context).start();
+			}
+			listening = true;
 		}
 	}
 
@@ -51,14 +63,79 @@ public class PacketListenerService extends Service {
 		super.onDestroy();
 	}
 
-	/**
-	 * 开启线程监听消息线程
-	 */
-	private void startCollectorHandlerThread() {
-		Collection<PacketCollector> collectors = con.getPacketCollectors();
-		Context context = getApplicationContext();
-		for (PacketCollector packetCollector : collectors) {
-			new CollectorThreadStarter(packetCollector, context).start();
+	// private static class LoginThread extends Thread
+	// {
+	// private XMPPConnection conn;
+	// private String username;
+	// private String dwID;
+	// private String password;
+	// private String resource;
+	//
+	// public LoginThread(String username, String dwID, String password, String
+	// resource)
+	// {
+	// super();
+	// this.username = username;
+	// this.dwID = dwID;
+	// this.password = password;
+	// this.resource = resource;
+	// }
+	//
+	// @Override
+	// public void run()
+	// {
+	// try
+	// {
+	// // connect
+	// conn = XmppHelper.getConnection(null);
+	// conn.login(username, dwID, password, resource);
+	// XmppHelper.setIsNewCon(false);
+	// Collection<PacketCollector> collectors = conn.getPacketCollectors();
+	// Context context = DecentWorldApp.getGlobalContext();
+	// for (PacketCollector packetCollector : collectors)
+	// {
+	// new CollectorThreadStarter(packetCollector , context).start();
+	// }
+	// }
+	// catch (Exception e)
+	// {
+	// LogUtils.i(TAG, "Exception=" + e.toString());
+	// }
+	// }
+	// }
+
+	@Override
+	public void connectionClosed() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void connectionClosedOnError(Exception e) {
+
+	}
+
+	@Override
+	public void reconnectingIn(int seconds) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void reconnectionSuccessful() {
+		LogUtils.i(TAG, "连接成功");
+		if (!listening) {
+			XMPPConnection conn = XmppHelper.getConnection(null);
+			Collection<PacketCollector> collectors = conn.getPacketCollectors();
+			Context context = DecentWorldApp.getGlobalContext();
+			for (PacketCollector packetCollector : collectors) {
+				new CollectorThreadStarter(packetCollector, context).start();
+			}
+			listening = true;
 		}
 	}
+
+	@Override
+	public void reconnectionFailed(Exception e) {
+
+	}
+
 }

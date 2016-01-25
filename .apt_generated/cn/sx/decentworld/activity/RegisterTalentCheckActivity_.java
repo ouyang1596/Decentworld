@@ -37,21 +37,21 @@ public final class RegisterTalentCheckActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        toast = ToastComponent_.getInstance_(this);
         registerComponent = RegisterComponent_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        etvMaterialKind = ((EditText) findViewById(id.etv_material_kind));
-        ivUploadPic = ((ImageView) findViewById(id.iv_upload_pic));
-        llRegisterTalent = ((LinearLayout) findViewById(id.root_register_talent));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
         btnOk = ((Button) findViewById(id.btn_OK));
-        ivBack = ((ImageView) findViewById(id.iv_back));
+        etvMaterialKind = ((EditText) findViewById(id.etv_material_kind));
+        llRegisterTalent = ((LinearLayout) findViewById(id.root_register_talent));
+        ivUploadPic = ((ImageView) findViewById(id.iv_upload_pic));
+        ((ToastComponent_) toast).afterSetContentView_();
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

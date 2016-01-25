@@ -8,13 +8,16 @@ import java.io.File;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.component.ChoceAndTakePictureComponent;
 import cn.sx.decentworld.component.TitleBar;
+import cn.sx.decentworld.utils.LogUtils;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
@@ -30,72 +33,125 @@ import com.googlecode.androidannotations.annotations.ViewById;
  * @date: 2015年7月14日 上午11:26:21
  */
 @EActivity(R.layout.chat_setting_set_bg)
-public class ChatSettingSetBgActivity extends BaseFragmentActivity
+public class ChatSettingSetBgActivity extends BaseFragmentActivity implements OnClickListener
 {
-	private static final String TAG= "ChatSettingSetBgActivity";
-	@Bean
-	TitleBar titleBar;
+    private static final String TAG = "ChatSettingSetBgActivity";
+    @Bean
+    TitleBar titleBar;
+    @Bean
+    ChoceAndTakePictureComponent picture;
 
-	@Bean
-	ChoceAndTakePictureComponent picture;
+    /** 从App提供的素材库中选取 **/
+    @ViewById(R.id.chat_setting_set_bg_fromlocal)
+    RelativeLayout chat_setting_set_bg_fromlocal;
 
-	@AfterViews
-	void init()
-	{
-		titleBar.setTitleBar("聊天背景", null);
-	}
+    /** 从相册中选取 **/
+    @ViewById(R.id.chat_setting_set_bg_choice_picture)
+    RelativeLayout chat_setting_set_bg_choice_picture;
 
-	/**
-	 * 启动选择背景图片界面
-	 */
-	@Click(R.id.chat_setting_set_bg_fromlocal)
-	void selectBgFromLocal(View view)
-	{
-		Intent intent = new Intent(ChatSettingSetBgActivity.this , ChatSettingSetBgFromLocalActivity_.class);
-		startActivity(intent);
-	}
+    /** 现拍摄一张照片 **/
+    @ViewById(R.id.chat_setting_set_bg_take_picture)
+    RelativeLayout chat_setting_set_bg_take_picture;
 
-	@Click(R.id.chat_setting_set_bg_choice_picture)
-	public void chat_setting_set_bg_choice_picture()
-	{
-		picture.choicePicture();
-	}
+    /** 返回 **/
+    @ViewById(R.id.main_header_left)
+    LinearLayout main_header_left;
 
-	@Click(R.id.chat_setting_set_bg_take_picture)
-	public void chat_setting_set_bg_take_picture()
-	{
-		picture.takePicture();
-	}
+    @AfterViews
+    void init()
+    {
+        parseIntent();
+        initView();
+        initData();
+        initListener();
+    }
 
-	@OnActivityResult(ChoceAndTakePictureComponent.TAKE_PICKTURE)
-	void onResult(int resultCode, Intent data)
-	{
-		if (RESULT_OK == resultCode)
-		{
-			try
-			{
+    /**
+     * 解析传递的参数
+     */
+    private void parseIntent()
+    {
 
-				File file = new File(picture.getImageName());
-				Intent intent = new Intent(this , ChatActivity_.class);
-				intent.putExtra("values", file);
-				startActivity(intent);
-				this.finish();
+    }
 
-			}
-			catch (Exception e)
-			{
+    /**
+     * 初始化界面资源
+     */
+    private void initView()
+    {
+        titleBar.setTitleBar("聊天背景", null);
+    }
 
-			}
-		}
-	}
-	
-	/**
-	 * 返回
-	 */
-	@Click(R.id.main_header_left)
-	void setBack()
-	{
-		finish();
-	}
+    /**
+     * 初始化数据
+     */
+    private void initData()
+    {
+
+    }
+
+    /**
+     * 设置监听
+     */
+    private void initListener()
+    {
+        chat_setting_set_bg_fromlocal.setOnClickListener(this);
+        chat_setting_set_bg_choice_picture.setOnClickListener(this);
+        chat_setting_set_bg_take_picture.setOnClickListener(this);
+        main_header_left.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.chat_setting_set_bg_fromlocal:
+                Intent intent = new Intent(ChatSettingSetBgActivity.this , ChatSettingSetBgFromLocalActivity_.class);
+                startActivity(intent);
+                break;
+            case R.id.chat_setting_set_bg_choice_picture:
+                picture.choicePicture();
+                break;
+            case R.id.chat_setting_set_bg_take_picture:
+                picture.takePicture();
+                break;
+            case R.id.main_header_left:
+                finish();
+                break;
+            default:
+                break;
+        }
+    }
+    
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK)
+        {
+            if(requestCode == ChoceAndTakePictureComponent.CHOICE_PICTURE)
+            {
+                LogUtils.i(TAG, "获得选择照片的结果");
+            }
+            else if(requestCode == ChoceAndTakePictureComponent.TAKE_PICKTURE)
+            {
+                try
+                {
+                    File file = new File(picture.getImageName());
+                    Intent intent = new Intent(this , ChatActivity_.class);
+                    intent.putExtra("values", file);
+                    startActivity(intent);
+                    finish();
+                }
+                catch (Exception e)
+                {
+                    LogUtils.e(TAG, "获取拍照返回结果："+e.toString());
+                }
+            }
+        }
+        
+    }
+    
 
 }

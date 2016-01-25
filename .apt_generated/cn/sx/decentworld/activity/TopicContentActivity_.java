@@ -41,14 +41,14 @@ public final class TopicContentActivity_
     }
 
     private void afterSetContentView_() {
-        ivHead = ((ImageView) findViewById(id.iv_head));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        tvIntroduce = ((TextView) findViewById(id.tv_introduce));
-        ivCover = ((ImageView) findViewById(id.iv_cover));
-        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
-        btnOK = ((Button) findViewById(id.btn_OK));
         etSubjectName = ((EditText) findViewById(id.tv_subj_name));
+        ivCover = ((ImageView) findViewById(id.iv_cover));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivHead = ((ImageView) findViewById(id.iv_head));
+        btnOK = ((Button) findViewById(id.btn_OK));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
+        tvIntroduce = ((TextView) findViewById(id.tv_introduce));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

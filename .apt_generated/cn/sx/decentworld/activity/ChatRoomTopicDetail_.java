@@ -18,7 +18,6 @@ import android.widget.RelativeLayout;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.TitleBar_;
-import cn.sx.decentworld.component.ui.MainFragmentComponent_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class ChatRoomTopicDetail_
@@ -34,28 +33,12 @@ public final class ChatRoomTopicDetail_
     }
 
     private void init_(Bundle savedInstanceState) {
-        compont = MainFragmentComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        chat_rooom_detail_bt_join = ((Button) findViewById(id.chat_rooom_detail_bt_join));
         root_activity_chat_room_data = ((RelativeLayout) findViewById(id.root_activity_chat_room_data));
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatRoomTopicDetail_.this.doback();
-                    }
-
-                }
-                );
-            }
-        }
+        chat_rooom_detail_bt_join = ((Button) findViewById(id.chat_rooom_detail_bt_join));
         {
             View view = findViewById(id.chat_rooom_detail_bt_join);
             if (view!= null) {
@@ -71,7 +54,21 @@ public final class ChatRoomTopicDetail_
                 );
             }
         }
-        ((MainFragmentComponent_) compont).afterSetContentView_();
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatRoomTopicDetail_.this.doback();
+                    }
+
+                }
+                );
+            }
+        }
         ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }

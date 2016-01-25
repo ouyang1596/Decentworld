@@ -488,7 +488,7 @@ public class ImageUtils {
 	 * 将文件转换成固定大小的图片
 	 * 
 	 * @param fileAbsolutePath
-	 * @return
+	 * @return Bitmap
 	 */
 	private Bitmap getBitmap(String fileAbsolutePath) {
 		BitmapFactory.Options options = new BitmapFactory.Options();

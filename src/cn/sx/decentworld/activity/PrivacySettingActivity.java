@@ -48,7 +48,7 @@ public class PrivacySettingActivity extends BaseFragmentActivity
 	LinearLayout ll_privacy_setting_root;
 	@ViewById(R.id.tv_phone_number)
 	TextView tvMobile;
-	public static final int REQUEST_BANKCARD = 1;
+//	public static final int REQUEST_BANKCARD = 1;
 	public static final int REQUEST_MOBILE = 2;
 	public static final int REQUEST_RESET_PWD = 3;
 	private FragmentManager fragmentManager;
@@ -56,8 +56,8 @@ public class PrivacySettingActivity extends BaseFragmentActivity
 	private ReminderDialog reminderDialog;
 
 	// 变量信息
-	@ViewById(R.id.privacy_setting_bank_card)
-	TextView tvBankCard;
+//	@ViewById(R.id.privacy_setting_bank_card)
+//	TextView tvBankCard;
 	@ViewById(R.id.tv_phone_number)
 	TextView privacy_setting_phone_number;
 	@ViewById(R.id.privacy_setting_password)
@@ -74,7 +74,7 @@ public class PrivacySettingActivity extends BaseFragmentActivity
 	}
 
 	@Click(
-	{ R.id.privacy_setting_modification_bank_card, R.id.privacy_setting_modification_phone_number, R.id.privacy_setting_modification_password })
+	{ R.id.privacy_setting_modification_phone_number, R.id.privacy_setting_modification_password })
 	void bankCardModification(View view)
 	{
 		checkIdentityDialog = new CheckIdentityDialog();
@@ -94,10 +94,6 @@ public class PrivacySettingActivity extends BaseFragmentActivity
 				toast.show("密码为空");
 				return;
 			}
-			// LogUtils.e("bm", "checkIdentityDialog.getPassword()--"
-			// + checkIdentityDialog.getPassword()
-			// + "DecentWorldApp.getInstance().getPassword()--"
-			// + DecentWorldApp.getInstance().getPassword());
 			String pwd = AES.encode(checkIdentityDialog.getPassword());
 			if (pwd.equals(DecentWorldApp.getInstance().getPassword()))
 			{
@@ -106,14 +102,6 @@ public class PrivacySettingActivity extends BaseFragmentActivity
 				toast.show("密码正确");
 				switch (checkIdentityDialog.getClickView().getId())
 				{
-					case R.id.privacy_setting_modification_bank_card:
-//						intent = new Intent(PrivacySettingActivity.this , ModifyPaycardActivity_.class);
-//						startActivityForResult(intent, REQUEST_BANKCARD);
-						//绑定账号（支付宝或者微信），用于推荐返现
-						intent = new Intent(PrivacySettingActivity.this , BindAccountActivity_.class);
-						startActivityForResult(intent, REQUEST_BANKCARD);
-						break;
-
 					case R.id.privacy_setting_modification_phone_number:
 						intent = new Intent(PrivacySettingActivity.this , ModificationPhoneNumOne_.class);
 						startActivityForResult(intent, REQUEST_MOBILE);
@@ -142,11 +130,6 @@ public class PrivacySettingActivity extends BaseFragmentActivity
 		@Override
 		public void confirm()
 		{
-			// // 跳转到修改密码 界面
-			// toast.show("密码错误");
-			// Intent intent = new Intent(PrivacySettingActivity.this,
-			// ModificationPasswordOne_.class);
-			// startActivity(intent);
 			reminderDialog.dismiss();
 		}
 	};
@@ -170,15 +153,6 @@ public class PrivacySettingActivity extends BaseFragmentActivity
 		}
 		switch (requestCode)
 		{
-			case REQUEST_BANKCARD:
-//				String bankCard = intent.getStringExtra(ModificationBankCardOne.BANK_CARD);
-//				String bankCardEnd = bankCard.substring(bankCard.length() - 4);
-//				tvBankCard.setText("*************" + bankCardEnd);
-//				toast.show("succ");
-				String payAccount = intent.getStringExtra(PrivacySettingActivity.PAYACCOUNT);
-				tvBankCard.setText(payAccount);
-				LogUtils.i(TAG, "设置支付账号成功");
-				break;
 			case REQUEST_MOBILE:
 				String mobile = intent.getStringExtra(ModificationPhoneNumOne.MOBILE);
 				tvMobile.setText("*******" + mobile.substring(mobile.length() - 4));

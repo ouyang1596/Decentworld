@@ -22,7 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.bean.RegisterInfo;
+import cn.sx.decentworld.bean.RegisterInfoUseless;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.KeyboardComponent;
 import cn.sx.decentworld.component.ToastComponent;
@@ -149,9 +149,9 @@ public class RegisterMoneyCheckActivity extends BaseFragmentActivity implements
 		if (null == DecentWorldApp.registerBean) {
 			return;
 		}
-		RegisterInfo info = RegisterInfo.queryByDwID(registerComponent.tel);
+		RegisterInfoUseless info = RegisterInfoUseless.queryByDwID(registerComponent.tel);
 		if (null == info) {
-			info = new RegisterInfo(registerComponent.tel);
+			info = new RegisterInfoUseless(registerComponent.tel);
 		}
 		String talentMaterial = info.talentMaterial;
 		String picPath = info.picTalentPath;
@@ -230,7 +230,7 @@ public class RegisterMoneyCheckActivity extends BaseFragmentActivity implements
 	@Override
 	public void backClick(int state) {
 		if (state == Constants.SAVE) {
-			RegisterInfo info = RegisterInfo.queryByDwID(registerComponent.tel);
+			RegisterInfoUseless info = RegisterInfoUseless.queryByDwID(registerComponent.tel);
 			if (info == null) {
 				return;
 			}

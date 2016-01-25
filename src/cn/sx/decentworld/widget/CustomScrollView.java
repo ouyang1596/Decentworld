@@ -3,12 +3,11 @@
  */
 package cn.sx.decentworld.widget;
 
-import cn.sx.decentworld.utils.LogUtils;
 import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.widget.ScrollView;
+import cn.sx.decentworld.utils.LogUtils;
 
 /**
  * @ClassName: MyPullToRefreshScrollView.java
@@ -18,6 +17,8 @@ import android.widget.ScrollView;
  */
 public class CustomScrollView extends ScrollView {
 	private OnScrollListener onScrollListener;
+	private ScrollViewListener scrollViewListener;
+
 	/**
 	 * 主要是用在用户手指离开MyScrollView，MyScrollView还在继续滑动，我们用来保存Y的距离，然后做比较
 	 */
@@ -42,6 +43,15 @@ public class CustomScrollView extends ScrollView {
 	 */
 	public void setOnScrollListener(OnScrollListener onScrollListener) {
 		this.onScrollListener = onScrollListener;
+	}
+
+	/**
+	 * Y轴滚动监听
+	 * 
+	 * @param listener
+	 */
+	public void setScrollViewChangeListener(ScrollViewListener listener) {
+		this.scrollViewListener = listener;
 	}
 
 	/**
@@ -71,23 +81,26 @@ public class CustomScrollView extends ScrollView {
 	 * MyScrollView可能还在滑动，所以当用户抬起手我们隔5毫秒给handler发送消息，在handler处理
 	 * MyScrollView滑动的距离
 	 */
-	@Override
-	public boolean onTouchEvent(MotionEvent ev) {
-		if (onScrollListener != null) {
-			onScrollListener.onScroll(lastScrollY = this.getScrollY());
-		}
-		switch (ev.getAction()) {
-		case MotionEvent.ACTION_UP:
-			handler.sendMessageDelayed(handler.obtainMessage(), 2);
-			break;
-		}
-		return super.onTouchEvent(ev);
-	}
+	// @Override
+	// public boolean onTouchEvent(MotionEvent ev)
+	// {
+	// getParent().requestDisallowInterceptTouchEvent(true);
+	// if (onScrollListener != null)
+	// {
+	// onScrollListener.onScroll(lastScrollY = this.getScrollY());
+	// }
+	// switch (ev.getAction())
+	// {
+	// case MotionEvent.ACTION_UP:
+	// handler.sendMessageDelayed(handler.obtainMessage(), 2);
+	// break;
+	// }
+	// return super.onTouchEvent(ev);
+	// }
 
 	/**
 	 * 
 	 * 滚动的回调接口
-	 * 
 	 * @author xiaanming
 	 * 
 	 */
@@ -99,5 +112,20 @@ public class CustomScrollView extends ScrollView {
 		 *            、
 		 */
 		public void onScroll(int scrollY);
+	}
+
+	/**
+	 * 滚动改变
+	 */
+	@Override
+	protected void onScrollChanged(int x, int y, int oldx, int oldy) {
+		super.onScrollChanged(x, y, oldx, oldy);
+		if (scrollViewListener != null) {
+			scrollViewListener.onYScrolled(y);
+		}
+	}
+
+	public interface ScrollViewListener {
+		void onYScrolled(int scrollY);
 	}
 }

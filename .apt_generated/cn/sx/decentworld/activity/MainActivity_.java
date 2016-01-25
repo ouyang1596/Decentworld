@@ -15,8 +15,8 @@ import android.view.ViewGroup.LayoutParams;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.common.DWViewPager;
+import cn.sx.decentworld.component.Common_;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.component.ui.MainFragmentComponent_;
 import cn.sx.decentworld.network.request.GetFriendInfo_;
 import cn.sx.decentworld.network.request.GetUserInfo_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -35,17 +35,17 @@ public final class MainActivity_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
+        common = Common_.getInstance_(this);
         getUserInfo = GetUserInfo_.getInstance_(this);
         getFriendInfo = GetFriendInfo_.getInstance_(this);
-        mainComponent = MainFragmentComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         main_viewpager = ((DWViewPager) findViewById(id.main_viewpager));
         ((ToastComponent_) toast).afterSetContentView_();
+        ((Common_) common).afterSetContentView_();
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((GetFriendInfo_) getFriendInfo).afterSetContentView_();
-        ((MainFragmentComponent_) mainComponent).afterSetContentView_();
         init();
     }
 

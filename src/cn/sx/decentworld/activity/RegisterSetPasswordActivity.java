@@ -1,5 +1,8 @@
 package cn.sx.decentworld.activity;
 
+import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -17,10 +20,11 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.bean.RegisterInfo;
 import cn.sx.decentworld.component.KeyboardComponent;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.component.ui.RegisterComponent;
+import cn.sx.decentworld.utils.AES;
+import cn.sx.decentworld.widget.ClearEditText;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
@@ -35,6 +39,8 @@ public class RegisterSetPasswordActivity extends BaseFragmentActivity {
 	TextView tvTitle;
 	@ViewById(R.id.iv_back)
 	ImageView ivBack;
+	@ViewById(R.id.et_realName)
+	ClearEditText etRealName;
 	@ViewById(R.id.etv_reset_pwd)
 	EditText etvPwd;
 	@ViewById(R.id.iv_pwd_is_show)
@@ -47,6 +53,12 @@ public class RegisterSetPasswordActivity extends BaseFragmentActivity {
 	@Bean
 	RegisterComponent registerComponent;
 	private FragmentManager fragmentManager;
+	private Handler mRegisterHandle = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			Intent intent = new Intent(RegisterSetPasswordActivity.this, LoginActivity_.class);
+			startActivity(intent);
+		};
+	};
 
 	@AfterViews
 	public void init() {
@@ -57,26 +69,22 @@ public class RegisterSetPasswordActivity extends BaseFragmentActivity {
 			@Override
 			public void onClick(View arg0) {
 				closeKeyBoard();
-
 			}
 		});
 		fragmentManager = getSupportFragmentManager();
 		int length = etvPwd.length();
 		setBtnState(length);
-		etvPwd.setInputType(InputType.TYPE_CLASS_TEXT
-				| InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		etvPwd.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 		ivPwdIsShow.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 				if (pwdIsShow) {
-					etvPwd.setInputType(InputType.TYPE_CLASS_TEXT
-							| InputType.TYPE_TEXT_VARIATION_PASSWORD);
+					etvPwd.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
 					ivPwdIsShow.setImageResource(R.drawable.hide_password);
 					pwdIsShow = false;
 				} else {
-					etvPwd.setInputType(InputType.TYPE_CLASS_TEXT
-							| InputType.TYPE_TEXT_VARIATION_NORMAL);
+					etvPwd.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
 					ivPwdIsShow.setImageResource(R.drawable.show_password);
 					pwdIsShow = true;
 				}
@@ -85,15 +93,13 @@ public class RegisterSetPasswordActivity extends BaseFragmentActivity {
 		etvPwd.addTextChangedListener(new TextWatcher() {
 
 			@Override
-			public void onTextChanged(CharSequence arg0, int arg1, int arg2,
-					int arg3) {
+			public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
 				int length = etvPwd.length();
 				setBtnState(length);
 			}
 
 			@Override
-			public void beforeTextChanged(CharSequence arg0, int arg1,
-					int arg2, int arg3) {
+			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
 
 			}
 
@@ -106,26 +112,26 @@ public class RegisterSetPasswordActivity extends BaseFragmentActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				final String pwd = etvPwd.getText().toString();
-				savePwd(pwd);
-				Handler handler = new Handler() {
-					public void handleMessage(android.os.Message msg) {
-						startActivity(new Intent(mContext,
-								RegisterPersonalMsgActivity_.class));
-						finish();
-					};
-				};
-				registerComponent.setPwd(pwd, handler);
-			}
-
-			private void savePwd(final String pwd) {
-				RegisterInfo info = RegisterInfo
-						.queryByDwID(registerComponent.tel);
-				if (null == info) {
-					info = new RegisterInfo(registerComponent.tel);
+				if (etvPwd.length() <= 0) {
+					toast.show("请先输入密码");
+					return;
 				}
-				info.password = pwd;
-				info.save();
+				String password = AES.encode(etvPwd.getText().toString());
+				if (etRealName.length() <= 0) {
+					toast.show("请先输入实名");
+					return;
+				}
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put("password", password);
+				map.put("realName", etRealName.getText().toString());
+				map.put("occupation", RegisterNickActivity.registerInfo.occupation);
+				map.put("sex", RegisterNickActivity.registerInfo.sex);
+				map.put("nickName", RegisterNickActivity.registerInfo.nickName);
+				File[] file = new File[3];
+				for (Map.Entry<Integer, String> entry : RegisterNickActivity.registerInfo.picPaths.entrySet()) {
+					file[entry.getKey()] = new File(entry.getValue());
+				}
+				registerComponent.register(map, file, mRegisterHandle);
 			}
 		});
 		ivBack.setVisibility(View.VISIBLE);
@@ -142,13 +148,11 @@ public class RegisterSetPasswordActivity extends BaseFragmentActivity {
 	private void setBtnState(int length) {
 		if (length <= 0) {
 			btnOk.setEnabled(false);
-			btnOk.setTextColor(getResources()
-					.getColor(R.color.rg_tv_blue_press));
+			btnOk.setTextColor(getResources().getColor(R.color.rg_tv_blue_press));
 			btnOk.setBackgroundResource(R.drawable.bg_btn_yellow_pressed_shape);
 		} else {
 			btnOk.setEnabled(true);
-			btnOk.setTextColor(getResources().getColor(
-					R.drawable.rg_tv_color_selector));
+			btnOk.setTextColor(getResources().getColor(R.drawable.rg_tv_color_selector));
 			btnOk.setBackgroundResource(R.drawable.bg_btn_yellow_selector);
 		}
 	}

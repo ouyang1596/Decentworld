@@ -8,6 +8,7 @@ package cn.sx.decentworld.component.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
+import cn.sx.decentworld.component.Common_;
 import cn.sx.decentworld.component.ToastComponent_;
 
 public final class ChatRoomComponent_
@@ -25,7 +26,7 @@ public final class ChatRoomComponent_
         if (!(context_ instanceof Activity)) {
             return ;
         }
-        ((MainFragmentComponent_) mainComponent).afterSetContentView_();
+        ((Common_) common).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
@@ -48,7 +49,7 @@ public final class ChatRoomComponent_
         if (context_ instanceof Activity) {
             activity = ((Activity) context_);
         }
-        mainComponent = MainFragmentComponent_.getInstance_(context_);
+        common = Common_.getInstance_(context_);
         toast = ToastComponent_.getInstance_(context_);
     }
 

@@ -19,7 +19,7 @@ import com.amap.api.location.AMapLocationListener;
 public class LocationProvider implements AMapLocationListener {
 	public AMapLocationClientOption mLocationOption = null;
 	public AMapLocationClient mLocationClient = null;
-	private static final int TIME_INTERVAL = 1000 * 60 * 5;// debug
+	private static final int TIME_INTERVAL = 1000 * 60*30;// debug
 
 	private Context context;
 
@@ -56,7 +56,7 @@ public class LocationProvider implements AMapLocationListener {
 		// 设置是否返回地址信息（默认返回地址信息）
 		mLocationOption.setNeedAddress(true);
 		// 设置是否只定位一次,默认为false
-		mLocationOption.setOnceLocation(true);
+		mLocationOption.setOnceLocation(onceLocation);
 		// 设置是否强制刷新WIFI，默认为强制刷新
 		mLocationOption.setWifiActiveScan(true);
 		// 设置是否允许模拟位置,默认为false，不允许模拟位置
@@ -142,6 +142,6 @@ public class LocationProvider implements AMapLocationListener {
 				}
 			}
 		}
-		stop();
+		// stop();
 	}
 }

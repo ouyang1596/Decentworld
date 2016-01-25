@@ -3,308 +3,501 @@
  */
 package cn.sx.decentworld.manager;
 
-import java.io.File;
-
-import cn.sx.decentworld.DecentWorldApp;
-import cn.sx.decentworld.R;
-import cn.sx.decentworld.activity.PrivacySettingActivity_;
-import cn.sx.decentworld.activity.RecommendBenefitActivity_;
-import cn.sx.decentworld.bean.ContactUser;
-import cn.sx.decentworld.bean.DWMessage;
-import cn.sx.decentworld.bean.RecommendBenefitList;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.ChatActivity;
+import cn.sx.decentworld.activity.ChatActivity_;
+import cn.sx.decentworld.activity.NewFriendsActivity_;
+import cn.sx.decentworld.activity.RechargeBenefitActivity_;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.MsgAndInfo;
+import cn.sx.decentworld.bean.UserSessionInfo;
 
 /**
  * @ClassName: MsgNotification.java
  * @Description: 消息通知管理器
  * @author: cj
+ * onCreate():
+ *          MsgNotifyManager.getInstance().Notifyclear(MsgNotifyManager.
+ *          NOTIFY_TYPE_SINGLE);
+ *          MsgNotifyManager.getInstance().NotifyStop(MsgNotifyManager
+ *          .NOTIFY_TYPE_SINGLE);
+ *onDestory():
+ *          MsgNotifyManager.getInstance().NotifyStart(MsgNotifyManager
+ *          .NOTIFY_TYPE_SINGLE);
+ * 
  * @date: 2015年12月17日 上午11:25:41
  */
 public class MsgNotifyManager
 {
-	public static final String TAG = "MsgNotification";
-	public static final MsgNotifyManager instance = new MsgNotifyManager();
-	private static Context context;
-	private static String service_type = "";
-	/**
-	 * 通知铃声类型
-	 */
-	private static Uri sound_type_single;
-	private static Uri sound_type_multi;
-	private static Uri sound_type_room_menber_online;
-	private static Uri sound_type_room_menber_offline;
-	private static Uri sound_type_other_worth_changed;
-	private static Uri sound_type_new_benefit;
+    private static final String TAG = "MsgNotification";
+    /** 单例 **/
+    private static MsgNotifyManager instance = null;
+    /** 锁 **/
+    private static Object INSTANCE_LOCK = new Object(); 
+    /** 上下午对象 **/
+    private static Context context;
+    /** 定义NotificationManager **/
+    private NotificationManager notificationManager;
+    /** 通知铃声类型 **/
+    private Uri sound_type_child;
+    private Uri sound_type_girl;
+    
+    /** 通知是否可用 **/
+    private boolean notify_enable_single = true;
+    private boolean notify_enable_multi = true;
+    private boolean notify_enable_other_worth_changed = true;
+    private boolean notify_enable_new_benefit = true;
+    private boolean notify_enable_new_friend = true;
+    
+    /** 播放的声音是否结束 **/
+    private boolean single_voice_enable = true;
 
-	/**
-	 * 静态模块
-	 */
-	static
-	{
-		context = DecentWorldApp.getGlobalContext();
-		service_type = Context.NOTIFICATION_SERVICE;
-		// 初始化声音
-		sound_type_single = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.received_message);
-		sound_type_multi = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.received_message);
-		sound_type_room_menber_online = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.received_message);
-		sound_type_room_menber_offline = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.received_message);
-		sound_type_other_worth_changed = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.received_message);
-		sound_type_new_benefit = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.received_message);
-	}
-	/**
-	 * 通知的消息类型
-	 */
-	public static final int msg_type_single_txt = 1;// 单聊文字信息
-	public static final int msg_type_single_voice = 2;// 单聊语音信息
-	public static final int msg_type_single_image = 3;// 单聊图片信息
-	public static final int msg_type_single_card = 4;// 单聊名片信息
+    /** 通知的消息类型 **/
+    public static final int MSG_TYPE_SINGLE_TXT = 1;// 单聊文字信息
+    public static final int MSG_TYPE_SINGLE_VOICE = 2;// 单聊语音信息
+    public static final int MSG_TYPE_SINGLE_IMAGE = 3;// 单聊图片信息
+    public static final int MSG_TYPE_SINGLE_CARD = 4;// 单聊名片信息
 
-	public static final int msg_type_multi_txt = 5;// 聊天室文字信息
-	public static final int msg_type_multi_voice = 6;// 聊天室语音信息
-	public static final int msg_type_multi_image = 7;// 聊天室图片信息
-	public static final int msg_type_multi_card = 8;// 聊天室名片信息
+    public static final int MSG_TYPE_MULTI_TXT = 5;// 聊天室文字信息
+    public static final int MSG_TYPE_MULTI_VOICE = 6;// 聊天室语音信息
+    public static final int MSG_TYPE_MULTI_IMAGE = 7;// 聊天室图片信息
+    public static final int MSG_TYPE_MULTI_CARD = 8;// 聊天室名片信息
 
-	public static final int msg_type_room_menber_online = 9;// 聊天室成员上线
-	public static final int msg_type_room_menber_offline = 10;// 聊天室成员下线
-	public static final int msg_type_other_worth_changed = 11;// 对方身价改变
-	public static final int msg_type_new_benefit = 12;// 有新的收益
+    public static final int MSG_TYPE_ROOM_MENBER_ONLINE = 9;// 聊天室成员上线
+    public static final int MSG_TYPE_ROOM_MENBER_OFFLINE = 10;// 聊天室成员下线
+    public static final int MSG_TYPE_OTHER_WORTH_CHANGED = 11;// 对方身价改变
+    public static final int MSG_TYPE_NEW_BENEFIT = 12;// 有新的收益
+    public static final int MSG_TYPE_NEW_FRIEND = 13;// 添加朋友
 
-	// public static final int msg_type_add_friend = 13;//添加朋友
+    /** 通知的类型,用于Notification分类，可作为唯一标记 **/
+    public static final int NOTIFY_TYPE_SINGLE = 1;// 单聊
+    public static final int NOTIFY_TYPE_MULTI = 2;// 聊天室
+    public static final int NOTIFY_TYPE_OTHER_WORTH_CHANGED = 3;// 对方身价改变
+    public static final int NOTIFY_TYPE_NEW_BENEFIT = 4;// 有新的收益
+    public static final int NOTIFY_TYPE_NEW_FRIEND = 5;// 新的朋友
+    
+    /** AddFriendNotify **/
+    public static final int NOTIFY_ADD_FRIEND_APPLY = 1;//申请
+    public static final int NOTIFY_ADD_FRIEND_AGREE = 2;//同意
+    public static final int NOTIFY_ADD_FRIEND_REFUSE = 3;//拒绝
+    
+    /** 小图标 **/
+    private int smallIcon;
+    /** 大图标 **/
+    private int largeIcon;
 
-	/**
-	 * 通知的类型
-	 */
-	public static final int notity_type_single = 1;// 单聊
-	public static final int notity_type_multi = 2;// 聊天室
-	public static final int notity_type_other_worth_changed = 3;// 对方身价改变
-	public static final int notity_type_new_benefit = 4;// 有新的收益
+    /**
+     * 获取单例
+     * @return
+     */
+    public static MsgNotifyManager getInstance()
+    {
+        if(instance == null)
+        {
+            synchronized (INSTANCE_LOCK)
+            {
+                if(instance == null)
+                {
+                    instance = new MsgNotifyManager();
+                }
+            }
+        }
+        return instance;
+    }
+    
+    /**
+     * 私有构造函数
+     */
+    private MsgNotifyManager()
+    {
+        context = DecentWorldApp.getGlobalContext();
+        /** 初始化声音 **/
+        sound_type_child = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.child_voice);
+        sound_type_girl = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.girl_voice);
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        smallIcon = R.drawable.ic_launcher;
+    }
 
-	/**
-	 * 获取单例
-	 * 
-	 * @return
-	 */
-	public static MsgNotifyManager getInstance()
-	{
-		return instance;
-	}
+    /**
+     * 开启通知
+     */
+    public void NotifyStart(int NOTIFY_TYPE)
+    {
+        if (NOTIFY_TYPE == NOTIFY_TYPE_SINGLE)
+        {
+            notify_enable_single = true;
+        }
+        else if (NOTIFY_TYPE == NOTIFY_TYPE_MULTI)
+        {
+            notify_enable_multi = true;
+        }
+        else if (NOTIFY_TYPE == NOTIFY_TYPE_OTHER_WORTH_CHANGED)
+        {
+            notify_enable_other_worth_changed = true;
+        }
+        else if (NOTIFY_TYPE == NOTIFY_TYPE_NEW_BENEFIT)
+        {
+            notify_enable_new_benefit = true;
+        }
+        else if (NOTIFY_TYPE == NOTIFY_TYPE_NEW_FRIEND)
+        {
+            notify_enable_new_friend = true;
+        }
+    }
 
-	/**
-	 * 单聊消息通知
-	 * 
-	 * @param dwMessage
-	 */
-	public void SingleNotify(DWMessage dwMessage)
-	{
-		// 消息通知栏
-		// 定义NotificationManager
-		NotificationManager notificationManager = (NotificationManager) context.getSystemService(service_type);
-		// 定义通知栏展现的内容信息
-		int icon = R.drawable.ic_launcher;
-		CharSequence tickerText = "亲，新的消息到了";
-		long when = System.currentTimeMillis();
-		Notification notification = new Notification(icon , tickerText , when);
-		// 定义下拉通知栏时要展现的内容信息
-		CharSequence title = "消息类型";
-		CharSequence content = "消息内容";
-		if (dwMessage.getMessageType() == DWMessage.TXT)
-		{
-			title = "新的文字消息";
-			content = dwMessage.getBody();
-		}
-		else if (dwMessage.getMessageType() == DWMessage.VOICE)
-		{
-			title = "新的语音消息";
-			content = "语音";
-		}
-		else if (dwMessage.getMessageType() == DWMessage.IMAGE)
-		{
-			title = "新的图片消息";
-			content = "图片";
-		}
-		else if (dwMessage.getMessageType() == DWMessage.CARD)
-		{
-			title = "你有一条新的名片消息";
-			content = "名片";
-		}
-		Intent notificationIntent = new Intent();
-		
-		
-		//启动ChatActivity需要传递5个参数；
-//		notificationIntent.putExtra("user_dwID", dwMessage.getFrom());
-//		if(ContactUser.isContact(dwMessage.getFrom()))
-//		{
-//			notificationIntent.putExtra("chatRelationship", DWMessage.CHAT_RELATIONSHIP_FRIEND);
-//		}
-//		else
-//		{
-//			notificationIntent.putExtra("chatRelationship", DWMessage.CHAT_RELATIONSHIP_STRANGER);
-//		}
-//		notificationIntent.putExtra("chatType", dwMessage.getChatType());
-//		notificationIntent.putExtra("user_nickname", "");
-//		notificationIntent.putExtra("user_worth", "");
-		
-		
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+    /**
+     * 停止通知
+     */
+    public void NotifyStop(int NOTIFY_TYPE)
+    {
+        if (NOTIFY_TYPE == NOTIFY_TYPE_SINGLE)
+        {
+            notify_enable_single = false;
+        }
+        else if (NOTIFY_TYPE == NOTIFY_TYPE_MULTI)
+        {
+            notify_enable_multi = false;
+        }
+        else if (NOTIFY_TYPE == NOTIFY_TYPE_OTHER_WORTH_CHANGED)
+        {
+            notify_enable_other_worth_changed = false;
+        }
+        else if (NOTIFY_TYPE == NOTIFY_TYPE_NEW_BENEFIT)
+        {
+            notify_enable_new_benefit = false;
+        }
+        else if (NOTIFY_TYPE == NOTIFY_TYPE_NEW_FRIEND)
+        {
+            notify_enable_new_friend = false;
+        }
+    }
 
-		notification.setLatestEventInfo(context, title, content, contentIntent);// 只有一条消息，相同的ID会覆盖
-		notification.sound = sound_type_single;// 设置声音
-		notification.flags = Notification.FLAG_AUTO_CANCEL;// 点击后自动取消
-		// 用notificationManager的notify方法通知用户生成标题栏消息通知
-		notificationManager.notify(notity_type_single, notification);
-	}
+    /**
+     * 清除通知
+     */
+    public void Notifyclear(int NOTIFY_TYPE)
+    {
+        notificationManager.cancel(NOTIFY_TYPE);
+    }
 
-	/**
-	 * 聊天室消息通知
-	 * 
-	 * @param dwMessage
-	 */
-	public void MultiNotify(DWMessage dwMessage)
-	{
-		// 消息通知栏
-		// 定义NotificationManager
-		NotificationManager notificationManager = (NotificationManager) context.getSystemService(service_type);
-		// 定义通知栏展现的内容信息
-		int icon = R.drawable.ic_launcher;
-		CharSequence tickerText = "亲，聊天室消息到了";
-		long when = System.currentTimeMillis();
-		Notification notification = new Notification(icon , tickerText , when);
-		// 定义下拉通知栏时要展现的内容信息
-		CharSequence title = "消息类型";
-		CharSequence content = "消息内容";
-		if (dwMessage.getMessageType() == DWMessage.TXT)
-		{
-			title = "新的文字消息";
-			content = dwMessage.getBody();
-		}
-		else if (dwMessage.getMessageType() == DWMessage.VOICE)
-		{
-			title = "新的语音消息";
-			content = "语音";
-		}
-		else if (dwMessage.getMessageType() == DWMessage.IMAGE)
-		{
-			title = "新的图片消息";
-			content = "图片";
-		}
-		else if (dwMessage.getMessageType() == DWMessage.CARD)
-		{
-			title = "新的名片消息";
-			content = "名片";
-		}
-		
-		Intent notificationIntent = new Intent();
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+    /**
+     * 单聊消息通知（只包括单聊 接收朋友 文字、语音、图片、名片消息）
+     * 
+     * @param dwMessage
+     */
+    public void SingleNotify(MsgAndInfo msgAndInfo)
+    {
+        if (notify_enable_single)
+        {
+            DWMessage dwMessage = msgAndInfo.getDwMessage();
+            UserSessionInfo userSessionInfo = msgAndInfo.getUserSessionInfo();
+            // 定义通知栏展现的内容信息
+            CharSequence tickerText =  "";
+            // 定义下拉通知栏时要展现的内容信息
+            CharSequence title = "";
+            CharSequence content = "消息内容";
+            if (dwMessage.getMessageType() == DWMessage.TXT)
+            {
+                tickerText = userSessionInfo.getShowName()+"  "+dwMessage.getBody();
+                title = tickerText;
+                content = dwMessage.getBody();
+            }
+            else if (dwMessage.getMessageType() == DWMessage.VOICE)
+            {
+                tickerText = userSessionInfo.getShowName()+"  发来一条语音";
+                title = tickerText;
+                content = "语音";
+            }
+            else if (dwMessage.getMessageType() == DWMessage.IMAGE)
+            {
+                tickerText = userSessionInfo.getShowName()+"  发来一张图片";
+                title = tickerText;
+                content = "图片";
+            }
+            else if (dwMessage.getMessageType() == DWMessage.CARD)
+            {
+                tickerText = userSessionInfo.getShowName()+"  发来一张名片";
+                title = tickerText;
+                content = "名片";
+            }
+            
+            /** 点击打开的界面 **/
+            Intent intent = new Intent(context , ChatActivity_.class);
+            intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, dwMessage.getChatRelationship());
+            intent.putExtra(ChatActivity.CHAT_TYPE, dwMessage.getChatType());
+            intent.putExtra(ChatActivity.OTHER_ID, String.valueOf(userSessionInfo.getFriendID()));
+            intent.putExtra(ChatActivity.OTHER_NICKNAME, userSessionInfo.getShowName());
+            intent.putExtra(ChatActivity.OTHER_WORTH, userSessionInfo.getWorth());
+            /** **/
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            
+            Notification.Builder builder = new Notification.Builder(context);
+            builder.setSmallIcon(smallIcon);
+            builder.setTicker(tickerText);
+            
+            builder.setContentTitle(title);
+            builder.setContentText(content);
+            builder.setWhen(System.currentTimeMillis());
+            builder.setContentIntent(pendingIntent);
+            /** 避免短时间内接收到的消息过多，提示音总是中断重新播放的问题 **/
+            if(single_voice_enable)
+            {
+                builder.setSound(sound_type_child);
+                single_voice_enable = false;
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Thread.sleep(4*1000);//时间为声音的长度
+                            single_voice_enable = true;
+                        }
+                        catch (InterruptedException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+            
+            builder.setAutoCancel(true);
+            notificationManager.notify(NOTIFY_TYPE_SINGLE, builder.build());
+        }
+    }
 
-		notification.setLatestEventInfo(context, title, content, contentIntent);// 只有一条消息，相同的ID会覆盖
-		notification.sound = sound_type_single;// 设置声音
-		notification.flags = Notification.FLAG_AUTO_CANCEL;// 点击后自动取消
-		// 用notificationManager的notify方法通知用户生成标题栏消息通知
-		notificationManager.notify(notity_type_multi, notification);
-	}
+    /**
+     * 聊天室消息通知
+     * 
+     * @param dwMessage
+     */
+    public void MultiNotify(DWMessage dwMessage)
+    {
+        if (notify_enable_multi)
+        {
+            CharSequence tickerText = "亲，聊天室消息到了";
+            // 定义下拉通知栏时要展现的内容信息
+            CharSequence title = "消息类型";
+            CharSequence content = "消息内容";
+            if (dwMessage.getMessageType() == DWMessage.TXT)
+            {
+                title = "新的文字消息";
+                content = dwMessage.getBody();
+            }
+            else if (dwMessage.getMessageType() == DWMessage.VOICE)
+            {
+                title = "新的语音消息";
+                content = "语音";
+            }
+            else if (dwMessage.getMessageType() == DWMessage.IMAGE)
+            {
+                title = "新的图片消息";
+                content = "图片";
+            }
+            else if (dwMessage.getMessageType() == DWMessage.CARD)
+            {
+                title = "新的名片消息";
+                content = "名片";
+            }
+            
+            Intent intent = new Intent();
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+           
+            Notification.Builder builder = new Notification.Builder(context);
+            builder.setSmallIcon(smallIcon);
+            builder.setTicker(tickerText);
+            
+            builder.setContentTitle(title);
+            builder.setContentText(content);
+            builder.setWhen(System.currentTimeMillis());
+            builder.setContentIntent(pendingIntent);
+            
+            builder.setAutoCancel(true);
+            builder.setSound(sound_type_child);
 
-	/**
-	 * 聊天室成员上线
-	 */
-	public void roomMemberOnline(String memberName, String roomName)
-	{
-		// 消息通知栏
-		// 定义NotificationManager
-		NotificationManager notificationManager = (NotificationManager) context.getSystemService(service_type);
-		// 定义通知栏展现的内容信息
-		int icon = R.drawable.ic_launcher;
-		CharSequence tickerText = memberName + "进入了" + roomName + "聊天室";
-		long when = System.currentTimeMillis();
-		Notification notification = new Notification(icon , tickerText , when);
-		// 定义下拉通知栏时要展现的内容信息
-		CharSequence title = "上线通知";
-		CharSequence content = memberName + "进入了" + roomName + "聊天室";
-		Intent notificationIntent = new Intent();
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(context, title, content, contentIntent);// 只有一条消息，相同的ID会覆盖
-		notification.sound = sound_type_room_menber_online;// 设置声音
-		notification.flags = Notification.FLAG_AUTO_CANCEL;// 点击后自动取消
-		// 用notificationManager的notify方法通知用户生成标题栏消息通知
-		notificationManager.notify(notity_type_multi, notification);
-	}
+            notificationManager.notify(NOTIFY_TYPE_MULTI, builder.build());
+        }
+    }
 
-	/**
-	 * 聊天室成员下线
-	 */
-	public void roomMemberOffline(String memberName, String roomName)
-	{
-		// 消息通知栏
-		// 定义NotificationManager
-		NotificationManager notificationManager = (NotificationManager) context.getSystemService(service_type);
-		// 定义通知栏展现的内容信息
-		int icon = R.drawable.ic_launcher;
-		CharSequence tickerText = memberName + "退出了" + roomName + "聊天室";
-		long when = System.currentTimeMillis();
-		Notification notification = new Notification(icon , tickerText , when);
-		// 定义下拉通知栏时要展现的内容信息
-		CharSequence title = "下线通知";
-		CharSequence content = memberName + "退出了" + roomName + "聊天室";
-		Intent notificationIntent = new Intent();
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(context, title, content, contentIntent);// 只有一条消息，相同的ID会覆盖
-		notification.sound = sound_type_room_menber_offline;// 设置声音
-		notification.flags = Notification.FLAG_AUTO_CANCEL;// 点击后自动取消
-		// 用notificationManager的notify方法通知用户生成标题栏消息通知
-		notificationManager.notify(notity_type_multi, notification);
-	}
+    /**
+     * 聊天室成员上线
+     */
+    public void roomMemberOnline(String memberName, String roomName)
+    {
+        if (notify_enable_multi)
+        {
+            CharSequence tickerText = memberName + "进入了" + roomName + "聊天室";
+            // 定义下拉通知栏时要展现的内容信息
+            CharSequence title = "上线通知";
+            CharSequence content = memberName + "进入了" + roomName + "聊天室";
+            
+            Intent intent = new Intent();
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            
+            Notification.Builder builder = new Notification.Builder(context);
+            builder.setSmallIcon(smallIcon);
+            builder.setTicker(tickerText);
+            
+            builder.setContentTitle(title);
+            builder.setContentText(content);
+            builder.setWhen(System.currentTimeMillis());
+            builder.setContentIntent(pendingIntent);
+            
+            builder.setAutoCancel(true);
+//            builder.setSound(sound_type_child);
+            // 用notificationManager的notify方法通知用户生成标题栏消息通知
+            notificationManager.notify(NOTIFY_TYPE_MULTI, builder.build());
+        }
+    }
 
-	/**
-	 * 对方身价改变
-	 */
-	public void otherWorthChanged(String name,String worth)
-	{
-		// 消息通知栏
-		// 定义NotificationManager
-		NotificationManager notificationManager = (NotificationManager) context.getSystemService(service_type);
-		// 定义通知栏展现的内容信息
-		int icon = R.drawable.ic_launcher;
-		CharSequence tickerText = name + "身价变成" + worth + "￥";
-		long when = System.currentTimeMillis();
-		Notification notification = new Notification(icon , tickerText , when);
-		// 定义下拉通知栏时要展现的内容信息
-		CharSequence title = "对方身价改变";
-		CharSequence content = tickerText;
-		Intent notificationIntent = new Intent();
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(context, title, content, contentIntent);// 只有一条消息，相同的ID会覆盖
-		notification.sound = sound_type_other_worth_changed;// 设置声音
-		notification.flags = Notification.FLAG_AUTO_CANCEL;// 点击后自动取消
-		// 用notificationManager的notify方法通知用户生成标题栏消息通知
-		notificationManager.notify(notity_type_other_worth_changed, notification);
-	}
+    /**
+     * 聊天室成员下线
+     */
+    public void roomMemberOffline(String memberName, String roomName)
+    {
+        if (notify_enable_multi)
+        {
+            CharSequence tickerText = memberName + "退出了" + roomName + "聊天室";
+            // 定义下拉通知栏时要展现的内容信息
+            CharSequence title = "下线通知";
+            CharSequence content = memberName + "退出了" + roomName + "聊天室";
+            Intent intent = new Intent();
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            Notification.Builder builder = new Notification.Builder(context);
+            builder.setSmallIcon(smallIcon);
+            builder.setTicker(tickerText);
+            
+            builder.setContentTitle(title);
+            builder.setContentText(content);
+            builder.setWhen(System.currentTimeMillis());
+            builder.setContentIntent(pendingIntent);
+            
+            builder.setAutoCancel(true);
+//            builder.setSound(sound_type_child);
+            // 用notificationManager的notify方法通知用户生成标题栏消息通知
+            notificationManager.notify(NOTIFY_TYPE_MULTI, builder.build());
+        }
+    }
 
-	/**
-	 * 新的收益，由被推荐人员返回
-	 */
-	public void newBenefit(String msg)
-	{		// 消息通知栏
-		// 定义NotificationManager
-		NotificationManager notificationManager = (NotificationManager) context.getSystemService(service_type);
-		// 定义通知栏展现的内容信息
-		int icon = R.drawable.ic_launcher;
-		CharSequence tickerText ="你有新的收益"+msg;
-		long when = System.currentTimeMillis();
-		Notification notification = new Notification(icon , tickerText , when);
-		// 定义下拉通知栏时要展现的内容信息
-		CharSequence title = "新的收益";
-		CharSequence content = msg;
-		Intent notificationIntent = new Intent(context , RecommendBenefitActivity_.class);
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
-		notification.setLatestEventInfo(context, title, content, contentIntent);// 只有一条消息，相同的ID会覆盖
-		notification.sound = sound_type_new_benefit;// 设置声音
-		notification.flags = Notification.FLAG_AUTO_CANCEL;// 点击后自动取消
-		// 用notificationManager的notify方法通知用户生成标题栏消息通知
-		notificationManager.notify(notity_type_new_benefit, notification);
-	}
+    /**
+     * 对方身价改变
+     */
+    public void otherWorthChanged(String name, String worth)
+    {
+        if (notify_enable_other_worth_changed)
+        {
+            CharSequence tickerText = name + "身价变成" + worth + "￥";
+            CharSequence title = "对方身价改变";
+            CharSequence content = tickerText;
+            
+            Notification.Builder builder = new Notification.Builder(context);
+            builder.setSmallIcon(smallIcon);
+            builder.setTicker(tickerText);
+            
+            builder.setContentTitle(title);
+            builder.setContentText(content);
+            builder.setWhen(System.currentTimeMillis());
+            
+            builder.setAutoCancel(true);
+//            builder.setSound(sound_type_child);
+            
+            // 用notificationManager的notify方法通知用户生成标题栏消息通知
+            notificationManager.notify(NOTIFY_TYPE_OTHER_WORTH_CHANGED, builder.build());
+        }
 
+    }
+
+    /**
+     * 新的收益，由被推荐人员返回
+     */
+    public void newBenefit(String msg)
+    {
+        if (notify_enable_new_benefit)
+        {
+            CharSequence tickerText = "你有新的收益" + msg;
+            CharSequence title = "新的收益";
+            CharSequence content = msg;
+            
+            Intent intent = new Intent(context , RechargeBenefitActivity_.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+           
+            Notification.Builder builder = new Notification.Builder(context);
+            builder.setSmallIcon(smallIcon);
+            builder.setTicker(tickerText);
+            
+            builder.setContentTitle(title);
+            builder.setContentText(content);
+            builder.setWhen(System.currentTimeMillis());
+            builder.setContentIntent(pendingIntent);
+            
+            builder.setAutoCancel(true);
+//            builder.setSound(sound_type_child);
+            // 用notificationManager的notify方法通知用户生成标题栏消息通知
+            notificationManager.notify(NOTIFY_TYPE_NEW_BENEFIT, builder.build());
+        }
+    }
+
+    /**
+     * 添加朋友流程通知（包括 申请、同意、拒绝）
+     * @param info  通知信息
+     */
+    public void addFriend(int type,String userName)
+    {
+        if (notify_enable_new_friend)
+        {
+            CharSequence tickerText = "";
+            CharSequence title = "";
+            CharSequence content = "";
+            
+            // 定义下拉通知栏时要展现的内容信息
+            if(type == NOTIFY_ADD_FRIEND_APPLY)
+            {
+                tickerText = userName+" 请求加为朋友";
+                title = "添加朋友";
+                
+            }else if(type == NOTIFY_ADD_FRIEND_AGREE)
+            {
+                tickerText = userName+" 同意你的好友申请";
+                title = "同意";
+            }else if(type == NOTIFY_ADD_FRIEND_REFUSE)
+            {
+                tickerText = userName+" 拒绝你的好友申请";
+                title = "拒绝";
+            }
+            content = tickerText;
+            Intent intent = new Intent(context, NewFriendsActivity_.class);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            
+            Notification.Builder builder = new Notification.Builder(context);
+            builder.setSmallIcon(smallIcon);
+            builder.setTicker(tickerText);
+            
+            builder.setContentTitle(title);
+            builder.setContentText(content);
+            builder.setWhen(System.currentTimeMillis());
+            builder.setContentIntent(pendingIntent);
+            
+            builder.setAutoCancel(true);
+//          builder.setSound(sound_type_child);
+            // 用notificationManager的notify方法通知用户生成标题栏消息通知
+            notificationManager.notify(NOTIFY_TYPE_NEW_FRIEND, builder.build());
+        }
+    }
+    
+    /**
+     * 设置单聊消息声音
+     * @param voiceType
+     */
+    public void setSingleVoice(int voiceType)
+    {
+        sound_type_child = Uri.parse("android.resource://" + context.getPackageName() + "/" + voiceType);
+    }
 }

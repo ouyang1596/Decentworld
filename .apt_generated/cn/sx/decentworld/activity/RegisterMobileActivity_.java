@@ -41,11 +41,11 @@ public final class RegisterMobileActivity_
 
     private void afterSetContentView_() {
         etCode = ((ClearEditText) findViewById(id.et_code));
-        btnOk = ((Button) findViewById(id.btn_OK));
-        etMobile = ((ClearEditText) findViewById(id.et_mobile));
-        tvNoReceive = ((TextView) findViewById(id.tv_no_receive_code));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        etMobile = ((ClearEditText) findViewById(id.et_mobile));
         ivBack = ((ImageView) findViewById(id.iv_back));
+        btnOk = ((Button) findViewById(id.btn_OK));
+        tvNoReceive = ((TextView) findViewById(id.tv_no_receive_code));
         ((ToastComponent_) toast).afterSetContentView_();
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         init();

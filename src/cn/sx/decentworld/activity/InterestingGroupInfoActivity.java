@@ -17,7 +17,7 @@ import android.widget.TextView;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.adapter.InterestingGroupGridAdapter;
 import cn.sx.decentworld.bean.GroupMember;
-import cn.sx.decentworld.component.ui.MainFragmentComponent;
+import cn.sx.decentworld.component.Common;
 import cn.sx.decentworld.utils.ViewUtil;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -48,7 +48,7 @@ public class InterestingGroupInfoActivity extends BaseFragmentActivity {
 		};
 	};
 	@Bean
-	MainFragmentComponent component;
+	Common common;
 	
 	@ViewById(R.id.main_header_right)
 	RelativeLayout main_header_right;
@@ -68,7 +68,7 @@ public class InterestingGroupInfoActivity extends BaseFragmentActivity {
 	}
 @Click(R.id.rl_toshow_something)
 public void showsomething(){
-	component.toActivity(InterestingGroupSomeThing_.class);
+    common.toActivity(InterestingGroupSomeThing_.class);
 }
 	@ViewById(R.id.activity_interesting_group_item_info_root)
 	ScrollView activity_interesting_group_item_info_root;

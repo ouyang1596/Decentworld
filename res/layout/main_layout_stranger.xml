@@ -20,7 +20,6 @@
             <!-- 主界面聊天 -->
 
             <include layout="@layout/fragment_stranger_chat" />
-
             <!-- 附近的人 -->
 
             <include layout="@layout/fragment_stranger_near" />

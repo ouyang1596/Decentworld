@@ -11,18 +11,16 @@ import org.json.JSONObject;
 import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.RadioGroup;
-import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.adapter.SearchAdapter;
 import cn.sx.decentworld.bean.SearchResult;
+import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.component.ui.SearchComponent;
 import cn.sx.decentworld.network.utils.JsonUtils;
 import cn.sx.decentworld.utils.LogUtils;
-import cn.sx.decentworld.widget.SearchEditText;
-import cn.sx.decentworld.widget.SearchEditText.OnSearchClickListener;
+import cn.sx.decentworld.widget.ClearEditText;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
@@ -39,16 +37,15 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
  * @author: yj
  * @date: 2015年7月17日 上午10:58:08
  */
-
 @EActivity(R.layout.activity_contact_search)
 public class SearchActivity extends BaseFragmentActivity implements
-		OnClickListener, OnCheckedChangeListener, OnSearchClickListener {
+		OnClickListener {
 	@ViewById(R.id.cet_search)
-	SearchEditText setSearch;
+	ClearEditText cetSearch;
 	@ViewById(R.id.tv_cancel)
 	TextView tvCancel;
-	@ViewById(R.id.rg_search_tag)
-	RadioGroup rgSearchTag;
+	@ViewById(R.id.tv_search)
+	TextView tvSearch;
 	@ViewById(R.id.lv_search)
 	PullToRefreshListView lvSearch;
 	private int page;
@@ -57,16 +54,17 @@ public class SearchActivity extends BaseFragmentActivity implements
 	@Bean
 	ToastComponent toast;
 	private String mSearchType;
-	private int searchType = SearchResult.SEARCH_TYPE_PHONE;// 搜索类型,默认为按电话号码搜素
+	// private int searchType = SearchResult.SEARCH_TYPE_PHONE;//
+	// 搜索类型,默认为按电话号码搜素
 	private List<SearchResult> data; // 搜索结果的list
 	private SearchAdapter searchAdapter;
 
 	@AfterViews
 	public void init() {
 		initAdapter();
-		rgSearchTag.setOnCheckedChangeListener(this);
+		// rgSearchTag.setOnCheckedChangeListener(this);
 		tvCancel.setOnClickListener(this);
-		setSearch.setOnSearchClickListener(this);
+		tvSearch.setOnClickListener(this);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -98,47 +96,21 @@ public class SearchActivity extends BaseFragmentActivity implements
 		case R.id.tv_cancel:
 			finish();
 			break;
-		}
-	}
-
-	@Override
-	public void onCheckedChanged(RadioGroup group, int checkedId) {
-		data.clear();
-		switch (checkedId) {
-		case R.id.rb_mobile:
-			searchType = 0;// 电话号码，不扣费
-			searchPeople(page);
-			break;
-		case R.id.rb_dw:
-			searchType = 1;// dwID号，不扣费
-			searchPeople(page);
-			break;
-		case R.id.rb_true_name:
-			searchType = 3;// 实名
-			searchPeople(page);
-			break;
-		case R.id.rb_nickname:
-			searchType = 2;// 昵称
+		case R.id.tv_search:
+			data.clear();
+			page = 0;
 			searchPeople(page);
 			break;
 		}
-	}
-
-	@Override
-	public void onSearchClick(View view) {
-		data.clear();
-		page = 0;
-		searchPeople(page);
 	}
 
 	private void searchPeople(int page) {
-		if (setSearch.length() <= 0) {
+		if (cetSearch.length() <= 0) {
 			toast.show("请输入要搜索的内容");
 			return;
 		}
 		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("searchKey", setSearch.getText().toString());
-		map.put("searchType", String.valueOf(searchType));
+		map.put("searchKey", cetSearch.getText().toString());
 		map.put("page", "" + page);
 		searchComponent.searchFriendBy(map, mSearchHandler);
 	}
@@ -156,7 +128,9 @@ public class SearchActivity extends BaseFragmentActivity implements
 					List<SearchResult> datas = (List<SearchResult>) JsonUtils
 							.json2BeanArray(array.toString(),
 									SearchResult.class);
-					searchAdapter.setTag(mSearchType);
+					searchAdapter.setTag(Constants.SEARCH_TYPE, mSearchType);
+					searchAdapter.setTag(Constants.MATCH, cetSearch.getText()
+							.toString());
 					if (null != datas) {
 						data.addAll(datas);
 						searchAdapter.notifyDataSetChanged();

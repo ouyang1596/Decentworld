@@ -163,7 +163,7 @@ public class TopicContentActivity extends BaseFragmentActivity {
 
 			@Override
 			public void onClick(View view) {
-				position = (Integer) view.getTag(Constants.ITEM_KEY);
+				position = (Integer) view.getTag(Constants.ITEM_POSITION);
 				switch (view.getId()) {
 				case R.id.iv_add_pic:
 					Intent intentPic = new Intent(getApplicationContext(),

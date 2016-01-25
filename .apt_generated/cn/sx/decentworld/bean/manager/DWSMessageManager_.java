@@ -45,10 +45,10 @@ public final class DWSMessageManager_
         if (context_ instanceof Activity) {
             Activity activity = ((Activity) context_);
         }
+        context = context_;
         if (context_ instanceof Activity) {
             activity = ((Activity) context_);
         }
-        context = context_;
         toastComponent = ToastComponent_.getInstance_(context_);
         getUserInfo = GetUserInfo_.getInstance_(context_);
     }

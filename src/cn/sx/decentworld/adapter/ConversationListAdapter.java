@@ -74,7 +74,7 @@ public class ConversationListAdapter extends BaseAdapter {
 					.findViewById(R.id.list_item_layout);
 			holder.iv_avatar = (ImageView) convertView
 					.findViewById(R.id.iv_fragment_chat_chat_avatar);
-			holder.iv_avatar.setTag(Constants.ITEM_KEY, position);
+			holder.iv_avatar.setTag(Constants.ITEM_POSITION, position);
 			holder.iv_avatar.setOnClickListener(mOnClickListener);
 			holder.tv_title = (TextView) convertView
 					.findViewById(R.id.tv_fragment_chat_chat_title);
@@ -149,7 +149,7 @@ public class ConversationListAdapter extends BaseAdapter {
 
 		@Override
 		public void onClick(View view) {
-			Integer position = (Integer) view.getTag(Constants.ITEM_KEY);
+			Integer position = (Integer) view.getTag(Constants.ITEM_POSITION);
 			Intent intent = new Intent(context, NearCardDetailActivity_.class);
 			intent.putExtra(Constants.DW_ID, getItem(position).getDwID());
 			context.startActivity(intent);

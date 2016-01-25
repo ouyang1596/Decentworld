@@ -33,14 +33,12 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 /**
  * @ClassName: GetRoomInfo.java
- * @Description: 获取聊天室相关信息 1.聊天过程中向服务器传文件（图片和语音） 2.获取聊天室历史记录
- * 3.根据dwID获取昵称和身价
+ * @Description: 获取聊天室相关信息 1.聊天过程中向服务器传文件（图片和语音） 2.获取聊天室历史记录 3.根据dwID获取昵称和身价
  * @author: cj
  * @date: 2015年9月25日 上午10:31:43
  */
 @EBean
-public class GetRoomInfo
-{
+public class GetRoomInfo {
 	private static String TAG = "GetRoomInfo";
 	@RootContext
 	Context context;
@@ -51,19 +49,15 @@ public class GetRoomInfo
 	private SendUrl sendUrl;
 
 	@AfterViews
-	void init()
-	{
+	void init() {
 		sendUrl = new SendUrl(context);
 	}
-	
-	
+
 	/**
 	 * 
 	 */
-	public GetRoomInfo(Context context)
-	{
-		if (sendUrl==null)
-		{
+	public GetRoomInfo(Context context) {
+		if (sendUrl == null) {
 			sendUrl = new SendUrl(context);
 		}
 	}
@@ -74,33 +68,26 @@ public class GetRoomInfo
 	 * @param handler
 	 *            用于返回待处理的结果
 	 */
-	public void getRoomList(final Handler handler, final int requestCode)
-	{
+	public void getRoomList(final Handler handler, final int requestCode) {
 		HashMap<String, String> map = new HashMap<String, String>();
 		LogUtils.i(TAG, "getRoomList...begin");
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + "/getChatRoomList", Method.GET, new HttpCallBack()
-		{
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + "/getChatRoomList", Method.GET, new HttpCallBack() {
 			@Override
-			public void onSuccess(String response, final ResultBean bean)
-			{
-				LogUtils.i(TAG, "getRoomList...msg.getResultCode=" + bean.getResultCode() + ",getData=" + bean.getData() + ",msg.getMsg=" + bean.getMsg());
-				if (bean.getResultCode() == 2222)
-				{
+			public void onSuccess(String response, final ResultBean bean) {
+				LogUtils.i(Constants.TAG_BM, "getRoomList------" + bean.getResultCode() + ",getData=" + bean.getData()
+						+ ",msg.getMsg=" + bean.getMsg());
+				if (bean.getResultCode() == 2222) {
 					Message message = new Message();
 					message.what = requestCode;
 					message.obj = bean.getData().toString();// 处理需要携带的结果
 					handler.sendMessage(message);
 				}
-
-				if (bean.getResultCode() == 3333)
-				{
+				if (bean.getResultCode() == 3333) {
 					// msg.getMsg() 为 获取聊天室失败
 					LogUtils.e(TAG, "getRoomList...failure,cause by:" + bean.getMsg());
-					activity.runOnUiThread(new Runnable()
-					{
+					activity.runOnUiThread(new Runnable() {
 						@Override
-						public void run()
-						{
+						public void run() {
 							toast.show("聊天室为空");
 						}
 					});
@@ -109,8 +96,7 @@ public class GetRoomInfo
 			}
 
 			@Override
-			public void onFailure(String error)
-			{
+			public void onFailure(String error) {
 				handler.sendEmptyMessage(1111);
 				LogUtils.e(TAG, "getRoomList...onFailure,cause by:" + error);
 			}
@@ -128,46 +114,51 @@ public class GetRoomInfo
 	 * @param dwMessageID
 	 * @param FileType
 	 */
-	public void sendFileWithParams(HashMap<String, String> hashmap, File[] images, String api, final Handler handler, final String txtMsgID)
-	{
-		sendUrl.httpRequestWithImage(hashmap, images, Constants.CONTEXTPATH_OPENFIRE + api, new HttpCallBack()
-		{
-			@Override
-			public void onSuccess(String response, ResultBean msg)
-			{
-				LogUtils.i(TAG, "sendFileWithParams...begin,msg.getResultCode="+msg.getResultCode()+",msg.getMsg="+msg.getMsg()+",msg.getData="+msg.getData().toString());
-				Message mssg = new Message();
-				if (msg.getResultCode() == 2222)
-				{
-					mssg.what = Constants.SUCC;
-					showToast("发送成功");
-				}
-				else
-				{
-					mssg.what = Constants.FAILURE;
-					showToast("发送失败");
-				}
-				mssg.obj = txtMsgID;
-				handler.sendMessage(mssg);
-			}
-
-			@Override
-			public void onFailure(String e)
-			{
-				showToast(Constants.NET_WRONG);
-			}
-
-		});
-	}
-	
-	private void showToast(final String netWrong) {
-		activity.runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				toast.show(netWrong);
-			}
-		});
-	}
+	// public void sendFileWithParams(HashMap<String, String> hashmap, File[]
+	// images, String api, final Handler handler, final String txtMsgID)
+	// {
+	//
+	//
+	// sendUrl.httpRequestWithImage(hashmap, images,
+	// Constants.CONTEXTPATH_OPENFIRE + api, new HttpCallBack()
+	// {
+	// @Override
+	// public void onSuccess(String response, ResultBean msg)
+	// {
+	// LogUtils.i(TAG,
+	// "sendFileWithParams...begin,msg.getResultCode="+msg.getResultCode()+",msg.getMsg="+msg.getMsg()+",msg.getData="+msg.getData().toString());
+	// Message mssg = new Message();
+	// if (msg.getResultCode() == 2222)
+	// {
+	// mssg.what = Constants.SUCC;
+	// showToast("发送成功");
+	// }
+	// else
+	// {
+	// mssg.what = Constants.FAILURE;
+	// showToast("发送失败");
+	// }
+	// mssg.obj = txtMsgID;
+	// handler.sendMessage(mssg);
+	// }
+	//
+	// @Override
+	// public void onFailure(String e)
+	// {
+	// showToast(Constants.NET_WRONG);
+	// }
+	//
+	// });
+	// }
+	//
+	// private void showToast(final String netWrong) {
+	// activity.runOnUiThread(new Runnable() {
+	// @Override
+	// public void run() {
+	// toast.show(netWrong);
+	// }
+	// });
+	// }
 
 	/**
 	 * 首次进入聊天室，自动从服务器拿取历史记录
@@ -183,95 +174,87 @@ public class GetRoomInfo
 	 * @param requestCode
 	 *            请求码
 	 */
-	public void autoGetRoomHistoryMsg(String roomID, final Handler handler)
-	{
+	public void autoGetRoomHistoryMsg(String roomID, final Handler handler) {
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("roomID", roomID);
 		LogUtils.i(TAG, "autoGetRoomHistoryMsg...begin,roomID=" + roomID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + "/getLastChatRoomHistory", Method.GET, new HttpCallBack()
-		{
-			@Override
-			public void onSuccess(String response, ResultBean msg)
-			{
-				LogUtils.i(TAG, "autoGetRoomHistoryMsg...msg.getResultCode=" + msg.getResultCode() + "\nmsg.getMsg=" + msg.getMsg() + "\nmsg.getData=" + msg.getData());
-				if (msg.getResultCode() == 2222)
-				{
-					LogUtils.i(TAG, "autoGetRoomHistoryMsg...success");
-					Message message = Message.obtain();
-					message.what = 1;
-					message.obj = msg.getData().toString();//history
-					handler.sendMessage(message);
-				}
-				if (msg.getResultCode() == 3333)
-				{
-					LogUtils.i(TAG, "autoGetRoomHistoryMsg...onfailure,cause by:" + msg.getMsg());
-					Message message = Message.obtain();
-					message.obj = msg.getMsg();
-					message.what = 2;
-					handler.sendMessage(message);
-				}
-			}
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + "/getLastChatRoomHistory", Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "autoGetRoomHistoryMsg...msg.getResultCode=" + msg.getResultCode() + "\nmsg.getMsg="
+								+ msg.getMsg() + "\nmsg.getData=" + msg.getData());
+						if (msg.getResultCode() == 2222) {
+							LogUtils.i(TAG, "autoGetRoomHistoryMsg...success");
+							Message message = Message.obtain();
+							message.what = 1;
+							message.obj = msg.getData().toString();// history
+							handler.sendMessage(message);
+						}
+						if (msg.getResultCode() == 3333) {
+							LogUtils.i(TAG, "autoGetRoomHistoryMsg...onfailure,cause by:" + msg.getMsg());
+							Message message = Message.obtain();
+							message.obj = msg.getMsg();
+							message.what = 2;
+							handler.sendMessage(message);
+						}
+					}
 
-			@Override
-			public void onFailure(String e)
-			{
-				LogUtils.i(TAG, "autoGetRoomHistoryMsg...onFailure,cause by:" + e);
-				Message message = Message.obtain();
-				message.obj = "网络错误";
-				message.what = 3;
-				handler.sendMessage(message);
-			}
-		});
+					@Override
+					public void onFailure(String e) {
+						LogUtils.i(TAG, "autoGetRoomHistoryMsg...onFailure,cause by:" + e);
+						Message message = Message.obtain();
+						message.obj = "网络错误";
+						message.what = 3;
+						handler.sendMessage(message);
+					}
+				});
 	}
-	
+
 	/**
 	 * 手动刷新从服务器拿取历史记录
+	 * 
 	 * @param roomID
 	 * @param minMsgID
 	 * @param handler
 	 */
-	public void manualGetRoomHistoryMsg(String roomID, long minMsgID, final Handler handler)
-	{
+	public void manualGetRoomHistoryMsg(String roomID, long minMsgID, final Handler handler) {
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("roomID", roomID);
 		map.put("firstIndex", String.valueOf(minMsgID));
 		LogUtils.i(TAG, "manualGetRoomHistoryMsg...begin,roomID=" + roomID + ",minMsgID=" + minMsgID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/chatHistory/getChatRoomHistory", Method.POST, new HttpCallBack()
-		{
-			@Override
-			public void onSuccess(String response, ResultBean msg)
-			{
-				LogUtils.i(TAG, "manualGetRoomHistoryMsg...msg.getResultCode=" + msg.getResultCode() + "\nmsg.getMsg=" + msg.getMsg() + "\nmsg.getData=" + msg.getData());
-				if (msg.getResultCode() == 2222)
-				{
-					LogUtils.i(TAG, "manualGetRoomHistoryMsg...success");
-					Message message = Message.obtain();
-					message.what = 1;
-					message.obj = msg.getData().toString();
-					handler.sendMessage(message);
-				}
-				if (msg.getResultCode() == 3333)
-				{
-					LogUtils.i(TAG, "manualGetRoomHistoryMsg...onfailure,cause by:" + msg.getMsg());
-					Message message = Message.obtain();
-					message.obj = msg.getMsg();
-					message.what = 2;
-					handler.sendMessage(message);
-					ToastUtils.toast(context, "无历史聊天记录");
-				}
-			}
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/chatHistory/getChatRoomHistory", Method.POST,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "manualGetRoomHistoryMsg...msg.getResultCode=" + msg.getResultCode() + "\nmsg.getMsg="
+								+ msg.getMsg() + "\nmsg.getData=" + msg.getData());
+						if (msg.getResultCode() == 2222) {
+							LogUtils.i(TAG, "manualGetRoomHistoryMsg...success");
+							Message message = Message.obtain();
+							message.what = 1;
+							message.obj = msg.getData().toString();
+							handler.sendMessage(message);
+						}
+						if (msg.getResultCode() == 3333) {
+							LogUtils.i(TAG, "manualGetRoomHistoryMsg...onfailure,cause by:" + msg.getMsg());
+							Message message = Message.obtain();
+							message.obj = msg.getMsg();
+							message.what = 2;
+							handler.sendMessage(message);
+							ToastUtils.toast(context, "无历史聊天记录");
+						}
+					}
 
-			@Override
-			public void onFailure(String e)
-			{
-				LogUtils.i(TAG, "manualGetRoomHistoryMsg...onFailure,cause by:" + e);
-				Message message = Message.obtain();
-				message.obj = "网络错误";
-				message.what = 3;
-				handler.sendMessage(message);
-			}
-		});
+					@Override
+					public void onFailure(String e) {
+						LogUtils.i(TAG, "manualGetRoomHistoryMsg...onFailure,cause by:" + e);
+						Message message = Message.obtain();
+						message.obj = "网络错误";
+						message.what = 3;
+						handler.sendMessage(message);
+					}
+				});
 	}
-	
-	
+
 }

@@ -19,18 +19,16 @@ public class PhotoSingleChoiceAdapter extends CommonAdapter<String> {
 	 */
 	private String mDirPath;
 	private Context context;
-	public PhotoSingleChoiceAdapter(Context context, List<String> mDatas, int itemLayoutId,
-			String dirPath) {
+
+	public PhotoSingleChoiceAdapter(Context context, List<String> mDatas, int itemLayoutId, String dirPath) {
 		super(context, mDatas, itemLayoutId);
 		this.mDirPath = dirPath;
 		this.context = context;
 	}
 
-
-
 	@Override
 	public void convert(ViewHolder helper, String item) {
 		helper.setImageResource(R.id.id_item_image, R.drawable.pictures_no);
-			helper.setImageByUrl(R.id.id_item_image, mDirPath + "/" + item);
+		helper.setImageByUrl(R.id.id_item_image, mDirPath + "/" + item);
 	}
 }

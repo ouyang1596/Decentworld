@@ -34,7 +34,6 @@ public class StrangerInfo extends Model {
 	public String nickname;
 	@Column(name = "icon")
 	public String icon;
-
 	
 	/**
 	 * @return the nickname

@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 /**
  * @ClassName: ToastUtils.java
- * @Description: 
+ * @Description: 弹出提示信息
  * @author: cj
  * @date: 2015年11月28日 上午10:36:25
  */

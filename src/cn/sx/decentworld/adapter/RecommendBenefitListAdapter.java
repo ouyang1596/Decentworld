@@ -13,12 +13,14 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.activity.RecommendBenefitDetailActivity_;
 import cn.sx.decentworld.bean.RecommendBenefitList;
+import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
 
@@ -30,106 +32,96 @@ import cn.sx.decentworld.utils.ImageUtils;
  */
 public class RecommendBenefitListAdapter extends BaseAdapter
 {
-	private Context context;
-	private LayoutInflater inflater;
-	private List<RecommendBenefitList> mData;
+    private Context context;
+    private LayoutInflater inflater;
+    private List<RecommendBenefitList> mData;
 
-	/**
-	 * @param context
-	 * @param inflater
-	 */
-	public RecommendBenefitListAdapter(Context context, List<RecommendBenefitList> mData)
-	{
-		this.context = context;
-		this.inflater = LayoutInflater.from(context);
-		this.mData = mData;
-	}
+    /**
+     * @param context
+     * @param inflater
+     */
+    public RecommendBenefitListAdapter(Context context, List<RecommendBenefitList> mData)
+    {
+        this.context = context;
+        this.inflater = LayoutInflater.from(context);
+        this.mData = mData;
+    }
 
-	@Override
-	public int getCount()
-	{
-		return mData.size();
-	}
+    @Override
+    public int getCount()
+    {
+        return mData.size();
+    }
 
-	@Override
-	public RecommendBenefitList getItem(int position)
-	{
-		return mData.get(position);
-	}
+    @Override
+    public RecommendBenefitList getItem(int position)
+    {
+        return mData.get(position);
+    }
 
-	@Override
-	public long getItemId(int position)
-	{
-		return position;
-	}
+    @Override
+    public long getItemId(int position)
+    {
+        return position;
+    }
 
-	@Override
-	public View getView(int position, View convertView, ViewGroup parent)
-	{
-		HolderView holder = null;
-		if (convertView == null)
-		{
-			holder = new HolderView();
-			convertView = inflater.from(context).inflate(R.layout.item_recommend_benefit_list, null);
-			holder.iv_icon = (ImageView) convertView.findViewById(R.id.iv_recom_benefit_icon);
-			holder.tv_name = (TextView) convertView.findViewById(R.id.tv_recom_benefit_name);
-			holder.tv_detail = (TextView) convertView.findViewById(R.id.tv_recom_benefit_detail);
-			holder.pb_grogressBar = (ProgressBar) convertView.findViewById(R.id.pb_recom_benefit_progress);
-			holder.tv_amount = (TextView) convertView.findViewById(R.id.tv_recom_benefit_end);
-			convertView.setTag(holder);
-		}
-		else
-		{
-			holder = (HolderView) convertView.getTag();
-		}
-		
-		final RecommendBenefitList benefitList = mData.get(position);
-		if(!benefitList.isRegister())//未注册
-		{
-			holder.iv_icon.setImageResource(R.drawable.default_avatar);
-			holder.tv_name.setText(benefitList.getName());
-			holder.tv_detail.setVisibility(View.GONE);
-			holder.pb_grogressBar.setVisibility(View.GONE);
-			holder.tv_amount.setVisibility(View.GONE);
-		}
-		else
-		{
-			//是否是朋友（设计）
-			String icon = ImageUtils.getIconByDwID(benefitList.getOtherID(), ImageUtils.ICON_SMALL);
-			ImageLoaderHelper.mImageLoader.displayImage(icon, holder.iv_icon);
-			
-			holder.tv_name.setText(benefitList.getName());
-			holder.tv_detail.setVisibility(View.VISIBLE);
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
+        HolderView holder = null;
+        if (convertView == null)
+        {
+            holder = new HolderView();
+            convertView = inflater.from(context).inflate(R.layout.item_recommend_benefit_list, null);
+            holder.ll_root = (LinearLayout) convertView.findViewById(R.id.ll_recom_benefit);
+            holder.tv_name = (TextView) convertView.findViewById(R.id.tv_recom_benefit_name);
+            holder.tv_phoneNum = (TextView) convertView.findViewById(R.id.tv_recom_benefit_phoneNum);
+            holder.tv_back = (TextView) convertView.findViewById(R.id.tv_benefit_item_back);
+            holder.tv_total = (TextView) convertView.findViewById(R.id.tv_benefit_item_total);
+            holder.pb_grogressBar = (ProgressBar) convertView.findViewById(R.id.pb_recom_benefit_progress);
+            convertView.setTag(holder);
+        }
+        else
+        {
+            holder = (HolderView) convertView.getTag();
+        }
 
-			int benefit = (int) benefitList.getBenefit();
-			holder.pb_grogressBar.setProgress(benefit);
-			
-			int amount = (int) (benefitList.getAmount());
-			holder.pb_grogressBar.setMax(amount);
-			
-			holder.tv_amount.setText(benefitList.getBenefit()+"/"+benefitList.getAmount());
-			holder.tv_detail.setOnClickListener(new OnClickListener()
-			{
-				@Override
-				public void onClick(View v)
-				{
-					Toast.makeText(context, "查看详情", Toast.LENGTH_SHORT).show();
-					Intent intent = new Intent(context,RecommendBenefitDetailActivity_.class);
-					intent.putExtra("otherID", benefitList.getOtherID());
-					context.startActivity(intent);
-				}
-			});
-		}
-		return convertView;
-	}
+        final RecommendBenefitList benefitList = mData.get(position);
 
-	class HolderView
-	{
-		ImageView iv_icon;
-		TextView tv_name;
-		TextView tv_detail;
-		ProgressBar pb_grogressBar;
-		TextView tv_amount;
-	}
+        holder.tv_name.setText(benefitList.getName());
+        holder.tv_phoneNum.setText(benefitList.getPhoneNum());
+        
+        holder.tv_back.setText(""+benefitList.getBenefit());
+        holder.tv_total.setText(""+benefitList.getAmount());
+        
+        int benefit = (int) benefitList.getBenefit();
+        holder.pb_grogressBar.setProgress(benefit);
+
+        int amount = (int) (benefitList.getAmount());
+        holder.pb_grogressBar.setMax(amount);
+
+        holder.ll_root.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Toast.makeText(context, "查看详情", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(context , RecommendBenefitDetailActivity_.class);
+                intent.putExtra("otherID", benefitList.getOtherID());
+                context.startActivity(intent);
+            }
+        });
+        return convertView;
+    }
+
+    class HolderView
+    {
+        LinearLayout ll_root;
+        TextView tv_name;
+        TextView tv_phoneNum;
+        TextView tv_back;
+        ProgressBar pb_grogressBar;
+        TextView tv_total;
+    }
 
 }

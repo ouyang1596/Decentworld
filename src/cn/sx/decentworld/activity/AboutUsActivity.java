@@ -137,6 +137,7 @@ public class AboutUsActivity extends BaseFragmentActivity
 		{
 			toast.show("请检查网络！");
 		}
+		
 	}
 
 }

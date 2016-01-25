@@ -6,38 +6,22 @@ package cn.sx.decentworld.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.R.string;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnTouchListener;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.AdapterView.OnItemLongClickListener;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.GroupGridAdapter;
+import cn.sx.decentworld.component.Common;
+import cn.sx.decentworld.component.ToastComponent;
 
-import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.Click;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
-
-import cn.sx.decentworld.R;
-import cn.sx.decentworld.adapter.GroupGridAdapter;
-import cn.sx.decentworld.component.ToastComponent;
-import cn.sx.decentworld.component.ui.MainFragmentComponent;
-import cn.sx.decentworld.utils.ViewUtil;
 
 /**
  * @ClassName: InterestingGroupBuildActivity.java
@@ -78,7 +62,7 @@ public class InterestingGroupBuildActivity extends BaseFragmentActivity {
 	ToastComponent toast;
 
 	@Bean
-	MainFragmentComponent component;
+	Common common;
 
 	@ViewById(R.id.build_activity_interesting_group_item_info_root)
 	LinearLayout build_activity_interesting_group_item_info_root;
@@ -116,7 +100,7 @@ public class InterestingGroupBuildActivity extends BaseFragmentActivity {
 
 	@Click(R.id.rl_toshow_something)
 	public void showsomething() {
-		component.toActivity(InterestingGroupSomeThing_.class);
+	    common.toActivity(InterestingGroupSomeThing_.class);
 	}
 
 	private boolean if_show = true;

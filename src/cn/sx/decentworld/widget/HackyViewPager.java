@@ -18,29 +18,29 @@ import android.view.MotionEvent;
  */
 public class HackyViewPager extends ViewPager {
 
-    private static final String TAG = "HackyViewPager";
+	private static final String TAG = "HackyViewPager";
 
-    public HackyViewPager(Context context) {
-        super(context);
-    }
+	public HackyViewPager(Context context) {
+		super(context);
+	}
 
-    public HackyViewPager(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+	public HackyViewPager(Context context, AttributeSet attrs) {
+		super(context, attrs);
+	}
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
-        try {
-            return super.onInterceptTouchEvent(ev);
-        } catch (IllegalArgumentException e) {
-            // 不理会
-            Log.e(TAG, "hacky viewpager error1");
-            return false;
-        } catch (ArrayIndexOutOfBoundsException e) {
-            // 不理会
-            Log.e(TAG, "hacky viewpager error2");
-            return false;
-        }
-    }
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		try {
+			return super.onInterceptTouchEvent(ev);
+		} catch (IllegalArgumentException e) {
+			// 不理会
+			Log.e(TAG, "hacky viewpager error1");
+			return false;
+		} catch (ArrayIndexOutOfBoundsException e) {
+			// 不理会
+			Log.e(TAG, "hacky viewpager error2");
+			return false;
+		}
+	}
 
 }

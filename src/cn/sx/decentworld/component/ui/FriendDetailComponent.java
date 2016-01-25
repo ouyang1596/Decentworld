@@ -3,27 +3,19 @@
  */
 package cn.sx.decentworld.component.ui;
 
-import java.io.File;
 import java.util.HashMap;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.widget.ScrollView;
-import cn.sx.decentworld.activity.FriendDetailActivity;
-import cn.sx.decentworld.bean.DWMessage;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
-import cn.sx.decentworld.utils.LogUtils;
 
 import com.android.volley.Request.Method;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -99,7 +91,7 @@ public class FriendDetailComponent
 			}
 		});
 
-		FriendDetailActivity.mScrollView = sv_friend_detail_pull_to_refresh.getRefreshableView();
+//		FriendDetailActivity.mScrollView = sv_friend_detail_pull_to_refresh.getRefreshableView();
 	}
 
 	private class GetDataTask extends AsyncTask<Void, Void, String[]>
@@ -133,8 +125,8 @@ public class FriendDetailComponent
 			if (Flag == 1)
 			{
 				toast.show("加载作品圈需要处理");
-				FriendDetailActivity.uu.add(FriendDetailActivity.bean);
-				FriendDetailActivity.adaper.notifyDataSetChanged();
+//				FriendDetailActivity.uu.add(FriendDetailActivity.bean);
+//				FriendDetailActivity.adaper.notifyDataSetChanged();
 			}
 			super.onPostExecute(result);
 		}

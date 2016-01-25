@@ -43,12 +43,12 @@ public final class RegisterTalentActivity_
     }
 
     private void afterSetContentView_() {
-        btnOk = ((Button) findViewById(id.btn_OK));
-        ivUploadPic = ((ImageView) findViewById(id.iv_upload_pic));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivBack = ((ImageView) findViewById(id.iv_back));
+        btnOk = ((Button) findViewById(id.btn_OK));
         llRegisterTalent = ((LinearLayout) findViewById(id.root_register_talent));
         etvMaterialKind = ((EditText) findViewById(id.etv_material_kind));
+        ivUploadPic = ((ImageView) findViewById(id.iv_upload_pic));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();

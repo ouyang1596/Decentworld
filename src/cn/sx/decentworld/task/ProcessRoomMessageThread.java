@@ -2,35 +2,14 @@
  * 
  */
 package cn.sx.decentworld.task;
-
-import java.io.File;
-
 import org.jivesoftware.smack.packet.Message;
 import org.simple.eventbus.EventBus;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.widget.Toast;
 import cn.sx.decentworld.DecentWorldApp;
-import cn.sx.decentworld.R;
-import cn.sx.decentworld.activity.ExamineActivity_;
-import cn.sx.decentworld.bean.AppearanceBean;
-import cn.sx.decentworld.bean.ContactUser;
-import cn.sx.decentworld.bean.ConversationList;
 import cn.sx.decentworld.bean.DWMessage;
-import cn.sx.decentworld.bean.NewFriend;
 import cn.sx.decentworld.bean.NotifyByEventBus;
-import cn.sx.decentworld.bean.manager.DWSMessageManager;
-import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.manager.MsgNotifyManager;
-import cn.sx.decentworld.network.utils.JsonUtils;
-import cn.sx.decentworld.utils.FileUtils;
-import cn.sx.decentworld.utils.HttpDownloader;
-import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.LogUtils;
 
 import com.alibaba.fastjson.JSON;
@@ -44,7 +23,7 @@ import com.alibaba.fastjson.JSONObject;
  */
 public class ProcessRoomMessageThread extends DWPacketHandler
 {
-	public static final String TAG = "ProcessRoomLeaveThread";
+	public static final String TAG = "ProcessRoomMessageThread";
 
 	public ProcessRoomMessageThread(Message msg, Context context)
 	{
@@ -78,25 +57,27 @@ public class ProcessRoomMessageThread extends DWPacketHandler
 		}
 		else if ("roomMSG".equals(subject))
 		{
-			String body = message.getBody();
-			final String dwID;
-			dwID = DecentWorldApp.getInstance().getDwID();
-			DWMessage dwMessage = DWMessage.toDWMessage(message.getBody());
+		    LogUtils.i(TAG, "message.getBody="+message.getBody());
+			JSONObject jsonObject=JSON.parseObject(message.getBody());
+	        String msg=jsonObject.getString("msg");
+	        String userSessionInfo=jsonObject.getString("userSessionInfo");
+	        String body = msg;
+			final String dwID = DecentWorldApp.getInstance().getDwID();
+			DWMessage dwMessage = DWMessage.toDWMessage(body);
 			if (dwMessage.getChatType() == DWMessage.CHAT_TYPE_MULTI)
 			{
 				LogUtils.i(TAG, "接受一条聊天室的文字消息：" + body);
 				if (!dwMessage.getFrom().equals(dwID))
 				{
-					// 别人发送过来的消息
+					/** 别人发送过来的消息 **/
 					dwMessage.setSendSuccess(1);// 接收成功
 					dwMessage.setDirect(DWMessage.RECEIVE);
 					dwMessage.save();
 					EventBus.getDefault().post(dwMessage, NotifyByEventBus.NT_CHAT_ROOM_MSG);
-					// 聊天室文字消息通知
+					/** 聊天室文字消息通知 **/
 					MsgNotifyManager.getInstance().MultiNotify(dwMessage);
 				}
 			}
 		}
-
 	}
 }

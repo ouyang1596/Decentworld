@@ -44,6 +44,7 @@ import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.common.MediaManager;
 import cn.sx.decentworld.common.SmileUtils;
+import cn.sx.decentworld.common.XmppHelper;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.LogUtils;
@@ -76,31 +77,28 @@ public class DWMessageAdapter extends BaseAdapter {
 	String nickname_tochat = "";
 	private int nowPosition = -1, prePosition = -1;
 
-	public DWMessageAdapter(Context context, List<DWMessage> listMsg) {
-		this.context = context;
-		this.listMsg = listMsg;
-		this.inflater = LayoutInflater.from(context);
-		icon_me = ImageUtils.getIconByDwID(DecentWorldApp.getInstance()
-				.getDwID(), ImageUtils.ICON_SMALL);
-		if (ChatActivity.chatType == DWMessage.CHAT_TYPE_SINGLE_ANONYMITY) {
-			nickname_tochat = "神秘人";
-			icon_tochat = "";
+    
+    public DWMessageAdapter(Context context, List<DWMessage> listMsg,int chatType,String otherNickname,String otherID)
+    {
+        this.context = context;
+        this.listMsg = listMsg;
+        this.inflater = LayoutInflater.from(context);
+        icon_me = ImageUtils.getIconByDwID(DecentWorldApp.getInstance().getDwID(), ImageUtils.ICON_SMALL);
+        if (chatType == DWMessage.CHAT_TYPE_SINGLE_ANONYMITY)
+        {
+            nickname_tochat = "神秘人";
+            icon_tochat = "";
+        }
+        else
+        {
+            nickname_tochat = otherNickname;
+            icon_tochat = ImageUtils.getIconByDwID(otherID, ImageUtils.ICON_SMALL);
+        }
+    }
 
-		} else {
-			nickname_tochat = ChatActivity.otherNickname;
-			icon_tochat = ImageUtils.getIconByDwID(ChatActivity.otherID,
-					ImageUtils.ICON_SMALL);
-		}
-	}
-
-	@Override
-	public void notifyDataSetChanged() {
-		super.notifyDataSetChanged();
-	}
 
 	@Override
 	public View getView(final int position, View convertView, ViewGroup parent) {
-		final String my_dwid = DecentWorldApp.getInstance().getDwID();
 		final DWMessage message = getItem(position);
 		message.setIsRead(1);
 		message.save();
@@ -158,9 +156,6 @@ public class DWMessageAdapter extends BaseAdapter {
 			} else {
 				// 发送语音时
 				if (CommUtil.isNotBlank(icon_me)) {
-					// Picasso.with(context).load(icon_me)
-					// .placeholder(R.drawable.work_default)
-					// .resize(120, 120).into(holder.iv_avatar);
 					ImageLoaderHelper.mImageLoader.displayImage(icon_me,
 							holder.iv_avatar, ImageLoaderHelper.mOptions);
 				}
@@ -210,7 +205,7 @@ public class DWMessageAdapter extends BaseAdapter {
 					.findViewById(R.id.iv_userhead);// 用户头像
 			holder.tv = (TextView) convertView
 					.findViewById(R.id.tv_chatcontent);// 文字内容
-			holder.tv.setTag(Constants.ITEM_KEY, position);
+			holder.tv.setTag(Constants.ITEM_POSITION, position);
 			holder.tv.setOnLongClickListener(mOnLongClickListener);
 
 			holder.tv_time_stamp = (TextView) convertView
@@ -229,9 +224,6 @@ public class DWMessageAdapter extends BaseAdapter {
 					holder.pb.setVisibility(View.GONE);
 				}
 				if (CommUtil.isNotBlank(icon_me)) {
-					// Picasso.with(context).load(icon_me)
-					// .placeholder(R.drawable.work_default)
-					// .resize(120, 120).into(holder.iv_avatar);
 					ImageLoaderHelper.mImageLoader.displayImage(icon_me,
 							holder.iv_avatar, ImageLoaderHelper.mOptions);
 				}
@@ -241,15 +233,18 @@ public class DWMessageAdapter extends BaseAdapter {
 					public void onClick(View v) {
 						EventBus.getDefault().post(message,
 								NotifyByEventBus.NT_RESET_TXT);
+						/** 判断是否联网  **/
+						
+						/** 判断是否已经连接上  **/
+						
+						/** 如果没有连接上，触发重连操作 **/
+						
 					}
 				});
 			} else {
 				// 别人发送过来的消息
 				holder.tv_usernick.setText(nickname_tochat);
 				if (CommUtil.isNotBlank(icon_tochat)) {
-					// Picasso.with(context).load(icon_tochat)
-					// .placeholder(R.drawable.work_default)
-					// .resize(120, 120).into(holder.iv_avatar);
 					ImageLoaderHelper.mImageLoader.displayImage(icon_tochat,
 							holder.iv_avatar, ImageLoaderHelper.mOptions);
 				}
@@ -284,7 +279,7 @@ public class DWMessageAdapter extends BaseAdapter {
 					.findViewById(R.id.iv_userhead);// 用户头像
 			holder.iv_sendPicture = (ImageView) convertView
 					.findViewById(R.id.iv_sendPicture);
-			holder.iv_sendPicture.setTag(Constants.ITEM_KEY, position);
+			holder.iv_sendPicture.setTag(Constants.ITEM_POSITION, position);
 			holder.iv_sendPicture.setOnLongClickListener(mOnLongClickListener);
 
 			holder.percentage = (TextView) convertView
@@ -295,20 +290,12 @@ public class DWMessageAdapter extends BaseAdapter {
 			if (message.getDirect() == DWMessage.RECEIVE) {
 				// 接受
 				if (CommUtil.isNotBlank(icon_tochat)) {
-					// Picasso.with(context).load(icon_tochat)
-					// .config(Config.RGB_565)
-					// .placeholder(R.drawable.work_default)
-					// .resize(120, 120).into(holder.iv_avatar);
 					ImageLoaderHelper.mImageLoader.displayImage(icon_tochat,
 							holder.iv_avatar, ImageLoaderHelper.mOptions);
 				}
 				holder.tv_usernick.setText(nickname_tochat);
 				// 接收的照片显示
 				if (CommUtil.isNotBlank(message.getUri())) {
-					// Picasso.with(context).load(new File(message.getUri()))
-					// .placeholder(R.drawable.work_default)
-					// .error(R.drawable.hollow_heart)
-					// .into(holder.iv_sendPicture);
 					ImageLoaderHelper.mImageLoader.displayImage(
 							Constants.URI_FILE + message.getUri(),
 							holder.iv_sendPicture, ImageLoaderHelper.mOptions);
@@ -326,9 +313,6 @@ public class DWMessageAdapter extends BaseAdapter {
 			} else {
 				// 发送
 				if (CommUtil.isNotBlank(icon_me)) {
-					// Picasso.with(context).load(icon_me).config(Config.RGB_565)
-					// .placeholder(R.drawable.work_default)
-					// .resize(120, 120).into(holder.iv_avatar);
 					ImageLoaderHelper.mImageLoader.displayImage(icon_me,
 							holder.iv_avatar, ImageLoaderHelper.mOptions);
 				}
@@ -394,9 +378,6 @@ public class DWMessageAdapter extends BaseAdapter {
 				// 接收
 				holder.tv_usernick.setText(nickname_tochat);
 				if (CommUtil.isNotBlank(icon_tochat)) {
-					// Picasso.with(context).load(icon_tochat)
-					// .placeholder(R.drawable.work_default)
-					// .resize(120, 120).into(holder.iv_avatar);
 					ImageLoaderHelper.mImageLoader.displayImage(icon_tochat,
 							holder.iv_avatar, ImageLoaderHelper.mOptions);
 				}
@@ -464,25 +445,22 @@ public class DWMessageAdapter extends BaseAdapter {
 					String fromDwId = message.getFrom();
 					String toDwId = message.getTo();
 
-					if (!fromDwId.equals(my_dwid)) {
-						Intent intent = new Intent(context,
-								NearCardDetailActivity_.class);
-						intent.putExtra("dwID", fromDwId);
-						context.startActivity(intent);
-					}
-				}
-			});
-			if (ChatActivity.chatType == DWMessage.CHAT_TYPE_SINGLE_ANONYMITY) {
-				// Picasso.with(context).load(R.drawable.default_avatar)
-				// .config(Config.RGB_565)
-				// .placeholder(R.drawable.work_default).resize(120, 120)
-				// .into(holder.iv_avatar);
-				holder.iv_avatar.setImageResource(R.drawable.default_avatar);
-			}
-			showTime(holder.tv_time_stamp, position);
-		}
-		return convertView;
-	}
+                    if (!fromDwId.equals(DecentWorldApp.getInstance().getDwID()))
+                    {
+                        Intent intent = new Intent(context , NearCardDetailActivity_.class);
+                        intent.putExtra("dwID", fromDwId);
+                        context.startActivity(intent);
+                    }
+                }
+            });
+            if (chatType == DWMessage.CHAT_TYPE_SINGLE_ANONYMITY)
+            {
+                holder.iv_avatar.setImageResource(R.drawable.default_avatar);
+            }
+            showTime(holder.tv_time_stamp, position);
+        }
+        return convertView;
+    }
 
 	private void handlerVoice(final int position, ImageView ivVoice) {
 		if (prePosition == position) {
@@ -504,7 +482,7 @@ public class DWMessageAdapter extends BaseAdapter {
 	private void setIconVoice(final int position, final ViewHolder holder,
 			ImageView ivVoice) {
 		holder.icon_voice.setTag(ivVoice);
-		holder.icon_voice.setTag(Constants.ITEM_KEY, position);
+		holder.icon_voice.setTag(Constants.ITEM_POSITION, position);
 		holder.icon_voice.setOnClickListener(mOnClickListener);
 		holder.icon_voice.setOnLongClickListener(mOnLongClickListener);
 	}
@@ -528,7 +506,7 @@ public class DWMessageAdapter extends BaseAdapter {
 	private OnClickListener mOnClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View view) {
-			int position = (Integer) view.getTag(Constants.ITEM_KEY);
+			int position = (Integer) view.getTag(Constants.ITEM_POSITION);
 			LogUtils.i("bm", "data--" + getItem(position).getUri());
 			if (isClickPosition == -1) {
 				startAudio(position);
@@ -782,20 +760,17 @@ public class DWMessageAdapter extends BaseAdapter {
 	 * @param position
 	 */
 	private void showTime(TextView timeStamp, int position) {
-		if (position == 0)
-		{
-			timeStamp.setText(TimeUtils.DataLong2String(getItem(position).getTime()));
+		if (position == 0) {
+			timeStamp.setText(TimeUtils.DataLong2String(getItem(position)
+					.getTime()));
 			timeStamp.setVisibility(View.VISIBLE);
-		}
-		else
-		{
-			if (TimeUtils.isShowTime(getItem(position - 1).getTime(), getItem(position).getTime()))
-			{
-				timeStamp.setText(TimeUtils.DataLong2String(getItem(position).getTime()));
+		} else {
+			if (TimeUtils.isShowTime(getItem(position - 1).getTime(),
+					getItem(position).getTime())) {
+				timeStamp.setText(TimeUtils.DataLong2String(getItem(position)
+						.getTime()));
 				timeStamp.setVisibility(View.VISIBLE);
-			}
-			else
-			{
+			} else {
 				timeStamp.setVisibility(View.GONE);
 			}
 		}
@@ -825,7 +800,6 @@ public class DWMessageAdapter extends BaseAdapter {
 		showProgressDialog();
 		httpUtils.download(message.getUri(), Constants.HOME_PATH
 				+ Constants.AUDIO_PATH + fileName, new RequestCallBack<File>() {
-
 			@Override
 			public void onSuccess(ResponseInfo<File> responseInfo) {
 				hideProgressDialog();

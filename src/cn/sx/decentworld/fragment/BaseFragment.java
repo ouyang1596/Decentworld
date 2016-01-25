@@ -18,6 +18,7 @@ public abstract class BaseFragment extends Fragment
 	/** 是否已被加载过一次，第二次就不再去请求数据了 */
 	protected boolean mHasLoadedOnce;
 
+	/** setUserVisibleHint是在onCreateView之前调用的 **/
 	@Override
 	public void setUserVisibleHint(boolean isVisibleToUser)
 	{

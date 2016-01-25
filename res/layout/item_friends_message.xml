@@ -32,7 +32,7 @@
                 android:gravity="center"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/new_textsize_12sp"
-                android:visibility="invisible" />
+                android:visibility="visible" />
         </FrameLayout>
 
         <LinearLayout
@@ -80,9 +80,10 @@
                 android:id="@+id/tv_fragment_chat_chat_content"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="说话的最后一段内容"
+                android:text="说话的最后一段内容..."
+                android:singleLine="true"
                 android:textColor="@color/two_black"
-                android:textSize="@dimen/new_textsize_13sp" />
+                android:textSize="@dimen/text_size_15" />
         </LinearLayout>
     </LinearLayout>
 

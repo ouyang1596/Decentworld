@@ -44,6 +44,7 @@
                 android:background="@drawable/fragment_chat_chat_find_item_click" />
 
             <RelativeLayout
+                android:id="@+id/rl_switch_msg_top"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:background="@drawable/find_item_selector"
@@ -76,6 +77,7 @@
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
+                android:id="@+id/rl_switch_msg_no_disturb"
                 android:background="@drawable/find_item_selector"
                 android:padding="10dp" >
 

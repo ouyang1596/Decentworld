@@ -21,18 +21,15 @@ public class ViewHolder {
 	private View mConvertView;
 	private WindowManager wm;
 
-	private ViewHolder(Context context, ViewGroup parent, int layoutId,
-			int position) {
+	private ViewHolder(Context context, ViewGroup parent, int layoutId, int position) {
 		this.mPosition = position;
 		this.mViews = new SparseArray<View>();
-		mConvertView = LayoutInflater.from(context).inflate(layoutId, parent,
-				false);
-//		ViewUtil.scaleContentView((ViewGroup)mConvertView);
-		
+		mConvertView = LayoutInflater.from(context).inflate(layoutId, parent, false);
+		// ViewUtil.scaleContentView((ViewGroup)mConvertView);
+
 		wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		// setTag
-		LayoutParams params = new LayoutParams(wm.getDefaultDisplay()
-				.getWidth() / 3, wm.getDefaultDisplay().getWidth() / 3);
+		LayoutParams params = new LayoutParams(wm.getDefaultDisplay().getWidth() / 3, wm.getDefaultDisplay().getWidth() / 3);
 		mConvertView.setLayoutParams(params);
 		mConvertView.setTag(this);
 	}
@@ -47,8 +44,7 @@ public class ViewHolder {
 	 * @param position
 	 * @return
 	 */
-	public static ViewHolder get(Context context, View convertView,
-			ViewGroup parent, int layoutId, int position) {
+	public static ViewHolder get(Context context, View convertView, ViewGroup parent, int layoutId, int position) {
 		ViewHolder holder = null;
 		if (convertView == null) {
 			holder = new ViewHolder(context, parent, layoutId, position);
@@ -126,8 +122,7 @@ public class ViewHolder {
 	 * @return
 	 */
 	public ViewHolder setImageByUrl(int viewId, String url) {
-		ImageLoader.getInstance(3, Type.LIFO).loadImage(url,
-				(ImageView) getView(viewId));
+		ImageLoader.getInstance(3, Type.LIFO).loadImage(url, (ImageView) getView(viewId));
 		return this;
 	}
 

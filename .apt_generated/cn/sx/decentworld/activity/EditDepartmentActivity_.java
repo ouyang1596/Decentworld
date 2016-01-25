@@ -38,10 +38,10 @@ public final class EditDepartmentActivity_
     }
 
     private void afterSetContentView_() {
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        et_edit_department = ((EditText) findViewById(id.et_edit_department));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         btn_edit_department_complete = ((Button) findViewById(id.btn_edit_department_complete));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        et_edit_department = ((EditText) findViewById(id.et_edit_department));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

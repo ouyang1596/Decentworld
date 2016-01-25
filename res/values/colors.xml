@@ -316,6 +316,7 @@
 
     <!--  -->
     <color name="white">#ffffff</color>
+    <color name="white_40_percent">#78ffffff</color>
     <color name="main_grey">#B6B6B6</color>
     <color name="bottom_blue">#397af2</color>
     <color name="error_item_color">#F6EBE6</color>
@@ -324,6 +325,7 @@
     <!-- chat_发现的背景色 -->
     <color name="chat_find_background">#e8e8e8</color>
     <color name="chat_find_text_color">#505766</color>
+    <color name="transparent">#00000000</color>
 
     <!-- 环信 -->
     <color name="voip_interface_text_color">#bababa</color>
@@ -383,6 +385,7 @@
     <color name="four_black">#EBEBEB</color>
     <color name="new_blue">#62DCC0</color>
     <color name="black_80_percent">#90000000</color>
+    <color name="black_30_percent">#4c000000</color>
     <color name="pink_bg">#FA6289</color>
     <color name="pink_line">#F83B6D</color>
     <color name="new_yellow">#F3B800</color>
@@ -391,8 +394,14 @@
     <color name="new_yellow_deep">#60D09E00</color>
     <color name="half_new_yellow">#99F3B800</color>
     <color name="new_white">#BFBFBF</color>
-    
-     <!-- 橘红色 -->
+
+    <!-- 橘红色 -->
     <color name="btn_orange">#FF9933</color>
+    <color name="dark_gray">#6C7B8A</color>
+    <color name="gray_a">#aaaaaa</color>
+    <color name="gray_b">#bbbbbb</color>
+    <color name="gray_c">#cccccc</color>
+    <color name="gray_d">#dddddd</color>
+    <color name="gray_e">#eeeeee</color>
 
 </resources>

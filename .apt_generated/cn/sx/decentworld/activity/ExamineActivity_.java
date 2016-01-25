@@ -13,6 +13,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
@@ -33,16 +35,21 @@ public final class ExamineActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         registerComponent = RegisterComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ivNoPass = ((ImageView) findViewById(id.iv_no_pass));
+        tvOccupation = ((TextView) findViewById(id.tv_occupation));
         ivPass = ((ImageView) findViewById(id.iv_pass));
+        ivNoPass = ((ImageView) findViewById(id.iv_no_pass));
         vpExamine = ((HackyViewPager) findViewById(id.vp_examine));
-        ((ToastComponent_) toast).afterSetContentView_();
+        llDots = ((LinearLayout) findViewById(id.ll_dots));
+        tvName = ((TextView) findViewById(id.tv_name));
+        tvSex = ((TextView) findViewById(id.tv_sex));
+        tvIntroduce = ((TextView) findViewById(id.tv_introduce));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

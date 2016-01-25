@@ -38,12 +38,12 @@ public final class InterestingGroupSomeThing_
     }
 
     private void afterSetContentView_() {
-        sv_something = ((PullToRefreshScrollView) findViewById(id.sv_something));
         lv_something = ((ListViewForScrollView) findViewById(id.lv_something));
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
-        main_header_title = ((TextView) findViewById(id.tv_header_title));
         main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
+        sv_something = ((PullToRefreshScrollView) findViewById(id.sv_something));
         main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
+        main_header_title = ((TextView) findViewById(id.tv_header_title));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {

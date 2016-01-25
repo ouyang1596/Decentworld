@@ -15,16 +15,13 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.activity.RegisterMobileActivity.TimeCount;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.KeyboardComponent;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.network.request.ResetPwdInfo;
-import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.widget.ClearEditText;
 
 import com.android.volley.Request.Method;
@@ -69,8 +66,16 @@ public class ForgetPwdMobileActivity extends BaseFragmentActivity implements
 		public void handleMessage(android.os.Message msg) {
 			switch (msg.what) {
 			case 2222:
-				startActivity(new Intent(mContext,
-						ForgetPwdIdCardActivity_.class));
+				try {
+					JSONObject object = new JSONObject(msg.obj.toString());
+					String token = object.getString("token");
+					Intent intent = new Intent(mContext,
+							ForgertPwdResetPwdActivity_.class);
+					intent.putExtra("token", token);
+					startActivity(intent);
+				} catch (JSONException e) {
+					toast.show("解析错误");
+				}
 				break;
 
 			}

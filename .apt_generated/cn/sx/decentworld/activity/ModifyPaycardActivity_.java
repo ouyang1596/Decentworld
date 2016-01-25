@@ -36,21 +36,21 @@ public final class ModifyPaycardActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        titleBar = TitleBar_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
         setUserInfo = SetUserInfo_.getInstance_(this);
-        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        et_paycard_weixin = ((EditText) findViewById(id.et_paycard_weixin));
-        btn_paycard_confirm = ((Button) findViewById(id.btn_paycard_confirm));
-        et_paycard_alipay = ((EditText) findViewById(id.et_paycard_alipay));
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         rb_paycard_weixin = ((RadioButton) findViewById(id.rb_paycard_weixin));
+        btn_paycard_confirm = ((Button) findViewById(id.btn_paycard_confirm));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
+        et_paycard_alipay = ((EditText) findViewById(id.et_paycard_alipay));
+        et_paycard_weixin = ((EditText) findViewById(id.et_paycard_weixin));
         rb_paycard_alipay = ((RadioButton) findViewById(id.rb_paycard_alipay));
+        ((TitleBar_) titleBar).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         ((SetUserInfo_) setUserInfo).afterSetContentView_();
-        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

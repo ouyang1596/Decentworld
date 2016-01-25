@@ -15,9 +15,9 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.TitleBar_;
 import cn.sx.decentworld.component.ToastComponent_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
@@ -35,27 +35,12 @@ public final class BindAccountAlipayActivity_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
-        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         et_bind_account_alipay = ((EditText) findViewById(id.et_bind_account_alipay));
+        ll_band_alipay_back = ((LinearLayout) findViewById(id.ll_band_alipay_back));
         btn_bind_account_confirm = ((Button) findViewById(id.btn_bind_account_confirm));
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        BindAccountAlipayActivity_.this.back();
-                    }
-
-                }
-                );
-            }
-        }
         {
             View view = findViewById(id.btn_bind_account_confirm);
             if (view!= null) {
@@ -72,7 +57,6 @@ public final class BindAccountAlipayActivity_
             }
         }
         ((ToastComponent_) toast).afterSetContentView_();
-        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

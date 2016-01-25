@@ -241,10 +241,10 @@ public class ChatRoomMeActivity extends BaseFragmentActivity implements
 			} else {
 				vh.ivRoomBackground.setImageResource(R.drawable.ic_launcher);
 			}
-			vh.ivNewTheme.setTag(Constants.ITEM_KEY, position);
-			vh.ivEdit.setTag(Constants.ITEM_KEY, position);
-			vh.tvChatRoomEnter.setTag(Constants.ITEM_KEY, position);
-			vh.tvSubjectList.setTag(Constants.ITEM_KEY, position);
+			vh.ivNewTheme.setTag(Constants.ITEM_POSITION, position);
+			vh.ivEdit.setTag(Constants.ITEM_POSITION, position);
+			vh.tvChatRoomEnter.setTag(Constants.ITEM_POSITION, position);
+			vh.tvSubjectList.setTag(Constants.ITEM_POSITION, position);
 			vh.ivNewTheme.setOnClickListener(this);
 			vh.ivEdit.setOnClickListener(this);
 			vh.tvChatRoomEnter.setOnClickListener(this);
@@ -267,7 +267,7 @@ public class ChatRoomMeActivity extends BaseFragmentActivity implements
 
 		@Override
 		public void onClick(View view) {
-			Integer position = (Integer) view.getTag(Constants.ITEM_KEY);
+			Integer position = (Integer) view.getTag(Constants.ITEM_POSITION);
 			MyChatRoom item = adapter.getItem(position);
 			Intent intent;
 			switch (view.getId()) {

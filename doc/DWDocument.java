@@ -24,6 +24,12 @@ public class DWDocument
 	 */
 
 	/**
+	 * 选择联系人用 PickContactActivity
+	 * 使用方法：见PickContactActivity内部描述
 	 * 
 	 */
+    
+    /**
+     * 管理App中Activity都用ExitAppUtils工具
+     */
 }

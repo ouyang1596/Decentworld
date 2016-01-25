@@ -41,13 +41,13 @@ public final class ExamineWelcomeActivity_
     }
 
     private void afterSetContentView_() {
+        relCheckedSuccess = ((RelativeLayout) findViewById(id.rel_check_success));
+        tvBackLogin = ((TextView) findViewById(id.tv_back_login));
         lvExamineSupport = ((ListView) findViewById(id.lv_examine_support));
         tvTryAgain = ((TextView) findViewById(id.tv_try_again));
         vsNoSupport = ((VerticalSeekBar) findViewById(id.vs_examine_no_support));
-        tvBackLogin = ((TextView) findViewById(id.tv_back_login));
         tvAnotherMethod = ((TextView) findViewById(id.tv_another_method));
         vsSupport = ((VerticalSeekBar) findViewById(id.vs_examine_support));
-        relCheckedSuccess = ((RelativeLayout) findViewById(id.rel_check_success));
         llCheckFailure = ((LinearLayout) findViewById(id.ll_check_failure));
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();

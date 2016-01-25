@@ -14,441 +14,241 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
-import android.support.v4.view.ViewPager.OnPageChangeListener;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.PerDataAdapter;
+import cn.sx.decentworld.adapter.PerPicPagerAdapter;
 import cn.sx.decentworld.bean.ContactUser;
 import cn.sx.decentworld.bean.DWMessage;
-import cn.sx.decentworld.bean.StrangerInfo;
 import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.common.LocationProvider;
 import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.Dialog_Fragment_add_friend;
+import cn.sx.decentworld.dialog.Dialog_Fragment_add_friend.add_friendListener;
+import cn.sx.decentworld.fragment.AchievementFragment;
+import cn.sx.decentworld.fragment.InfoFragment;
+import cn.sx.decentworld.fragment.InfoFragment.OnInfoClickListener;
+import cn.sx.decentworld.fragment.WorksFragment;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
 import cn.sx.decentworld.network.request.GetStrangerInfo;
 import cn.sx.decentworld.utils.DWUtils;
-import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.JsonHelper;
 import cn.sx.decentworld.utils.LogUtils;
-import cn.sx.decentworld.utils.TimeUtils;
 import cn.sx.decentworld.widget.HackyViewPager;
 
+import com.android.volley.Request.Method;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
+import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
 
 /**
  * @ClassName: NearCardDetailActivity.java
- * @Description:显示陌生人和好友的详细信息 启动界面传入参数 1.dwID 对方dwID
  * @author: yj
  * @date: 2015年10月7日 下午7:05:47
  */
 @EActivity(R.layout.activity_near_card_detail)
-public class NearCardDetailActivity extends BaseFragmentActivity {
-	private static final String TAG = "NearCardDetailActivity";
-	private static final String STATE_POSITION = "STATE_POSITION";
+public class NearCardDetailActivity extends BaseFragmentActivity implements OnClickListener, OnInfoClickListener,
+		add_friendListener {
 	public static final String EXTRA_IMAGE_INDEX = "image_index";
 	public static final String EXTRA_IMAGE_URLS = "image_urls";
-	@ViewById(R.id.vp_near_card_detail_pager)
-	HackyViewPager mPager;
-	@ViewById(R.id.tv_header_title)
-	TextView tvTitle;
-	@ViewById(R.id.iv_back)
-	ImageView ivBack;
-	private int pagerPosition;
-	@ViewById(R.id.iv_dislike)
-	ImageView ivDislike;
-	@ViewById(R.id.iv_like)
-	ImageView ivLike;
-	@ViewById(R.id.item_nearby_stranger_location)
-	TextView tvLocation;
-	@ViewById(R.id.tv_user_detail_info_sign)
-	TextView tvUserSign;
-	@ViewById(R.id.ll_detail)
-	LinearLayout llDetail;
-	@ViewById(R.id.ll_works)
-	LinearLayout llWorks;
-	@ViewById(R.id.tv_detail)
-	TextView tvDetail;
-	@ViewById(R.id.tv_works)
-	TextView tvWorks;
-	private String strangerDwID;
-	@ViewById(R.id.iv_talk_stranger)
-	ImageView ivTalkToStranger;
-	@ViewById(R.id.iv_sex)
-	ImageView ivSex;
-	@ViewById(R.id.tv_age)
-	TextView tvAge;
-	@ViewById(R.id.user_detail_info_root)
-	LinearLayout llRootDetailInfo;
-	@ViewById(R.id.ll_root_works)
-	LinearLayout llRootWorks;
-	@ViewById(R.id.lv_anonymous_info)
-	ListView lvStrangerInfo;
-	@ViewById(R.id.tv_realname_nickname)
-	TextView tvRealNameNickname;
-	@ViewById(R.id.item_nearby_stranger_worth)
-	TextView tvWorth;
-	@ViewById(R.id.line_iv_detail)
-	ImageView ivDetailLine;
-	@ViewById(R.id.line_iv_works)
-	ImageView ivWorksLine;
-	@Bean
-	GetStrangerInfo getStrangerInfo;
-	@Bean
-	ToastComponent toast;
-	// @ViewById(R.id.ll_like_dislike)
-	// LinearLayout llLikeDisLike;
-	@ViewById(R.id.activity_near_card_detail_root)
-	FrameLayout fCardDetail;
-	private StrangerAdapter strangerAdapter;
-	private Map<String, String> mapValue;
 	public static final String USER_NICKNAME = "user_nickname";
 	public static final String USER_WORTH = "user_worth";
-	// 身价
-	private String worth;
+	@ViewById(R.id.vp_near_card_detail_pager)
+	HackyViewPager mPager;
+	@ViewById(R.id.rg_per_data)
+	RadioGroup mRgPerData;
+	@ViewById(R.id.tv_per_age)
+	TextView tvPerAge;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	@ViewById(R.id.tv_per_distance)
+	TextView tvPerDistance;
+	@ViewById(R.id.tv_per_job)
+	TextView tvPerJob;
+	@ViewById(R.id.pScrollView)
+	PullToRefreshScrollView pScrollView;
+	@ViewById(R.id.tv_per_name)
+	TextView tvPerName;
+	@ViewById(R.id.iv_add_friend)
+	ImageView ivAddFriend;
+	@ViewById(R.id.iv_per_dislike)
+	ImageView ivDisLike;
+	@ViewById(R.id.iv_per_like)
+	ImageView ivLike;
+	@ViewById(R.id.tv_per_sex)
+	TextView tvPerSex;
+	@ViewById(R.id.tv_per_sign)
+	TextView tvPerSign;
+	@ViewById(R.id.tv_per_worth)
+	TextView tvPerWorth;
+	@Bean
+	ToastComponent toast;
+	@ViewById(R.id.ll_talk_stranger)
+	LinearLayout llTalkToStranger;
+	@Bean
+	GetStrangerInfo getStrangerInfo;
+	private PerDataAdapter mPerDataAdapter;
+	private String strangerDwID;
+	private SendUrl mSendUrl;
+	private String introduce, shortIntroduce;
 	// 储存头像的地址
 	ArrayList<String> mUrls = new ArrayList<String>();
-	// List<ImageView> imgvs = new ArrayList<ImageView>();
-	/**
-	 * 装ImageView数组
-	 */
+	// 装ImageView数组
 	private ImageView[][] mImageViews;
-
-	private String nickname, age, location;
+	private Handler mGetStrangerInfoHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			Log.i("bm", "detail-----=" + msg.obj.toString());
+			parserJson(msg.obj.toString());
+		};
+	};
 
 	@AfterViews
 	public void init() {
-		initView();
+		NGetIntent();
+		initPicPager();
+		initPerDataPager();
 		getStrangerInfo();
+		initData();
 	}
 
-	private void initPagerAdapetr() {
-		CustomAdapter adapter = new CustomAdapter();
+	private static String POSITION = "position";
+	private int position;
+
+	private void NGetIntent() {
+		strangerDwID = getIntent().getStringExtra(Constants.DW_ID);
+		position = getIntent().getIntExtra(POSITION, -1);
+	}
+
+	private void initPicPager() {
+		mImageViews = new ImageView[3][];
+		// 将图片装载到数组中,其中一组类似缓冲，防止图片少时出现黑色图片，即显示不出来
+		mImageViews[0] = new ImageView[3];
+		mImageViews[1] = new ImageView[3];
+		mImageViews[2] = new ImageView[3];
+		for (int i = 0; i < 3; i++) {
+			// imgvs.add(new ImageView(mContext));
+			for (int j = 0; j < mImageViews[i].length; j++) {
+				ImageView imageView = new ImageView(this);
+				imageView.setScaleType(ScaleType.FIT_XY);
+				imageView.setImageResource(R.drawable.default_icon);
+				mImageViews[i][j] = imageView;
+			}
+			switch (i) {
+			case 0:
+				mUrls.add(ImageUtils.getIconByDwID(strangerDwID, ImageUtils.ICON_MAIN));
+				break;
+			case 1:
+				mUrls.add(ImageUtils.getIconByDwID(strangerDwID, ImageUtils.ICON_EXTRA_1));
+				break;
+			case 2:
+				mUrls.add(ImageUtils.getIconByDwID(strangerDwID, ImageUtils.ICON_EXTRA_2));
+				break;
+			}
+		}
+		PerPicPagerAdapter adapter = new PerPicPagerAdapter(mUrls, mImageViews);
 		mPager.setAdapter(adapter);
 		mPager.setCurrentItem((mUrls.size()) * 50);
 	}
 
-	private void initView() {
-		TimeUtils.currentTimeFormate();
-		NGetIntent();
-		setImageViews();
-		initPagerAdapetr();
-		initMapValue();
-		ivDetailLine.setVisibility(View.VISIBLE);
-		ivWorksLine.setVisibility(View.GONE);
-		View view = View.inflate(mContext, R.layout.item_chat_anonymous, null);
-		lvStrangerInfo.addFooterView(view);
-		strangerAdapter = new StrangerAdapter();
-		lvStrangerInfo.setAdapter(strangerAdapter);
-		pagerPosition = getIntent().getIntExtra(EXTRA_IMAGE_INDEX, 0);
-		ArrayList<String> urls = getIntent().getStringArrayListExtra(
-				EXTRA_IMAGE_URLS);
-		llDetail.setOnClickListener(new OnClickListener() {
+	private InfoFragment infoFragment;
+	private AchievementFragment achievementFragment;
+	private WorksFragment worksFragment;
 
-			@Override
-			public void onClick(View view) {
-				tvDetail.setTextColor(Color.parseColor("#62DCC0"));
-				ivDetailLine.setVisibility(View.VISIBLE);
-				tvWorks.setTextColor(Color.parseColor("#797979"));
-				ivWorksLine.setVisibility(View.GONE);
-				llRootDetailInfo.setVisibility(View.VISIBLE);
-				llRootWorks.setVisibility(View.GONE);
-			}
-		});
-		llWorks.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View view) {
-				tvWorks.setTextColor(Color.parseColor("#62DCC0"));
-				ivWorksLine.setVisibility(View.VISIBLE);
-				tvDetail.setTextColor(Color.parseColor("#797979"));
-				ivDetailLine.setVisibility(View.GONE);
-				llRootDetailInfo.setVisibility(View.GONE);
-				llRootWorks.setVisibility(View.VISIBLE);
-			}
-		});
-		lvStrangerInfo.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> arg0, View view,
-					int position, long arg3) {
-				if (position == strangerAdapter.getCount()) {
-					Intent intent = new Intent(mContext,
-							NearCardDetail2Activity_.class);
-					intent.putExtra(Constants.DW_ID, strangerDwID);
-					intent.putExtra(USER_NICKNAME, nickname);
-					intent.putExtra(USER_WORTH, worth);
-					startActivity(intent);
-				}
-			}
-		});
-		// 更新下标
-		mPager.setOnPageChangeListener(new OnPageChangeListener() {
-
-			@Override
-			public void onPageScrollStateChanged(int arg0) {
-				// item_nearby_stranger
-			}
-
-			@Override
-			public void onPageScrolled(int arg0, float arg1, int arg2) {
-
-			}
-
-			@Override
-			public void onPageSelected(int arg0) {
-				CharSequence text = getString(R.string.viewpager_indicator,
-						arg0 + 1, mPager.getAdapter().getCount());
-				// indicator.setText(text);
-			}
-		});
-
-		ivTalkToStranger.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				LogUtils.i(TAG, "跳转到ChatActivity的信息不完整【缺少worth】，请完善");
-				Intent intent = new Intent(mContext, ChatActivity_.class);
-				intent.putExtra("user_dwID", strangerDwID);
-				if (null != nickname) {
-					intent.putExtra("user_nickname", nickname);
-				} else {
-					intent.putExtra("user_nickname", "");
-				}
-				intent.putExtra("chatType", DWMessage.CHAT_TYPE_SINGLE);
-				if (ContactUser.isContact(strangerDwID)) {
-					// 朋友关系
-					intent.putExtra("chatRelationship",
-							DWMessage.CHAT_RELATIONSHIP_FRIEND);
-				} else {
-					// 陌生人关系
-					intent.putExtra("chatRelationship",
-							DWMessage.CHAT_RELATIONSHIP_STRANGER);
-				}
-				intent.putExtra("user_worth", worth);
-				startActivity(intent);
-				saveStrangerInfo();
-			}
-		});
-		ivDislike.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				Intent intent = new Intent();
-				intent.putExtra(POSITION, position);
-				setResult(Constants.RESULT_CODE_DISLIKE, intent);
-				finish();
-			}
-		});
-		ivLike.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				Intent intent = new Intent();
-				intent.putExtra(POSITION, position);
-				setResult(Constants.RESULT_CODE_LIKE, intent);
-				finish();
-			}
-		});
-		ivBack.setVisibility(View.VISIBLE);
-		ivBack.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				finish();
-			}
-		});
+	private void initPerDataPager() {
+		infoFragment = new InfoFragment();
+		infoFragment.setOnInfoClickListener(this);
+		achievementFragment = new AchievementFragment();
+		worksFragment = new WorksFragment();
+		getSupportFragmentManager().beginTransaction().add(R.id.fl_fragment_container, infoFragment, "inf")
+				.add(R.id.fl_fragment_container, achievementFragment, "acf")
+				.add(R.id.fl_fragment_container, worksFragment, "wof").hide(achievementFragment).hide(worksFragment).commit();
 	}
 
 	private void getStrangerInfo() {
-		Handler handler = new Handler() {
-			public void handleMessage(android.os.Message msg) {
-				String jsonData = msg.obj.toString();
-				LogUtils.i("bm", "detail-----=" + msg.obj.toString());
-				parserJson(jsonData);
-				strangerAdapter.notifyDataSetChanged();
-			}
-		};
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put(Constants.DW_ID, strangerDwID);
-		getStrangerInfo.getNearStrangerDetailInfo(map, handler);
+		getStrangerInfo.getNearStrangerDetailInfo(map, mGetStrangerInfoHandler);
 	}
 
+	private void initData() {
+		mSendUrl = new SendUrl(this);
+		if (-1 == position) {
+			ivDisLike.setVisibility(View.GONE);
+			ivLike.setVisibility(View.GONE);
+		}
+		disableAutoScrollToBottom();
+		pScrollView.setMode(Mode.PULL_FROM_END);
+		pScrollView.setScrollY(0);
+		ivBack.setVisibility(View.VISIBLE);
+		ivBack.setOnClickListener(this);
+		ivDisLike.setOnClickListener(this);
+		llTalkToStranger.setOnClickListener(this);
+		ivLike.setOnClickListener(this);
+		ivAddFriend.setOnClickListener(this);
+		mRgPerData.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+				switch (checkedId) {
+				case R.id.rb_info:
+					getSupportFragmentManager().beginTransaction().hide(achievementFragment).hide(worksFragment)
+							.show(infoFragment).commit();
+					break;
+				case R.id.rb_achievement:
+					getSupportFragmentManager().beginTransaction().hide(worksFragment).hide(infoFragment)
+							.show(achievementFragment).commit();
+					break;
+				case R.id.rb_works:
+					getSupportFragmentManager().beginTransaction().hide(achievementFragment).hide(infoFragment)
+							.show(worksFragment).commit();
+					break;
+				}
+			}
+		});
+	}
+
+	private double ln, lt;
+	private String worth, otherWorth, age, nickname;
 	private List<String> keyList = new ArrayList<String>();
 	private List<String> valueList = new ArrayList<String>();
-	/**
-	 * 将json转化成map
-	 * */
-	Map map;
 
-	private void mapToList(JSONObject jo) throws JSONException {
-		map = JsonHelper.toMap(jo.toString());
-		Set set = map.entrySet();
-		Iterator iterator = set.iterator();
-		while (iterator.hasNext()) {
-			Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator
-					.next();
-			String value = entry.getValue();
-			if (!"".equals(value) && !entry.getKey().equals("身价")) {
-				keyList.add(entry.getKey());
-				valueList.add(value);
+	private void disableAutoScrollToBottom() {
+		pScrollView.setDescendantFocusability(ViewGroup.FOCUS_BEFORE_DESCENDANTS);
+		pScrollView.setFocusable(true);
+		pScrollView.setFocusableInTouchMode(true);
+		pScrollView.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				v.requestFocusFromTouch();
+				return false;
 			}
-		}
-	};
-
-	private static String POSITION = "position";
-	private boolean ifLike;
-	private int position;
-
-	private void NGetIntent() {
-		location = getIntent().getStringExtra("location");
-		tvLocation.setText(location + "km");
-		strangerDwID = getIntent().getStringExtra(Constants.DW_ID);
-		ifLike = getIntent().getBooleanExtra(Constants.IF_LIKE, false);
-		position = getIntent().getIntExtra(POSITION, -1);
+		});
 	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		outState.putInt(STATE_POSITION, mPager.getCurrentItem());
-	}
-
-	public class CustomAdapter extends PagerAdapter {
-
-		@Override
-		public int getCount() {
-			return Integer.MAX_VALUE;
-		}
-
-		@Override
-		public boolean isViewFromObject(View arg0, Object arg1) {
-			return arg0 == arg1;
-		}
-
-		@Override
-		public void destroyItem(View container, int position, Object object) {
-			if (mUrls.size() == 1)
-				((ViewPager) container).removeView(mImageViews[position
-						/ mUrls.size() % 2][0]);
-			else
-				((ViewPager) container).removeView(mImageViews[position
-						/ mUrls.size() % 2][position % mUrls.size()]);
-		}
-
-		/**
-		 * 载入图片进去，用当前的position 除以 图片数组长度取余数是关键
-		 */
-		@Override
-		public Object instantiateItem(View container, int position) {
-			if (mUrls.size() == 1) {
-				((ViewPager) container).addView(mImageViews[position
-						/ mUrls.size() % 2][0]);
-				ImageLoaderHelper.mImageLoader.displayImage(
-						mUrls.get(position % 3),
-						mImageViews[position / mUrls.size() % 2][0],
-						ImageLoaderHelper.mOptions);
-				LogUtils.i("bm", "position--" + position);
-				return mImageViews[position / mUrls.size() % 2][0];
-			} else
-				((ViewPager) container).addView(
-						mImageViews[position / mUrls.size() % 2][position
-								% mUrls.size()], 0);
-			ImageLoaderHelper.mImageLoader.displayImage(
-					mUrls.get(position % 3),
-					mImageViews[position / mUrls.size() % 2][position
-							% mUrls.size()], ImageLoaderHelper.mOptions);
-			LogUtils.i("bm", "position--" + position);
-			return mImageViews[position / mUrls.size() % 2][position
-					% mUrls.size()];
-		}
-	}
-
-	private static final String GRAY = "#C0C0C0";
-
-	class StrangerAdapter extends BaseAdapter {
-
-		@Override
-		public int getCount() {
-			return keyList == null ? 0 : keyList.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return keyList.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View con, ViewGroup arg2) {
-			ViewHolder vh = null;
-			if (null == con) {
-				con = View.inflate(mContext, R.layout.item_stranger_base_info,
-						null);
-				vh = new ViewHolder();
-				vh.tvName = (TextView) con.findViewById(R.id.tv_name);
-				vh.tvValue = (TextView) con.findViewById(R.id.tv_value);
-				vh.llBaseInfo = (LinearLayout) con
-						.findViewById(R.id.ll_baseinfo);
-				con.setTag(vh);
-			} else {
-				vh = (ViewHolder) con.getTag();
-			}
-			String key = keyList.get(position);
-			String value = valueList.get(position);
-			vh.tvName.setText(key);
-			vh.tvValue.setText(value);
-			return con;
-		}
-
-		class ViewHolder {
-			TextView tvName, tvValue;
-			LinearLayout llBaseInfo;
-		}
-	}
-
-	private void saveStrangerInfo() {
-		StrangerInfo info = StrangerInfo.queryByDwID(strangerDwID);
-		if (null == info) {
-			info = new StrangerInfo();
-		}
-		info.strangerDwID = strangerDwID;
-		info.age = age;
-		info.nickname = nickname;
-		info.location = location;
-		if (null != mUrls && mUrls.size() > 0) {
-			info.icon = mUrls.get(0);
-		}
-		info.save();
-	}
-
-	private Double ln = 0.0, lt = 0.0;
 
 	private void parserJson(String jsonData) {
 		try {
 			JSONObject object = new JSONObject(jsonData);
 			String sign = object.getString("个性签名");
-			tvUserSign.setText(sign);
+			tvPerSign.setText(sign);
 			JSONObject baseInfoObject = object.getJSONObject("基本信息");
 			if (CommUtil.isNotBlank(baseInfoObject.getString("ln"))) {
 				ln = Double.valueOf(baseInfoObject.getString("ln"));
@@ -456,31 +256,31 @@ public class NearCardDetailActivity extends BaseFragmentActivity {
 			if (CommUtil.isNotBlank(baseInfoObject.getString("lt"))) {
 				lt = Double.valueOf(baseInfoObject.getString("lt"));
 			}
-			double distance = DWUtils.getDistance(LocationProvider.longitude,
-					LocationProvider.latitude, ln, lt);
+			double distance = DWUtils.getDistance(LocationProvider.longitude, LocationProvider.latitude, ln, lt);
 			distance = ((int) (distance * 100)) / 100.0;
-			tvLocation.setText(distance + "km");
+			tvPerDistance.setText(distance + "km");
 			worth = baseInfoObject.getString("身价");
-			tvWorth.setText(worth);
+			tvPerWorth.setText(worth);
+			otherWorth = worth;
 			String sex = baseInfoObject.getString("性别");
-			if ("男".equals(sex)) {
-				ivSex.setImageResource(R.drawable.dot_boy);
-			} else {
-				ivSex.setImageResource(R.drawable.dot_girl);
-			}
+			tvPerSex.setText(sex);
 			age = baseInfoObject.getString("年龄");
-			tvAge.setText(age);
-			nickname = baseInfoObject.getString("昵称");
-			if (null != nickname && !"".equals(nickname)) {
-				tvTitle.setText(nickname);
-				tvRealNameNickname.setText(nickname);
+			tvPerAge.setText(age);
+			if (CommUtil.isNotBlank(baseInfoObject.getString("昵称"))) {
+				nickname = baseInfoObject.getString("昵称");
 			}
-			nickname = baseInfoObject.getString("实名");
 			if (null != nickname && !"".equals(nickname)) {
-				tvTitle.setText(nickname);
-				tvRealNameNickname.setText(nickname);
+				tvPerName.setText(nickname);
 			}
-
+			introduce = baseInfoObject.getString("introduce");
+			shortIntroduce = baseInfoObject.getString("shorIntroduce");
+			achievementFragment.setIntroduce(shortIntroduce, introduce);
+			if (CommUtil.isNotBlank(baseInfoObject.getString("实名"))) {
+				nickname = baseInfoObject.getString("实名");
+			}
+			if (null != nickname && !"".equals(nickname)) {
+				tvPerName.setText(nickname);
+			}
 			JSONObject historyObject = object.getJSONObject("我的历史");
 			keyList.add("我的历史");
 			valueList.add("");
@@ -493,43 +293,110 @@ public class NearCardDetailActivity extends BaseFragmentActivity {
 		}
 	}
 
-	private void setImageViews() {
-		mImageViews = new ImageView[3][];
-		// 将图片装载到数组中,其中一组类似缓冲，防止图片少时出现黑色图片，即显示不出来
-		mImageViews[0] = new ImageView[3];
-		mImageViews[1] = new ImageView[3];
-		mImageViews[2] = new ImageView[3];
-		for (int i = 0; i < 3; i++) {
-			// imgvs.add(new ImageView(mContext));
-			for (int j = 0; j < mImageViews[i].length; j++) {
-				ImageView imageView = new ImageView(this);
-				imageView.setImageResource(R.drawable.default_icon);
-				mImageViews[i][j] = imageView;
+	Map map;
+
+	/**
+	 * 将json转化成map
+	 * */
+	private void mapToList(JSONObject jo) throws JSONException {
+		map = JsonHelper.toMap(jo.toString());
+		Set set = map.entrySet();
+		Iterator iterator = set.iterator();
+		while (iterator.hasNext()) {
+			Map.Entry<String, String> entry = (Map.Entry<String, String>) iterator.next();
+			String value = entry.getValue();
+			if (!"".equals(value) && !entry.getKey().equals("身价")) {
+				keyList.add(entry.getKey());
+				valueList.add(value);
 			}
-			switch (i) {
-			case 0:
-				mUrls.add(ImageUtils.getIconByDwID(strangerDwID,
-						ImageUtils.ICON_MAIN));
-				break;
-			case 1:
-				mUrls.add(ImageUtils.getIconByDwID(strangerDwID,
-						ImageUtils.ICON_EXTRA_1));
-				break;
-			case 2:
-				mUrls.add(ImageUtils.getIconByDwID(strangerDwID,
-						ImageUtils.ICON_EXTRA_2));
-				break;
-			}
+		}
+		infoFragment.upData(keyList, valueList);
+	}
+
+	@Override
+	public void onClick(View v) {
+		Intent intent;
+		switch (v.getId()) {
+		case R.id.iv_per_like:
+			intent = new Intent();
+			intent.putExtra(POSITION, position);
+			setResult(Constants.RESULT_CODE_LIKE, intent);
+			finish();
+			break;
+		case R.id.iv_per_dislike:
+			intent = new Intent();
+			intent.putExtra(POSITION, position);
+			setResult(Constants.RESULT_CODE_DISLIKE, intent);
+			finish();
+			break;
+		case R.id.ll_talk_stranger:
+			intentToChatActivity();
+			break;
+		case R.id.iv_back:
+			finish();
+			break;
+		case R.id.iv_add_friend:
+			Dialog_Fragment_add_friend dialog = Dialog_Fragment_add_friend.newInstance();
+			dialog.setOnListener(this);
+			dialog.show(getSupportFragmentManager(), "dialog");
+
+			break;
 		}
 	}
 
-	private void initMapValue() {
-		mapValue = new HashMap<String, String>();
-		Resources res = getResources();
-		String[] keys = res.getStringArray(R.array.user_info_indexs);
-		String[] values = res.getStringArray(R.array.user_info_keys);
-		for (int i = 0; i < keys.length; i++) {
-			mapValue.put(keys[i], values[i]);
-		}
+	private void intentToChatActivity() {
+		LogUtils.i("aa", nickname);
+		Intent intent;
+		intent = new Intent(mContext, ChatActivity_.class);
+		intent.putExtra(ChatActivity.OTHER_ID, strangerDwID);
+		intent.putExtra(ChatActivity.OTHER_NICKNAME, nickname);
+		intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
+		if (ContactUser.isContact(strangerDwID))
+			intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+		else
+			intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_STRANGER);
+		intent.putExtra(ChatActivity.OTHER_WORTH, Float.valueOf(worth));
+		startActivity(intent);
 	}
+
+	@Override
+	public void OnInfoClick(int position) {
+		intentToChatActivity();
+	}
+
+	private void showToastInfo(final String info) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				toast.show(info);
+			}
+		});
+	}
+
+	@Override
+	public void add_friend_with_reason(String reason) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", DecentWorldApp.getInstance().getDwID());
+		map.put("friendID", strangerDwID);
+		map.put("searchType", "3");
+		map.put("addReason", reason);
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + Constants.API_ADD_FRIEND_NO_CONTACT, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						if (msg.getResultCode() == 2222) {
+							showToastInfo("申请已发送");
+						} else {
+							showToastInfo(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToastInfo(Constants.NET_WRONG);
+					}
+				});
+	};
 }

@@ -25,7 +25,6 @@ import cn.sx.decentworld.dialog.ReminderDialog;
 import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
 import cn.sx.decentworld.network.request.PrivacySettingInfo;
 import cn.sx.decentworld.network.request.ResetPwdInfo;
-import cn.sx.decentworld.utils.ActivityCollector;
 
 import com.android.volley.Request.Method;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -65,8 +64,6 @@ public class ModificationPhoneNumOne extends BaseFragmentActivity implements
 
 	@AfterViews
 	public void init() {
-		ActivityCollector.clear();
-		ActivityCollector.addActivity(this);
 		titleBar.setTitleBar("返回", "替换手机号码");
 		fm = getSupportFragmentManager();
 		btn_modification_phone_num_one_next.setOnClickListener(this);

@@ -26,8 +26,10 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.packet.Session;
 import org.jivesoftware.smack.sasl.*;
-
 import org.apache.harmony.javax.security.auth.callback.CallbackHandler;
+
+import cn.sx.decentworld.utils.LogUtils;
+
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -398,7 +400,7 @@ public class SASLAuthentication implements UserAuthentication
 				// server, which
 				// may not match the XMPP domain.
 				currentMechanism.authenticate(username, connection.getServiceName(), password);
-
+				LogUtils.i("bgm", currentMechanism+username+password+resource+connection.getServiceName());
 				// Wait until SASL negotiation finishes
 				synchronized (this)
 				{
@@ -419,6 +421,8 @@ public class SASLAuthentication implements UserAuthentication
 					// SASL authentication failed and the server may have closed
 					// the connection
 					// so throw an exception
+					LogUtils.i("bgm", "saslFailed------>");
+
 					if (errorCondition != null)
 					{
 						throw new XMPPException("SASL authentication " + selectedMechanism + " failed: " + errorCondition);
@@ -450,6 +454,9 @@ public class SASLAuthentication implements UserAuthentication
 		} else
 		{
 			// No SASL method was found so try a Non-SASL authentication
+			//this
+			LogUtils.i("bgm", "this------>");
+
 			return new NonSASLAuthentication(connection).authenticate(username, password, resource);
 		}
 	}

@@ -12,13 +12,12 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.component.ui.SearchComponent_;
-import cn.sx.decentworld.widget.SearchEditText;
+import cn.sx.decentworld.widget.ClearEditText;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
@@ -35,17 +34,17 @@ public final class SearchActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         searchComponent = SearchComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        setSearch = ((SearchEditText) findViewById(id.cet_search));
-        rgSearchTag = ((RadioGroup) findViewById(id.rg_search_tag));
+        tvSearch = ((TextView) findViewById(id.tv_search));
         tvCancel = ((TextView) findViewById(id.tv_cancel));
+        cetSearch = ((ClearEditText) findViewById(id.cet_search));
         lvSearch = ((PullToRefreshListView) findViewById(id.lv_search));
-        ((ToastComponent_) toast).afterSetContentView_();
         ((SearchComponent_) searchComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

@@ -1,163 +1,137 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:percent="http://schemas.android.com/apk/res/cn.sx.decentworld"
     android:id="@+id/ll_item_chat_room_image_list_root"
     android:layout_width="match_parent"
-    android:layout_height="568px"
-    android:background="#F6F9FB"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="284dp"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content" >
 
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="230dp" >
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="202dp"
-                android:layout_marginBottom="28dp" >
-
-                <ImageView
-                    android:id="@+id/iv_bg"
-                    android:layout_width="match_parent"
-                    android:layout_height="202dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/ic_launcher" />
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="9dp"
-                    android:layout_marginLeft="75dp"
-                    android:layout_marginRight="25dp"
-                    android:orientation="horizontal" >
-
-                    <TextView
-                        android:id="@+id/tv_self_nickname"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginRight="10dp"
-                        android:text="欧阳"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/new_textsize_14sp" />
-
-                    <TextView
-                        android:id="@+id/tv_self_introduce"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="欢迎来到滴滴答答"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/new_textsize_14sp" />
-                </LinearLayout>
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentLeft="true" >
-
-                <RelativeLayout
-                    android:id="@+id/rl_1"
-                    android:layout_width="55dp"
-                    android:layout_height="55dp"
-                    android:layout_centerVertical="true"
-                    android:layout_marginLeft="16dp"
-                    android:background="@drawable/chat_room_avatar_bg" >
-
-                    <!-- cn.sx.decentworld.widget.CircularImageView -->
-
-                    <cn.sx.decentworld.widget.CircularImageView
-                        android:id="@+id/iv_detail"
-                        android:layout_width="49dp"
-                        android:layout_height="49dp"
-                        android:layout_centerInParent="true"
-                        android:src="@drawable/default_icon"
-                        android:visibility="visible" />
-                </RelativeLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/rl_1"
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="16dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal"
-                    android:padding="5dp" >
-
-                    <TextView
-                        android:id="@+id/tv_chatroom_enter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_alignParentRight="true"
-                        android:text="进入聊天室"
-                        android:textColor="#00BCD4"
-                        android:textSize="@dimen/new_textsize_14sp" />
-
-                    <ImageView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="5dp"
-                        android:src="@drawable/chat_room_join" />
-                </LinearLayout>
-            </RelativeLayout>
-        </RelativeLayout>
+        <cn.sx.decentworld.widget.CircularImageView
+            android:id="@+id/iv_detail"
+            android:layout_width="49dp"
+            android:layout_height="49dp"
+            android:layout_margin="12dp"
+            android:src="@drawable/default_icon" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:orientation="vertical" >
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/iv_detail"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingRight="12dp" >
 
-            <TextView
-                android:id="@+id/tv_subject_name"
-                android:layout_width="wrap_content"
-                android:layout_height="0px"
-                android:layout_weight="1"
-                android:gravity="center_vertical"
-                android:text="欢迎来到滴滴答答"
-                android:textColor="@color/new_black_one"
-                android:textSize="@dimen/new_textsize_16sp" />
-
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0px"
-                android:layout_alignBottom="@id/iv_detail"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal" >
 
                 <TextView
-                    android:id="@+id/tv_online_count"
+                    android:id="@+id/tv_self_nickname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_centerVertical="true"
-                    android:text="34"
-                    android:textColor="@color/new_black_two"
-                    android:textSize="@dimen/new_textsize_12sp" />
+                    android:text="name"
+                    android:textColor="@color/one_black"
+                    android:textSize="@dimen/new_textsize_18sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
 
                 <TextView
                     android:id="@+id/tv_chargerAmount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginRight="20dp"
-                    android:text="¥ 23"
-                    android:textColor="@color/new_black_two"
-                    android:textSize="@dimen/new_textsize_12sp" />
-            </RelativeLayout>
+                    android:text="价格"
+                    android:textColor="@color/one_black"
+                    android:textSize="@dimen/new_textsize_14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/tv_self_introduce"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="我的介绍"
+                    android:textColor="@color/one_black"
+                    android:textSize="@dimen/new_textsize_14sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/tv_online_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="在线"
+                    android:textColor="@color/three_black"
+                    android:textSize="@dimen/new_textsize_14sp" />
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
+
+    <cn.sx.decentworld.widget.PercentImageView
+        android:id="@+id/iv_bg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/camera"
+        percent:weightHeight="4"
+        percent:weightWidth="7" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp" >
+
+        <TextView
+            android:id="@+id/tv_subject_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="10dp"
+            android:text="我的主题"
+            android:textColor="@color/one_black"
+            android:textSize="@dimen/new_textsize_18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_subject_name"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="10dp"
+            android:text="我的主题介绍"
+            android:textColor="@color/two_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+
+        <ImageView
+            android:id="@+id/iv_chatroom_enter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/iv_go" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:background="#E7EFF0" />
 
 </LinearLayout>

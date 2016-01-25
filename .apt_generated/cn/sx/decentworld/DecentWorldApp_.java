@@ -5,7 +5,6 @@
 
 package cn.sx.decentworld;
 
-import cn.sx.decentworld.component.ui.MainFragmentComponent_;
 
 public final class DecentWorldApp_
     extends DecentWorldApp
@@ -13,7 +12,6 @@ public final class DecentWorldApp_
 
 
     private void init_() {
-        mainComponent = MainFragmentComponent_.getInstance_(this);
     }
 
     @Override

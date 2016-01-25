@@ -38,26 +38,11 @@ public final class InterestingGroupBuildRuleActivity_
     }
 
     private void afterSetContentView_() {
-        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         root_activitiy_build_group_rule = ((LinearLayout) findViewById(id.root_activitiy_build_group_rule));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
+        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
         main_header_title = ((TextView) findViewById(id.tv_header_title));
         main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
-        {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        InterestingGroupBuildRuleActivity_.this.toback();
-                    }
-
-                }
-                );
-            }
-        }
         {
             View view = findViewById(id.bt_rule_toshow_fragment);
             if (view!= null) {
@@ -67,6 +52,21 @@ public final class InterestingGroupBuildRuleActivity_
                     @Override
                     public void onClick(View view) {
                         InterestingGroupBuildRuleActivity_.this.toshow();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        InterestingGroupBuildRuleActivity_.this.toback();
                     }
 
                 }

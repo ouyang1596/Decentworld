@@ -40,7 +40,7 @@ public class RecommendBenefitDetail extends Model
 	float amount;
 	
 	/**
-	 * 获得收益收件
+	 * 获得收益时间
 	 */
 	@Column(name = "time")
 	String time;

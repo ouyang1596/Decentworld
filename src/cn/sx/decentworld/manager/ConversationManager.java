@@ -4,15 +4,22 @@
 package cn.sx.decentworld.manager;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-
-import com.activeandroid.query.Select;
+import java.util.Map;
 
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.bean.ContactUser;
 import cn.sx.decentworld.bean.ConversationList;
 import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.MsgAndInfo;
+import cn.sx.decentworld.bean.UserSessionInfo;
+import cn.sx.decentworld.utils.AnonymityNickNameCreator;
+import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.LogUtils;
+
+import com.activeandroid.query.Select;
 
 /**
  * @ClassName: ConversationManager.java
@@ -22,121 +29,376 @@ import cn.sx.decentworld.utils.LogUtils;
  */
 public class ConversationManager
 {
-	private static final String TAG = "ConversationManager";
-	private static ConversationManager instance = new ConversationManager();
-	private ConversationManager()
-	{
-		
-	}
-	
-	/**
-	 * 获得实例
-	 * @return
-	 */
-	public static ConversationManager getInstance()
-	{
-		if(instance==null)
-		{
-			instance = new ConversationManager();
-		}
-		return instance;
-	}
-	
-	
-	/**
-	 * 获得所有好友的会话列表
-	 */
-	public List<ConversationList> getFriendConversationList()
-	{
-		// 查询朋友的会话列表
-		String userID = DecentWorldApp.getInstance().getDwID();
-		String sql = "userID=? and chatRelationship=?";
-		List<ConversationList> list = new Select().from(ConversationList.class).where(sql, userID, DWMessage.CHAT_RELATIONSHIP_FRIEND).orderBy("time desc").execute();
-		// 是否全部满足条件
-		for(ConversationList temp:list)
-		{
-			if(!ContactUser.isContact(temp.getDwID()))
-			{
-				LogUtils.i(TAG, "dwID="+temp.getDwID()+",已经不是自己的好友，将会话列表移到陌生人处");
-				list.remove(temp);
-				temp.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
-				temp.setTitle("重新获取昵称");
-				temp.save();
-			}
-		}
-		// 排序
-		Collections.sort(list);
-		return list;
-	}
-	
-	
-	/**
-	 * 获得所有陌生人的会话列表
-	 */	
-	public static List<ConversationList> getStrangerConversationList()
-	{
-		// 查询陌生人的会话列表
-		String userID = DecentWorldApp.getInstance().getDwID();
-		String sql = "userID=? and chatRelationship=?";
-		List<ConversationList> list = new Select().from(ConversationList.class).where(sql, userID, DWMessage.CHAT_RELATIONSHIP_STRANGER).orderBy("time desc").execute();
-		// 判断是否全部满足条件
-		for (ConversationList temp : list)
-		{
-			if (ContactUser.isContact(temp.getDwID()))
-			{
-				LogUtils.i(TAG, "dwID=" + temp.getDwID() + ",已经是自己的好友，将会话列表移到好友处");
-				list.remove(temp);
-				temp.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_FRIEND);
-//				temp.setTitle("重新获取昵称");
-				temp.save();
-			}
-		}
-		// 排序
-		Collections.sort(list);
-		return list;
-	}
-	
-	/**
-	 * 更加消息更新会话列表
-	 * @param dwMessage
-	 */
-	public void refreshConvByMsg(DWMessage dwMessage)
-	{
-		//新来一条消息，更新会话列表（消息可能是自己发送的，也可能是接收到的）
-		
-		//更新内存
-		
-		//更新数据库
-	}
-	
-	/**
-	 * 添加朋友时更新会话列表
-	 */
-	public void refreshConvByAddFriend()
-	{
-		//更新好友会话列表
-		
-		//更新陌生人会话列表
-		
-		
-	}
-	
-	/**
-	 * 删除好友时更新会话列表
-	 */
-	public void refreshConvByDelFriend()
-	{
-		//更新好友会话列表
-		
-		//更新陌生人会话列表
-		
-		
-	}
-	
-	
+    private static final String TAG = "ConversationManager";
+    private static ConversationManager instance = new ConversationManager();
 
-	
+    private ConversationManager()
+    {
+        
+    }
 
-	
-	
+    /**
+     * 获得实例
+     * 
+     * @return
+     */
+    public static ConversationManager getInstance()
+    {
+        return instance;
+    }
+
+    /**
+     * 获得所有好友的会话列表
+     */
+    public List<ConversationList> getFriendConversationList()
+    {
+        // 查询朋友的会话列表
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and chatRelationship=?";
+        List<ConversationList> list = new Select().from(ConversationList.class).where(sql, userID, DWMessage.CHAT_RELATIONSHIP_FRIEND).orderBy("time asc").execute();
+
+        // 去掉相同的
+        HashMap<String, ConversationList> map = new HashMap<String, ConversationList>();
+        for (ConversationList conv : list)
+        {
+            String key = conv.getDwID() + conv.getChatType();
+            map.put(key, conv);
+        }
+
+        list.clear();
+        for (Map.Entry<String, ConversationList> t : map.entrySet())
+        {
+            list.add(t.getValue());
+        }
+
+        // 去掉不是联系人的
+        Iterator<ConversationList> iterator = list.iterator();
+        while (iterator.hasNext())
+        {
+            ConversationList t = iterator.next();
+            if (!ContactUser.isContact(t.getDwID()))
+            {
+                LogUtils.i(TAG, "dwID=" + t.getDwID() + ",已经不是自己的好友，将会话列表移到陌生人处");
+                t.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+                // t.setTitle("重新获取昵称");//待优化，删除联系人后，应该显示昵称，而不应该显示备注
+                t.save();
+                iterator.remove();
+            }
+        }
+        // 排序
+        Collections.sort(list);
+        return list;
+    }
+
+    /**
+     * 获得所有陌生人的会话列表
+     */
+    public List<ConversationList> getStrangerConversationList()
+    {
+        // 查询陌生人的会话列表
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and chatRelationship=?";
+        List<ConversationList> list = new Select().from(ConversationList.class).where(sql, userID, DWMessage.CHAT_RELATIONSHIP_STRANGER).orderBy("time asc").execute();
+
+        // 去掉相同的
+        HashMap<String, ConversationList> map = new HashMap<String, ConversationList>();
+        for (ConversationList conv : list)
+        {
+            String key = conv.getDwID() + conv.getChatType();
+            map.put(key, conv);
+        }
+
+        list.clear();
+        for (Map.Entry<String, ConversationList> t : map.entrySet())
+        {
+            list.add(t.getValue());
+        }
+
+        // 判断是否全部满足条件
+        Iterator<ConversationList> iterator = list.iterator();
+        while (iterator.hasNext())
+        {
+            ConversationList next = iterator.next();
+            if (ContactUser.isContact(next.getDwID()))
+            {
+                LogUtils.i(TAG, "dwID=" + next.getDwID() + ",已经是自己的好友，将会话列表移到好友处");
+                next.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_FRIEND);
+                next.setTitle(ContactUser.getContactName(next.getDwID()));
+                next.save();
+                iterator.remove();
+            }
+        }
+        // 排序
+        Collections.sort(list);
+        return list;
+    }
+
+    /**
+     * 收到一条好友消息时更新会话列表，这条消息可能是接收到的，也可能是自己发送的;
+     * 接收到一条消息，如果不存在该DwID的会话项，则新建，如果存在则修改对应的内存数据和数据库
+     * 
+     * @param msgAndInfo
+     *            消息
+     * @param conversationLists
+     *            内存中的数据
+     * @param conversationMap
+     *            数据键值对
+     */
+    public void refreshFriendConvByMsg(MsgAndInfo msgAndInfo, List<ConversationList> conversationData, Map<String, ConversationList> conversationMap)
+    {
+        LogUtils.i(TAG, "接收到一条更新会话列表的通知");
+        DWMessage dwMessage = msgAndInfo.getDwMessage();
+        /** 如果是自己发送过来的信息，那么userSessionInfo则是自己构造的，没有token字段 **/
+        UserSessionInfo userSessionInfo = msgAndInfo.getUserSessionInfo();
+        /** 自己的ID **/
+        String userID = DecentWorldApp.getInstance().getDwID();
+        /** 对方ID **/
+        String otherID = userSessionInfo.getFriendID();
+        String otherNickname = userSessionInfo.getShowName();
+        String otherWorth = String.valueOf(userSessionInfo.getWorth());
+
+        int chatType = dwMessage.getChatType();
+        int chatRelationship = dwMessage.getChatRelationship();
+        String key = otherID + dwMessage.getChatType();
+        ConversationList conversation = conversationMap.get(key);
+        // 新的列表
+        if (conversation == null)
+        {
+            String conversation_icon = null;
+            String title = null;
+            if (chatType == DWMessage.CHAT_TYPE_SINGLE)
+            {
+                conversation_icon = ImageUtils.getIconByDwID(otherID, ImageUtils.ICON_SMALL);
+                title = ContactUser.getContactName(otherID);
+                if (title.equals(""))
+                {
+                    // 说明对方为陌生人
+                    title = userSessionInfo.getShowName();
+                }
+            }
+            else if (chatType == DWMessage.CHAT_TYPE_SINGLE_ANONYMITY)
+            {
+                /** 自己发送出去的消息 **/
+                if (dwMessage.getFrom().equals(userID))
+                {
+                    conversation_icon = ImageUtils.getIconByDwID(otherID, ImageUtils.ICON_SMALL);
+                    title = ContactUser.getContactName(otherID) + "[匿名聊天]";
+                    if (title.equals(""))
+                    {
+                        // 说明对方为陌生人
+                        title = userSessionInfo.getShowName() + "[匿名聊天]";
+                    }
+                }
+                /** 别人发送过来的消息 **/
+                else
+                {
+                    conversation_icon = "";
+                    title = AnonymityNickNameCreator.getRandomName() + "[匿名聊天]";
+                }
+            }
+            int msgType = dwMessage.getMessageType();
+            String body = "";
+            if (msgType == DWMessage.TXT)
+            {
+                body = dwMessage.getBody();
+            }
+
+            if (dwMessage.getFrom().equals(userID))
+            {
+                // 为发送出去的消息
+                conversation = new ConversationList(userID , otherID , conversation_icon , title , body , String.valueOf(System.currentTimeMillis()) , 1 , 0 , 1 , 1);
+            }
+            else
+            {
+                conversation = new ConversationList(userID , otherID , conversation_icon , title , body , String.valueOf(System.currentTimeMillis()) , 1 , 1 , 1 , 1);
+            }
+            conversation.setMessageType(msgType);
+            conversation.setChatType(chatType);
+            conversation.setChatRelationship(dwMessage.getChatRelationship());
+            conversation.setWorth(otherWorth);
+            conversation.save();
+            conversationMap.put(key, conversation);
+            conversationData.add(conversation);
+            LogUtils.i(TAG, "新建会话消息");
+        }
+        else
+        {
+            /** 修改内存 **/
+            conversation.setTime(dwMessage.getTime());
+            conversation.setMessageType(dwMessage.getMessageType());
+            if (dwMessage.getMessageType() == DWMessage.TXT)
+            {
+                conversation.setContent(dwMessage.getBody());
+            }
+            conversation.setCount(conversation.getCount() + 1);
+            if (!dwMessage.getFrom().equals(userID))
+            {
+                conversation.setUnReadCount(conversation.getUnReadCount() + 1);
+            }
+            conversation.setWorth(otherWorth);
+            LogUtils.i(TAG, "测试关系：" + otherID + ",getChatType=" + dwMessage.getChatType() + ",getChatRelationship=" + dwMessage.getChatRelationship());
+
+            /** 修改数据库 **/
+            ConversationList db_conversation = ConversationList.queryByDwID(otherID, chatType, chatRelationship);
+            if (db_conversation != null)
+            {
+                db_conversation.setTime(dwMessage.getTime());
+                db_conversation.setMessageType(dwMessage.getMessageType());
+                if (dwMessage.getMessageType() == DWMessage.TXT)
+                {
+                    db_conversation.setContent(dwMessage.getBody());
+                }
+                db_conversation.setCount(db_conversation.getCount() + 1);
+                LogUtils.i(TAG, "from=" + dwMessage.getFrom() + ",userID=" + userID);
+                if (!dwMessage.getFrom().equals(userID))
+                {
+                    db_conversation.setUnReadCount(db_conversation.getUnReadCount() + 1);
+                }
+                db_conversation.setWorth(otherWorth);
+                db_conversation.save();
+                LogUtils.i(TAG, "保存数据库完成");
+            }
+        }
+    }
+
+    /**
+     * 收到一条陌生人消息时更新会话列表，这条消息可能是接收到的，也可能是自己发送的;
+     * 接收到一条消息，如果不存在该DwID的会话项，则新建，如果存在则修改对应的内存数据和数据库
+     * 
+     * @param msgAndInfo
+     *            消息
+     * @param conversationLists
+     *            内存中的数据
+     * @param conversationMap
+     *            数据键值对
+     */
+    public void refreshStrangerConvByMsg(MsgAndInfo msgAndInfo, List<ConversationList> strangerConversationList, Map<String, ConversationList> strangerConversationMap)
+    {
+        LogUtils.i(TAG, "接收到一条更新会话列表的通知");
+        DWMessage dwMessage = msgAndInfo.getDwMessage();
+        UserSessionInfo userSessionInfo = msgAndInfo.getUserSessionInfo();
+        /** 自己的ID **/
+        String userID = DecentWorldApp.getInstance().getDwID();
+        /** 对方ID **/
+        String otherID = userSessionInfo.getFriendID();
+        String otherNickname = userSessionInfo.getShowName();
+        String otherWorth = String.valueOf(userSessionInfo.getWorth());
+        /** 聊天类型 **/
+        int chatType = dwMessage.getChatType();
+        int chatRelationship = dwMessage.getChatRelationship();
+        String key = otherID + dwMessage.getChatType();
+        ConversationList conversation = strangerConversationMap.get(key);
+        // 新的列表
+        if (conversation == null)
+        {
+            String conversation_icon = null;
+            String title = null;
+            if (chatType == DWMessage.CHAT_TYPE_SINGLE)
+            {
+                conversation_icon = ImageUtils.getIconByDwID(otherID, ImageUtils.ICON_SMALL);
+                title = otherNickname;// 设置名字
+            }
+            else if (chatType == DWMessage.CHAT_TYPE_SINGLE_ANONYMITY)
+            {
+                conversation_icon = "";
+                if (dwMessage.getFrom().equals(userID))
+                {
+                    conversation_icon = ImageUtils.getIconByDwID(otherID, ImageUtils.ICON_SMALL);
+                    title = otherNickname;
+                }
+                else
+                {
+                    // 接收到的
+                    conversation_icon = "";
+                    title = AnonymityNickNameCreator.getRandomName() + "[匿名聊天]";
+                }
+            }
+            int msgType = dwMessage.getMessageType();
+            String body = "";
+            if (msgType == DWMessage.TXT)
+            {
+                body = dwMessage.getBody();
+            }
+
+            if (dwMessage.getFrom().equals(userID))
+            {
+                // 为发送出去的消息
+                conversation = new ConversationList(userID , otherID , conversation_icon , title , body , String.valueOf(System.currentTimeMillis()) , 1 , 0 , 1 , 1);
+            }
+            else
+            {
+                conversation = new ConversationList(userID , otherID , conversation_icon , title , body , String.valueOf(System.currentTimeMillis()) , 1 , 1 , 1 , 1);
+            }
+
+            conversation.setMessageType(msgType);
+            conversation.setChatType(chatType);
+            conversation.setChatRelationship(dwMessage.getChatRelationship());
+            conversation.setWorth(otherWorth);
+            conversation.save();
+            strangerConversationMap.put(key, conversation);
+            strangerConversationList.add(conversation);
+            LogUtils.i(TAG, "新建会话消息");
+        }
+        else
+        {
+            /** 修改内存 **/
+            conversation.setTime(dwMessage.getTime());
+            conversation.setMessageType(dwMessage.getMessageType());
+            if (dwMessage.getMessageType() == DWMessage.TXT)
+            {
+                conversation.setContent(dwMessage.getBody());
+            }
+            conversation.setCount(conversation.getCount() + 1);
+            if (!dwMessage.getFrom().equals(userID))
+            {
+                conversation.setUnReadCount(conversation.getUnReadCount() + 1);
+            }
+            conversation.setWorth(String.valueOf(userSessionInfo.getWorth()));
+            LogUtils.i(TAG, "测试关系：" + otherID + ",getChatType=" + dwMessage.getChatType() + ",getChatRelationship=" + dwMessage.getChatRelationship());
+        }
+
+        /** 修改数据库 **/
+        ConversationList db_conversation = ConversationList.queryByDwID(otherID, chatType, chatRelationship);
+        if (db_conversation != null)
+        {
+            db_conversation.setTime(dwMessage.getTime());
+            db_conversation.setMessageType(dwMessage.getMessageType());
+            if (dwMessage.getMessageType() == DWMessage.TXT)
+            {
+                db_conversation.setContent(dwMessage.getBody());
+            }
+            db_conversation.setCount(db_conversation.getCount() + 1);
+            LogUtils.i(TAG, "from=" + dwMessage.getFrom() + ",userID=" + userID);
+            if (!dwMessage.getFrom().equals(userID))
+            {
+                db_conversation.setUnReadCount(db_conversation.getUnReadCount() + 1);
+            }
+            db_conversation.setWorth(otherWorth);
+            db_conversation.save();
+            LogUtils.i(TAG, "保存数据库完成");
+        }
+    }
+
+    /**
+     * 添加朋友时更新会话列表
+     */
+    public void refreshConvByAddFriend()
+    {
+        // 更新好友会话列表
+
+        // 更新陌生人会话列表
+
+    }
+
+    /**
+     * 删除好友时更新会话列表
+     */
+    public void refreshConvByDelFriend()
+    {
+        // 更新好友会话列表
+
+        // 更新陌生人会话列表
+
+    }
+
 }

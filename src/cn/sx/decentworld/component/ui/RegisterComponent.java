@@ -6,17 +6,14 @@ package cn.sx.decentworld.component.ui;
 import java.io.File;
 import java.util.HashMap;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.activity.LoginActivity;
+import cn.sx.decentworld.common.ConstantNet;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.network.SendUrl;
@@ -73,31 +70,25 @@ public class RegisterComponent {
 	 * @param tel
 	 * @return 验证码
 	 */
-	public void requestCode(String tel, final Handler handler) {
+	public void requestCode(String tel) {
 		// showProgressDialog();
 		this.tel = tel;
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("phoneNum", tel);
 		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/register/sendCode", Method.GET, new HttpCallBack() {
+				+ ConstantNet.API_SEND_CODE, Method.GET, new HttpCallBack() {
 
 			@Override
 			public void onSuccess(String response, final ResultBean msg) {
-				LogUtils.e("bm", "requestCode==" + msg.getData().toString());
-				// hideProgressDialog();
-				JSONObject object;
-				try {
-					object = new JSONObject(msg.getData().toString());
-					String ifGuarantee = object.getString("isGuarantee");
-					DecentWorldApp.ifGuarantee = ifGuarantee;
-				} catch (JSONException e1) {
+				if (2222 == msg.getResultCode()) {
+					showToast("验证码已发送到手机");
+				} else {
+					showToast(msg.getMsg());
 				}
-				handler.sendEmptyMessage(msg.getResultCode());
 			}
 
 			@Override
 			public void onFailure(String e) {
-				// hideProgressDialog();
 				showToast(Constants.NET_WRONG);
 			}
 		});
@@ -107,43 +98,27 @@ public class RegisterComponent {
 	 * 验证码验证
 	 */
 	public void identifyCode(HashMap<String, String> map, final Handler handler) {
-
 		showProgressDialog();
 		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/validate/phoneCode", Method.GET, new HttpCallBack() {
+				+ ConstantNet.API_CHECK_CODE, Method.GET, new HttpCallBack() {
 			@Override
 			public void onSuccess(String response, final ResultBean msg) {
 				hideProgressDialog();
-				LogUtils.v("resultBean_from_jason", msg.getResultCode() + "");
-				LogUtils.v("resultBean_from_jason", msg.toString() + "");
-				if (msg.getResultCode() == 1004) {
-					LogUtils.v("resultBean_from_jason", "1004");
-					iscode = true;
-					handler.sendEmptyMessage(Constants.SUCC);
-					// Message mssg = new Message();
-					// mssg.what = 1;
-					// ui_handler.sendMessage(mssg);
+				if (2222 == msg.getResultCode()) {
+					handler.sendEmptyMessage(msg.getResultCode());
 				} else {
-					iscode = false;
-					activity.runOnUiThread(new Runnable() {
-
-						@Override
-						public void run() {
-							toastComponent.show(msg.getMsg());
-						}
-					});
+					showToast(msg.getMsg());
 				}
-				LogUtils.v("resultBean_from_jason", "onSuccess" + iscode);
 			}
 
 			@Override
 			public void onFailure(String e) {
 				hideProgressDialog();
+				LogUtils.v("bm", "wrong---" + e);
 				showToast(Constants.NET_WRONG);
 			}
 
 		});
-		LogUtils.v("resultBean_from_jason", "2" + iscode);
 	}
 
 	/**
@@ -153,48 +128,20 @@ public class RegisterComponent {
 	 *            密码
 	 * @param handler
 	 */
-	public void setPwd(String pwd, final Handler handler) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("phoneNum", tel);
-		map.put("password", pwd);
-		// final Handler ui_handler = new Handler()
-		// {
-		// public void handleMessage(Message msg)
-		// {
-		// switch (msg.what)
-		// {
-		// case 1:
-		// Message this_mssg = new Message();
-		// this_mssg.what = LoginActivity.toNextDialog;
-		// handler.sendMessage(this_mssg);
-		// break;
-		//
-		// default:
-		// break;
-		// }
-		// };
-		// };
+	public void register(HashMap<String, String> map, File[] file,
+			final Handler handler) {
 		showProgressDialog();
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
-				+ "/register/updatePassword", Method.GET, new HttpCallBack() {
+		map.put("phoneNum", tel);
+		sendUrl.httpRequestWithImage(map, file, Constants.CONTEXTPATH
+				+ ConstantNet.API_REGISTER, new HttpCallBack() {
 
 			@Override
-			public void onSuccess(String response, final ResultBean msg) {
-				if (msg.getResultCode() == 3000) {
-					iscard = true;
-					// Message mssg = new Message();
-					// mssg.what = 1;
-					// ui_handler.sendMessage(mssg);
-					handler.sendEmptyMessage(Constants.SUCC);
-					LogUtils.i(TAG, "密码设置成功，Result = 3000");
+			public void onSuccess(String response, ResultBean msg) {
+				hideProgressDialog();
+				if (2007 == msg.getResultCode()) {
+					handler.sendEmptyMessage(msg.getResultCode());
 				} else {
-					iscode = false;
-					activity.runOnUiThread(new Runnable() {
-						@Override
-						public void run() {
-							toastComponent.show(msg.getMsg());
-						}
-					});
+					showToast(msg.getMsg());
 				}
 			}
 
@@ -203,7 +150,6 @@ public class RegisterComponent {
 				hideProgressDialog();
 				showToast(Constants.NET_WRONG);
 			}
-
 		});
 	}
 
@@ -467,7 +413,7 @@ public class RegisterComponent {
 					mssg.what = Constants.SUCC;
 					handler.sendMessage(mssg);
 				} else {
-					showToast(msg.getData().toString());
+					showToast(msg.getMsg());
 				}
 			}
 
@@ -573,5 +519,37 @@ public class RegisterComponent {
 						showToast(Constants.NET_WRONG);
 					}
 				});
+	}
+
+	/**
+	 * 审核为假
+	 * 
+	 */
+	public void examineFake(HashMap map, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
+				+ Constants.API_EXAMINE_FAKE, Method.GET, new HttpCallBack() {
+
+			@Override
+			public void onSuccess(String response, final ResultBean msg) {
+				hideProgressDialog();
+				if (msg.getResultCode() == 2222) {
+					Message message = handler.obtainMessage();
+					message.what = msg.getResultCode();
+					message.obj = msg.getMsg();
+					handler.sendMessage(message);
+				} else {
+					handler.sendEmptyMessage(msg.getResultCode());
+					showToast(msg.getMsg());
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				handler.sendEmptyMessage(-1);
+				hideProgressDialog();
+				showToast(Constants.NET_WRONG);
+			}
+		});
 	}
 }

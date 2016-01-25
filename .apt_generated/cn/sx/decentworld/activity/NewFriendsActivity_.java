@@ -19,7 +19,6 @@ import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.TitleBar_;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.component.ui.MainFragmentComponent_;
 import cn.sx.decentworld.network.request.GetFriendInfo_;
 import cn.sx.decentworld.network.request.GetUserInfo_;
 import cn.sx.decentworld.widget.ListViewForScrollView;
@@ -38,17 +37,16 @@ public final class NewFriendsActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        getUserInfo = GetUserInfo_.getInstance_(this);
-        mainFragmentComponent = MainFragmentComponent_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
-        getFriendInfo = GetFriendInfo_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        getFriendInfo = GetFriendInfo_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
+        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         lv_newfriends = ((ListViewForScrollView) findViewById(id.lv_newfriends));
-        bt_to_add = ((Button) findViewById(id.bt_to_add));
         main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
+        bt_to_add = ((Button) findViewById(id.bt_to_add));
         {
             View view = findViewById(id.main_header_right_tv);
             if (view!= null) {
@@ -79,11 +77,10 @@ public final class NewFriendsActivity_
                 );
             }
         }
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((MainFragmentComponent_) mainFragmentComponent).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
-        ((GetFriendInfo_) getFriendInfo).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((GetFriendInfo_) getFriendInfo).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 
