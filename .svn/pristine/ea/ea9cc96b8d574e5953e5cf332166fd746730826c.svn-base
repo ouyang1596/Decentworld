@@ -1,0 +1,57 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_activity_me"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include layout="@layout/top_title" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:padding="18dp" >
+
+        <!-- cn.sx.decentworld.widget.CircularImageView -->
+
+        <cn.sx.decentworld.widget.CircularImageView
+            android:id="@+id/iv_head"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:src="@drawable/solid_heart" />
+
+        <TextView
+            android:id="@+id/tv_create_chatroom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="17dp"
+            android:layout_toRightOf="@+id/iv_head"
+            android:background="@drawable/stroke_bg_tv"
+            android:padding="8dp"
+            android:text="创建我的聊天室"
+            android:textColor="@color/bottom_blue"
+            android:textSize="@dimen/new_textsize_13sp" />
+
+        <TextView
+            android:id="@+id/tv_edit_self_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_create_chatroom"
+            android:layout_marginLeft="14dp"
+            android:layout_toRightOf="@+id/tv_create_chatroom"
+            android:background="@drawable/stroke_bg_tv"
+            android:padding="8dp"
+            android:text="编辑资料"
+            android:textColor="@color/bottom_blue"
+            android:textSize="@dimen/new_textsize_13sp" />
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/lv_chatrooms"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#F6F9FB" >
+    </ListView>
+
+</LinearLayout>

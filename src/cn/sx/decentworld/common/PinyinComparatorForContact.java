@@ -1,0 +1,33 @@
+package cn.sx.decentworld.common;
+
+import java.util.Comparator;
+
+import cn.sx.decentworld.bean.ContactUser;
+
+/**
+ * 
+ * @ClassName: PinyinComparatorForContact.java
+ * @Description:
+ * @author: cj
+ * @date: 2016年1月1日 下午8:49:14
+ */
+public class PinyinComparatorForContact implements Comparator<ContactUser>
+{
+
+    public int compare(ContactUser o1, ContactUser o2)
+    {
+        if (o1.getNameLetter().equals("@") || o2.getNameLetter().equals("#"))
+        {
+            return -1;
+        }
+        else if (o1.getNameLetter().equals("#") || o2.getNameLetter().equals("@"))
+        {
+            return 1;
+        }
+        else
+        {
+            return o1.getNameLetter().compareTo(o2.getNameLetter());
+        }
+    }
+
+}

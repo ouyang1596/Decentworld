@@ -1,0 +1,24 @@
+/**
+ * 
+ */
+package cn.sx.decentworld;
+
+import java.util.List;
+
+/**
+ * @ClassName: DecentWorldSDKHelper.java
+ * @Description: 应用的数据缓存存放区
+ * @author: cj
+ * @date: 2015年7月27日 下午7:43:46
+ */
+
+public class DecentWorldSDKHelper 
+{
+	/**
+	 *  在内存中置顶用户
+	 *
+	 */
+	private List<String> topList;
+	
+	
+}

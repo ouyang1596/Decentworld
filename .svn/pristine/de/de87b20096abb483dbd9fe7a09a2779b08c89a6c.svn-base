@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_main_layout_stranger"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <cn.sx.decentworld.widget.ScrollLayout
+            android:id="@+id/stranger_scrollLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1" >
+
+            <!-- 主界面聊天 -->
+
+            <include layout="@layout/fragment_stranger_chat" />
+            <!-- 附近的人 -->
+
+            <include layout="@layout/fragment_stranger_near" />
+        </cn.sx.decentworld.widget.ScrollLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/fragment_stranger_tab"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="15dp"
+        android:src="@drawable/iv_new_heart_" />
+
+</RelativeLayout>

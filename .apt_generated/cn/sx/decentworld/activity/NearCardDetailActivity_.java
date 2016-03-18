@@ -37,28 +37,32 @@ public final class NearCardDetailActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         getStrangerInfo = GetStrangerInfo_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        pScrollView = ((PullToRefreshScrollView) findViewById(id.pScrollView));
-        llTalkToStranger = ((LinearLayout) findViewById(id.ll_talk_stranger));
-        tvPerWorth = ((TextView) findViewById(id.tv_per_worth));
-        ivLike = ((ImageView) findViewById(id.iv_per_like));
-        ivAddFriend = ((ImageView) findViewById(id.iv_add_friend));
-        tvPerSex = ((TextView) findViewById(id.tv_per_sex));
-        mRgPerData = ((RadioGroup) findViewById(id.rg_per_data));
-        tvPerSign = ((TextView) findViewById(id.tv_per_sign));
         mPager = ((HackyViewPager) findViewById(id.vp_near_card_detail_pager));
+        ivLike = ((ImageView) findViewById(id.iv_per_like));
         ivDisLike = ((ImageView) findViewById(id.iv_per_dislike));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        tvPerAge = ((TextView) findViewById(id.tv_per_age));
+        ivAddFriend = ((ImageView) findViewById(id.iv_add_friend));
+        tvPerWorth = ((TextView) findViewById(id.tv_per_worth));
         tvPerName = ((TextView) findViewById(id.tv_per_name));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        ivDoubt = ((ImageView) findViewById(id.iv_doubt));
+        pScrollView = ((PullToRefreshScrollView) findViewById(id.pScrollView));
+        tvPerAge = ((TextView) findViewById(id.tv_per_age));
+        mRgPerData = ((RadioGroup) findViewById(id.rg_per_data));
+        ivRealNameOrNickName = ((ImageView) findViewById(id.iv_realname_nickname));
         tvPerJob = ((TextView) findViewById(id.tv_per_job));
+        tvPerSex = ((TextView) findViewById(id.tv_per_sex));
         tvPerDistance = ((TextView) findViewById(id.tv_per_distance));
-        ((ToastComponent_) toast).afterSetContentView_();
+        tvPerSign = ((TextView) findViewById(id.tv_per_sign));
+        tvPerShortIntroduce = ((TextView) findViewById(id.tv_per_short_introduce));
+        llTalkToStranger = ((LinearLayout) findViewById(id.ll_talk_stranger));
+        tvWealth = ((TextView) findViewById(id.tv_per_wealth));
         ((GetStrangerInfo_) getStrangerInfo).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

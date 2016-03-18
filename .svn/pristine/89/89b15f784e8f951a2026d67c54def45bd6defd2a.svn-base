@@ -1,0 +1,388 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.activity.RechargePayMethodActivity;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
+
+/**
+ * @ClassName: UserExtraInfo.java
+ * @Description: 用户额外信息
+ * @author: cj
+ * @date: 2016年1月7日 上午11:04:26
+ */
+@Table(name = "userExtraInfo")
+public class UserExtraInfo extends Model
+{
+    public static final int ALIPAY = RechargePayMethodActivity.ALIPAY;// 支付宝
+    public static final int WX = RechargePayMethodActivity.WX;// 微信
+    
+    /** 用户ID **/
+    @Column(name = "userID")
+    public String userID;
+    
+    /** 头像  **/
+    @Column(name = "icon")
+    private String icon;
+    
+    /** 用户头像2 **/
+    @Column(name = "icon2")
+    public String icon2;
+
+    /** 用户头像3 **/
+    @Column(name = "icon3")
+    public String icon3;
+    
+    /** 用户小头像 **/
+    @Column(name = "iconSmall")
+    public String iconSmall;
+    
+    /** AdvanceSetting **/
+    @Column(name = "canFindByID")
+    public Boolean canFindByID;
+    @Column(name = "canFindByPhoneNum")
+    public Boolean canFindByPhoneNum;
+    @Column(name = "canFindByNickName")
+    public Boolean canFindByNickName;
+    @Column(name = "canFindByRealName")
+    public Boolean canFindByRealName;
+    @Column(name = "noticeStrangerMessage")
+    public Boolean noticeStrangerMessage;
+    
+    /** 是否接受服务器推送的消息 **/
+    @Column(name = "acceptPush")
+    public Boolean acceptPush;
+    
+    /** 是否接受服务器推送关于貌的审核信息 **/
+    @Column(name = "acceptBeautyPush")
+    public Boolean acceptBeautyPush;
+    
+    /** 是否同意自动转账 true同意  false不同意 **/
+    @Column(name = "autoTransfer")
+    public Boolean autoTransfer;
+    
+    /** 返现账号类型 （0为支付宝  1为微信）**/
+    @Column(name = "accountType")
+    public int accountType;
+    
+    /** 返现账号 **/
+    @Column(name = "accountName")
+    public String accountName;
+    
+    
+    /** 我的贵人 **/
+    @Column(name = "grId")
+    public String grId;
+
+    /** 我是谁的贵人 **/
+    @Column(name = "isgrId")
+    public String isgrId;
+    
+    
+    public UserExtraInfo()
+    {
+        this.userID = DecentWorldApp.getInstance().getDwID();
+        accountType = -1;
+        accountName = "";
+    }
+  
+
+    /**
+     * @return the userID
+     */
+    public String getUserID()
+    {
+        return userID;
+    }
+
+    /**
+     * @param userID the userID to set
+     */
+    public void setUserID(String userID)
+    {
+        this.userID = userID;
+    }
+
+    /**
+     * @return the icon
+     */
+    public String getIcon()
+    {
+        return icon;
+    }
+
+    /**
+     * @param icon the icon to set
+     */
+    public void setIcon(String icon)
+    {
+        this.icon = icon;
+    }
+
+    /**
+     * @return the icon2
+     */
+    public String getIcon2()
+    {
+        return icon2;
+    }
+
+    /**
+     * @param icon2 the icon2 to set
+     */
+    public void setIcon2(String icon2)
+    {
+        this.icon2 = icon2;
+    }
+
+    /**
+     * @return the icon3
+     */
+    public String getIcon3()
+    {
+        return icon3;
+    }
+
+    /**
+     * @param icon3 the icon3 to set
+     */
+    public void setIcon3(String icon3)
+    {
+        this.icon3 = icon3;
+    }
+
+    /**
+     * @return the iconSmall
+     */
+    public String getIconSmall()
+    {
+        return iconSmall;
+    }
+
+    /**
+     * @param iconSmall the iconSmall to set
+     */
+    public void setIconSmall(String iconSmall)
+    {
+        this.iconSmall = iconSmall;
+    }
+
+    /**
+     * @return the grId
+     */
+    public String getGrId()
+    {
+        return grId;
+    }
+
+    /**
+     * @param grId the grId to set
+     */
+    public void setGrId(String grId)
+    {
+        this.grId = grId;
+    }
+
+    /**
+     * @return the isgrId
+     */
+    public String getIsgrId()
+    {
+        return isgrId;
+    }
+
+    /**
+     * @param isgrId the isgrId to set
+     */
+    public void setIsgrId(String isgrId)
+    {
+        this.isgrId = isgrId;
+    }
+
+  
+
+    /**
+     * @return the canFindByID
+     */
+    public Boolean getCanFindByID()
+    {
+        return canFindByID;
+    }
+
+    /**
+     * @param canFindByID the canFindByID to set
+     */
+    public void setCanFindByID(Boolean canFindByID)
+    {
+        this.canFindByID = canFindByID;
+    }
+
+    /**
+     * @return the canFindByPhoneNum
+     */
+    public Boolean getCanFindByPhoneNum()
+    {
+        return canFindByPhoneNum;
+    }
+
+    /**
+     * @param canFindByPhoneNum the canFindByPhoneNum to set
+     */
+    public void setCanFindByPhoneNum(Boolean canFindByPhoneNum)
+    {
+        this.canFindByPhoneNum = canFindByPhoneNum;
+    }
+
+    /**
+     * @return the canFindByNickName
+     */
+    public Boolean getCanFindByNickName()
+    {
+        return canFindByNickName;
+    }
+
+    /**
+     * @param canFindByNickName the canFindByNickName to set
+     */
+    public void setCanFindByNickName(Boolean canFindByNickName)
+    {
+        this.canFindByNickName = canFindByNickName;
+    }
+
+    /**
+     * @return the canFindByRealName
+     */
+    public Boolean getCanFindByRealName()
+    {
+        return canFindByRealName;
+    }
+
+    /**
+     * @param canFindByRealName the canFindByRealName to set
+     */
+    public void setCanFindByRealName(Boolean canFindByRealName)
+    {
+        this.canFindByRealName = canFindByRealName;
+    }
+
+    /**
+     * @return the noticeStrangerMessage
+     */
+    public Boolean getNoticeStrangerMessage()
+    {
+        return noticeStrangerMessage;
+    }
+
+    /**
+     * @param noticeStrangerMessage the noticeStrangerMessage to set
+     */
+    public void setNoticeStrangerMessage(Boolean noticeStrangerMessage)
+    {
+        this.noticeStrangerMessage = noticeStrangerMessage;
+    }
+
+    /**
+     * @return the acceptPush
+     */
+    public Boolean getAcceptPush()
+    {
+        return acceptPush;
+    }
+
+    /**
+     * @param acceptPush the acceptPush to set
+     */
+    public void setAcceptPush(Boolean acceptPush)
+    {
+        this.acceptPush = acceptPush;
+    }
+
+    /**
+     * @return the acceptBeautyPush
+     */
+    public Boolean getAcceptBeautyPush()
+    {
+        return acceptBeautyPush;
+    }
+
+    /**
+     * @param acceptBeautyPush the acceptBeautyPush to set
+     */
+    public void setAcceptBeautyPush(Boolean acceptBeautyPush)
+    {
+        this.acceptBeautyPush = acceptBeautyPush;
+    }
+
+    /**
+     * @return the autoTransfer
+     */
+    public Boolean getAutoTransfer()
+    {
+        return autoTransfer;
+    }
+
+    /**
+     * @param autoTransfer the autoTransfer to set
+     */
+    public void setAutoTransfer(Boolean autoTransfer)
+    {
+        this.autoTransfer = autoTransfer;
+    }
+    
+    
+    
+
+    /**
+     * @return the accountType
+     */
+    public int getAccountType()
+    {
+        return accountType;
+    }
+
+
+    /**
+     * @param accountType the accountType to set
+     */
+    public void setAccountType(int accountType)
+    {
+        this.accountType = accountType;
+    }
+
+
+    /**
+     * @return the accountName
+     */
+    public String getAccountName()
+    {
+        return accountName;
+    }
+
+
+    /**
+     * @param accountName the accountName to set
+     */
+    public void setAccountName(String accountName)
+    {
+        this.accountName = accountName;
+    }
+
+
+    /**
+     * 通过ID号查找单条用户记录并返回
+     * @param userID
+     * @return
+     */
+    public static UserExtraInfo queryBy(String userID)
+    {
+        return new Select().from(UserExtraInfo.class).where("userID = ?", userID).executeSingle();
+    }
+    
+
+}

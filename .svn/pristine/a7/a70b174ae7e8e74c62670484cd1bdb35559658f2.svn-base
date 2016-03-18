@@ -1,0 +1,54 @@
+文档更新时间 2016-03-08
+一、版本规定
+1.为每个版本做好标记，与其它版本区别开来；
+1）软件版本
+a.版本号：
+android:versionCode="1"
+b.版本名：
+android:versionName= "1.0.1"
+
+2）数据库版本
+<meta-data
+   android:name="AA_DB_NAME"
+   android:value="dw.db" />
+<meta-data
+   android:name="AA_DB_VERSION"
+   android:value="1" />
+
+3）sdk版本
+android:minSdkVersion="9"
+android:targetSdkVersion="22"
+
+2.每次进入软件都会检测是否有新版本，如果有则提示更新；
+1）出现更新界面时，如果用户点击取消，那么就会在两天后再次提醒更新；
+2）如果用户点击确定，app会启动一个后台下载服务，从服务器下载最新apk；
+
+3.服务器端修改
+1）版本号versionCode
+2）版本名字versionName
+3）描述：本次版本更新的内容和模块、解决上一个版本的bug；
+4）地址：前缀+软件名+时间（151217）
+
+命名为：DW20151218-1.0.6.apk
+
+调用接口返回的数据如下：
+12-18 12:35:41.032: I/dw Upgrade(29251): getVersionInfo...begin,msg.getResultCode=2222,msg.getMsg=,msg.getData={"version":{"appType":"ANDROID","description":"欢迎更新最新版本1.0.6","downLoadUrl":"http://112.74.13.117/data/apk/DW20151218-1.0.6.apk","id":1,"versionName":"1.0.6","versionNum":6}}
+
+4.每次发布新版本时
+1）将LogUtils的LOG_LEVEL改为0；
+2）将CrashHandler中的infos.put("package",getExtraInfo());改为package；
+3）若数据库有变更，则需要修改数据库的版本号；
+4）去掉XmppHelper中的connConfig.setDebuggerEnabled(true);
+
+二、版本迭代中添加的功能；
+1.2016-2-20【版本号3、版本名1.0.3】
+2.【版本号3-5过程中添加的功能以及解决的bug】
+1）断开重连的提示，将不再以对话框的形式提示，而是在会话列表上方有提示；
+2）修改完个人资料后，上传时，从数据库获取的权限记录为空的bug（解决方案：new 一个新的对象，待优化）；
+3）登录时账号或密码错误的bug；（解决方案：将XMPPConnection置为null，有待优化）
+3.【版本号5-6过程中添加的功能以及解决的bug】
+1）增加提现功能；
+4.【版本号6-7过程中添加的功能以及解决的bug】
+1）修改陌生人会话列表的排序问题；
+2）
+

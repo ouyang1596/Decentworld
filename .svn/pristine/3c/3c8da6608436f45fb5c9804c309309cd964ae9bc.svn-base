@@ -1,0 +1,176 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+/**
+ * @ClassName: NearbyStrangerInfo.java
+ * @Description: 附近的陌生人的信息，在卡片中显示
+ * @author: cj
+ * @date: 2015年10月9日 下午1:13:08
+ */
+public class NearbyStrangerInfo {
+	/**
+	 * dwID
+	 */
+	private String dwID;
+	/**
+	 * 昵称
+	 */
+
+	private String name;
+	/**
+	 * 年龄
+	 */
+	private String age;
+	/**
+	 * 性别
+	 */
+	private String sex = "1";
+	/**
+	 * 身价
+	 */
+	private String worth;
+
+	/**
+	 * 职业
+	 */
+	private String occupation;
+	/**
+	 * 离自己的距离
+	 */
+	private String distance = "0";
+	/**
+	 * 判断这个对象是否被点击过 0没有 1有
+	 * */
+	private boolean ifLike;
+
+	public NearbyStrangerInfo() {
+	}
+
+	// public NearbyStrangerInfo(String dwID, String icon, String job,
+	// String worth, String age, String nickName, String distance) {
+	// super();
+	// this.dwID = dwID;
+	// this.icon = icon;
+	// this.job = job;
+	// this.worth = worth;
+	// this.age = age;
+	// this.nickName = nickName;
+	// this.distance = distance;
+	// }
+
+	public boolean getIfLike() {
+		return ifLike;
+	}
+
+	public void setIfLike(boolean ifClick) {
+		this.ifLike = ifClick;
+	}
+
+	/**
+	 * @return the dwID
+	 */
+	public String getDwID() {
+		return dwID;
+	}
+
+	/**
+	 * @param dwID
+	 *            the dwID to set
+	 */
+	public void setDwID(String dwID) {
+		this.dwID = dwID;
+	}
+
+	/**
+	 * @return the worth
+	 */
+	public String getWorth() {
+		return worth;
+	}
+
+	/**
+	 * @param worth
+	 *            the worth to set
+	 */
+	public void setWorth(String worth) {
+		this.worth = worth;
+	}
+
+	/**
+	 * @return the age
+	 */
+	public String getAge() {
+		return age;
+	}
+
+	/**
+	 * @param age
+	 *            the age to set
+	 */
+	public void setAge(String age) {
+		this.age = age;
+	}
+
+	/**
+	 * @return the distance
+	 */
+	public String getDistance() {
+		return distance;
+	}
+
+	/**
+	 * @param distance
+	 *            the distance to set
+	 */
+	public void setDistance(String distance) {
+		this.distance = distance;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the sex
+	 */
+	public String getSex() {
+		return sex;
+	}
+
+	/**
+	 * @param sex
+	 *            the sex to set
+	 */
+	public void setSex(String sex) {
+		this.sex = sex;
+	}
+
+	/**
+	 * @return the occupation
+	 */
+	public String getOccupation() {
+		return occupation;
+	}
+
+	/**
+	 * @param occupation
+	 *            the occupation to set
+	 */
+	public void setOccupation(String occupation) {
+		this.occupation = occupation;
+	}
+
+}

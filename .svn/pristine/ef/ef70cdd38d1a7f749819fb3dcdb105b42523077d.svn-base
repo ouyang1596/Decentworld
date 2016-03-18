@@ -1,0 +1,34 @@
+package cn.sx.decentworld.common;
+
+/**
+ * @ClassName: Constants
+ * @Description: 网络请求常量类
+ * @author oyyj
+ * @date 2014-12-27 上午10:51:16
+ */
+public class ConstantNet {
+	// 获得腕审核状态
+	public static final String API_WAN_CHECH_STATE = "/check/getStarCheckStatus";
+	// 去疑资料为假时，再次进行去疑时，交钱需要调用的接口
+	public static final String API_DOUBT_PAY_RETRY = "/check/payRetry";
+	// 不通过直接买通
+	public static final String API_DOUBT_NO_PASS_BUY = "/check/guarantee";
+	// 重置用户审核状态
+	public static final String API_WAN_RESET_CHECH_STATE = "/check/resetStarCheckStatus";
+	// 开始腕审核流程
+	public static final String API_WAN_START_CHECK = "/check/startStarCheck";
+	// 上传腕资料
+	public static final String API_WAN_UPLOAD_MATERIAL = "/check/starMaterialUpload";
+	// 登录时openfire前，从服务器获取DwID
+	public static final String API_LOGIN_GET_DWID = "/user/getUserId";
+	// 发送验证码
+	public static final String API_SEND_CODE = "/register/sendCode";
+	// 核对验证码
+	public static final String API_CHECK_CODE = "/register/checkCode";
+	// 注册提交数据
+	public static final String API_REGISTER = "/register/register";
+	// 上传简介
+	public static final String API_UPDATE_INTRODUCE = "/user/updateIntroduce";
+	// 获取简介
+	public static final String API_GET_INTRODUCE = "/user/getIntroduce";
+}

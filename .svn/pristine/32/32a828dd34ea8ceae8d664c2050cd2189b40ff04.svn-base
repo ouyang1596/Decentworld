@@ -1,0 +1,13 @@
+LoginActivity
+1）客户端验证用户名和密码是否符合规范；
+2）对密码进行加密；
+3）使用用户名从服务器获取对应的dwID和token；
+4）使用dwID和加密后的密码登录openfire服务器；
+5）登录openfire服务器成功后，将用户信息保存到本地文件中；（包括dwID、password、token、phoneNum）
+6）跳转到加载数据的页面；
+7）如果登录openfire服务器失败，则会断开连接，将连接变量设置为null，并且根据对应的错误信息进行提示；
+
+LoadNetdataActivity
+
+
+

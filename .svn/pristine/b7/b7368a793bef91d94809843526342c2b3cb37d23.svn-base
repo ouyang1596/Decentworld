@@ -1,0 +1,213 @@
+package cn.sx.decentworld.adapter;
+
+import java.util.List;
+
+import android.content.Context;
+import android.content.Intent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.ChatActivity;
+import cn.sx.decentworld.activity.ChatActivity_;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.NearbyStrangerInfo;
+import cn.sx.decentworld.bean.StrangerInfo;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.ViewUtil;
+import cn.sx.decentworld.widget.RoundImageView;
+
+public class CardAdapter extends BaseAdapter {
+	private static final String TAG = "CardAdapter";
+	private Context mContext;
+	private List<NearbyStrangerInfo> mCardList;
+	private LayoutInflater inflater;
+
+	public CardAdapter(Context mContext, List<NearbyStrangerInfo> mCardList) {
+		this.mContext = mContext;
+		this.mCardList = mCardList;
+		inflater = LayoutInflater.from(mContext);
+	}
+
+	@Override
+	public int getCount() {
+		return mCardList.size();
+	}
+
+	@Override
+	public NearbyStrangerInfo getItem(int position) {
+		return mCardList.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View con, ViewGroup parent) {
+		ViewHolder vh = null;
+		if (con == null) {
+			con = inflater.inflate(R.layout.item_card_stranger, parent, false);
+			ViewUtil.scaleView(con);
+			vh = new ViewHolder();
+			vh.mCardIcon = (RoundImageView) con.findViewById(R.id.item_nearby_stranger_icon);
+			// vh.mCardHeadPic = (ImageView) con.findViewById(R.id.iv_head_pic);
+			// vh.mCardHeadPic.setOnClickListener(mOnClickListener);
+			vh.mCardSex = (ImageView) con.findViewById(R.id.item_nearby_stranger_sex);
+			vh.mCardUserType = (ImageView) con.findViewById(R.id.iv_usertype);
+			vh.mCardName = (TextView) con.findViewById(R.id.item_nearby_stranger_name);
+			vh.mCardAge = (TextView) con.findViewById(R.id.item_nearby_stranger_age);
+			vh.llTalkToStranger = (LinearLayout) con.findViewById(R.id.ll_talk_stranger);
+			vh.llTalkToStranger.setOnClickListener(mOnClickListener);
+			vh.ivRealNameOrNickName = (ImageView) con.findViewById(R.id.iv_realname_nickname);
+			vh.mCardWorth = (TextView) con.findViewById(R.id.item_nearby_stranger_worth);
+			vh.mCardJob = (TextView) con.findViewById(R.id.item_nearby_stranger_work);
+			vh.tvWealth = (TextView) con.findViewById(R.id.tv_wealth);
+			vh.tvLikeCount = (TextView) con.findViewById(R.id.tv_likeCount);
+			// vh.mCardSex = (ImageView) con.findViewById(R.id.iv_sex_girl_boy);
+			vh.mCardDistance = (TextView) con.findViewById(R.id.item_nearby_stranger_location);
+			vh.mCardSign = (TextView) con.findViewById(R.id.item_nearby_stranger_sign);
+			// vh.mCardLike = (ImageView) con
+			// .findViewById(R.id.item_nearby_stranger_like);
+			// vh.mCardLike.setOnClickListener(mOnClickListener);
+			// vh.mCardSayHi = (ImageView) con
+			// .findViewById(R.id.item_nearby_stranger_sayhi);
+			// vh.mCardSayHi.setOnClickListener(mOnClickListener);
+			con.setTag(vh);
+		} else {
+			vh = (ViewHolder) con.getTag();
+		}
+		vh.llTalkToStranger.setTag(position);
+		// vh.mCardHeadPic.setTag(position);
+		// vh.mCardLike.setTag(position);
+		// vh.mCardSayHi.setTag(position);
+		NearbyStrangerInfo info = mCardList.get(position);
+		ImageLoaderHelper.mImageLoader.displayImage(ImageUtils.getIconByDwID(info.getDwID(), ImageUtils.ICON_MAIN), vh.mCardIcon,
+				ImageLoaderHelper.mOptions);
+		vh.mCardName.setText(info.getName());
+		// vh.mCardSex
+		// .setImageResource("0".equals(info.getSex()) ? R.drawable.me_sex_women
+		// : R.drawable.me_sex_man);
+		if ("秘密".equals(info.getAge())) {
+			vh.mCardAge.setText("最好的年龄");
+		} else {
+			vh.mCardAge.setText(info.getAge());
+		}
+		vh.mCardWorth.setText(info.getWorth());
+		vh.mCardJob.setText(info.getOccupation());
+		if ("0".equals(info.getUserType())) {
+			vh.mCardUserType.setVisibility(View.VISIBLE);
+			vh.mCardUserType.setImageResource(R.drawable.stranger_doubt);
+		} else if ("1".equals(info.getUserType())) {
+			vh.mCardUserType.setVisibility(View.GONE);
+		} else if ("2".equals(info.getUserType())) {
+			vh.mCardUserType.setVisibility(View.VISIBLE);
+			vh.mCardUserType.setImageResource(R.drawable.stranger_wan);
+		}
+		if ("0".equals(info.getRealName())) {
+			vh.ivRealNameOrNickName.setImageResource(R.drawable.stranger_nick);
+		} else if ("1".equals(info.getRealName())) {
+			vh.ivRealNameOrNickName.setImageResource(R.drawable.stranger_real);
+		} else {
+			vh.ivRealNameOrNickName.setImageResource(R.drawable.stranger_zhu);
+		}
+		Double distance = Double.valueOf(info.getDistance());
+		distance = ((int) (distance * 100)) / 100.0;
+		vh.mCardDistance.setText(distance + "km");
+		if ("男".equals(info.getSex())) {
+			vh.mCardSex.setImageResource(R.drawable.stranger_boy);
+		} else {
+			vh.mCardSex.setImageResource(R.drawable.stranger_girl);
+		}
+		vh.tvLikeCount.setText(info.getLikedCount());
+		if (CommUtil.isNotBlank(info.getWealth())) {
+			vh.tvWealth.setText(info.getWealth());
+		} else {
+			vh.tvWealth.setVisibility(View.GONE);
+		}
+		if (CommUtil.isNotBlank(info.getShortIntroduce())) {
+			vh.mCardSign.setText(info.getShortIntroduce());
+		}
+		return con;
+	}
+
+	private static String POSITION = "position";
+	private OnClickListener mOnClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View view) {
+			Integer position = (Integer) view.getTag();
+			switch (view.getId()) {
+			case R.id.item_nearby_stranger_like:
+				// NearbyStrangerInfo info =
+				// CardAdapter.this.getItem(position);
+				// info.setIfLike(true);
+				// strangerFragment.flingContainer.getTopCardListener()
+				// .selectRight();
+				// strangerFragment.like(info.getDwID());
+				break;
+			case R.id.ll_talk_stranger:
+				NearbyStrangerInfo item = CardAdapter.this.getItem(position);
+				Intent intent = new Intent(mContext, ChatActivity_.class);
+				intent.putExtra(ChatActivity.OTHER_ID, item.getDwID());
+				intent.putExtra(ChatActivity.OTHER_NICKNAME, item.getName());
+				intent.putExtra(ChatActivity.OTHER_WORTH, Float.valueOf(item.getWorth()));
+				intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
+				if (ContactUser.isContact(item.getDwID())) {
+					// 朋友关系
+					intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+				} else {
+					// 陌生人关系
+					intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_STRANGER);
+				}
+				mContext.startActivity(intent);
+				saveStrangerInfo(position);
+				break;
+			case R.id.iv_head_pic:
+				// strangerFragment.flingContainer.getTopCardListener()
+				// .selectLeft();
+				break;
+			}
+		}
+	};
+
+	private void saveStrangerInfo(int position) {
+		NearbyStrangerInfo nearStrangerInfo = this.getItem(position);
+		String dwID = nearStrangerInfo.getDwID();
+		StrangerInfo info = StrangerInfo.queryByDwID(dwID);
+		if (null == info) {
+			info = new StrangerInfo();
+		}
+		info.strangerDwID = dwID;
+		info.age = nearStrangerInfo.getAge();
+		info.nickname = nearStrangerInfo.getName();
+		info.save();
+	}
+
+	class ViewHolder {
+		RoundImageView mCardIcon;
+		// ImageView mCardSayHi, mCardLike, mCardSex;
+		// ImageView mCardHeadPic;
+		ImageView mCardUserType;
+		ImageView ivRealNameOrNickName;
+		TextView mCardName;
+		TextView mCardAge;
+		TextView mCardWorth;
+		TextView mCardJob;
+		TextView mCardDistance;
+		TextView mCardSign;
+		ImageView mCardSex;
+		TextView tvLikeCount;
+		TextView tvWealth;
+		LinearLayout llTalkToStranger;
+	}
+}

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F6F6F6"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="21dp" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp" >
+
+        <ImageView
+            android:id="@+id/iv_back"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/back_doubt" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="推荐"
+            android:textSize="20sp" />
+
+        <ImageView
+            android:id="@+id/iv_recommend_unavaliable"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/chat_me_header_icon_circle" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="40dp"
+        android:gravity="center" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/dialog_et_bg"
+            android:padding="5dp" >
+
+            <EditText
+                android:id="@+id/et_recommend_phoneNum"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:background="@null"
+                android:hint="@string/add_recommand_info"
+                android:maxLength="11"
+                android:phoneNumber="true"
+                android:singleLine="true"
+                android:textColor="#4A4A4A"
+                android:textSize="15sp" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="24dp"
+        android:gravity="center" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/dialog_et_bg"
+            android:padding="5dp" >
+
+            <EditText
+                android:id="@+id/et_recommend_money"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:background="@null"
+                android:digits="0123456789"
+                android:hint="@string/add_recommand_money"
+                android:phoneNumber="true"
+                android:singleLine="true"
+                android:textColor="#4A4A4A"
+                android:textSize="15sp" />
+        </RelativeLayout>
+    </LinearLayout>
+    
+    <Button
+        android:id="@+id/btn_recommend_confirm"
+        android:layout_width="160dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="33dp"
+        android:background="@drawable/dialog_click_selector"
+        android:padding="4dp"
+        android:text="@string/sure"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
+        android:text="被推荐者与你加为朋友，你就有机会（随机1%）成为幸运用户，从此，他每充值和兑现金额的10%，公司让利给你，达到总额为 推荐金额*推荐金额 为止;（比如，你缴纳了30元推荐金，又成为了幸运用户，最多得到30*30=900元为止）"
+        android:textColor="@color/darkgray"
+        android:textSize="18dp" />
+
+    
+
+</LinearLayout>

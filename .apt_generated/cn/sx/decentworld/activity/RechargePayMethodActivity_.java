@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
@@ -35,14 +34,15 @@ public final class RechargePayMethodActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         rechargeComponent = RechargeComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        llAliPay = ((LinearLayout) findViewById(id.ll_ali_pay));
-        llWX = ((LinearLayout) findViewById(id.ll_wx));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        llWX = ((ImageView) findViewById(id.iv_recharge_wx));
+        tvMoney = ((TextView) findViewById(id.tv_money));
+        llAliPay = ((ImageView) findViewById(id.iv_recharge_alipay));
         ivBack = ((ImageView) findViewById(id.iv_back));
         {
             View view = findViewById(id.iv_back);
@@ -59,8 +59,8 @@ public final class RechargePayMethodActivity_
                 );
             }
         }
-        ((ToastComponent_) toast).afterSetContentView_();
         ((RechargeComponent_) rechargeComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

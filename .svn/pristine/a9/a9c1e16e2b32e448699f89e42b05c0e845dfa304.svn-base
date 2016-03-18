@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/activity_contact_search_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/half_new_yellow" >
+
+        <cn.sx.decentworld.widget.SearchEditText
+            android:id="@+id/cet_search"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="15dp"
+            android:layout_toLeftOf="@+id/tv_cancel"
+            android:background="@drawable/stroke_bg_search"
+            android:hint="搜索"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
+            android:textColor="@color/one_black"
+            android:textColorHint="@color/white"
+            android:textSize="@dimen/new_textsize_14sp" />
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:padding="15dp"
+            android:text="取消"
+            android:textColor="@color/white"
+            android:textSize="@dimen/new_textsize_14sp" />
+    </RelativeLayout>
+
+    <RadioGroup
+        android:id="@+id/rg_search_tag"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:background="@color/new_yellow_32"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:weightSum="1" >
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.04" />
+
+        <RadioButton
+            android:id="@+id/rb_mobile"
+            style="@style/radioButtonStyle"
+            android:checked="true"
+            android:text="手机号" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.04" />
+
+        <RadioButton
+            android:id="@+id/rb_dw"
+            style="@style/radioButtonStyle"
+            android:text="DW号" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.04" />
+
+        <RadioButton
+            android:id="@+id/rb_true_name"
+            style="@style/radioButtonStyle"
+            android:text="实名" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.04" />
+
+        <RadioButton
+            android:id="@+id/rb_nickname"
+            style="@style/radioButtonStyle"
+            android:text="昵称" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="0.04" />
+    </RadioGroup>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <ListView
+            android:id="@+id/lv_search"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:visibility="visible" >
+        </ListView>
+    </FrameLayout>
+
+</LinearLayout>

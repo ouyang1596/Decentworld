@@ -12,15 +12,14 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.RelativeLayout;
+import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.network.request.GetUserInfo_;
-import cn.sx.decentworld.widget.VerticalSeekBar;
+import cn.sx.decentworld.widget.GridViewForScrollView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class ExamineWelcomeActivity_
@@ -36,21 +35,26 @@ public final class ExamineWelcomeActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        getUserInfo = GetUserInfo_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        relCheckedSuccess = ((RelativeLayout) findViewById(id.rel_check_success));
-        tvBackLogin = ((TextView) findViewById(id.tv_back_login));
-        lvExamineSupport = ((ListView) findViewById(id.lv_examine_support));
-        tvTryAgain = ((TextView) findViewById(id.tv_try_again));
-        vsNoSupport = ((VerticalSeekBar) findViewById(id.vs_examine_no_support));
-        tvAnotherMethod = ((TextView) findViewById(id.tv_another_method));
-        vsSupport = ((VerticalSeekBar) findViewById(id.vs_examine_support));
-        llCheckFailure = ((LinearLayout) findViewById(id.ll_check_failure));
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
+        tvSupport = ((TextView) findViewById(id.tv_support));
+        tvTryAgainBuy = ((TextView) findViewById(id.tv_try_again_buy));
+        sclView = ((ScrollView) findViewById(id.sclView));
+        sbSupport = ((SeekBar) findViewById(id.sb_support));
+        sbNotReal = ((SeekBar) findViewById(id.sb_not_real));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        llCeshi = ((LinearLayout) findViewById(id.ll_ceshi));
+        gvSupporters = ((GridViewForScrollView) findViewById(id.gv_supporters));
+        sbDisLike = ((SeekBar) findViewById(id.sb_dislike));
+        tvFailureReason = ((TextView) findViewById(id.tv_failure_reason));
+        llGv = ((LinearLayout) findViewById(id.ll_gv));
+        tvComplain = ((TextView) findViewById(id.tv_complain));
+        tvDislike = ((TextView) findViewById(id.tv_dislike));
+        viewMask = ((View) findViewById(id.view_mask));
+        tvNotReal = ((TextView) findViewById(id.tv_not_real));
+        llDoubtFinish = ((LinearLayout) findViewById(id.ll_doubt_finish));
+        tvGoDoubt = ((TextView) findViewById(id.tv_go_doubt));
         init();
     }
 

@@ -1,0 +1,152 @@
+package cn.sx.decentworld.activity;
+
+import java.util.HashMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.component.ui.RechargeComponent;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_pay_dialog)
+public class PayDialogActivity extends BaseFragmentActivity implements
+		OnClickListener {
+	@ViewById(R.id.iv_pay_weixin)
+	ImageView ivPayWeixin;
+	@ViewById(R.id.iv_pay_zhifubao)
+	ImageView ivPayZhifubao;
+	@ViewById(R.id.tv_renminbi)
+	TextView tvRenminbi;
+	// 支付类型
+	public static final int ALIPAY = 0;// 手机
+	public static final int WX = 4;
+	private static final int REQUEST_CODE_PAYMENT = 0;
+	@Bean
+	RechargeComponent rechargeComponent;
+	@Bean
+	ToastComponent toast;
+	private int check;
+	private String retryTimes;
+	private Float money;
+	private Handler mHadnler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+			case 2222:
+				try {
+					JSONObject object = new JSONObject(msg.obj.toString());
+					String charge = object.getString("charge");
+					startPayment(charge);
+				} catch (JSONException e) {
+					toast.show("解析异常");
+				}
+				break;
+			case 3333:
+				toast.show("failure");
+				break;
+			}
+		};
+	};
+
+	public void startPayment(String charge) {
+		if (null == charge) {
+			toast.show("请求出错,请检查URL,URL无法获取charge");
+			return;
+		}
+		Intent intent = new Intent();
+		String packageName = getPackageName();
+		ComponentName componentName = new ComponentName(packageName,
+				packageName + ".wxapi.WXPayEntryActivity");
+		intent.setComponent(componentName);
+		intent.putExtra(com.pingplusplus.android.PaymentActivity.EXTRA_CHARGE,
+				charge);
+		LogUtils.e("bm", "charge---" + charge);
+		startActivityForResult(intent, REQUEST_CODE_PAYMENT);
+	}
+
+	@AfterViews
+	public void init() {
+		PGetIntent();
+		initData();
+	}
+
+	private void initData() {
+		tvRenminbi.setText("" + money);
+		ivPayWeixin.setOnClickListener(this);
+		ivPayZhifubao.setOnClickListener(this);
+	}
+
+	private void PGetIntent() {
+		retryTimes = getIntent().getStringExtra("retryTimes");
+		if (null != retryTimes) {
+			money = Float.valueOf(retryTimes);
+			money = money = money + 1;
+		}
+		check = getIntent().getIntExtra(Constants.CHECK, -100);
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.iv_pay_weixin:
+			getCheckCharge(WX, money, DecentWorldApp.getInstance().getDwID());
+			break;
+
+		case R.id.iv_pay_zhifubao:
+			getCheckCharge(ALIPAY, money, DecentWorldApp.getInstance()
+					.getDwID());
+			break;
+		}
+	}
+
+	public void getCheckCharge(int payType, Float amount, String dwID) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("type", "" + payType);
+		map.put("dwID", dwID);
+		map.put("amount", "" + amount);
+		rechargeComponent.getCheckCharge(map, mHadnler);
+	}
+
+	// @Override
+	// protected void onActivityResult(int requestCode, int resultCode, Intent
+	// data) {
+	// super.onActivityResult(requestCode, resultCode, data);
+	// // 支付页面返回处理
+	// if (requestCode == REQUEST_CODE_PAYMENT) {
+	// if (resultCode == Activity.RESULT_OK) {
+	// String result = data.getExtras().getString("pay_result");
+	// String errorMsg = data.getExtras().getString("error_msg"); // 错误信息
+	// String extraMsg = data.getExtras().getString("extra_msg"); // 错误信息
+	// if ("success".equals(result)) {
+	// toast.show("充值成功");
+	// if (check == Constants.CHECK_TRY_AGAIN) {
+	// setResult(100);
+	// } else if (check == Constants.CHECK_ANOTHER_METHOD) {
+	// Intent intent = new Intent(mContext,
+	// RegisterAppearanceCheckActivity_.class);
+	// startActivity(intent);
+	// }
+	// } else {
+	// toast.show("充值失败");
+	// }
+	// finish();
+	// }
+	// }
+	// }
+}

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="第一步"
+        android:textColor="@color/one_black"
+        android:textSize="@dimen/new_textsize_20sp" />
+
+    <EditText
+        android:id="@+id/et_real_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/stroke_bg_et"
+        android:hint="请输入您的真实姓名"
+        android:padding="10dp" />
+
+    <EditText
+        android:id="@+id/et_id_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="15dp"
+        android:background="@drawable/stroke_bg_et"
+        android:hint="请输入您的身份证号码"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/tv_demand"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:gravity="center"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:text="按要求"
+        android:textColor="@color/three_black"
+        android:textSize="@dimen/new_textsize_16sp"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_idcard"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/camera" />
+
+    <TextView
+        android:id="@+id/tv_check"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_ensure"
+        android:gravity="center"
+        android:text="确认"
+        android:textColor="@color/new_yellow"
+        android:textSize="@dimen/new_textsize_20sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:text="请填写真实资料，否则当您获得收入时，公司无法汇款给您"
+        android:textColor="@color/two_black"
+        android:textSize="@dimen/new_textsize_14sp" />
+
+</LinearLayout>

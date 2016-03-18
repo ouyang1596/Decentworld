@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_contact"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/chat_lv_item_selector"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/catalog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="false"
+            android:gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:text="A"
+            android:textColor="#454545" />
+
+        <RelativeLayout
+            android:id="@+id/fragment_chat_contact_lv_item_rl"
+            android:layout_width="58dp"
+            android:layout_height="58dp" >
+
+            <ImageView
+                android:id="@+id/fragment_chat_contact_lv_item_icon"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="10dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/default_avatar" />
+
+            <ImageView
+                android:id="@+id/fragment_chat_contact_lv_item_usertype"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="right"
+                android:layout_marginRight="3dp"
+                android:layout_marginTop="3dp"
+                android:visibility="gone" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/fragment_chat_contact_lv_item_name"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp"
+            android:gravity="center_vertical"
+            android:text="大我"
+            android:textColor="#333333"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/three_black" />
+
+</LinearLayout>

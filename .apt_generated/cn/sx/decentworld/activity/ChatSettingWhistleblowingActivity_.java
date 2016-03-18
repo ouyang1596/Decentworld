@@ -34,33 +34,33 @@ public final class ChatSettingWhistleblowingActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        titleBar = TitleBar_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ll_chat_setting_whistleblowing_5 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_5));
-        activity_whistleblowing_reason_6 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_6));
-        ll_chat_setting_whistleblowing_1 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_1));
-        ll_chat_setting_whistleblowing_6 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_6));
-        ll_chat_setting_whistleblowing_2 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_2));
-        activity_whistleblowing_reason_3 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_3));
-        ll_chat_setting_whistleblowing_4 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_4));
-        activity_whistleblowing_reason_2 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_2));
-        activity_whistleblowing_reason_5 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_5));
         chat_setting_whistleblowing_supplement = ((LinearLayout) findViewById(id.chat_setting_whistleblowing_supplement));
-        ll_chat_setting_whistleblowing_3 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_3));
         activity_whistleblowing_reason_4 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_4));
+        ll_chat_setting_whistleblowing_5 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_5));
+        ll_chat_setting_whistleblowing_4 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_4));
+        ll_chat_setting_whistleblowing_1 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_1));
+        activity_whistleblowing_reason_2 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_2));
+        activity_whistleblowing_reason_6 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_6));
+        ll_chat_setting_whistleblowing_2 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_2));
+        ll_chat_setting_whistleblowing_6 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_6));
+        activity_whistleblowing_reason_5 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_5));
+        ll_chat_setting_whistleblowing_3 = ((LinearLayout) findViewById(id.ll_chat_setting_whistleblowing_3));
         activity_whistleblowing_reason_1 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_1));
+        activity_whistleblowing_reason_3 = ((RadioButton) findViewById(id.activity_whistleblowing_reason_3));
         {
-            View view = findViewById(id.main_header_left);
+            View view = findViewById(id.main_header_right_tv);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        ChatSettingWhistleblowingActivity_.this.setBackBtn();
+                        ChatSettingWhistleblowingActivity_.this.submit();
                     }
 
                 }
@@ -83,14 +83,14 @@ public final class ChatSettingWhistleblowingActivity_
             }
         }
         {
-            View view = findViewById(id.main_header_right_tv);
+            View view = findViewById(id.main_header_left);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
 
 
                     @Override
                     public void onClick(View view) {
-                        ChatSettingWhistleblowingActivity_.this.submit();
+                        ChatSettingWhistleblowingActivity_.this.setBackBtn();
                     }
 
                 }
@@ -187,8 +187,8 @@ public final class ChatSettingWhistleblowingActivity_
                 );
             }
         }
-        ((TitleBar_) titleBar).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

@@ -1,0 +1,1 @@
+ALTER TABLE newFriend ADD userID TEXT;

@@ -40,12 +40,12 @@ public final class ChatRoomMeActivity_
     }
 
     private void afterSetContentView_() {
-        ivHead = ((CircularImageView) findViewById(id.iv_head));
-        lvChatRooms = ((ListView) findViewById(id.lv_chatrooms));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        tvCreateChatRoom = ((TextView) findViewById(id.tv_create_chatroom));
         tvEditSelfInfo = ((TextView) findViewById(id.tv_edit_self_info));
+        lvChatRooms = ((ListView) findViewById(id.lv_chatrooms));
+        ivHead = ((CircularImageView) findViewById(id.iv_head));
+        tvCreateChatRoom = ((TextView) findViewById(id.tv_create_chatroom));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((ToastComponent_) toast).afterSetContentView_();
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         init();

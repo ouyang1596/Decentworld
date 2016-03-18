@@ -1,0 +1,123 @@
+package cn.sx.decentworld.activity;
+
+import java.util.HashMap;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.CheckResultBean;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_doubt)
+public class DoubtActivity extends BaseFragmentActivity implements
+		OnClickListener {
+	@ViewById(R.id.ll_doubt)
+	LinearLayout llDoubt;
+	@ViewById(R.id.ll_wan)
+	LinearLayout llWan;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	private SendUrl mSendUrl;
+	// String data =
+	// "{\"dwID\":\"769015\",\"fakeAmount\":0,\"passAmount\":0,\"standard\":22,\"status\":1,\"supporters\":[{\"gender\":\"男\",\"id\":\"769015\",\"occupation\":\"\",\"showName\":\"晕乐\",\"userType\":1,\"worth\":1.0}],\"unpassAmount\":0}";
+	private Handler mDoubtHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			CheckResultBean bean = JsonUtils.json2Bean(msg.obj.toString(),
+					CheckResultBean.class);
+			Intent intent;
+			// if (bean.status == 0) {
+			intent = new Intent(DoubtActivity.this,
+					DoubtCancelDoubtActivity_.class);
+			startActivity(intent);
+			// } else {
+			// intent = new Intent(DoubtActivity.this,
+			// ExamineWelcomeActivity_.class);
+			// intent.putExtra("checkResult", bean);
+			// startActivity(intent);
+			// }
+		};
+	};
+
+	@AfterViews
+	public void init() {
+		initData();
+	}
+
+	private void initData() {
+		mSendUrl = new SendUrl(this);
+		llDoubt.setOnClickListener(this);
+		llWan.setOnClickListener(this);
+		ivBack.setOnClickListener(this);
+	}
+
+	public void getCheckResult() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
+				+ Constants.API_GET_CHECK_STATUS, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						if (2222 == msg.getResultCode()) {
+							showToast("成功");
+							LogUtils.i("bm", "getCheckResult--"
+									+ msg.getData().toString());
+							Message message = mDoubtHandler.obtainMessage();
+							message.obj = msg.getData().toString();
+							mDoubtHandler.sendMessage(message);
+						} else {
+							showToast("失败");
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToast(Constants.NET_WRONG);
+					}
+
+				});
+	}
+
+	private void showToast(final String data) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				Toast.makeText(mContext, data, Toast.LENGTH_SHORT).show();
+			}
+		});
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.ll_doubt:
+			getCheckResult();
+			break;
+		case R.id.ll_wan:
+			startActivity(new Intent(this, DoubtWanActivity.class));
+			break;
+		case R.id.iv_back:
+			finish();
+			break;
+		}
+	}
+}

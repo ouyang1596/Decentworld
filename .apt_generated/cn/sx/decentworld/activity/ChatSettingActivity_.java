@@ -40,15 +40,15 @@ public final class ChatSettingActivity_
     }
 
     private void afterSetContentView_() {
-        iv_switch_top = ((ImageView) findViewById(id.iv_switch_top));
-        rl_chat_details_empty_record = ((RelativeLayout) findViewById(id.rl_chat_details_empty_record));
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
-        rl_switch_msg_no_disturb = ((RelativeLayout) findViewById(id.rl_switch_msg_no_disturb));
         rl_chat_details_whistleblowing = ((RelativeLayout) findViewById(id.rl_chat_details_whistleblowing));
         rl_chat_details_set_bg = ((RelativeLayout) findViewById(id.rl_chat_details_set_bg));
-        iv_switch_no_disturb = ((ImageView) findViewById(id.iv_switch_no_disturb));
+        rl_chat_details_empty_record = ((RelativeLayout) findViewById(id.rl_chat_details_empty_record));
         chat_setting_gridview = ((ExpandGridView) findViewById(id.chat_setting_gridview));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         rl_switch_msg_top = ((RelativeLayout) findViewById(id.rl_switch_msg_top));
+        iv_switch_no_disturb = ((ImageView) findViewById(id.iv_switch_no_disturb));
+        rl_switch_msg_no_disturb = ((RelativeLayout) findViewById(id.rl_switch_msg_no_disturb));
+        iv_switch_top = ((ImageView) findViewById(id.iv_switch_top));
         ((TitleBar_) titleBar).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

@@ -1,0 +1,109 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.util.List;
+
+import android.content.Context;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.nui.multiphotopicker.model.ImageItem;
+
+/**
+ * @ClassName: GridViewFriendsCircleAdapter.java
+ * @author: yj
+ * @date: 2016年3月3日 上午11:20:20
+ */
+public class GridViewFriendsCircleAdapter extends BaseAdapter {
+	private Context mContext;
+	private List<ImageItem> mData;
+	private boolean ifShowDeleteButton;
+
+	public GridViewFriendsCircleAdapter(Context context, List<ImageItem> data) {
+		mContext = context;
+		mData = data;
+	}
+
+	@Override
+	public int getCount() {
+		return mData == null ? 0 : mData.size();
+	}
+
+	@Override
+	public ImageItem getItem(int position) {
+		return mData.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View con, ViewGroup parent) {
+		ViewHolder vh = null;
+		if (null == con) {
+			con = View.inflate(mContext, R.layout.item_publish, null);
+			vh = new ViewHolder();
+			vh.ivSelect = (ImageView) con.findViewById(R.id.item_grid_image);
+			vh.ivDeleteItem = (ImageView) con.findViewById(R.id.iv_delete_item);
+			vh.ivDeleteItem.setOnClickListener(mOnDeleteClickListener);
+			con.setTag(vh);
+		} else {
+			vh = (ViewHolder) con.getTag();
+		}
+		ImageItem imageItem = mData.get(position);
+		ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE + imageItem.sourcePath, vh.ivSelect);
+		LogUtils.i("bm", "thumbnailPath--" + Constants.URI_FILE + imageItem.sourcePath);
+		vh.ivDeleteItem.setTag(position);
+		if (ifShowDeleteButton) {
+			vh.ivDeleteItem.setVisibility(View.VISIBLE);
+		} else {
+			vh.ivDeleteItem.setVisibility(View.GONE);
+		}
+		return con;
+	}
+
+	private OnClickListener mOnDeleteClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			int position = (Integer) v.getTag();
+			mData.remove(position);
+			if (null != mOnImageItemSizeListener) {
+				mOnImageItemSizeListener.OnImageItemSize(mData);
+			}
+			notifyDataSetChanged();
+		}
+	};
+	public OnImageItemSizeListener mOnImageItemSizeListener;
+
+	public interface OnImageItemSizeListener {
+		void OnImageItemSize(List<ImageItem> imageItems);
+	}
+
+	public void setOnImageItemSizeListener(OnImageItemSizeListener onImageItemSizeListener) {
+		mOnImageItemSizeListener = onImageItemSizeListener;
+	}
+
+	public boolean isIfShowDeleteButton() {
+		return ifShowDeleteButton;
+	}
+
+	public void setIfShowDeleteButton(boolean ifShowDeleteButton) {
+		this.ifShowDeleteButton = ifShowDeleteButton;
+	}
+
+	class ViewHolder {
+		ImageView ivSelect, ivDeleteItem;
+	}
+}

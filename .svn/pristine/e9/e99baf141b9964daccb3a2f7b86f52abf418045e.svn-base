@@ -1,0 +1,39 @@
+package cn.sx.decentworld.activity;
+
+import android.view.View;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.fragment.DoubtFirstStepFragment;
+import cn.sx.decentworld.fragment.DoubtFirstStepFragment.OnDoubtFirstClickListener;
+import cn.sx.decentworld.fragment.DoubtSecondStepFragment;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+
+@EActivity(R.layout.activity_doubt_verify)
+public class DoubtVerifyActivity extends BaseFragmentActivity implements
+		OnDoubtFirstClickListener {
+	private DoubtFirstStepFragment mDoubtFirstStepFragment;
+	private DoubtSecondStepFragment mDoubtSecondFragment;
+
+	@AfterViews
+	public void init() {
+		initData();
+	}
+
+	private void initData() {
+		mDoubtFirstStepFragment = new DoubtFirstStepFragment();
+		mDoubtSecondFragment = new DoubtSecondStepFragment();
+		getSupportFragmentManager().beginTransaction()
+				.add(R.id.fl_doubt_container, mDoubtFirstStepFragment, "dff")
+				.add(R.id.fl_doubt_container, mDoubtSecondFragment, "dsf")
+				.hide(mDoubtFirstStepFragment).commit();
+		mDoubtFirstStepFragment.setOnDoubtFirstClickListener(this);
+	}
+
+	@Override
+	public void OnDoubtFirstClick(View view) {
+		getSupportFragmentManager().beginTransaction()
+				.hide(mDoubtFirstStepFragment).show(mDoubtSecondFragment)
+				.commit();
+	}
+}

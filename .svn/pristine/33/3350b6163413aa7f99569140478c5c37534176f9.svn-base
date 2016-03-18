@@ -1,0 +1,142 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.engine;
+
+import com.activeandroid.query.Select;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.DisplayAuthority;
+import cn.sx.decentworld.bean.UserInfo;
+
+/**
+ * @ClassName: UserInfoEngine.java
+ * @Description: 个人信息管理模块（加载、修改、上传）
+ * @author: cj
+ * @date: 2016年3月15日 下午3:31:03
+ */
+public class UserInfoEngine {
+	private static final String TAG = "UserInfoEngine";
+	private static UserInfoEngine instance;
+	private final static Object LOCK = new Object();
+	private String userID = DecentWorldApp.getInstance().getDwID();
+	// 个人信息
+	private static UserInfo userInfo;
+	// 权限信息
+	private static DisplayAuthority displayAuthority;
+
+	/**
+     * 
+     */
+	private UserInfoEngine() {
+
+	}
+
+	/**
+	 * 获取实例
+	 * 
+	 * @return
+	 */
+	public static UserInfoEngine getInstance() {
+		if (instance == null) {
+			synchronized (LOCK) {
+				if (instance == null) {
+					instance = new UserInfoEngine();
+				}
+			}
+		}
+		return instance;
+	}
+
+	// ////////////////////////////////////////////初始化数据//////////////////////////////////////////
+
+	/**
+	 * 初始化数据(LoadNetdataActivity中初始化)
+	 */
+	public void initData() {
+		if (userInfo == null) {
+			userInfo = new Select().from(UserInfo.class).where("userId=?", userID).executeSingle();
+		}
+
+		if (displayAuthority == null) {
+			displayAuthority = new Select().from(DisplayAuthority.class).where("userId=?", userID).executeSingle();
+		}
+	}
+
+	/**
+	 * 当用户手动退出软件后，调用该函数清理内存中的数据
+	 */
+	public void clear() {
+		if (userInfo != null) {
+			userInfo = null;
+		}
+		if (displayAuthority != null) {
+			displayAuthority = null;
+		}
+	}
+
+	// ////////////////////////////////////////对方公开的方法////////////////////////////////
+
+	/**
+	 * 获取个人信息
+	 */
+	public UserInfo getUserInfo() {
+		if (userInfo == null) {
+			userInfo = new Select().from(UserInfo.class).where("userId=?", userID).executeSingle();
+			if (userInfo == null)
+				userInfo = new UserInfo();
+		}
+		return userInfo;
+	}
+
+	/**
+	 * 获取个人权限信息
+	 */
+	public DisplayAuthority getDisplayAuthority() {
+		if (displayAuthority == null) {
+			displayAuthority = DisplayAuthority.queryByDwID(userID);
+			if (displayAuthority == null)
+				displayAuthority = new DisplayAuthority();
+		}
+		return displayAuthority;
+	}
+
+	/**
+	 * 获取显示的名字，按优先级顺序显示，实名(2)、昵称(1)
+	 * 
+	 * @return
+	 */
+	public String getShowName() {
+		String showName = ";";
+		DisplayAuthority authority = getDisplayAuthority();
+		if (authority != null) {
+			if (authority.getShowRealName()) {
+				showName = "2;" + userInfo.getRealName();
+			} else {
+				showName = "1;" + userInfo.getNickName();
+			}
+		}
+		return showName;
+	}
+
+	/**
+	 * 是否显示身家
+	 * 
+	 * @return
+	 */
+	public boolean isShowWealth() {
+		boolean isShowWealth = false;
+		DisplayAuthority authority = getDisplayAuthority();
+		if (authority != null) {
+			isShowWealth = authority.getShowWealth();
+		}
+		return isShowWealth;
+	}
+
+	// ////////////////////////////////////////对方公开的方法////////////////////////////////
+
+	// ////////////////////////////////////////私有方法////////////////////////////////////
+
+	// ////////////////////////////////////////私有方法////////////////////////////////////
+
+}

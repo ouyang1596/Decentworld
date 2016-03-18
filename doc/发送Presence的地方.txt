@@ -1,0 +1,13 @@
+文档更新时间 2016-03-08
+
+一、ConversationFragment文件中
+1.此文件中有三处地方地方调用XmppHelper.sendPresence();
+2.用途：在初始化界面后，发送一个presence接收离线消息；
+
+
+二、ViConnectionListener文件中
+1.用途：收到重连成功后发送presence，表示登录；因为正常登录也会进入重连成功的方法，所以这里要判断界面是否初始化完毕，
+如果界面没有初始化完毕，代表是正常登录，否则是重连触发的）
+
+
+三、ConnectOpenFireTask文件中

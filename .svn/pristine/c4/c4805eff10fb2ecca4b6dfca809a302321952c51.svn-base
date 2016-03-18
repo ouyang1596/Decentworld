@@ -1,0 +1,72 @@
+package cn.sx.decentworld.activity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.R.id;
+import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.adapter.SearchAdapter;
+import cn.sx.decentworld.bean.SearchResult;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
+@EActivity(R.layout.activity_contact)
+public class ContactActivity extends BaseFragmentActivity {
+	@ViewById(R.id.lv_contact)
+	PullToRefreshListView lvContact;
+	@Bean
+	ToastComponent toast;
+	private String data;
+	private List<SearchResult> searchResultList;
+	public static final String JSON_DATA = "JSON_DATA";
+	private String mSearchType;
+	private SearchAdapter searchAdapter;
+
+	@AfterViews
+	public void init() {
+		CGetIntent();
+		initLv();
+		parserJsonData();
+	}
+
+	private void CGetIntent() {
+		data = getIntent().getStringExtra(JSON_DATA);
+	}
+
+	private void initLv() {
+		searchResultList = new ArrayList<SearchResult>();
+		searchAdapter = new SearchAdapter(this, searchResultList);
+		lvContact.setAdapter(searchAdapter);
+	}
+
+	private void parserJsonData() {
+		try {
+			JSONObject object = new JSONObject(data);
+			mSearchType = object.getString("searchType");
+			JSONArray array = object.getJSONArray("recommend");
+			LogUtils.e("bm", "array--" + array.toString());
+			List<SearchResult> datas = (List<SearchResult>) JsonUtils
+					.json2BeanArray(array.toString(), SearchResult.class);
+			searchAdapter.setTag(mSearchType);
+			if (null != datas) {
+				searchResultList.addAll(datas);
+				searchAdapter.notifyDataSetChanged();
+			}
+		} catch (JSONException e) {
+			toast.show("解析错误");
+		}
+	}
+
+}

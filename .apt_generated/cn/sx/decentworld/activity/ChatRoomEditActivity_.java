@@ -45,23 +45,23 @@ public final class ChatRoomEditActivity_
     }
 
     private void afterSetContentView_() {
-        btnFeeScaleSave = ((Button) findViewById(id.btn_fee_scale_save));
-        btnContentSave = ((Button) findViewById(id.btn_content_save));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        etSubjectName = ((EditText) findViewById(id.tv_subj_name));
-        etFee = ((EditText) findViewById(id.et_fee));
-        rgFeeScale = ((RadioGroup) findViewById(id.rg_fee_Scale));
-        llEdit = ((LinearLayout) findViewById(id.root_activity_edit));
-        tvPercent = ((TextView) findViewById(id.tv_percent));
-        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
-        tvSend = ((TextView) findViewById(id.tv_send));
-        tvFeeScale = ((TextView) findViewById(id.rb_fee_scale));
-        rbFeeScale = ((RadioButton) findViewById(id.rb_fee_scale));
-        rbFixed = ((RadioButton) findViewById(id.rb_fixed));
-        ivCover = ((ImageView) findViewById(id.iv_cover));
         rbContent = ((RadioButton) findViewById(id.rb_content));
-        rgFeeContent = ((RadioGroup) findViewById(id.rg_content));
+        rbFixed = ((RadioButton) findViewById(id.rb_fixed));
+        tvFeeScale = ((TextView) findViewById(id.rb_fee_scale));
+        tvSend = ((TextView) findViewById(id.tv_send));
         slFee = ((ScrollLayout) findViewById(id.sl_fee));
+        rbFeeScale = ((RadioButton) findViewById(id.rb_fee_scale));
+        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
+        llEdit = ((LinearLayout) findViewById(id.root_activity_edit));
+        etFee = ((EditText) findViewById(id.et_fee));
+        btnFeeScaleSave = ((Button) findViewById(id.btn_fee_scale_save));
+        tvPercent = ((TextView) findViewById(id.tv_percent));
+        ivCover = ((ImageView) findViewById(id.iv_cover));
+        rgFeeContent = ((RadioGroup) findViewById(id.rg_content));
+        rgFeeScale = ((RadioGroup) findViewById(id.rg_fee_Scale));
+        btnContentSave = ((Button) findViewById(id.btn_content_save));
+        etSubjectName = ((EditText) findViewById(id.tv_subj_name));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

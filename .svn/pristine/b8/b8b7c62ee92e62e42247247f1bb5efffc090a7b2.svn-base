@@ -1,0 +1,251 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean.manager;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.simple.eventbus.EventBus;
+
+import android.app.Activity;
+import android.content.Context;
+import android.os.Handler;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.utils.FileUtils;
+import cn.sx.decentworld.utils.HttpDownloader;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.activeandroid.query.Select;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EBean;
+import com.googlecode.androidannotations.annotations.RootContext;
+
+/**
+ * @ClassName: DWMMessageManager.java
+ * @Description: 单聊消息管理器
+ * @author: cj
+ * @date: 2015年11月22日 下午6:43:29
+ */
+@EBean
+public class DWSMessageManager {
+	@RootContext
+	Context context;
+
+	@RootContext
+	Activity activity;
+
+	@Bean
+	ToastComponent toastComponent;
+
+	@AfterViews
+	void init() {
+
+	}
+
+	private static final String TAG = "DWSMessageManager";
+	/**
+	 * 每一页的消息条数，默认为十条
+	 */
+	private static int countSinglePage = 10;
+
+	@Bean
+	GetUserInfo getUserInfo;
+
+	/**
+	 * 私有构造方法，防止外部创建实例
+	 */
+	public DWSMessageManager() {
+
+	}
+
+	/**
+	 * 根据文本消息的txtMsgID搜索唯一的DWMessage
+	 * 
+	 * @param txtMsgID
+	 * @return
+	 */
+	public static DWMessage queryItem(String txtMsgID) {
+		return new Select().from(DWMessage.class)
+				.where("txtMsgID = ?", txtMsgID).executeSingle();
+	}
+
+	/**
+	 * 第一次进入单聊界面时自动拿取十条记录
+	 * @param dwID
+	 * @param toID
+	 * @param chatType
+	 * @return
+	 */
+	public void getFistPageMsg(String dwID, String toID, int chatType)
+	{
+		String sql = "(userID=? and fromDwId=? and toDwId=? and chatType=?)" + "or" + "(userID=? and fromDwId=? and toDwId=? and chatType= ?)";
+		List<DWMessage> temp = new Select().from(DWMessage.class).where(sql, dwID,dwID, toID, chatType,dwID, toID, dwID, chatType).limit(countSinglePage).orderBy("mid desc").execute();// ASC，添加消息id后，排序字段换成消息id
+		if (temp.size() > 0)
+		{
+			LogUtils.i(TAG, "getFistPageMsg...size=" + temp.size());
+			EventBus.getDefault().post(temp,
+					NotifyByEventBus.NT_UPDATE_SINGLE_HISTORY_MSG);
+		} 
+		else 
+		{
+			// 调用从网络获取单聊历史记录的接口
+			// 传入参数：1.dwID 2.friendID 3.传入最大值，表示客户端没有任何数据
+			LogUtils.i(TAG, "getFistPageMsg...数据库中数据不足，从网络拿取");
+			getUserInfo.getUserHistoryMsg(dwID, toID, -1, chatType, handler);
+		}
+	}
+
+	/**
+	 * 手动加载十条数据
+	 * @param dwID
+	 *            自己的dwID
+	 * @param toID
+	 *            对方的dwID
+	 * @return
+	 */
+	public void getNextPageMsg(String dwID, String toID, long minMsgID, int chatType)
+	{
+		String sql = "((userID = ? and fromDwId=? and toDwId=? and chatType = ?)" + "or" + "(userID = ? and fromDwId=? and toDwId=? and chatType = ?))" + "and mid<?";
+		List<DWMessage> temp = new Select().from(DWMessage.class).where(sql, dwID,dwID, toID, chatType, dwID,toID, dwID, chatType, minMsgID).limit(countSinglePage).orderBy("mid desc").execute();// ASC，添加消息id后，排序字段换成消息id
+		if (temp.size() > 0)
+		{
+			// 从数据库拿取十条消息，判断如果大于0条，则返回
+			LogUtils.i(TAG, "getNextPageMsg...size=" + temp.size());
+			EventBus.getDefault().post(temp,
+					NotifyByEventBus.NT_UPDATE_SINGLE_HISTORY_MSG);
+		} else {
+			// 否则从网络获取
+			LogUtils.i(TAG, "getNextPageMsg...数据库中数据不足，从网络拿取");
+			getUserInfo.getUserHistoryMsg(dwID, toID, minMsgID, chatType,
+					handler);
+		}
+	}
+
+	// 服务器返回数据后经过解析，在把结果通过EventBus传递到ChatActivity中
+	Handler handler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			// LogUtils.i(TAG, "从服务器获取消息记录成功，内容为："+msg.obj.toString());
+			// 解析下列数据
+			List<DWMessage> temp = new ArrayList<DWMessage>();
+			switch (msg.what) {
+			case 1:// 成功
+				String result = msg.obj.toString();
+				LogUtils.i(TAG, "获取用户单聊历史记录成功，内容为：" + result);
+				JSONObject jsonObject = JSON.parseObject(result);
+				JSONArray array = jsonObject.getJSONArray("chatList");
+				DWMessage dwMessage;
+				for (int i = 0; i < array.size(); i++) {
+					JSONObject ob = array.getJSONObject(i);
+					int messageType = ob.getIntValue("messageType");
+					int direct = ob.getIntValue("direct");// 0 接收 1发送
+					String connectorID = ob.getString("connectorID");
+					String sendTime = ob.getString("sendTime");
+					String dwID = ob.getString("dwID");
+					long id = ob.getLongValue("id");
+					int chatType = ob.getIntValue("chatType");
+
+					if (direct == DWMessage.RECEIVE) {
+						dwMessage = new DWMessage(messageType,
+								DWMessage.RECEIVE);
+						dwMessage.setFrom(connectorID);
+						dwMessage.setTo(dwID);
+					} else {
+						dwMessage = new DWMessage(messageType, DWMessage.SEND);
+						dwMessage.setTo(connectorID);
+						dwMessage.setFrom(dwID);
+					}
+					dwMessage.setTime(sendTime);
+					dwMessage.setMid(id);
+					dwMessage.setChatType(chatType);
+					dwMessage.setSendSuccess(1);
+					if (messageType == DWMessage.TXT) {
+						// 如果是文字，message就是body
+						dwMessage.setBody(ob.getString("message"));
+					} else if (messageType == DWMessage.VOICE) {
+						// 如果是语音，需要uri,length
+						String data = ob.getString("message");
+						JSONObject object = JSON.parseObject(data);
+						String uri = object.getString("uri");
+						int length = Integer
+								.valueOf(object.getString("length"));
+						// String fileName = Constants.HomePath
+						// + Constants.AudioReceivePath + File.separator
+						// + FileUtils.generateFileName() + ".mp3";
+						// downloadAudio(uri, fileName);
+						dwMessage.setUri(uri);
+						dwMessage.ifFromNet = 0;
+						dwMessage.setRemoteUrl(uri);
+						dwMessage.setVoiceTime(length);
+					} else if (messageType == DWMessage.IMAGE) {
+						// 如果是图片，需要uri,img
+						String data = ob.getString("message");
+						JSONObject object = JSON.parseObject(data);
+						String uri = object.getString("uri");
+						String img = object.getString("img");
+						File file = ImageUtils.AnalyticThumbnail(img);
+						dwMessage.setUri(file.getAbsolutePath());
+						dwMessage.setRemoteUrl(uri);
+					} else if (messageType == DWMessage.CARD) {
+						String data = ob.getString("message");
+						LogUtils.i(TAG,
+								"messageType=3," + "body=" + ob.toJSONString());
+						JSONObject object = JSON.parseObject(data);
+						String forwardName = object.getString("nickName");
+						String forwardDwId = object.getString("dwID");
+						dwMessage.setForwardDwId(forwardDwId);
+						dwMessage.setForwardName(forwardName);
+					}
+					dwMessage.setIsRead(0);
+					// 将结果保存到数据库
+					dwMessage.save();
+					// 加到temp中
+					temp.add(dwMessage);
+				}
+				break;
+			case 2:// 失败
+				LogUtils.i(TAG, "失败，case 2" + ",temp.size = " + temp.size());
+
+				break;
+			case 3:// 失败
+				LogUtils.i(TAG, "失败，case 3" + ",temp.size = " + temp.size());
+				break;
+			default:
+				break;
+			}
+			// 将结果通过EventBus传递到ChatActivity中
+			EventBus.getDefault().post(temp,
+					NotifyByEventBus.NT_UPDATE_SINGLE_HISTORY_MSG);
+		};
+	};
+
+	/**
+	 * 下载语音
+	 */
+	private int downloadAudio(String uri, String fileName) {
+		// InputStream inputStream = null;
+		int result = Constants.SUCC;
+		if (!FileUtils.isFileExist(Constants.HomePath)) {
+			FileUtils.createSDDir(Constants.HomePath);
+		}
+		if (!FileUtils.isFileExist(Constants.HomePath
+				+ Constants.AudioReceivePath)) {
+			FileUtils.createSDDir(Constants.HomePath
+					+ Constants.AudioReceivePath);
+		}
+		result = HttpDownloader.downFile(uri, fileName);
+		return result;
+	}
+
+}

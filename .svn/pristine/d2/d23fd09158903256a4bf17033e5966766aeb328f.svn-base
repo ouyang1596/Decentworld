@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="49dp"
+    android:background="@color/gray_e"
+    android:orientation="horizontal" >
+
+    <RelativeLayout
+        android:id="@+id/menu_tab_4"
+        android:layout_width="0dp"
+        android:layout_height="49dp"
+        android:layout_weight="1" >
+
+        <TextView
+            android:id="@+id/menu_tab4_unread_msg_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/unread_count_bg"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:id="@+id/menu_tab4_iv"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/main_me_selector" />
+
+            <TextView
+                android:id="@+id/menu_tab4_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/main_bottom_me"
+                android:textColor="@color/new_yellow_deep"
+                android:textSize="@dimen/new_textsize_10sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/menu_tab_3"
+        android:layout_width="0dp"
+        android:layout_height="49dp"
+        android:layout_weight="1" >
+
+        <TextView
+            android:id="@+id/menu_tab3_unread_msg_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/unread_count_bg"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:id="@+id/menu_tab3_iv"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/main_find_selector" />
+
+            <TextView
+                android:id="@+id/menu_tab3_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/main_bottom_find"
+                android:textColor="@color/new_yellow_deep"
+                android:textSize="@dimen/new_textsize_10sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/menu_tab_2"
+        android:layout_width="0dp"
+        android:layout_height="49dp"
+        android:layout_weight="1" >
+
+        <TextView
+            android:id="@+id/menu_tab2_unread_msg_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/unread_count_bg"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:id="@+id/menu_tab2_iv"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/main_contact_selector" />
+
+            <TextView
+                android:id="@+id/menu_tab2_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/main_bottom_contact"
+                android:textColor="@color/new_yellow_deep"
+                android:textSize="@dimen/new_textsize_10sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/menu_tab_1"
+        android:layout_width="0dp"
+        android:layout_height="49dp"
+        android:layout_weight="1" >
+
+        <TextView
+            android:id="@+id/menu_tab1_unread_msg_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/unread_count_bg"
+            android:gravity="center"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:visibility="invisible" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:id="@+id/menu_tab1_iv"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/main_chat_selector" />
+
+            <TextView
+                android:id="@+id/menu_tab1_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="@string/main_bottom_chat"
+                android:textColor="@color/new_yellow_deep"
+                android:textSize="@dimen/new_textsize_10sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

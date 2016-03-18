@@ -1,0 +1,44 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_activity_social_status"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <include layout="@layout/layout_register_title_bg2" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="82px"
+            android:layout_marginRight="82px"
+            android:text="更改我的身价"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textsize_36px" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/et_social_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_line_press"
+        android:inputType="number"
+        android:text="1" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp" >
+
+        <include layout="@layout/layout_register_btn_common" />
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,72 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.me;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EFragment;
+
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.fragment.BaseFragment;
+
+/**
+ * @ClassName: AchievementFragment.java
+ * @Description: 
+ * @author: cj
+ * @date: 2016年1月18日 下午7:51:54
+ */
+@EFragment(R.layout.fragment_me_achievement)
+public class AchievementFragment extends BaseFragment
+{
+    /**
+     * 常量
+     */
+    private static final String TAG = "AchievementFragment";
+    
+    /**
+     * 工具类
+     */
+    @Bean
+    ToastComponent toast;
+    
+    /**
+     * 界面资源
+     */
+    
+    
+    /**
+     * 变量
+     */
+    private boolean isPrepared = false;
+    
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        
+        isPrepared = true;
+        lazyLoad();
+    }
+    
+    /**
+     * 数据延迟加载
+     */
+    @Override
+    protected void lazyLoad()
+    {
+
+        
+    }
+
+    @Override
+    public void turnToTab(int tab)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+}

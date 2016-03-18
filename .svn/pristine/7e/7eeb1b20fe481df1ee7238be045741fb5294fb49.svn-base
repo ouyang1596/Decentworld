@@ -1,0 +1,385 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rb_bg"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:orientation="horizontal" >
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" >
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_ref_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="12dp"
+                        android:text="可预期总额"
+                        android:textColor="@color/white"
+                        android:textSize="10dp" />
+
+                    <ImageView
+                        android:id="@+id/iv_cash_benefit_ref_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@id/tv_cash_benefit_ref_1"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="10dp"
+                        android:src="@drawable/rb_divide_line" />
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_total_big"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@id/iv_cash_benefit_ref_1"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="12dp"
+                        android:text="0"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_total_small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/tv_cash_benefit_total_big"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="10dp"
+                        android:layout_toRightOf="@id/tv_cash_benefit_total_big"
+                        android:text=".00"
+                        android:textColor="@color/white" />
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="0.5dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/dark_gray" />
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" >
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_ref_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="12dp"
+                        android:text="历史返现"
+                        android:textColor="@color/white"
+                        android:textSize="10dp" />
+
+                    <ImageView
+                        android:id="@+id/iv_cash_benefit_ref_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@id/tv_cash_benefit_ref_2"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="10dp"
+                        android:src="@drawable/rb_divide_line" />
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_back_big"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@id/iv_cash_benefit_ref_2"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="12dp"
+                        android:text="0"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_back_small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/tv_cash_benefit_back_big"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="10dp"
+                        android:layout_toRightOf="@id/tv_cash_benefit_back_big"
+                        android:text=".00"
+                        android:textColor="@color/white" />
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="0.5dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/dark_gray" />
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" >
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_ref_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="12dp"
+                        android:text="未提零钱"
+                        android:textColor="@color/white"
+                        android:textSize="10dp" />
+
+                    <ImageView
+                        android:id="@+id/iv_cash_benefit_ref_3"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@id/tv_cash_benefit_ref_3"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="10dp"
+                        android:src="@drawable/rb_divide_line" />
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_not_big"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_above="@id/iv_cash_benefit_ref_3"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="12dp"
+                        android:text="0"
+                        android:textColor="@color/white" />
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_not_small"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/tv_cash_benefit_not_big"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginBottom="10dp"
+                        android:layout_toRightOf="@id/tv_cash_benefit_not_big"
+                        android:text=".00"
+                        android:textColor="@color/white" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/dark_gray" />
+
+            <RelativeLayout
+                android:id="@+id/rl_cash_benefit_draw"
+                android:layout_width="143dp"
+                android:layout_height="143dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="40dp"
+                android:background="@drawable/rb_draw_cash" >
+
+                <TextView
+                    android:id="@+id/tv_cash_benefit_not_draw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="0.00"
+                    android:textColor="@color/white"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@id/tv_cash_benefit_not_draw"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="12dp"
+                    android:text="Today"
+                    android:textColor="@color/white"
+                    android:textSize="15dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/tv_cash_benefit_not_draw"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="15dp"
+                    android:text="提取"
+                    android:textColor="@color/dark_gray"
+                    android:textSize="11dp" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_cash_benefit_state"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="17dp" >
+
+                <LinearLayout
+                    android:id="@+id/ll_cash_benefit_ref_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginLeft="26dp"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/rb_progress_1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="可绑定微信或支付宝进行提现"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_cash_benefit_ref_2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/ll_cash_benefit_ref_1"
+                    android:layout_marginLeft="26dp"
+                    android:layout_marginRight="26dp"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/rb_progress_1"
+                        android:visibility="invisible" />
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_wx_rule"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="微信收费2%"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_cash_benefit_ref_3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@id/ll_cash_benefit_ref_2"
+                    android:layout_marginLeft="26dp"
+                    android:layout_marginRight="26dp"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:src="@drawable/rb_progress_1"
+                        android:visibility="invisible" />
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_alipay_rule"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="支付宝收取1%"
+                        android:textColor="@color/white"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_cash_benefit_ref_1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/ll_cash_benefit_ref_3"
+                    android:layout_marginTop="14dp" >
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_alipay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="26dp"
+                        android:background="@drawable/rb_btn_bg"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:text="支付宝接收"
+                        android:textColor="@color/white"
+                        android:textSize="12dp" />
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_wx"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="22dp"
+                        android:layout_toLeftOf="@id/tv_cash_benefit_alipay"
+                        android:background="@drawable/rb_btn_bg"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:text="微信接收"
+                        android:textColor="@color/white"
+                        android:textSize="12dp" />
+
+                    <TextView
+                        android:id="@+id/tv_cash_benefit_autoTransfer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="22dp"
+                        android:layout_toLeftOf="@id/tv_cash_benefit_wx"
+                        android:background="@drawable/rb_btn_bg"
+                        android:gravity="center"
+                        android:padding="5dp"
+                        android:text="变为手动提取"
+                        android:textColor="@color/white"
+                        android:textSize="12dp" />
+                </RelativeLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="4dp"
+                    android:layout_below="@id/rl_cash_benefit_ref_1"
+                    android:layout_marginLeft="26dp"
+                    android:layout_marginRight="26dp"
+                    android:layout_marginTop="8dp"
+                    android:background="@drawable/rb_under_line" />
+            </RelativeLayout>
+
+            <cn.sx.decentworld.widget.ListViewForScrollView
+                android:layout_marginTop="10dp"
+                android:id="@+id/lv_cash_benefit"
+                android:layout_width="match_parent"
+                android:divider="@null"
+                android:visibility="gone"
+                android:layout_height="wrap_content" >
+            </cn.sx.decentworld.widget.ListViewForScrollView>
+            
+            <LinearLayout 
+                android:id="@+id/ll_cash_benefit_remind"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:padding="10dp"
+                android:visibility="visible"
+                android:layout_marginTop="5dp"
+                android:layout_height="wrap_content">
+                <TextView 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="你还没有推荐过任何人!"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.KeyboardComponent_;
@@ -36,21 +37,22 @@ public final class LoginActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        getUserInfo = GetUserInfo_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
-        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        btnLogin = ((Button) findViewById(id.btn_login));
+        etMobile = ((EditText) findViewById(id.et_mobile));
         flLogin = ((LinearLayout) findViewById(id.fl_login));
         etPassword = ((EditText) findViewById(id.et_password));
-        ivForgetPwd = ((ImageView) findViewById(id.iv_forget_password));
-        etMobile = ((EditText) findViewById(id.et_mobile));
         ivRegister = ((ImageView) findViewById(id.iv_register));
+        btnLogin = ((Button) findViewById(id.btn_login));
+        tvCeshi = ((TextView) findViewById(id.tv_ceshi));
+        ivForgetPwd = ((ImageView) findViewById(id.iv_forget_password));
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

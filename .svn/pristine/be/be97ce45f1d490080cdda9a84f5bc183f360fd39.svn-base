@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cn.sx.decentworld.widget.CardRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:zhy="http://schemas.android.com/apk/res/cn.sx.decentworld"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="20dp"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:layout_marginTop="20dp"
+    android:background="@color/white" >
+
+    <RelativeLayout
+        android:id="@+id/rel_head"
+        android:layout_width="match_parent"
+        android:layout_height="300dp" >
+
+        <cn.sx.decentworld.widget.RoundImageView
+            android:id="@+id/item_nearby_stranger_icon"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/login_bg"
+            zhy:borderRadius="2dp"
+            zhy:type="round" />
+
+        <TextView
+            android:id="@+id/tv_likeCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_white_translucent_radius"
+            android:drawableLeft="@drawable/heart_count"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
+            android:text="0"
+            android:textColor="@color/white"
+            android:textSize="@dimen/new_textsize_14sp" />
+
+        <ImageView
+            android:id="@+id/iv_usertype"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/doubt_person" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rel_head"
+        android:paddingLeft="18dp"
+        android:paddingRight="18dp" >
+
+        <RelativeLayout
+            android:id="@+id/rel_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <LinearLayout
+                android:id="@+id/ll_talk_stranger"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:gravity="bottom"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/item_nearby_stranger_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/stranger_name_bg"
+                    android:gravity="center"
+                    android:text="章子怡"
+                    android:textColor="@color/one_black"
+                    android:textSize="@dimen/new_textsize_18sp" />
+
+                <ImageView
+                    android:id="@+id/iv_realname_nickname"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginLeft="4dp"
+                    android:src="@drawable/stranger_nick" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_worth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="身价"
+                    android:textColor="@color/new_yellow"
+                    android:textSize="@dimen/new_textsize_12sp" />
+
+                <TextView
+                    android:id="@+id/item_nearby_stranger_worth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:text="24"
+                    android:textColor="@color/new_yellow"
+                    android:textSize="@dimen/new_textsize_40sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_wealth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/ll_worth"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/ll_worth" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="身家"
+                    android:textColor="@color/three_black"
+                    android:textSize="@dimen/new_textsize_12sp" />
+
+                <TextView
+                    android:id="@+id/tv_wealth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:text="24"
+                    android:textColor="@color/three_black"
+                    android:textSize="@dimen/new_textsize_12sp" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_short_introduce"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/rel_title"
+            android:layout_marginTop="18dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/item_nearby_stranger_sex"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/item_nearby_stranger_age"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="4dp"
+                android:text="24"
+                android:textColor="@color/three_black"
+                android:textSize="@dimen/new_textsize_14sp" />
+
+            <TextView
+                android:id="@+id/item_nearby_stranger_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="2km"
+                android:textColor="@color/three_black"
+                android:textSize="@dimen/new_textsize_14sp" />
+
+            <TextView
+                android:id="@+id/item_nearby_stranger_work"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="金融 法律顾问"
+                android:textColor="@color/three_black"
+                android:textSize="@dimen/new_textsize_12sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/item_nearby_stranger_sign"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/ll_short_introduce"
+            android:layout_marginTop="5dp"
+            android:text=""
+            android:textColor="@color/three_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/iv_card_like"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:src="@drawable/like_card"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/iv_card_dislike"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0"
+        android:src="@drawable/dislike_card"
+        android:visibility="gone" />
+
+</cn.sx.decentworld.widget.CardRelativeLayout>

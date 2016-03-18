@@ -1,0 +1,155 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.network.request;
+
+import java.util.HashMap;
+
+import android.app.Activity;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtils;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EBean;
+import com.googlecode.androidannotations.annotations.RootContext;
+
+/**
+ * @ClassName: SetFriendInfo.java
+ * @Description: 设置朋友相关信息 1. 设置朋友的备注 2.删除好友
+ * @author: cj
+ * @date: 2015年9月25日 上午10:30:58
+ */
+@EBean
+public class SetFriendInfo
+{
+	private static String TAG = "SetFriendInfo";
+	@RootContext
+	Context context;
+	@RootContext
+	Activity activity;
+	@Bean
+	ToastComponent toast;
+	private SendUrl sendUrl;
+
+	@AfterViews
+	void init()
+	{
+		sendUrl = new SendUrl(context);
+	}
+
+	/**
+	 * 设置备注
+	 * @param dwID
+	 * @param friendID
+	 * @param remark
+	 * @param handler
+	 * @param requestCode
+	 */
+	public void setRemark(String dwID,String friendID,String remark,final Handler handler,final int requestCode)
+	{
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("friendID", friendID);
+		map.put("remark", remark);
+		LogUtils.i(TAG, "setRemark...begin,dwID="+dwID+",friendID="+friendID+",remark="+remark);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH+"/user/setRemark", Method.GET, new HttpCallBack()
+		{
+			@Override
+			public void onSuccess(String response, ResultBean msg)
+			{
+				
+				LogUtils.i(TAG, "setRemark...msg.getResultCode="+msg.getResultCode());
+				if(msg.getResultCode()==2222)
+				{
+					LogUtils.i(TAG, "setRemark...msg.getMsg="+msg.getMsg());
+					Message message = Message.obtain();
+					message.what = requestCode;
+					handler.sendMessage(message);
+				}
+				if(msg.getResultCode()==3333)
+				{
+					LogUtils.i(TAG, "setRemark...msg.getMsg="+msg.getMsg());
+					((Activity)context).runOnUiThread(new Runnable()
+					{
+						@Override
+						public void run()
+						{
+							toast.show("设置备注失败");
+						}
+					});
+			
+				}
+				
+			}
+			
+			@Override
+			public void onFailure(String e)
+			{
+				LogUtils.i(TAG, "setRemark...failure,caused by:"+e);
+				((Activity)context).runOnUiThread(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						toast.show("设置备注失败,网络错误");
+					}
+				});
+			}
+		});
+	}
+	
+	/**
+	 * 删除好友
+	 * @param dwID
+	 * @param friendID
+	 * @param handler
+	 * @param requestCode
+	 */
+	public void deleteContact(String dwID,String friendID,final Handler handler,final int requestCode)
+	{
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("friendID", friendID);
+		LogUtils.i(TAG, "deleteContact...begin,dwID="+dwID+",friendID="+friendID);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH+"/friend/deleteFriend", Method.GET, new HttpCallBack()
+		{
+			@Override
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "deleteContact...msg.getResultCode="+msg.getResultCode());
+				if(msg.getResultCode()==2222)
+				{
+					LogUtils.i(TAG, "deleteContact...msg.getMsg="+msg.getMsg());
+					Message message = Message.obtain();
+					message.what = requestCode;
+					handler.sendMessage(message);
+				}
+				if(msg.getResultCode()==3333)
+				{
+					LogUtils.i(TAG, "deleteContact...failure,cause by:"+msg.getMsg());
+					ToastUtils.toast(context, "删除好友失败");
+				}
+			}
+			
+			@Override
+			public void onFailure(String e)
+			{
+				LogUtils.i(TAG, "deleteContact...onFailure,cause by:"+e);
+				ToastUtils.toast(context, "删除好友失败，网络错误");
+			}
+		});
+	}
+
+
+
+}

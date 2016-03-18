@@ -39,10 +39,10 @@ public final class EditJobActivity_
     }
 
     private void afterSetContentView_() {
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ll_edit_job_root = ((LinearLayout) findViewById(id.ll_edit_job_root));
         btn_edit_job_complete = ((Button) findViewById(id.btn_edit_job_complete));
         et_edit_job = ((EditText) findViewById(id.et_edit_job));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
         ((ToastComponent_) toast).afterSetContentView_();
         init();

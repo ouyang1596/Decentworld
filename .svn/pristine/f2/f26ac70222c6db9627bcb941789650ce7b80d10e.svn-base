@@ -1,0 +1,94 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+/**
+ * @ClassName: UserSessionInfo.java
+ * @Description: 消息发送至的额外信息
+ * @author: cj
+ * @date: 2015年12月30日 下午3:42:57
+ */
+public class UserSessionInfo
+{
+    /** 发送者ID **/
+    private String dwID;
+    /** 发送者昵称 **/
+    private String nickName;
+    /** 发送者身价 **/
+    private String worth;
+    /** 令牌 **/
+    private String token;
+    
+    /**
+     * 
+     */
+    public UserSessionInfo()
+    {
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * @return the dwID
+     */
+    public String getDwID()
+    {
+        return dwID;
+    }
+
+    /**
+     * @param dwID the dwID to set
+     */
+    public void setDwID(String dwID)
+    {
+        this.dwID = dwID;
+    }
+
+    /**
+     * @return the nickName
+     */
+    public String getNickName()
+    {
+        return nickName;
+    }
+
+    /**
+     * @param nickName the nickName to set
+     */
+    public void setNickName(String nickName)
+    {
+        this.nickName = nickName;
+    }
+
+    /**
+     * @return the worth
+     */
+    public String getWorth()
+    {
+        return worth;
+    }
+
+    /**
+     * @param worth the worth to set
+     */
+    public void setWorth(String worth)
+    {
+        this.worth = worth;
+    }
+
+    /**
+     * @return the token
+     */
+    public String getToken()
+    {
+        return token;
+    }
+
+    /**
+     * @param token the token to set
+     */
+    public void setToken(String token)
+    {
+        this.token = token;
+    }
+}

@@ -39,9 +39,9 @@ public final class RechargePayMethodUselessActivity_
     }
 
     private void afterSetContentView_() {
-        llWX = ((LinearLayout) findViewById(id.ll_wx));
         ivBack = ((ImageView) findViewById(id.iv_back));
         llAliPay = ((LinearLayout) findViewById(id.ll_ali_pay));
+        llWX = ((LinearLayout) findViewById(id.ll_wx));
         {
             View view = findViewById(id.iv_back);
             if (view!= null) {

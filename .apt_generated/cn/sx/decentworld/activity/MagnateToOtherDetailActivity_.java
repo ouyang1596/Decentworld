@@ -13,7 +13,9 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.TitleBar_;
@@ -40,6 +42,8 @@ public final class MagnateToOtherDetailActivity_
     }
 
     private void afterSetContentView_() {
+        tv_magnate_to_other_remind = ((TextView) findViewById(id.tv_magnate_to_other_remind));
+        lv_magnate_to_other_remind = ((LinearLayout) findViewById(id.lv_magnate_to_other_remind));
         lv_magnate_to_other_detail = ((ListView) findViewById(id.lv_magnate_to_other_detail));
         {
             View view = findViewById(id.main_header_left);

@@ -1,0 +1,47 @@
+package cn.sx.decentworld.activity;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.ConstantIntent;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_templet)
+public class TempletActivity extends BaseFragmentActivity implements
+		OnClickListener {
+	@ViewById(R.id.tv_back)
+	TextView tvBack;
+	@ViewById(R.id.tv_ensure)
+	TextView tvEnsure;
+	@ViewById(R.id.tv_introduce_detail)
+	TextView tvIntroduceDetail;
+
+	@AfterViews
+	public void init() {
+		tvBack.setOnClickListener(this);
+		tvEnsure.setOnClickListener(this);
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.tv_back:
+
+			break;
+
+		case R.id.tv_ensure:
+			Intent intent = new Intent();
+			intent.putExtra(
+					ConstantIntent.ACTIVITY_ACHIEVEMENT_INTRODUCE_DETAIL,
+					tvIntroduceDetail.getText().toString());
+			setResult(RESULT_OK, intent);
+			break;
+		}
+		finish();
+	}
+}

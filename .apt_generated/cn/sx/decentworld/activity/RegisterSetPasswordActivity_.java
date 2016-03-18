@@ -38,22 +38,22 @@ public final class RegisterSetPasswordActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
-        registerComponent = RegisterComponent_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
+        registerComponent = RegisterComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ivPwdIsShow = ((ImageView) findViewById(id.iv_pwd_is_show));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        etvPwd = ((EditText) findViewById(id.etv_reset_pwd));
-        llRegisterSetPassword = ((LinearLayout) findViewById(id.root_activity_register_set_password));
-        etRealName = ((ClearEditText) findViewById(id.et_realName));
         btnOk = ((Button) findViewById(id.btn_OK));
+        llRegisterSetPassword = ((LinearLayout) findViewById(id.root_activity_register_set_password));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        etRealName = ((ClearEditText) findViewById(id.et_realName));
+        etvPwd = ((EditText) findViewById(id.etv_reset_pwd));
+        ivPwdIsShow = ((ImageView) findViewById(id.iv_pwd_is_show));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ((ToastComponent_) toast).afterSetContentView_();
-        ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
+        ((RegisterComponent_) registerComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

@@ -1,0 +1,1002 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+import java.util.List;
+
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+
+/**
+ * @ClassName: UserDetailInfo.java
+ * @Description:保存用户的详细信息，该表在登录时新建，初次保存dwID、phoneNum、password
+ * @author: cj
+ * @date: 2015年8月25日 下午5:30:39
+ */
+@Table(name = "userInfo")
+public class UserInfo extends Model
+{
+    private static String TAG = "UserInfo";
+    /** 用户活跃的时间（打开MainActivity和退出MainActivity保存当时时间） **/
+    @Column(name = "activeTime")
+    public long activeTime;
+
+    /** 个性签名 **/
+    @Column(name = "sign")
+    public String sign;
+
+    /** 实名 **/
+    @Column(name = "realName")
+    public String realName;
+
+    /** 昵称 **/
+    @Column(name = "nickname")
+    public String nickName;
+
+    /** 年龄（服务器从身份证中提取，用户不可修改） **/
+    @Column(name = "age")
+    public int age;
+
+    /** 性别 (男、女) **/
+    @Column(name = "gender")
+    public String gender;
+
+    /** 身高(如果用户没有填写，默认为 -1) **/
+    @Column(name = "height")
+    public float height;
+
+    /** 常去的地点 **/
+    @Column(name = "position")
+    public String position;
+
+    /** 用户类型(疑，真，腕) **/
+    @Column(name = "userType")
+    public int userType;
+
+    /** 身家 **/
+    @Column(name = "wealth")
+    public float wealth;
+
+    /** 用户ID **/
+    @Column(name = "userId")
+    public String userId;
+
+    /** 学校 **/
+    @Column(name = "school")
+    public String school;
+
+    /** 院系 **/
+    @Column(name = "department")
+    public String department;
+
+    /** 班级 **/
+    @Column(name = "classes")
+    public String classes;
+
+    /** 行业 **/
+    @Column(name = "occupation")
+    public String occupation;
+
+    /** 公司 **/
+    @Column(name = "corporation")
+    public String corporation;
+
+    /** 职位 **/
+    @Column(name = "job")
+    public String job;
+
+    /** 家乡 **/
+    @Column(name = "hometown")
+    public String hometown;
+
+    /** 民族 **/
+    @Column(name = "nation")
+    public String nation;
+
+    /** 手机号码 **/
+    @Column(name = "phoneNum")
+    public String phoneNum;
+
+    /** 邮箱 **/
+    @Column(name = "email")
+    public String email;
+
+    /** qq **/
+    @Column(name = "qq")
+    public String qq;
+
+    /** 微信 **/
+    @Column(name = "wechat")
+    public String wechat;
+
+    /** 博客 **/
+    @Column(name = "blog")
+    public String blog;
+
+    /** 车子 **/
+    @Column(name = "vehicle")
+    public String vehicle;
+
+    /** 血型 **/
+    @Column(name = "bloodType")
+    public String bloodType;
+
+    /** 星座 **/
+    @Column(name = "constellatory")
+    public String constellatory;
+
+    /** 婚姻状况 **/
+    @Column(name = "maritalStatus")
+    public String maritalStatus;
+
+    /** 宗教 **/
+    @Column(name = "religion")
+    public String religion;
+
+    /** 特长 **/
+    @Column(name = "speciality")
+    public String speciality;
+
+    /** 偶像 **/
+    @Column(name = "idol")
+    public String idol;
+
+    /** 座右铭 **/
+    @Column(name = "motto")
+    public String motto;
+
+    /** 旅行足迹 **/
+    @Column(name = "footprint")
+    public String footprint;
+
+    /** 喜欢的书和动漫 **/
+    @Column(name = "likebooks")
+    public String likebooks;
+
+    /** 喜欢的音乐 **/
+    @Column(name = "likemusic")
+    public String likemusic;
+
+    /** 喜欢的影视 **/
+    @Column(name = "likemovie")
+    public String likemovie;
+
+    /** 喜欢的运动 **/
+    @Column(name = "likesport")
+    public String likesport;
+
+    /** 美食 **/
+    @Column(name = "cate")
+    public String cate;
+
+    /** 是否是学生 **/
+    @Column(name = "ifStudent")
+    public String ifStudent;
+
+    /** 经度 **/
+    @Column(name = "ln")
+    public double ln;
+
+    /** 纬度 **/
+    @Column(name = "lt")
+    public double lt;
+
+    /** 身价 **/
+    @Column(name = "worth")
+    public float worth;
+
+    /** 身份证号 **/
+    @Column(name = "card")
+    public String card;
+
+    /**
+    * 
+    */
+    public UserInfo()
+    {
+        this.activeTime = activeTime;
+        this.sign = sign;
+        this.realName = realName;
+        this.nickName = nickName;
+        this.age = age;
+        this.gender = gender;
+        this.height = height;
+        this.position = position;
+        this.userType = userType;
+        this.wealth = wealth;
+        this.userId = userId;
+        this.school = school;
+        this.department = department;
+        this.classes = classes;
+        this.occupation = occupation;
+        this.corporation = corporation;
+        this.job = job;
+        this.hometown = hometown;
+        this.nation = nation;
+        this.phoneNum = phoneNum;
+        this.email = email;
+        this.qq = qq;
+        this.wechat = wechat;
+        this.blog = blog;
+        this.vehicle = vehicle;
+        this.bloodType = bloodType;
+        this.constellatory = constellatory;
+        this.maritalStatus = maritalStatus;
+        this.religion = religion;
+        this.speciality = speciality;
+        this.idol = idol;
+        this.motto = motto;
+        this.footprint = footprint;
+        this.likebooks = likebooks;
+        this.likemusic = likemusic;
+        this.likemovie = likemovie;
+        this.likesport = likesport;
+        this.cate = cate;
+        this.ifStudent = ifStudent;
+        this.ln = ln;
+        this.lt = lt;
+        this.worth = worth;
+        this.card = card;
+    }
+
+    /**
+     */
+    public UserInfo(long activeTime, String sign, String realName, String nickName, int age, String gender, float height, String position, int userType, float wealth, String userId, String school,
+            String department, String classes, String occupation, String corporation, String job, String hometown, String nation, String phoneNum, String email, String qq, String wechat, String blog,
+            String vehicle, String bloodType, String constellatory, String maritalStatus, String religion, String speciality, String idol, String motto, String footprint, String likebooks,
+            String likemusic, String likemovie, String likesport, String cate, String ifStudent, double ln, double lt, float worth, String card)
+    {
+        this.activeTime = activeTime;
+        this.sign = sign;
+        this.realName = realName;
+        this.nickName = nickName;
+        this.age = age;
+        this.gender = gender;
+        this.height = height;
+        this.position = position;
+        this.userType = userType;
+        this.wealth = wealth;
+        this.userId = userId;
+        this.school = school;
+        this.department = department;
+        this.classes = classes;
+        this.occupation = occupation;
+        this.corporation = corporation;
+        this.job = job;
+        this.hometown = hometown;
+        this.nation = nation;
+        this.phoneNum = phoneNum;
+        this.email = email;
+        this.qq = qq;
+        this.wechat = wechat;
+        this.blog = blog;
+        this.vehicle = vehicle;
+        this.bloodType = bloodType;
+        this.constellatory = constellatory;
+        this.maritalStatus = maritalStatus;
+        this.religion = religion;
+        this.speciality = speciality;
+        this.idol = idol;
+        this.motto = motto;
+        this.footprint = footprint;
+        this.likebooks = likebooks;
+        this.likemusic = likemusic;
+        this.likemovie = likemovie;
+        this.likesport = likesport;
+        this.cate = cate;
+        this.ifStudent = ifStudent;
+        this.ln = ln;
+        this.lt = lt;
+        this.worth = worth;
+        this.card = card;
+    }
+    
+    
+
+    /**
+     * @return the activeTime
+     */
+    public long getActiveTime()
+    {
+        return activeTime;
+    }
+
+    /**
+     * @param activeTime the activeTime to set
+     */
+    public void setActiveTime(long activeTime)
+    {
+        this.activeTime = activeTime;
+    }
+
+    /**
+     * @return the sign
+     */
+    public String getSign()
+    {
+        return sign;
+    }
+
+    /**
+     * @param sign the sign to set
+     */
+    public void setSign(String sign)
+    {
+        this.sign = sign;
+    }
+
+    /**
+     * @return the realName
+     */
+    public String getRealName()
+    {
+        return realName;
+    }
+
+    /**
+     * @param realName the realName to set
+     */
+    public void setRealName(String realName)
+    {
+        this.realName = realName;
+    }
+
+    /**
+     * @return the nickName
+     */
+    public String getNickName()
+    {
+        return nickName;
+    }
+
+    /**
+     * @param nickName the nickName to set
+     */
+    public void setNickName(String nickName)
+    {
+        this.nickName = nickName;
+    }
+
+    /**
+     * @return the age
+     */
+    public int getAge()
+    {
+        return age;
+    }
+
+    /**
+     * @param age the age to set
+     */
+    public void setAge(int age)
+    {
+        this.age = age;
+    }
+
+    /**
+     * @return the gender
+     */
+    public String getGender()
+    {
+        return gender;
+    }
+
+    /**
+     * @param gender the gender to set
+     */
+    public void setGender(String gender)
+    {
+        this.gender = gender;
+    }
+
+    /**
+     * @return the height
+     */
+    public float getHeight()
+    {
+        return height;
+    }
+
+    /**
+     * @param height the height to set
+     */
+    public void setHeight(float height)
+    {
+        this.height = height;
+    }
+
+    /**
+     * @return the position
+     */
+    public String getPosition()
+    {
+        return position;
+    }
+
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(String position)
+    {
+        this.position = position;
+    }
+
+    /**
+     * @return the userType
+     */
+    public int getUserType()
+    {
+        return userType;
+    }
+
+    /**
+     * @param userType the userType to set
+     */
+    public void setUserType(int userType)
+    {
+        this.userType = userType;
+    }
+
+    /**
+     * @return the wealth
+     */
+    public float getWealth()
+    {
+        return wealth;
+    }
+
+    /**
+     * @param wealth the wealth to set
+     */
+    public void setWealth(float wealth)
+    {
+        this.wealth = wealth;
+    }
+
+
+
+    /**
+     * @return the userId
+     */
+    public String getUserId()
+    {
+        return userId;
+    }
+
+    /**
+     * @param userId the userId to set
+     */
+    public void setUserId(String userId)
+    {
+        this.userId = userId;
+    }
+
+    /**
+     * @return the school
+     */
+    public String getSchool()
+    {
+        return school;
+    }
+
+    /**
+     * @param school the school to set
+     */
+    public void setSchool(String school)
+    {
+        this.school = school;
+    }
+
+    /**
+     * @return the department
+     */
+    public String getDepartment()
+    {
+        return department;
+    }
+
+    /**
+     * @param department the department to set
+     */
+    public void setDepartment(String department)
+    {
+        this.department = department;
+    }
+
+    /**
+     * @return the classes
+     */
+    public String getClasses()
+    {
+        return classes;
+    }
+
+    /**
+     * @param classes the classes to set
+     */
+    public void setClasses(String classes)
+    {
+        this.classes = classes;
+    }
+
+    /**
+     * @return the occupation
+     */
+    public String getOccupation()
+    {
+        return occupation;
+    }
+
+    /**
+     * @param occupation the occupation to set
+     */
+    public void setOccupation(String occupation)
+    {
+        this.occupation = occupation;
+    }
+
+    /**
+     * @return the corporation
+     */
+    public String getCorporation()
+    {
+        return corporation;
+    }
+
+    /**
+     * @param corporation the corporation to set
+     */
+    public void setCorporation(String corporation)
+    {
+        this.corporation = corporation;
+    }
+
+    /**
+     * @return the job
+     */
+    public String getJob()
+    {
+        return job;
+    }
+
+    /**
+     * @param job the job to set
+     */
+    public void setJob(String job)
+    {
+        this.job = job;
+    }
+
+    /**
+     * @return the hometown
+     */
+    public String getHometown()
+    {
+        return hometown;
+    }
+
+    /**
+     * @param hometown the hometown to set
+     */
+    public void setHometown(String hometown)
+    {
+        this.hometown = hometown;
+    }
+
+    /**
+     * @return the nation
+     */
+    public String getNation()
+    {
+        return nation;
+    }
+
+    /**
+     * @param nation the nation to set
+     */
+    public void setNation(String nation)
+    {
+        this.nation = nation;
+    }
+
+    /**
+     * @return the phoneNum
+     */
+    public String getPhoneNum()
+    {
+        return phoneNum;
+    }
+
+    /**
+     * @param phoneNum the phoneNum to set
+     */
+    public void setPhoneNum(String phoneNum)
+    {
+        this.phoneNum = phoneNum;
+    }
+
+    /**
+     * @return the email
+     */
+    public String getEmail()
+    {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email)
+    {
+        this.email = email;
+    }
+
+    /**
+     * @return the qq
+     */
+    public String getQq()
+    {
+        return qq;
+    }
+
+    /**
+     * @param qq the qq to set
+     */
+    public void setQq(String qq)
+    {
+        this.qq = qq;
+    }
+
+    /**
+     * @return the wechat
+     */
+    public String getWechat()
+    {
+        return wechat;
+    }
+
+    /**
+     * @param wechat the wechat to set
+     */
+    public void setWechat(String wechat)
+    {
+        this.wechat = wechat;
+    }
+
+    /**
+     * @return the blog
+     */
+    public String getBlog()
+    {
+        return blog;
+    }
+
+    /**
+     * @param blog the blog to set
+     */
+    public void setBlog(String blog)
+    {
+        this.blog = blog;
+    }
+
+    /**
+     * @return the vehicle
+     */
+    public String getVehicle()
+    {
+        return vehicle;
+    }
+
+    /**
+     * @param vehicle the vehicle to set
+     */
+    public void setVehicle(String vehicle)
+    {
+        this.vehicle = vehicle;
+    }
+
+    /**
+     * @return the bloodType
+     */
+    public String getBloodType()
+    {
+        return bloodType;
+    }
+
+    /**
+     * @param bloodType the bloodType to set
+     */
+    public void setBloodType(String bloodType)
+    {
+        this.bloodType = bloodType;
+    }
+
+    /**
+     * @return the constellatory
+     */
+    public String getConstellatory()
+    {
+        return constellatory;
+    }
+
+    /**
+     * @param constellatory the constellatory to set
+     */
+    public void setConstellatory(String constellatory)
+    {
+        this.constellatory = constellatory;
+    }
+
+    /**
+     * @return the maritalStatus
+     */
+    public String getMaritalStatus()
+    {
+        return maritalStatus;
+    }
+
+    /**
+     * @param maritalStatus the maritalStatus to set
+     */
+    public void setMaritalStatus(String maritalStatus)
+    {
+        this.maritalStatus = maritalStatus;
+    }
+
+    /**
+     * @return the religion
+     */
+    public String getReligion()
+    {
+        return religion;
+    }
+
+    /**
+     * @param religion the religion to set
+     */
+    public void setReligion(String religion)
+    {
+        this.religion = religion;
+    }
+
+    /**
+     * @return the speciality
+     */
+    public String getSpeciality()
+    {
+        return speciality;
+    }
+
+    /**
+     * @param speciality the speciality to set
+     */
+    public void setSpeciality(String speciality)
+    {
+        this.speciality = speciality;
+    }
+
+    /**
+     * @return the idol
+     */
+    public String getIdol()
+    {
+        return idol;
+    }
+
+    /**
+     * @param idol the idol to set
+     */
+    public void setIdol(String idol)
+    {
+        this.idol = idol;
+    }
+
+    /**
+     * @return the motto
+     */
+    public String getMotto()
+    {
+        return motto;
+    }
+
+    /**
+     * @param motto the motto to set
+     */
+    public void setMotto(String motto)
+    {
+        this.motto = motto;
+    }
+
+    /**
+     * @return the footprint
+     */
+    public String getFootprint()
+    {
+        return footprint;
+    }
+
+    /**
+     * @param footprint the footprint to set
+     */
+    public void setFootprint(String footprint)
+    {
+        this.footprint = footprint;
+    }
+
+    /**
+     * @return the likemusic
+     */
+    public String getLikemusic()
+    {
+        return likemusic;
+    }
+
+    /**
+     * @return the likebooks
+     */
+    public String getLikebooks()
+    {
+        return likebooks;
+    }
+
+    /**
+     * @param likebooks the likebooks to set
+     */
+    public void setLikebooks(String likebooks)
+    {
+        this.likebooks = likebooks;
+    }
+
+    /**
+     * @param likemusic the likemusic to set
+     */
+    public void setLikemusic(String likemusic)
+    {
+        this.likemusic = likemusic;
+    }
+
+    /**
+     * @return the likemovie
+     */
+    public String getLikemovie()
+    {
+        return likemovie;
+    }
+
+    /**
+     * @param likemovie the likemovie to set
+     */
+    public void setLikemovie(String likemovie)
+    {
+        this.likemovie = likemovie;
+    }
+
+    /**
+     * @return the likesport
+     */
+    public String getLikesport()
+    {
+        return likesport;
+    }
+
+    /**
+     * @param likesport the likesport to set
+     */
+    public void setLikesport(String likesport)
+    {
+        this.likesport = likesport;
+    }
+
+    /**
+     * @return the cate
+     */
+    public String getCate()
+    {
+        return cate;
+    }
+
+    /**
+     * @param cate the cate to set
+     */
+    public void setCate(String cate)
+    {
+        this.cate = cate;
+    }
+
+    /**
+     * @return the ifStudent
+     */
+    public String getIfStudent()
+    {
+        return ifStudent;
+    }
+
+    /**
+     * @param ifStudent the ifStudent to set
+     */
+    public void setIfStudent(String ifStudent)
+    {
+        this.ifStudent = ifStudent;
+    }
+
+    /**
+     * @return the ln
+     */
+    public double getLn()
+    {
+        return ln;
+    }
+
+    /**
+     * @param ln the ln to set
+     */
+    public void setLn(double ln)
+    {
+        this.ln = ln;
+    }
+
+    /**
+     * @return the lt
+     */
+    public double getLt()
+    {
+        return lt;
+    }
+
+    /**
+     * @param lt the lt to set
+     */
+    public void setLt(double lt)
+    {
+        this.lt = lt;
+    }
+
+    /**
+     * @return the worth
+     */
+    public float getWorth()
+    {
+        return worth;
+    }
+
+    /**
+     * @param worth the worth to set
+     */
+    public void setWorth(float worth)
+    {
+        this.worth = worth;
+    }
+
+    /**
+     * @return the card
+     */
+    public String getCard()
+    {
+        return card;
+    }
+
+    /**
+     * @param card the card to set
+     */
+    public void setCard(String card)
+    {
+        this.card = card;
+    }
+
+    /**
+     * 查询指定dwID号的记录并返回结果
+     * 
+     * @param dwID
+     */
+    public static UserInfo queryByDwID(String userID)
+    {
+        return new Select().from(UserInfo.class).where("userId=?", userID).executeSingle();
+    }
+
+}

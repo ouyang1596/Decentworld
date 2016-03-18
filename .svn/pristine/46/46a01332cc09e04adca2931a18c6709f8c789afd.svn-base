@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <LinearLayout
+        android:id="@+id/ll_cash_income_root"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/divide_line_transparency"
+            android:padding="2dp"
+            android:text="收益总览"
+            android:textSize="20sp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/me_setting_row_selector"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:text="总金额" />
+
+                <TextView
+                    android:id="@+id/tv_recommend_benefit_all"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="3"
+                    android:gravity="center"
+                    android:text="0.0"
+                    android:textSize="@dimen/text_size_px_26" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="#66000000" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:text="总收益" />
+
+                <TextView
+                    android:id="@+id/tv_recommend_benefit_has_back"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="3"
+                    android:gravity="center"
+                    android:text="0.0"
+                    android:textSize="@dimen/text_size_px_26" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:background="#66000000" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="2"
+                    android:gravity="center"
+                    android:text="未提现" />
+
+                <TextView
+                    android:id="@+id/tv_recommend_benefit_not_takeout"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="3"
+                    android:gravity="center"
+                    android:text="0.0"
+                    android:textSize="@dimen/text_size_px_26" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/divide_line_transparency"
+            android:padding="2dp"
+            android:text="收益列表"
+            android:textSize="20sp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" >
+
+            <ListView
+                android:id="@+id/lv_recommend_benefit_detail"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" >
+            </ListView>
+
+            <TextView
+                android:id="@+id/tv_recommend_benefit_reminder"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="没有推荐的人"
+                android:textSize="20sp"
+                android:visibility="invisible" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_cash_income_draw_cash"
+            android:layout_width="match_parent"
+            android:layout_height="100px"
+            android:background="@color/grey"
+            android:visibility="gone"
+            android:clickable="true" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/activity_cash_income_draw_cash"
+                android:textSize="@dimen/text_size_px_30" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

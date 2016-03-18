@@ -1,0 +1,285 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.util.HashMap;
+import java.util.List;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.ChatActivity_;
+import cn.sx.decentworld.activity.NearCardDetailActivity_;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.NewFriend;
+import cn.sx.decentworld.bean.SearchResult;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.dialog.Dialog_Fragment_add_friend;
+import cn.sx.decentworld.dialog.Dialog_Fragment_add_friend.add_friendListener;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtils;
+import cn.sx.decentworld.widget.CircularImageView;
+
+import com.android.volley.Request.Method;
+
+/**
+ * @ClassName: InterestingGroupJoinedAdapter.java
+ * @Description:
+ * @author: dyq
+ * @date: 2015年7月28日 上午9:06:14
+ */
+public class SearchAdapter extends BaseAdapter {
+	private static final String TAG = "SearchAdapter";
+	private Context context;
+	private List<SearchResult> list;
+	private LayoutInflater inflater;
+	private FragmentManager fragmentManager;
+
+	public SearchAdapter(Context context, List<SearchResult> list) {
+		super();
+		this.context = context;
+		this.list = list;
+		inflater = LayoutInflater.from(context);
+	}
+
+	@Override
+	public int getCount() {
+		return list.size();
+	}
+
+	@Override
+	public SearchResult getItem(int position) {
+		return list.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View convertView, ViewGroup parent) {
+		final SearchResult searchResult = list.get(position);
+
+		ViewHolder holder = null;
+		if (convertView == null) {
+			holder = new ViewHolder();
+			convertView = inflater.inflate(
+					R.layout.activity_interesting_group_joined_item, null);
+			holder.ll_item = (LinearLayout) convertView
+					.findViewById(R.id.ll_join);
+			holder.civ_icon = (CircularImageView) convertView
+					.findViewById(R.id.iv_join);
+			holder.tv_name = (TextView) convertView
+					.findViewById(R.id.tv_join_name);
+			holder.iv_add = (ImageView) convertView
+					.findViewById(R.id.iv_join_add);
+			holder.iv_chat = (ImageView) convertView
+					.findViewById(R.id.iv_join_conversation);
+			convertView.setTag(holder);
+		} else {
+			holder = (ViewHolder) convertView.getTag();
+		}
+		// 设置头像
+		String iconPath = ImageUtils.getIconByDwID(searchResult.getDwID(),
+				ImageUtils.ICON_SMALL);
+		if (CommUtil.isNotBlank(iconPath)) {
+			ImageLoaderHelper.mImageLoader.displayImage(iconPath,
+					holder.civ_icon);
+		}
+		// 设置昵称
+		holder.tv_name.setText(searchResult.getNickName());
+		holder.iv_add.setVisibility(View.VISIBLE);
+		holder.civ_icon.setOnClickListener(new ItemClick(holder, searchResult));
+		holder.iv_add.setOnClickListener(new ItemClick(holder, searchResult));
+		holder.iv_chat.setOnClickListener(new ItemClick(holder, searchResult));
+		return convertView;
+	}
+
+	/**
+	 * Holder
+	 */
+	private static class ViewHolder {
+		LinearLayout ll_item;
+		CircularImageView civ_icon;
+		TextView tv_name;
+		ImageView iv_add;
+		ImageView iv_chat;
+	}
+
+	/**
+	 * 申请加为好友接口
+	 * 
+	 * @param dwID
+	 * @param friendID
+	 * @param searchType
+	 * @param addReason
+	 * @param context
+	 */
+	public void addFriend(String dwID, final String friendID, int searchType,
+			String addReason, final Handler handler) {
+		SendUrl sendUrl = new SendUrl(context);
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("friendID", friendID);
+		map.put("searchType", searchType + "");
+		map.put("addReason", addReason);
+		LogUtils.i(TAG, "addFriend...dwID=" + dwID + ",friendID="
+				+ ",searchType=" + searchType + ",addReason=" + addReason);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
+				+ "/friend/addFriend", Method.GET, new HttpCallBack() {
+			@Override
+			public void onFailure(String e) {
+				LogUtils.i(TAG, "addFriend...onFailure" + e);
+			}
+
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.i(TAG,
+						"addFriend...getResultCode=" + msg.getResultCode()
+								+ ",getData=" + msg.getData().toString()
+								+ ",getMsg" + msg.getMsg());
+				if (msg.getResultCode() == 2222) {
+					Message message = new Message();
+					message.obj = "申请已发送";
+					message.what = 0;
+					handler.sendMessage(message);
+					LogUtils.i(TAG, "addFriend...success");
+				}
+
+				if (msg.getResultCode() == 3333) {
+					// 你不能添加自己为好友
+					ToastUtils.toast(context, msg.getMsg());
+					LogUtils.i(TAG,
+							"addFriend...failure，cause by:" + msg.getMsg());
+				}
+			}
+
+		});
+	}
+
+	class ItemClick implements OnClickListener {
+		private ViewHolder holder;
+		private SearchResult result;
+
+		public ItemClick(ViewHolder holder, SearchResult result) {
+			this.holder = holder;
+			this.result = result;
+		}
+
+		@Override
+		public void onClick(View v) {
+			Intent intent;
+			switch (v.getId()) {
+			case R.id.iv_join:// 头像
+				intent = new Intent(context, NearCardDetailActivity_.class);
+				intent.putExtra(Constants.DW_ID, result.getDwID());
+				context.startActivity(intent);
+				break;
+			case R.id.iv_join_add:// 添加
+				fragmentManager = ((FragmentActivity) context)
+						.getSupportFragmentManager();
+				Dialog_Fragment_add_friend dialog = Dialog_Fragment_add_friend
+						.newInstance();
+				dialog.setOnListener(new AddFriendListener(result));
+				dialog.show(fragmentManager, "dialog");
+				break;
+			case R.id.iv_join_conversation:// 对话
+				intent = new Intent(context, ChatActivity_.class);
+				intent.putExtra("user_dwID", result.getDwID());
+				intent.putExtra("user_nickname", result.getNickName());
+				intent.putExtra("chatType", DWMessage.CHAT_TYPE_SINGLE);
+				if (ContactUser.isContact(result.getDwID())) {
+					intent.putExtra("chatRelationship",
+							DWMessage.CHAT_RELATIONSHIP_FRIEND);
+				} else {
+					intent.putExtra("chatRelationship",
+							DWMessage.CHAT_RELATIONSHIP_STRANGER);
+				}
+				intent.putExtra("user_worth", result.getWorth());
+				context.startActivity(intent);
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	/**
+	 * 添加好友监听
+	 */
+	class AddFriendListener implements add_friendListener {
+		private SearchResult searchResult;
+		private String apply_reason;
+
+		public AddFriendListener(SearchResult searchResult) {
+			this.searchResult = searchResult;
+		}
+
+		@Override
+		public void add_friend_with_reason(String reason) {
+			String otherID = searchResult.getDwID();
+			if (ContactUser.queryByDwID(otherID) == null) {
+				apply_reason = reason;
+				addFriend(DecentWorldApp.getInstance().getDwID(), otherID,
+						searchResult.getSearchType(), reason, handler);
+			} else {
+				// TODO 已经是好友，提示不能重复添加
+				Toast.makeText(context, "已经互为好友", Toast.LENGTH_SHORT).show();
+			}
+		}
+
+		Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				String result = msg.obj.toString();
+				switch (msg.what) {
+				case 0:
+					Toast.makeText(context, result, Toast.LENGTH_SHORT).show();
+					NewFriend newFriend = NewFriend.queryByDwID(searchResult
+							.getDwID());
+					if (newFriend != null) {
+						newFriend.setMessage_type(NewFriend.message_had_apply);
+						newFriend.setInfo_detail(apply_reason);
+						newFriend.setIsShown(1);
+					} else {
+						newFriend = new NewFriend();
+						newFriend.setUsername(searchResult.getNickName());
+						newFriend.setDw_id(searchResult.getDwID());
+						newFriend.setAvatar(searchResult.getIcon());
+						newFriend.setWorth(searchResult.getWorth());
+						newFriend.setInfo_detail(apply_reason);
+						newFriend.setMessage_type(NewFriend.message_had_apply);
+						newFriend.setIsShown(1);
+					}
+					newFriend.save();
+					break;
+				default:
+					break;
+				}
+			};
+		};
+	}
+
+}

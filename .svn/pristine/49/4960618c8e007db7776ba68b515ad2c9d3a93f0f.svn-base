@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white" >
+
+    <cn.sx.decentworld.widget.CustomScrollView
+        xmlns:ptr="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sv_chat_me"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        ptr:ptrAnimationStyle="flip"
+        ptr:ptrMode="both" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="360dp" >
+
+                <cn.sx.decentworld.widget.HackyViewPager
+                    android:id="@+id/vp_me_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#6600ff00"
+                    android:visibility="visible" >
+                </cn.sx.decentworld.widget.HackyViewPager>
+
+                <ImageView
+                    android:id="@+id/iv_me_doubt"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginRight="20dp"
+                    android:src="@drawable/doubt" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp" >
+
+                <ImageView
+                    android:id="@+id/iv_me_recharge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="24dp"
+                    android:background="@drawable/me_recharge" />
+
+                <ImageView
+                    android:id="@+id/iv_me_setting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="30dp"
+                    android:layout_toLeftOf="@+id/iv_me_recharge"
+                    android:background="@drawable/me_setting" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_me_base_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp" >
+
+                <LinearLayout
+                    android:id="@+id/ll_me_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="24dp"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/talk_shape" />
+
+                    <TextView
+                        android:id="@+id/tv_me_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="欧阳"
+                        android:textColor="@color/two_black"
+                        android:textSize="@dimen/new_textsize_24sp" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_me_worth_tag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginRight="24dp"
+                    android:text="身价"
+                    android:textColor="@color/new_yellow"
+                    android:textSize="@dimen/new_textsize_9sp" />
+
+                <TextView
+                    android:id="@+id/tv_me_worth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/tv_me_worth_tag"
+                    android:layout_toLeftOf="@+id/tv_me_worth_tag"
+                    android:text="24"
+                    android:textColor="@color/new_yellow"
+                    android:textSize="@dimen/new_textsize_35sp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_me_base_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/ll_me_name"
+                    android:layout_alignRight="@id/tv_me_worth"
+                    android:layout_below="@id/ll_me_name"
+                    android:layout_marginTop="18dp"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:id="@+id/tv_me_age"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="24"
+                        android:textColor="@color/three_black"
+                        android:textSize="@dimen/new_textsize_12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_me_gender"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="男"
+                        android:textColor="@color/three_black"
+                        android:textSize="@dimen/new_textsize_12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_me_distance"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="25km"
+                        android:textColor="@color/three_black"
+                        android:textSize="@dimen/new_textsize_12sp" />
+
+                    <TextView
+                        android:id="@+id/tv_me_occupation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="职业"
+                        android:textColor="@color/three_black"
+                        android:textSize="@dimen/new_textsize_12sp" />
+                </LinearLayout>
+
+                <!-- 如果有一句话概括的内容，则显示一句话概括，否则显示个性签名 -->
+
+                <TextView
+                    android:id="@+id/tv_me_sign"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/ll_me_base_info"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginRight="24dp"
+                    android:layout_marginTop="18dp"
+                    android:ellipsize="end"
+                    android:maxLines="3"
+                    android:text="九鼎记就的记得交定金是解放军及二级计算机房间计算dddkk觉得静静地九鼎记就的记得交定金大将军等级的就记得记得简介待解决的基督教的机房时间紧而仅仅是缴费金额及" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="24dp"
+                android:layout_marginRight="24dp"
+                android:layout_marginTop="58dp"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:weightSum="1" >
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.4"
+                    android:background="@drawable/bg_line_press" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.2"
+                    android:gravity="center"
+                    android:text="我的"
+                    android:textColor="@color/three_black"
+                    android:textSize="@dimen/new_textsize_18sp" />
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.4"
+                    android:background="@drawable/bg_line_press" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/tv_me_innate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="天生"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/tv_me_achievement"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="成就"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:id="@+id/tv_me_work"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="作品"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:id="@+id/fl_me_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+            </FrameLayout>
+        </LinearLayout>
+    </cn.sx.decentworld.widget.CustomScrollView>
+    <RelativeLayout
+        android:id="@+id/rel_me_title"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:background="@drawable/gradient_black"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tv_me_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/main_bottom_me"
+            android:textColor="@color/white"
+            android:textSize="@dimen/new_textsize_18sp" />
+    </RelativeLayout>
+
+</RelativeLayout>

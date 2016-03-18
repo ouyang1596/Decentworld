@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_item_work_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white" >
+
+        <ImageView
+            android:id="@+id/iv_item_work_avatar"
+            android:layout_width="82px"
+            android:layout_height="82px"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="20px"
+            android:layout_marginTop="14px"
+            android:src="@drawable/item_work_avatar" />
+
+        <TextView
+            android:id="@+id/tv_item_work_nickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="16px"
+            android:layout_marginTop="20px"
+            android:layout_toRightOf="@id/iv_item_work_avatar"
+            android:text="我的昵称"
+            android:textSize="@dimen/text_size_px_26" />
+
+        <TextView
+            android:id="@+id/tv_item_work_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_item_work_nickname"
+            android:layout_marginLeft="16px"
+            android:layout_marginTop="12px"
+            android:layout_toRightOf="@id/iv_item_work_avatar"
+            android:text="昨天  12:05"
+            android:textColor="#9b9b9b"
+            android:textSize="@dimen/text_size_px_24" />
+
+        <TextView
+            android:id="@+id/tv_item_work_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="40px"
+            android:layout_marginTop="42px"
+            android:text="删除"
+            android:textColor="#4A90E2"
+            android:textSize="@dimen/text_size_px_24" />
+
+        <TextView
+            android:id="@+id/tv_item_work_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/iv_item_work_avatar"
+            android:layout_marginLeft="20px"
+            android:layout_marginRight="20px"
+            android:layout_marginTop="20px"
+            android:ellipsize="end"
+            android:lines="2"
+            android:text="  成龙，国家一级演员，大中华区影坛和国际功夫影星。1960年进入中国戏剧学校学习戏曲，以武师身份进身电影圈。1970年自戏校毕业，因为自幼在影片中跑过龙套，所以希望往电影界发展。"
+            android:textSize="@dimen/text_size_px_30" />
+
+        <LinearLayout
+            android:id="@+id/ll_item_work_refer_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_item_work_description"
+            android:layout_marginLeft="20px"
+            android:layout_marginRight="20px"
+            android:layout_marginTop="20px"
+            android:orientation="vertical" >
+
+            <cn.sx.decentworld.widget.ExpandGridView
+                android:id="@+id/gv_item_work_picture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10px"
+                android:background="@android:color/transparent"
+                android:horizontalSpacing="4px"
+                android:listSelector="#00000000"
+                android:numColumns="3"
+                android:verticalSpacing="10px" >
+            </cn.sx.decentworld.widget.ExpandGridView>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_item_work_line"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_below="@id/ll_item_work_refer_1"
+            android:layout_marginTop="16px"
+            android:background="#9b9b9b" />
+
+        <LinearLayout
+            android:id="@+id/ll_item_work_refer_2"
+            android:layout_width="match_parent"
+            android:layout_height="70px"
+            android:layout_below="@id/iv_item_work_line"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:id="@+id/ll_item_work_report"
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="40px"
+                    android:layout_height="37px"
+                    android:layout_marginLeft="20px"
+                    android:src="@drawable/item_work_warming" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10px"
+                    android:text="举报" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="2px"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5px"
+                android:layout_marginTop="5px"
+                android:background="#9b9b9b" />
+
+            <LinearLayout
+                android:id="@+id/ll_item_work_good"
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="40px"
+                    android:layout_height="37px"
+                    android:layout_marginLeft="20px"
+                    android:src="@drawable/item_work_warming"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30px"
+                    android:text="赞"
+                    android:textSize="@dimen/text_size_px_30" />
+
+                <TextView
+                    android:id="@+id/tv_item_work_good"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10px"
+                    android:text="100" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="2px"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5px"
+                android:layout_marginTop="5px"
+                android:background="#9b9b9b" />
+
+            <LinearLayout
+                android:id="@+id/ll_item_work_bad"
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="40px"
+                    android:layout_height="37px"
+                    android:layout_marginLeft="20px"
+                    android:src="@drawable/item_work_warming"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30px"
+                    android:text="踩"
+                    android:textSize="@dimen/text_size_px_30" />
+
+                <TextView
+                    android:id="@+id/tv_item_work_bad"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10px"
+                    android:text="120" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="2px"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="5px"
+                android:layout_marginTop="5px"
+                android:background="#9b9b9b" />
+
+            <LinearLayout
+                android:id="@+id/ll_item_work_comment"
+                android:layout_width="0px"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="40px"
+                    android:layout_height="37px"
+                    android:layout_marginLeft="20px"
+                    android:src="@drawable/item_work_warming" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15px"
+                    android:text="评论" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_item_work_shadow"
+            android:layout_width="match_parent"
+            android:layout_height="15px"
+            android:layout_below="@id/ll_item_work_refer_2"
+            android:background="@drawable/item_work_line_shadow" />
+    </RelativeLayout>
+
+</LinearLayout>

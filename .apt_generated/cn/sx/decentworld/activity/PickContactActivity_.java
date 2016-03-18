@@ -35,18 +35,18 @@ public final class PickContactActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         setUserInfo = SetUserInfo_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
         main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         lv_contact = ((ListView) findViewById(id.lv_contact));
-        ((ToastComponent_) toast).afterSetContentView_();
+        main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
         ((SetUserInfo_) setUserInfo).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

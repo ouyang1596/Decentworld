@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@color/white"
+     >
+
+    <RelativeLayout
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.244" >
+
+        <ImageView
+            android:id="@+id/iv_inter_group_icon"
+            android:layout_width="128px"
+            android:layout_height="128px"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="30px"
+            android:src="@drawable/ic_launcher" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="0px"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.696"
+        android:paddingBottom="36px"
+        android:orientation="vertical"
+        android:background="@color/white" >
+
+        <TextView
+            android:id="@+id/tv_inter_group_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginTop="34px"
+            android:text="title(11/50)"
+            android:textSize="36px" />
+        <TextView
+            android:id="@+id/tv_inter_group_info"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginTop="34px"
+            android:text="asdfsssssssssssssssssssassssssssssssssssssssssssssssss"
+            android:textSize="30px" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.07" >
+
+</LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,80 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_activity_register_set_password"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <include layout="@layout/top_register_title" />
+
+    <ImageView
+        android:id="@+id/iv_pwd_is_show"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:src="@drawable/hide_password" />
+
+    <cn.sx.decentworld.widget.ClearEditText
+        android:id="@+id/etv_reset_pwd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/bg_line_press"
+        android:gravity="center_horizontal"
+        android:hint="请设置密码"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:textColor="@color/two_black"
+        android:textColorHint="@color/three_black"
+        android:textCursorDrawable="@drawable/color_cursor"
+        android:textSize="@dimen/new_textsize_13sp" />
+
+    <cn.sx.decentworld.widget.ClearEditText
+        android:id="@+id/et_realName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_line_press"
+        android:gravity="center_horizontal"
+        android:hint="请输入您的实名"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp"
+        android:textColor="@color/two_black"
+        android:textColorHint="@color/three_black"
+        android:textCursorDrawable="@drawable/color_cursor"
+        android:textSize="@dimen/new_textsize_13sp" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp" >
+
+        <Button
+            android:id="@+id/btn_OK"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:background="@drawable/bg_btn_yellow_selector"
+            android:padding="10dp"
+            android:text="下一步"
+            android:textColor="@color/white"
+            android:textSize="@dimen/new_textsize_15sp" />
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="21dp"
+        android:text="Decent World可能会为您带来收入，请把密码设置得够复杂并记住，确保您的安全"
+        android:textColor="@color/two_black"
+        android:textSize="@dimen/new_textsize_14sp" />
+
+</LinearLayout>

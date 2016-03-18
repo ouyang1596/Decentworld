@@ -1,0 +1,77 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.utils;
+
+import java.text.DecimalFormat;
+
+/**
+ * @ClassName: DataTransferUtils.java
+ * @Description: 数据转换工具
+ * @author: cj
+ * @date: 2016年1月14日 下午6:34:29
+ */
+public class DataConvertUtils
+{
+    
+    /**
+     * 将浮点型的数字分割成整数部分和小数部分，以字符串的形式返回
+     * @param num
+     * @return
+     */
+    public static String[] splitFloat(float num)
+    {
+        String[] result = new String[]{"",""};
+        int a = (int) Math.floor(num);
+        
+        float remain = num - a;
+        DecimalFormat decimalFormat = new DecimalFormat(".00");
+        String b = decimalFormat.format(remain);
+        
+        result[0] = String.valueOf(a);
+        result[1] = b;
+        
+        return result;
+    }
+    
+    /**
+     * 格式化浮点型数据，保留两位小数
+     * @param num
+     * @param format
+     * @return
+     */
+    public static String formatFloat(float num)
+    {
+        if(num<=0)
+        {
+            return "0.00";
+        }
+        else if(num>0&&num<1)
+        {
+            DecimalFormat decimalFormat = new DecimalFormat(".00");
+            String b = decimalFormat.format(num);
+            return "0"+b;
+        }
+        else
+        {
+            DecimalFormat decimalFormat = new DecimalFormat(".00");
+            String b = decimalFormat.format(num);
+            return b;
+        }
+    }
+    
+    /**
+     * 格式化浮点型数据
+     * @param num
+     * @param format
+     * @return
+     */
+    public static String formatFloat(float num,String format)
+    {
+        int a = (int) Math.floor(num);
+        DecimalFormat decimalFormat = new DecimalFormat(format);
+        String b = decimalFormat.format(num);
+        return a+b;
+    }
+
+}

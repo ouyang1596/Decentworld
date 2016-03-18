@@ -1,0 +1,1292 @@
+package cn.sx.decentworld.fragment;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.ChatActivity;
+import cn.sx.decentworld.activity.ChatActivity_;
+import cn.sx.decentworld.activity.EditUserInfoActivity_;
+import cn.sx.decentworld.activity.GroupContactActivity_;
+import cn.sx.decentworld.activity.NearCardDetailForMessageActivity_;
+import cn.sx.decentworld.activity.NewFriendsActivity_;
+import cn.sx.decentworld.activity.RechargePayMethodActivity_;
+import cn.sx.decentworld.activity.SearchActivity_;
+import cn.sx.decentworld.activity.ShareActivity_;
+import cn.sx.decentworld.adapter.ConversationListAdapter;
+import cn.sx.decentworld.adapter.FragmentContactAdapter;
+import cn.sx.decentworld.adapter.FragmentContactAdapter.OnContactClickListener;
+import cn.sx.decentworld.adapter.SlideImageAdapter;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.ConversationList;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.EditUserInfoItem;
+import cn.sx.decentworld.bean.MsgAndInfo;
+import cn.sx.decentworld.bean.NewFriend;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.bean.UserSessionInfo;
+import cn.sx.decentworld.bean.manager.UserInfoManager;
+import cn.sx.decentworld.common.CharacterParser;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.PinyinComparatorForContact;
+import cn.sx.decentworld.component.ChoceAndTakePictureComponent;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.component.ui.LoginComponent;
+import cn.sx.decentworld.component.ui.MainFragmentComponent;
+import cn.sx.decentworld.component.ui.MeComponent;
+import cn.sx.decentworld.dialog.Chat_delete_dialogListener;
+import cn.sx.decentworld.dialog.Chatfragment_delete_conversation;
+import cn.sx.decentworld.dialog.EditAndModificationDialog;
+import cn.sx.decentworld.dialog.EditAndModificationDialog.EditAndModificationListener;
+import cn.sx.decentworld.dialog.GuaranteeDialog;
+import cn.sx.decentworld.dialog.GuaranteeDialog.GuaranteeListener;
+import cn.sx.decentworld.dialog.RecommandDialog;
+import cn.sx.decentworld.dialog.RecommandDialog.RecommondListener;
+import cn.sx.decentworld.dialog.ReminderDialog;
+import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
+import cn.sx.decentworld.manager.ConversationManager;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.network.request.SetFriendInfo;
+import cn.sx.decentworld.network.request.SetUserInfo;
+import cn.sx.decentworld.utils.AnonymityNickNameCreator;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.widget.FloatScrollView;
+import cn.sx.decentworld.widget.FloatScrollView.OnScrollListener;
+import cn.sx.decentworld.widget.HackyViewPager;
+import cn.sx.decentworld.widget.ListViewForScrollView;
+import cn.sx.decentworld.widget.ScrollLayout;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.Click;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ItemLongClick;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: ChatFragment
+ * @Description: 主界面聊天fragment
+ * @author yj
+ * @date 2015年6月29日12:34:03
+ */
+@EFragment(R.layout.main_layout_chat)
+public class ChatFragment extends BaseFragment implements OnScrollListener,
+		OnClickListener {
+	private static String TAG = ChatFragment.class.getSimpleName();
+	private Context context;
+	private FragmentManager fragmentManager;
+	private static final String IS_STUDENT = "1";
+	@Bean
+	MainFragmentComponent mainFragmentComponent;
+	@Bean
+	LoginComponent loginComponent;
+	@Bean
+	ToastComponent toast;
+	// 上面的标题栏
+	@ViewById(R.id.chat_room_title_root)
+	RelativeLayout relTitle;
+
+	/** 聊天Fragment下面的四个导航栏 */
+	@ViewById(R.id.main_bottom_ll)
+	LinearLayout main_bottom_ll;
+	// 底部TAB的显示图片
+	@ViewById(R.id.menu_tab1_iv)
+	ImageView menu_tab1_iv;
+	@ViewById(R.id.menu_tab2_iv)
+	ImageView menu_tab2_iv;
+	@ViewById(R.id.menu_tab3_iv)
+	ImageView menu_tab3_iv;
+	@ViewById(R.id.menu_tab4_iv)
+	ImageView menu_tab4_iv;
+	@ViewById(R.id.vp_near_card_detail_pager)
+	HackyViewPager mPager;
+	// 底部TAB的显示文字
+	@ViewById(R.id.menu_tab1_tv)
+	TextView menu_tab1_tv;
+	@ViewById(R.id.menu_tab2_tv)
+	TextView menu_tab2_tv;
+	@ViewById(R.id.menu_tab3_tv)
+	TextView menu_tab3_tv;
+	@ViewById(R.id.menu_tab4_tv)
+	TextView menu_tab4_tv;
+	@ViewById(R.id.iv_search)
+	ImageView ivSearch;
+	@ViewById(R.id.tv_header_title)
+	TextView tvTitle;
+
+	// 获取数据库中已存在的用户相对应的DWid
+	private String dwID = DecentWorldApp.getInstance().getDwID();
+	// 轮换四个页面的的ScrollLayout
+	@ViewById(R.id.chat_scrollLayout)
+	public ScrollLayout chat_scrollLayout;
+
+	/** pageIndex 页面标签的索引值，默认页面索引值是0 */
+	private int index = 3;
+	private CustomPageAdapter pagerAdapter;
+
+	/** 消息资源list */
+	public static List<ConversationList> conversationData;
+	private ConversationListAdapter conversationAdapter;
+	/** 消息资源Map */
+	private Map<String, ConversationList> conversationMap;
+	/** 聊天界面的资源 */
+	@ViewById(R.id.fragment_chat_chat_lv)
+	ListView fragment_chat_chat_lv;
+	@ViewById(R.id.rl_error_item)
+	public RelativeLayout rl_error_item;
+	@ViewById(R.id.tv_connect_errormsg)
+	public TextView errorText;
+	// 会话处未读消息textview
+	@ViewById(R.id.menu_tab1_unread_msg_number)
+	TextView unreadLabel;
+	// 各种组件
+	@Bean
+	MeComponent meComponent;
+	@Bean
+	GetUserInfo getUserInfo;
+	@Bean
+	SetUserInfo setUserInfo;
+	@Bean
+	SetFriendInfo setFriendInfo;
+
+	@Bean
+	ChoceAndTakePictureComponent choceAndTakePictureComponent;
+	/**
+	 * 主界面的底部选项卡
+	 */
+	@ViewById(R.id.menu_tab_1)
+	RelativeLayout menu_tab_1;
+	@ViewById(R.id.menu_tab_2)
+	LinearLayout menu_tab_2;
+	@ViewById(R.id.menu_tab_3)
+	LinearLayout menu_tab_3;
+	@ViewById(R.id.menu_tab_4)
+	LinearLayout menu_tab_4;
+	/**
+	 * 汉字转换成拼音的类
+	 */
+	private CharacterParser mCharacterParser;
+	/**
+	 * 根据拼音来排列ListView里面的数据类
+	 */
+	private PinyinComparatorForContact mPinyinComparatorForContact;
+
+	@Override
+	public void onAttach(Activity activity) {
+		LogUtils.i(TAG, "ChatFragment onAttach called");
+		super.onAttach(activity);
+		context = activity;
+	}
+
+	@Override
+	protected void lazyLoad() {
+		LogUtils.i(TAG, "ChatFragment lazyload");
+		// 如果页面没有加载完毕，或者暂时不能显示，则退出
+		if (!isPrepared || !isVisible) {
+			return;
+		}
+	}
+
+	@AfterViews
+	public void init() {
+		EventBus.getDefault().register(this);
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				LogUtils.i(TAG, "ChatFragment initView Called");
+				fragmentManager = getActivity().getSupportFragmentManager();
+				// 实例化汉字转拼音类
+				mCharacterParser = CharacterParser.getInstance();
+				mPinyinComparatorForContact = new PinyinComparatorForContact();
+				// 初始化默认的View页面
+				switchScrollLayoutView(index);
+
+				initListener();
+				isPrepared = true;
+			}
+		}, 200);
+	}
+
+	/**
+	 * 监听事件初始化
+	 */
+	private void initListener() {
+		ll_contact_list_recommend.setOnClickListener(this);
+		ll_contact_list_guarantee.setOnClickListener(this);
+		ll_contact_list_invite.setOnClickListener(this);
+		new_friends_ll.setOnClickListener(this);
+		group_chat_ll.setOnClickListener(this);
+		interesting_group_ll.setOnClickListener(this);
+		menu_tab_1.setOnClickListener(this);
+		menu_tab_2.setOnClickListener(this);
+		menu_tab_3.setOnClickListener(this);
+		menu_tab_4.setOnClickListener(this);
+		ivSearch.setOnClickListener(this);
+
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.menu_tab_1:
+			index = 0;
+			switchScrollLayoutView(index);
+			break;
+		case R.id.menu_tab_2:
+			index = 1;
+			switchScrollLayoutView(index);
+			break;
+		case R.id.menu_tab_3:
+			index = 2;
+			switchScrollLayoutView(index);
+			break;
+		case R.id.menu_tab_4:
+			index = 3;
+			switchScrollLayoutView(index);
+			break;
+		case R.id.ll_contact_list_recommend:
+			recommend();// 推荐
+			break;
+		case R.id.ll_contact_list_guarantee:
+			guarantee();// 担保
+			break;
+		case R.id.ll_contact_list_invite:
+			invite();// 邀请
+			break;
+		case R.id.new_friends_ll:
+			startActivity(new Intent(context, NewFriendsActivity_.class));
+			break;
+		case R.id.group_chat_ll:
+			toast.show(Constants.DEVELOPING_NOTIFY);
+			break;
+		case R.id.interesting_group_ll:
+			toast.show(Constants.DEVELOPING_NOTIFY);
+			break;
+		case R.id.iv_search:
+			startActivity(new Intent(context, SearchActivity_.class));
+			break;
+		}
+	}
+
+	/**
+	 * 跳转到Index的页面
+	 * 
+	 * @param index
+	 */
+	public void switchScrollLayoutView(int index) {
+		// 先将所有的Menu标签初始化为最初的状态
+		setTabDefaultBackground();
+		switch (index) {
+		case 0:
+			initChatView();
+			break;
+		case 1:
+			initContact();
+			break;
+		case 2:
+			initFind();
+			break;
+		case 3:
+			initUserView();
+			break;
+		}
+		// 页面切换到对应的索引值
+		chat_scrollLayout.setToScreen(index);
+	}
+
+	/**
+	 * 初始化我的个人信息页面
+	 */
+	private void initUserView() {
+		// 初始化
+		ivSearch.setVisibility(View.GONE);
+		relTitle.setVisibility(View.GONE);
+		menu_tab4_iv.setImageResource(R.drawable.main_me_click);
+		menu_tab4_tv.setTextColor(getResources().getColor(
+				R.color.new_yellow_deep));
+		meComponent.setFragmentManager(fragmentManager);
+		// 初始化头像
+		initHeader(UserInfoManager.getUserInfoInstance());
+		// meConponent的设置userInfo数据，显示用户详情的数据
+
+		// 初始化
+		initIntroduction();
+		meComponent.getIconPath(dwID);
+		initPicUrl();
+	}
+
+	/**
+	 * 设置默认的图标和文字
+	 */
+	private void setTabDefaultBackground() {
+		// 默认显示Title
+		relTitle.setVisibility(View.VISIBLE);
+		// 默认显示搜索按钮
+		ivSearch.setVisibility(View.VISIBLE);
+
+		menu_tab1_iv.setImageResource(R.drawable.main_chat_default);
+		menu_tab1_tv.setTextColor(getResources().getColor(R.color.main_grey));
+		menu_tab2_iv.setImageResource(R.drawable.main_contact_default);
+		menu_tab2_tv.setTextColor(getResources().getColor(R.color.main_grey));
+		menu_tab3_iv.setImageResource(R.drawable.main_find_default);
+		menu_tab3_tv.setTextColor(getResources().getColor(R.color.main_grey));
+		menu_tab4_iv.setImageResource(R.drawable.main_me_default);
+		menu_tab4_tv.setTextColor(getResources().getColor(R.color.main_grey));
+	}
+
+	/**
+	 * 邀请
+	 */
+	private void invite() {
+		Intent intent = new Intent(getActivity(), ShareActivity_.class);
+		startActivity(intent);
+	}
+
+	/**
+	 * 担保
+	 */
+	private void guarantee() {
+		final GuaranteeDialog guaranteeDialog = new GuaranteeDialog();
+		guaranteeDialog.setListener(new GuaranteeListener() {
+			@Override
+			public void confirm(final String phoneNum, final String money) {
+				final int VALIDATE_GUARANTEE = 1;
+				Handler vHandler = new Handler() {
+					public void handleMessage(android.os.Message msg) {
+						switch (msg.what) {
+						case VALIDATE_GUARANTEE:
+							Intent intent = new Intent(getActivity(),
+									RechargePayMethodActivity_.class);
+							intent.putExtra("isGuarantee", true);
+							intent.putExtra("phoneNum", phoneNum);
+							intent.putExtra("amount", money);
+							startActivity(intent);
+							guaranteeDialog.dismiss();
+							break;
+						default:
+							break;
+						}
+					};
+				};
+				getUserInfo.validateGuarantee(phoneNum, vHandler,
+						VALIDATE_GUARANTEE);
+			}
+		});
+		guaranteeDialog.setName(UserInfoManager.getUserInfoInstance()
+				.getNickName());
+		guaranteeDialog.show(fragmentManager, "GuaranteeDialog");
+	}
+
+	/**
+	 * 推荐
+	 */
+	private void recommend() {
+		final RecommandDialog recommandDialog = new RecommandDialog();
+		recommandDialog.setListener(new RecommondListener() {
+			@Override
+			public void confirm(final String phoneNum, final String money) {
+				final int VALIDATERECOMMEND = 1;
+				Handler vHandler = new Handler() {
+					public void handleMessage(android.os.Message msg) {
+						switch (msg.what) {
+						case VALIDATERECOMMEND:
+							Intent intent = new Intent(getActivity(),
+									RechargePayMethodActivity_.class);
+							intent.putExtra("isRecommend", true);
+							intent.putExtra("phoneNum", phoneNum);
+							intent.putExtra("amount", money);
+							startActivity(intent);
+							recommandDialog.dismiss();
+							break;
+						default:
+							break;
+						}
+					};
+				};
+				getUserInfo.validateRecommend(dwID, phoneNum, vHandler,
+						VALIDATERECOMMEND);
+			}
+		});
+		recommandDialog.setName(UserInfoManager.getUserInfoInstance()
+				.getNickName());
+		recommandDialog.show(fragmentManager, "RecommandDialog");
+	}
+
+	/**
+	 * 由ProcessFriendMessageThread路由过来的【申请加为好友】的通知 刷新新的朋友Item上的小红点数
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_SHOW_FRIENDS_ADDED)
+	public void refreshUnreadContactMsg(String name) {
+		LogUtils.i(TAG, "接到通知【申请加为好友】");
+		int newfriend_count = NewFriend.selectAllIsNotShown();
+		if (newfriend_count > 0) {
+			LogUtils.i(TAG, "refreshNewFriendList---NotShown---count>0");
+			// 新的朋友的小红点
+			new_friends_ll_unread_msg_number.setVisibility(View.VISIBLE);
+			new_friends_ll_unread_msg_number.setText(String
+					.valueOf(newfriend_count));
+		} else {
+			LogUtils.i(TAG, "refreshNewFriendList---NotShown---count=0");
+			new_friends_ll_unread_msg_number.setVisibility(View.INVISIBLE);
+		}
+	}
+
+	/**
+	 * 初始化聊天界面
+	 */
+	private void initChatView() {
+		// 初始化界面View的控件
+		tvTitle.setText(getResources().getString(R.string.main_bottom_chat));
+		menu_tab1_iv.setImageResource(R.drawable.main_chat_click);
+		menu_tab1_tv.setTextColor(getResources().getColor(
+				R.color.new_yellow_deep));
+
+		initConversation();
+	}
+
+	/**
+	 * 初始化会话列表 包括初始化变量、数据、未读消息
+	 */
+	private void initConversation() {
+		initChatVar();
+		initChatData();
+		initUnReadMsgCount();
+	}
+
+	/**
+	 * 初始化会话列表相关变量 list map adapter listview
+	 */
+	private void initChatVar() {
+		if (conversationData == null || conversationAdapter == null) {
+			conversationData = new ArrayList<ConversationList>();
+			conversationMap = new HashMap<String, ConversationList>();
+			conversationAdapter = new ConversationListAdapter(getActivity(),
+					conversationData);
+			fragment_chat_chat_lv.setAdapter(conversationAdapter);
+			fragment_chat_chat_lv
+					.setOnItemClickListener(new OnItemClickListener() {
+						@Override
+						public void onItemClick(AdapterView<?> parent,
+								View view, int position, long id) {
+							ConversationList conversationList = conversationData
+									.get(position);
+							Intent intent = new Intent(getActivity(),
+									ChatActivity_.class);
+							intent.putExtra(ChatActivity.OTHER_ID,
+									conversationList.getDwID());
+							intent.putExtra(ChatActivity.OTHER_NICKNAME,
+									conversationList.getTitle());
+							intent.putExtra(ChatActivity.CHAT_RELATIONSHIP,
+									conversationList.getChatRelationship());
+							intent.putExtra(ChatActivity.CHAT_TYPE,
+									conversationList.getChatType());
+							intent.putExtra(ChatActivity.OTHER_WORTH,
+									conversationList.getWorth());
+							startActivity(intent);
+						}
+					});
+		}
+	}
+
+	/**
+	 * 初始化会话列表数据
+	 */
+	private void initChatData() {
+		conversationData.clear();
+		conversationMap.clear();
+		List<ConversationList> convList = ConversationManager.getInstance()
+				.getFriendConversationList();
+		/** 将从数据库获取的会话列表加载到内存中 **/
+		if (convList.size() > 0) {
+			for (ConversationList con : convList) {
+				String key = con.getDwID() + con.getChatType();
+				conversationData.add(con);
+				conversationMap.put(key, con);
+			}
+		}
+		/** 刷新界面 **/
+		if (conversationAdapter != null) {
+			conversationAdapter.notifyDataSetChanged();
+		}
+	}
+
+	/**
+	 * 将汉字转成拼音并获取首个字母的大写
+	 */
+	public void setNameLetters(List<ContactUser> conversationList) {
+		if (conversationList == null) {
+			return;
+		}
+		for (int i = 0; i < conversationList.size(); i++) {
+			ContactUser conversationData = conversationList.get(i);
+			// 汉字转换成拼音
+			String pinyin = mCharacterParser.getSelling(conversationData
+					.getShowName());
+			// String pinyin = mCharacterParser.getSelling("厦门");
+			String firstLetter = pinyin.substring(0, 1).toUpperCase();
+
+			// 正则表达式，判断首字母是否是英文字母
+			if (firstLetter.matches("[A-Z]")) {
+				conversationData.setNameLetter(firstLetter);
+			} else {
+				conversationData.setNameLetter("#");
+			}
+		}
+	}
+
+	/**
+	 * 初始化未读消息数 根据list中的数据计算未读消息数
+	 */
+	private void initUnReadMsgCount() {
+		// 从会话列表中计算未读消息总数
+		int count = 0;
+		if (conversationData == null)
+			count = 0;
+		else {
+			for (ConversationList conv : conversationData) {
+				if (conv.getChatRelationship() == DWMessage.CHAT_RELATIONSHIP_FRIEND)
+					count += conv.getUnReadCount();
+			}
+		}
+		// 更新ChatTab标签页，并显示数字
+		if (count > 0) {
+			unreadLabel.setText(String.valueOf(count));
+			unreadLabel.setVisibility(View.VISIBLE);
+		} else {
+			unreadLabel.setVisibility(View.GONE);
+		}
+	}
+
+	/**
+	 * 刷新会话列表和chatTab选项卡(5个地方会调用)
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_REFRESH_CONVERSATION)
+	public void refreshConversation(MsgAndInfo msgAndInfo) {
+		ConversationManager.getInstance().refreshFriendConvByMsg(msgAndInfo,
+				conversationData, conversationMap);
+		if (conversationAdapter != null) {
+			Collections.sort(conversationData);
+			conversationAdapter.notifyDataSetChanged();
+		}
+		// 显示小红点
+		initUnReadMsgCount();
+	}
+
+	/**
+	 * 按拼音进行排序
+	 * */
+	private void sort() {
+		setNameLetters(mDatas);
+		// 根据a-z进行排序
+		Collections.sort(mDatas, mPinyinComparatorForContact);
+	}
+
+	/**
+	 * 接收到刷新会话列表的通知
+	 * 
+	 * @param tag
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_INIT_FRIEND_CONVERSATION)
+	public void initConversation(String tag) {
+		initConversation();
+	}
+
+	/**
+	 * 清除指定联系人会话列表
+	 * 
+	 * @param conversationKey
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_CLEAR_CONVERSATION_UNREAD)
+	public void clearUnread(String conversationKey) {
+		ConversationList conversation = conversationMap.get(conversationKey);
+		if (conversation != null) {
+			conversation.setUnReadCount(0);
+			conversation.updateUnReadCount();
+			initUnReadMsgCount();
+			conversationAdapter.notifyDataSetChanged();
+		}
+	}
+
+	/**
+	 * 联系人列表资源
+	 */
+	// 推荐
+	@ViewById(R.id.ll_contact_list_recommend)
+	LinearLayout ll_contact_list_recommend;
+	// 担保
+	@ViewById(R.id.ll_contact_list_guarantee)
+	LinearLayout ll_contact_list_guarantee;
+	// 邀请
+	@ViewById(R.id.ll_contact_list_invite)
+	LinearLayout ll_contact_list_invite;
+	// 新的朋友
+	@ViewById(R.id.new_friends_ll)
+	LinearLayout new_friends_ll;
+	// 群聊
+	@ViewById(R.id.group_chat_ll)
+	LinearLayout group_chat_ll;
+	// 兴趣组
+	@ViewById(R.id.interesting_group_ll)
+	LinearLayout interesting_group_ll;
+	// 未读通讯录textview
+	// @ViewById(R.id.menu_tab2_unread_msg_number)
+	// TextView unreadAddressLable;
+	// 新朋友未读数
+	@ViewById(R.id.new_friends_ll_unread_msg_number)
+	TextView new_friends_ll_unread_msg_number;
+	@ViewById(R.id.fragment_contact_choice_ll)
+	LinearLayout fragment_contact_choice_ll;
+
+	@ViewById(R.id.fragment_chat_contact_sv)
+	FloatScrollView fragment_chat_contact_sv;
+
+	@ViewById(R.id.fragment_chat_contact_header)
+	LinearLayout fragment_chat_contact_header;
+
+	@ViewById(R.id.fragment_contact_choice_ll_child)
+	LinearLayout fragment_contact_choice_ll_child;
+
+	@ViewById(R.id.fragment_chat_contact_lv)
+	ListViewForScrollView fragment_chat_contact_lv;
+
+	public static List<ContactUser> mDatas = new ArrayList<ContactUser>();
+	private FragmentContactAdapter contactAdapter;
+	private int searchLayoutTop;
+
+	/**
+	 * 初始化通讯录界面
+	 */
+	private void initContact() {
+		tvTitle.setText(getResources().getString(R.string.main_bottom_contact));
+		menu_tab2_iv.setImageResource(R.drawable.main_contact_click);
+		menu_tab2_tv.setTextColor(getResources().getColor(
+				R.color.new_yellow_deep));
+		// 初始化联系人数据，并显示
+		if (contactAdapter == null) {
+			contactAdapter = new FragmentContactAdapter(getActivity(), mDatas);
+		}
+		sort();
+		fragment_chat_contact_lv.setAdapter(contactAdapter);
+		contactAdapter.setOnContactClickListener(new OnContactClickListener() {
+			@Override
+			public void onClick(View view) {
+				int position = (Integer) view.getTag(Constants.ITEM_KEY);
+				Intent intent;
+				switch (view.getId()) {
+				case R.id.fragment_chat_contact_lv_item_icon:
+					intent = new Intent(getActivity(),
+							NearCardDetailForMessageActivity_.class);
+					intent.putExtra(Constants.DW_ID, mDatas.get(position)
+							.getFriendID());
+					intent.putExtra(ChatActivity.CHAT_TYPE,
+							DWMessage.CHAT_TYPE_SINGLE);
+					intent.putExtra(ChatActivity.CHAT_RELATIONSHIP,
+							DWMessage.CHAT_RELATIONSHIP_FRIEND);
+					startActivity(intent);
+					break;
+				case R.id.fragment_chat_contact_lv_item_name:
+					intent = new Intent(getActivity(), ChatActivity_.class);
+					intent.putExtra(ChatActivity.OTHER_ID, mDatas.get(position)
+							.getFriendID());
+					intent.putExtra(ChatActivity.OTHER_NICKNAME,
+							mDatas.get(position).getShowName());
+					intent.putExtra(ChatActivity.CHAT_TYPE,
+							DWMessage.CHAT_TYPE_SINGLE);
+					intent.putExtra(ChatActivity.CHAT_RELATIONSHIP,
+							DWMessage.CHAT_RELATIONSHIP_FRIEND);
+					intent.putExtra(ChatActivity.OTHER_WORTH,
+							String.valueOf(mDatas.get(position).getWorth()));
+					startActivity(intent);
+					break;
+				}
+			}
+		});
+		fragment_chat_contact_sv.setOnScrollListener(this);
+		searchLayoutTop = fragment_chat_contact_header.getBottom();
+		refreshContact();
+	}
+
+	/**
+	 * 无参 刷新联系人列表
+	 */
+	public void refreshContact() {
+		mDatas.clear();
+		List<ContactUser> temp = ContactUser.getAll();
+		if (temp.size() > 0) {
+			mDatas.addAll(temp);
+			if (contactAdapter != null) {
+				sort();
+				contactAdapter.notifyDataSetChanged();
+			}
+		}
+	}
+
+	/**
+	 * 有参 dwID 刷新联系人列表
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_REFRESH_CONTACT)
+	public void refreshContact(String dwID) {
+		LogUtils.i(TAG, "收到一条通知【更新联系人列表】：" + dwID);
+		refreshContact();
+	}
+
+	/**
+	 * 初始化发现界面
+	 */
+	private void initFind() {
+		// 检查网络是否可用
+		// checkNetwork();
+		ivSearch.setVisibility(View.GONE);
+		tvTitle.setText(getResources().getString(R.string.main_bottom_find));
+		menu_tab3_iv.setImageResource(R.drawable.main_find_click);
+		menu_tab3_tv.setTextColor(getResources().getColor(
+				R.color.new_yellow_deep));
+	}
+
+	/**
+	 * 初始化我的设置界面
+	 */
+
+	// 用户头像(圆形)
+	@ViewById(R.id.iv_chat_me_avatar)
+	ImageView iv_chat_me_avatar;
+	// 身价
+	@ViewById(R.id.tv_chat_me_worth)
+	public static TextView tv_chat_me_worth;
+	@ViewById(R.id.tv_chat_me_wealth)
+	public static TextView tv_chat_me_wealth;
+	// 用户详细信息 Tab
+	@ViewById(R.id.ll_chat_me_user_detail)
+	LinearLayout ll_chat_me_user_detail;
+
+	// 用户信息（唯一）
+	public static List<EditUserInfoItem> userInfoDatas;
+
+	private static final int GET_USER_WEALTH = 2;
+	private static final int GET_USER_WORTH = 3;
+
+	Handler meHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+			case GET_USER_WEALTH:
+				tv_chat_me_wealth.setText(msg.obj.toString());
+				break;
+			case GET_USER_WORTH:
+				tv_chat_me_worth.setText(msg.obj.toString());
+				break;
+			default:
+				break;
+			}
+		};
+	};
+
+	private List<String> icons;
+	private SlideImageAdapter slideImageAdapter;
+	private List<ImageView> imgs;
+
+	@ViewById(R.id.ll_chat_me_chat_room)
+	LinearLayout ll_chat_me_chat_room;
+
+	/**
+	 * 如果自己有多个聊天室，则点击可以打开自己创建的聊天室列表
+	 */
+	@Click(R.id.ll_chat_me_chat_room)
+	void editRoomList() {
+		toast.show("打开聊天室列表");
+	}
+
+	@ViewById(R.id.tv_chat_me_name)
+	TextView tv_chat_me_name;
+
+	@ViewById(R.id.btn_chat_me_send_msg)
+	Button btn_chat_me_send_msg;
+
+	/**
+	 * 给自己发送短信
+	 */
+	@Click(R.id.btn_chat_me_send_msg)
+	void sendMsg() {
+		toast.show("给自己发送短信");
+	}
+
+	/**
+	 * 自己的毕业院校 或 职业
+	 */
+	@ViewById(R.id.tv_chat_me_school)
+	TextView tv_chat_me_school;
+
+	/**
+	 * 自己的毕业院校
+	 */
+	@ViewById(R.id.tv_chat_me_sign)
+	TextView tv_chat_me_sign;
+
+	/**
+	 * 我的资源
+	 */
+	private List<String> picUrls = new ArrayList<String>();
+	private List<ImageView> imgvs = new ArrayList<ImageView>();
+
+	@ViewById(R.id.tv_chat_me_introduce)
+	TextView tv_chat_me_introduce;
+
+	@ViewById(R.id.tv_chat_me_edit)
+	TextView tv_chat_me_edit;
+
+	public static UserDetailFragment userDetailFragment;
+
+	/**
+	 * 初始化我的资料处的头部信息
+	 */
+	private void initHeader(UserInfo userInfo) {
+		// 显示用户的实名
+		tv_chat_me_name.setText(userInfo.getRealName());
+		// 学生的话显示用户的身份信息
+		if (userInfo.getIfStudent().equals(IS_STUDENT)) {
+			tv_chat_me_school.setText(userInfo.getSchool());
+		} else {
+			tv_chat_me_school.setText(userInfo.getOccupation());
+		}
+		// 显示用户的个性签名
+		tv_chat_me_sign.setText(userInfo.getSign());
+	}
+
+	/**
+	 * 初始化显示用户的详细资料
+	 */
+	private void initIntroduction() {
+		tv_chat_me_introduce.setVisibility(View.GONE);
+		tv_chat_me_edit.setVisibility(View.VISIBLE);
+		userDetailFragment = new UserDetailFragment_();
+		userDetailFragment.setData(userInfoDatas);
+		FragmentManager fragmentManager = getActivity()
+				.getSupportFragmentManager();
+		FragmentTransaction fragmentTransaction = fragmentManager
+				.beginTransaction();
+		fragmentTransaction.replace(R.id.ll_chat_me_container,
+				userDetailFragment);
+		fragmentTransaction.commitAllowingStateLoss();
+	}
+
+	/**
+	 * 初始化头像
+	 */
+	private void initPicUrl() {
+		picUrls.clear();
+		UserInfo userInfo = UserInfoManager.getUserInfoInstance();
+		if (null == userInfo) {
+			return;
+		}
+		if (CommUtil.isNotBlank(userInfo.getIcon())) {
+			ImageView v = new ImageView(getActivity());
+			v.setScaleType(ImageView.ScaleType.CENTER_CROP);
+			imgvs.add(v);
+			picUrls.add(userInfo.getIcon());
+		}
+		if (CommUtil.isNotBlank(userInfo.getIcon2())) {
+			ImageView v = new ImageView(getActivity());
+			v.setScaleType(ImageView.ScaleType.CENTER_CROP);
+			imgvs.add(v);
+			picUrls.add(userInfo.getIcon2());
+		}
+
+		if (CommUtil.isNotBlank(userInfo.getIcon3())) {
+			ImageView v = new ImageView(getActivity());
+			v.setScaleType(ImageView.ScaleType.CENTER_CROP);
+			imgvs.add(v);
+			picUrls.add(userInfo.getIcon3());
+		}
+
+		pagerAdapter = new CustomPageAdapter();
+		mPager.setAdapter(pagerAdapter);
+		// 显示用户圆形头像
+		if (CommUtil.isNotBlank(userInfo.getIcon())) {
+			ImageLoaderHelper.mImageLoader.displayImage(userInfo.getIcon(),
+					iv_chat_me_avatar, ImageLoaderHelper.mOptions);
+		}
+	}
+
+	@Click(R.id.tv_chat_me_edit)
+	void editUserInfo(View view) {
+		LogUtils.i(TAG, "点击了个人信息的中的编辑按钮");
+		Intent intent = new Intent(context, EditUserInfoActivity_.class);
+		startActivityForResult(intent, R_GET_USER_THREE_ICON);
+	}
+
+	private static final int GET_USER_DISPALY_INFO = 1;
+	Handler handler = new Handler() {
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case GET_USER_DISPALY_INFO:
+				LogUtils.i(TAG, "获取用户要显示的信息 ok");
+				JSONObject jsonObject = JSON.parseObject(msg.obj.toString());
+				break;
+			default:
+				break;
+			}
+		};
+	};
+
+	/**
+	 * 长按消息列表中的item
+	 * 
+	 * @param position
+	 */
+	@ItemLongClick(R.id.fragment_chat_chat_lv)
+	void show_delete_dialog(int position) {
+		Chatfragment_delete_conversation dialog2 = Chatfragment_delete_conversation
+				.newInstance(position);
+		dialog2.setOnListener(cdd_listener);
+		dialog2.show(fragmentManager, "dialog2");
+	}
+
+	Chat_delete_dialogListener cdd_listener = new Chat_delete_dialogListener() {
+		@Override
+		public void delete_message(int position) {
+			boolean handled = true;
+			boolean deleteMessage = false;
+
+		}
+
+		@Override
+		public void delete_conversation(int position) {
+			boolean handled = false;
+			boolean deleteMessage = false;
+			// 更新消息未读数
+		}
+
+	};
+
+	/**
+	 * 已加入的群组
+	 */
+	@Click(R.id.group_chat_ll)
+	public void showGroupChat() {
+		mainFragmentComponent.toActivity(GroupContactActivity_.class);
+	}
+
+	// 监听滚动Y值变化，通过addView和removeView来实现悬停效果
+	@Override
+	public void onScroll(int scrollY) {
+		// if (scrollY >= searchLayoutTop)
+		// {
+		// if (fragment_contact_choice_ll_child.getParent() !=
+		// fragment_contact_choice_ll_top)
+		// {
+		// fragment_contact_choice_ll.removeView(fragment_contact_choice_ll_child);
+		// fragment_contact_choice_ll_top.addView(fragment_contact_choice_ll_child);
+		// fragment_contact_choice_ll_top.setBackgroundResource(R.drawable.fragment_contact_choice_child_bg);
+		// }
+		// } else
+		// {
+		//
+		// if (fragment_contact_choice_ll_top.getChildCount() > 0)
+		// {
+		// fragment_contact_choice_ll_top.removeView(fragment_contact_choice_ll_child);
+		// fragment_contact_choice_ll.addView(fragment_contact_choice_ll_child);
+		// fragment_contact_choice_ll_top.setBackgroundColor(Color.TRANSPARENT);
+		// }
+		//
+		// }
+
+	}
+
+	@Override
+	public boolean onContextItemSelected(final MenuItem item) {
+		// 如果Fragment可见，则截取事件，否则继续分发
+		final int SET_REMARK = 1;
+		final int DELETE_CONTACT = 2;
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case SET_REMARK:
+					afterSetRemark(friendID, remark);
+					break;
+				case DELETE_CONTACT:
+					afterDeleteContact(friendID);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+		if (getUserVisibleHint()) {
+			if (item.getItemId() == 1) {
+				LogUtils.i(TAG, "ChatFragment可见,点击了菜单 修改备注");
+				editAndModificationDialog = new EditAndModificationDialog();
+				editAndModificationDialog.setTitle("修改备注");
+				editAndModificationDialog
+						.setListener(new EditAndModificationListener() {
+							@Override
+							public void confirm(String info) {
+								friendID = mDatas.get(
+										item.getIntent().getIntExtra(
+												"position", -1)).getFriendID();
+								remark = info;
+								setFriendInfo.setRemark(dwID, friendID, info,
+										handler, SET_REMARK);
+							}
+						});
+				editAndModificationDialog.show(fragmentManager, "setremark");
+			} else if (item.getItemId() == 2) {
+				LogUtils.i(TAG, "ChatFragment可见,点击了菜单 删除好友");
+				reminderDialog = new ReminderDialog();
+				reminderDialog.setInfo("删除好友");
+				reminderDialog.setListener(new ReminderListener() {
+					@Override
+					public void confirm() {
+						friendID = mDatas.get(
+								item.getIntent().getIntExtra("position", -1))
+								.getFriendID();
+						setFriendInfo.deleteContact(dwID, friendID, handler,
+								DELETE_CONTACT);
+					}
+				});
+				reminderDialog.show(fragmentManager, "deleteFriend");
+			}
+			return super.onContextItemSelected(item);
+		}
+		LogUtils.i(TAG, "ChatFragment不可见");
+		return false;
+	}
+
+	/**
+	 * 设置备注后的处理
+	 */
+	private void afterSetRemark(String friendID, String remark) {
+		LogUtils.i(TAG, "设置备注成功，修改为:" + remark);
+		/** 修改会话列表 **/
+		ConversationList temp = ConversationList.queryByDwID(friendID,
+				DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+		if (temp != null) {
+			temp.setTitle(remark);
+			temp.save();
+			initConversation();
+		}
+		/** 修改指定ID好友数据库 ，并刷新列表 **/
+		ContactUser contactUser = ContactUser.queryByDwID(friendID);
+		if (contactUser != null) {
+			contactUser.setShowName(remark);
+			;
+			contactUser.save();
+			refreshContact();
+		}
+		toast.show("设置备注成功");
+	}
+
+	/**
+	 * 删除联系人后的处理
+	 */
+	private void afterDeleteContact(String friendID) {
+		List<ConversationList> conversationList = ConversationList.queryByDwID(
+				friendID, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+		/** 将好友的会话列表移到陌生人处 **/
+		if (conversationList.size() > 0) {
+			for (ConversationList t : conversationList) {
+				t.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+				// t.setTitle("");//设置为昵称
+				t.save();
+			}
+			EventBus.getDefault().post("【删除好友，通知主页面更新会话列表】",
+					NotifyByEventBus.NT_INIT_FRIEND_CONVERSATION);
+			EventBus.getDefault().post("【删除好友，通知陌生人页面更新会话列表】",
+					NotifyByEventBus.NT_INIT_STRANGER_CONVERSATION);
+		}
+		/** 将指定ID好友从数据库中删除，并刷新列表 **/
+		ContactUser user = ContactUser.queryByDwID(friendID);
+		if (user != null) {
+			user.delete();
+			refreshContact(user.getFriendID());
+		}
+		/** 删除该好友的本地聊天记录 **/
+		DWMessage.deleteByDwID(friendID);
+		LogUtils.i(TAG, "删除好友成功");
+		toast.show("删除好友成功");
+	}
+
+	private boolean isFirst = true;
+	public static boolean update_introduction = false;
+
+	@Override
+	public void onResume() {
+		LogUtils.i(TAG, "onResume");
+		super.onResume();
+		if (conversationData == null) {
+			initConversation();
+		}
+
+		if (contactAdapter != null) {
+			refreshContact();
+		}
+		ImageLoaderHelper.clearCache();
+		if (null != pagerAdapter) {
+			pagerAdapter.notifyDataSetChanged();
+		}
+		/**
+		 * 获取身价、身家
+		 */
+		getUserInfo.getWealth(dwID, meHandler, GET_USER_WEALTH);
+		getUserInfo.getWorth(dwID, meHandler, GET_USER_WORTH);
+	}
+
+	/**
+	 * 跳到指定Tab项
+	 */
+	@Override
+	public void turnToTab(int tab) {
+		if (tab != -1) {
+			chat_scrollLayout.scrollToScreen(tab);
+			switchScrollLayoutView(tab);
+		}
+	}
+
+	public static final int R_GET_USER_THREE_ICON = 1;// 获取用户的三张头像
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		LogUtils.i(TAG, "进入到：onActivityResult,requestCode=" + requestCode
+				+ ",resultCode" + resultCode);
+		if (resultCode == Activity.RESULT_OK) {
+			if (requestCode == R_GET_USER_THREE_ICON) {
+				LogUtils.i(TAG, "进入数据更新");
+				meComponent.getIconPath(dwID);
+				UserInfo info = UserInfoManager.getUserInfoInstance();
+				initHeader(info);
+				if (pagerAdapter != null) {
+					LogUtils.i(TAG, "pagerAdapter更新");
+					pagerAdapter.notifyDataSetChanged();
+				} else {
+					LogUtils.i(TAG, "pagerAdapter==null");
+				}
+				ImageLoaderHelper.mImageLoader.displayImage(info.getIcon(),
+						iv_chat_me_avatar, ImageLoaderHelper.mOptions);
+			}
+		}
+	}
+
+	private class CustomPageAdapter extends PagerAdapter {
+
+		@Override
+		public int getCount() {
+			return picUrls.size();
+		}
+
+		@Override
+		public Object instantiateItem(View arg0, int position) {
+			ImageView imageView = imgvs.get(position);
+			LogUtils.e("bm", "url---" + picUrls.get(position));
+			ImageLoaderHelper.mImageLoader.displayImage(picUrls.get(position),
+					imageView, ImageLoaderHelper.mOptions);
+			((ViewPager) arg0).addView(imageView);
+			return imageView;
+		}
+
+		@Override
+		public void destroyItem(View arg0, int arg1, Object arg2) {
+			((ViewPager) arg0).removeView((View) arg2);
+		}
+
+		@Override
+		public boolean isViewFromObject(View arg0, Object arg1) {
+			return arg0 == arg1;
+		}
+
+		@Override
+		public void finishUpdate(ViewGroup container) {
+			super.finishUpdate(container);
+		}
+
+		@Override
+		public int getItemPosition(Object object) {
+			return POSITION_NONE;
+		}
+	}
+
+	/**
+	 * 上下午菜单
+	 */
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, v, menuInfo);
+	}
+
+	/**
+	 * 当上下文菜单被点击时触发事件 return true 代表截断 return false 代表继续分发 1.修改备注 2.删除好友
+	 */
+	private String friendID;
+	private String remark;
+
+	private EditAndModificationDialog editAndModificationDialog;
+	private ReminderDialog reminderDialog;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		LogUtils.i(TAG, "onCreate");
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		LogUtils.i(TAG, "onStart");
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		LogUtils.i(TAG, "onPause");
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		LogUtils.i(TAG, "onStop");
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		conversationData = null;
+		LogUtils.i(TAG, "onDestroy");
+		EventBus.getDefault().unregister(this);
+	}
+
+}

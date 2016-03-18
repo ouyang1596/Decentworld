@@ -1,0 +1,52 @@
+package cn.sx.decentworld.activity;
+
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_first_eye)
+public class FirstEyeActivity extends BaseFragmentActivity {
+	@ViewById(R.id.lv_first_eye)
+	ListView lvFirstEye;
+	String data[] = { "a", "b", "c", "d", "e", "f" };
+
+	@AfterViews
+	public void init() {
+
+	}
+
+	class FirstEyeAdapter extends BaseAdapter {
+
+		@Override
+		public int getCount() {
+			return data.length;
+		}
+
+		@Override
+		public String getItem(int position) {
+			return data[position];
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View con, ViewGroup arg2) {
+
+			return null;
+		}
+
+		class ViewHolder {
+
+		}
+	}
+}

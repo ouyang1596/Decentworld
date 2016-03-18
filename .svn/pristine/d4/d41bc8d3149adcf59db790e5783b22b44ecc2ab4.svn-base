@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <EditText
+        android:id="@+id/et_bind_account_alipay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入支付宝账号" />
+
+    <Button
+        android:id="@+id/btn_bind_account_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="确定" />
+
+</LinearLayout>

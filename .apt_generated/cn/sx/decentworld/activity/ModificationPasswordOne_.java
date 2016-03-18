@@ -35,16 +35,16 @@ public final class ModificationPasswordOne_
     }
 
     private void init_(Bundle savedInstanceState) {
-        titleBar = TitleBar_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
         privacySettingInfo = PrivacySettingInfo_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         et_new_password_more = ((EditText) findViewById(id.et_new_password_more));
         et_old_password = ((EditText) findViewById(id.et_old_password));
-        et_new_password = ((EditText) findViewById(id.et_new_password));
         btn_ensure = ((Button) findViewById(id.btn_modification_password_one_next));
+        et_new_password = ((EditText) findViewById(id.et_new_password));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -60,9 +60,9 @@ public final class ModificationPasswordOne_
                 );
             }
         }
-        ((TitleBar_) titleBar).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         ((PrivacySettingInfo_) privacySettingInfo).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

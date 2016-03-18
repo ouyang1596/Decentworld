@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="538px"
+    android:layout_height="394px"
+    android:background="@drawable/dialog_bg"
+    android:layout_gravity="center"
+    android:id="@+id/root_dialog_groupchat_groupname"
+     >
+
+    <TextView
+        android:id="@+id/groupname_textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="42px"
+        android:text="本群的名称"
+        android:textColor="#4A4A4A"
+        android:textSize="32px" />
+
+    <EditText
+        android:id="@+id/editT"
+        android:layout_width="450px"
+        android:layout_height="80px"
+        android:textSize="30px" 
+        android:layout_below="@id/groupname_textView1"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:singleLine="true"
+        android:textColor="#4A4A4A"
+        android:maxLength="18"
+        android:text="123"
+        android:background="@drawable/edittext_selector"
+        >
+    </EditText>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="450px"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/editT"
+        android:layout_marginTop="10px"
+        android:text="@string/group_name_info"
+        android:textColor="#9b9b9b"
+        android:textSize="28px" />
+
+    <Button
+        android:id="@+id/group_name_yes"
+        android:layout_width="228px"
+        android:layout_height="52px"
+        android:layout_below="@id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30px"
+        android:background="@drawable/button_bg"
+        android:textSize="30px"
+        android:text="@string/save" />
+<!--      android:layout_alignParentRight="true" -->
+        
+<!--         android:layout_marginRight="22dp" -->
+
+    <ImageView
+        android:id="@+id/group_name_cancel"
+       android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:paddingRight="44px"
+        android:layout_marginTop="28px"
+        android:src="@drawable/close_button" />
+
+</RelativeLayout>

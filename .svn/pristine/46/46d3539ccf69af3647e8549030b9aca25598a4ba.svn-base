@@ -1,0 +1,245 @@
+package cn.sx.decentworld.activity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentManager;
+import android.widget.Button;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.NewFriendLVAdapter;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.ConversationList;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.NewFriend;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.component.TitleBar;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.component.ui.MainFragmentComponent;
+import cn.sx.decentworld.network.request.GetFriendInfo;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.widget.ListViewForScrollView;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.Click;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_new_friends)
+public class NewFriendsActivity extends BaseFragmentActivity
+{
+	private static final String TAG = "NewFriendsActivity";
+	@Bean
+	TitleBar titleBar;
+	private FragmentManager fragmentManager;
+	private NewFriendLVAdapter newf_adapter;
+	private List<NewFriend> lnf;
+	@ViewById(R.id.lv_newfriends)
+	ListViewForScrollView lv_newfriends;
+
+	@ViewById(R.id.bt_to_add)
+	Button bt_to_add;
+	@Bean
+	MainFragmentComponent mainFragmentComponent;
+	@Bean
+	ToastComponent toast;
+
+	@Bean
+	GetFriendInfo getFriendInfo;
+	@Bean
+	GetUserInfo getUserInfo;
+	
+	@ViewById(R.id.main_header_left_tv)
+	TextView main_header_left_tv;
+	
+	private String userID;
+	
+
+	@AfterViews
+	void init()
+	{
+		EventBus.getDefault().register(this);
+		titleBar.setTitleBar("联系人", "历史记录", "刷新");
+		userID = DecentWorldApp.getInstance().getDwID();
+		fragmentManager = getSupportFragmentManager();
+		lnf = NewFriend.queryAllList();
+		newf_adapter = new NewFriendLVAdapter(getApplicationContext() , lnf , fragmentManager);
+		lv_newfriends.setAdapter(newf_adapter);
+	};
+
+	/**
+	 * 接受好友请求后，发送一个通知给服务器，通知对方，然后再将消息路由到此处更新自己的联系人列表 更新新的朋友列表的通知
+	 * 
+	 * @param newfriend
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_UPDATE_NEW_FRIEND_LIST)
+	public void updateNewFriendList(NewFriend newfriend)
+	{
+		if (newfriend.getMessage_type() == NewFriend.message_had_add)
+		{
+			// 数据库增加item
+			final ContactUser cc = new ContactUser();
+			cc.setDwID(newfriend.getDw_id());
+			cc.setIcon(newfriend.getAvatar());
+			cc.setNickName(newfriend.getUsername());
+			cc.setWorth(newfriend.getWorth());
+			cc.setUserID(DecentWorldApp.getInstance().getDwID());
+			cc.save();
+		}
+		// 更新页面
+		lnf.clear();
+		lnf.addAll(NewFriend.queryAllList());
+		if (newf_adapter != null)
+		{
+			newf_adapter.notifyDataSetChanged();
+		}
+
+		// 路由到ChatFragment
+		EventBus.getDefault().post("", NotifyByEventBus.NT_SHOW_FRIENDS_ADDED);
+		// 路由到ChatFragment
+		EventBus.getDefault().post(newfriend.getDw_id(), NotifyByEventBus.NT_REFRESH_CONTACT);
+		
+		//将陌生人处的会话列表移动到好友处处
+		List<ConversationList> conversationList = ConversationList.queryByDwID(newfriend.getDw_id(), DWMessage.CHAT_RELATIONSHIP_STRANGER);
+		if(conversationList.size()>0)
+		{
+			for(ConversationList temp:conversationList)
+			{
+				temp.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_FRIEND);
+				temp.save();
+			}
+			EventBus.getDefault().post("【同意添加，更新好友会话列表】", NotifyByEventBus.NT_INIT_FRIEND_CONVERSATION);
+			EventBus.getDefault().post("【同意添加，更新陌生人会话列表】", NotifyByEventBus.NT_INIT_STRANGER_CONVERSATION);
+		}
+		//生成一条通知消息记录（DWMessage）
+		///////////////////////////已经添加对方为好友
+		// new 一个消息，保存
+		DWMessage dwMessage = new DWMessage(DWMessage.NOTIFY, DWMessage.RECEIVE);
+		dwMessage.setFrom(newfriend.getDw_id());
+		dwMessage.setBody("已经添加对方为好友,扣费方式改变，以自己的身价为基准");
+		dwMessage.save();
+	}
+
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		EventBus.getDefault().unregister(this);
+	}
+	
+	/**
+	 * 返回
+	 */
+	@Click(R.id.main_header_left)
+	void back()
+	{
+		this.finish();
+	}
+	
+	/**
+	 * 刷新列表
+	 */
+	@Click(R.id.main_header_right_tv)
+	void refreshList()
+	{
+		getUserInfo.getAddNewFriendHistory(userID, handler, GET_ADD_NEW_FRIEND_HISTORY);
+	}
+	
+	private static final int GET_ADD_NEW_FRIEND_HISTORY= 1;
+	Handler handler = new Handler()
+	{
+		public void handleMessage(Message msg) {
+			switch (msg.what)
+			{
+				case GET_ADD_NEW_FRIEND_HISTORY:
+					
+					NewFriend.deleteAll();
+					LogUtils.i(TAG, "获取添加朋友的历史记录列表，获得数据，待处理："+msg.obj.toString());
+					List<NewFriend> list = new ArrayList<NewFriend>();
+					NewFriend temp;
+					JSONObject root = JSON.parseObject(msg.obj.toString());
+					//别人加我
+					JSONArray toFriend = JSON.parseArray(root.getString("toFriend"));
+					if(toFriend.size()>0)
+					{
+						for(int i = 0;i<toFriend.size();i++)
+						{
+							JSONObject jsonObject =  toFriend.getJSONObject(i);
+							String otherID = jsonObject.getString("dwID");
+							JSONObject info = JSON.parseObject(jsonObject.getString("extra"));
+							String addReason = info.getString("addReason");
+							String nickName = info.getString("nickName");
+							String searchType = info.getString("searchType");
+							String worth = info.getString("worth");
+							temp = new NewFriend();
+							//设置数据
+							temp.setDw_id(otherID);
+							temp.setAvatar(ImageUtils.getIconByDwID(otherID, ImageUtils.ICON_SMALL));
+							temp.setUsername(nickName);
+							temp.setWorth(worth);
+							temp.setMessage_type(NewFriend.message_be_add);
+							temp.setInfo_detail(addReason);
+							temp.setIsShown(1);
+							temp.setSearchType(Integer.valueOf(searchType));
+							temp.save();
+							list.add(temp);
+						}
+					}
+					
+					//我加别人
+					JSONArray toMe = JSON.parseArray(root.getString("toMe"));
+					if(toMe.size()>0)
+					{
+						for(int i = 0;i<toMe.size();i++)
+						{
+							JSONObject jsonObject =  toMe.getJSONObject(i);
+							String otherID = jsonObject.getString("friendID").split("@")[0];
+							JSONObject info = JSON.parseObject(jsonObject.getString("extra"));
+							String addReason = info.getString("addReason");
+							String nickName = info.getString("nickName");
+							String searchType = info.getString("searchType");
+							String worth = info.getString("worth");
+							temp = new NewFriend();
+							//设置数据
+							temp.setDw_id(otherID);
+							temp.setAvatar(ImageUtils.getIconByDwID(otherID, ImageUtils.ICON_SMALL));
+							temp.setUsername(nickName);
+							temp.setWorth(worth);
+							temp.setMessage_type(NewFriend.message_had_apply);
+							temp.setInfo_detail(addReason);
+							temp.setIsShown(1);
+							temp.setSearchType(Integer.valueOf(searchType));
+							temp.save();
+							list.add(temp);
+						}
+					}
+					
+					// 更新页面
+					lnf.clear();
+					lnf.addAll(list);
+					if (newf_adapter != null)
+					{
+						newf_adapter.notifyDataSetChanged();
+					}
+					LogUtils.i(TAG, "获取添加朋友的历史记录列表【完成】");
+					break;
+				default:
+					break;
+			}
+		};
+	};
+
+}

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        layout="@layout/header_titlebar" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#66000000"
+        android:padding="3dp"
+        android:text="设置提现账号：" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/et_draw_cash_setting_account"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="请输入账号..."
+            android:inputType="number" />
+
+        <Button
+            android:id="@+id/btn_draw_cash_setting_account_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="确认" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_draw_cash_setting_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="3dp"
+        android:text="银行名字：" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="#66000000"
+        android:padding="3dp"
+        android:text="设置提现密码：" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="vertical" >
+
+        <EditText
+            android:id="@+id/et_draw_cash_setting_pwd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入密码..." />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal" >
+
+            <EditText
+                android:id="@+id/et_draw_cash_setting_pwd1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="请确认密码..." />
+
+            <Button
+                android:id="@+id/btn_draw_cash_setting_pwd_submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="确认" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="#66000000"
+        android:padding="3dp"
+        android:text="虚拟币提现：" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/et_draw_cash_setting_amount"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="请输入提现金额..." />
+
+        <Button
+            android:id="@+id/btn_draw_cash_setting_draw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="提取" />
+    </LinearLayout>
+
+</LinearLayout>

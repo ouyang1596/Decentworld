@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/user_detail_info_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_e" >
+
+    <FrameLayout
+        android:id="@+id/fl_achievement"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible" >
+
+        <TextView
+            android:id="@+id/tv_achievement"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingBottom="100dp"
+            android:paddingTop="50dp"
+            android:text="还没有添加，赶快开始吧"
+            android:textColor="@color/two_black"
+            android:textSize="@dimen/new_textsize_16sp" />
+
+        <ImageView
+            android:id="@+id/iv_achievement"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:padding="20dp"
+            android:src="@drawable/btn_baseinfo_select" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_introduce"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="vertical"
+        android:paddingBottom="20dp"
+        android:paddingLeft="30dp"
+        android:paddingRight="30dp"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/iv_edit_introduce"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:padding="10dp"
+            android:src="@drawable/btn_baseinfo_select" />
+
+        <TextView
+            android:id="@+id/tv_short_introduce"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="请输入一句话简介"
+            android:padding="6dp"
+            android:textColor="@color/three_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+
+        <TextView
+            android:id="@+id/tv_detail_introduce"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:hint="简介详情"
+            android:padding="6dp"
+            android:textColor="@color/three_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+    </LinearLayout>
+
+</RelativeLayout>

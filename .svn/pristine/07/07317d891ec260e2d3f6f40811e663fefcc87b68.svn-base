@@ -1,0 +1,108 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment;
+
+import android.graphics.Color;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.ForegroundColorSpan;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+
+/**
+ * @ClassName: DoubtVerifyFragment.java
+ * @author: yj
+ * @date: 2016年1月12日 下午3:25:20
+ */
+public class DoubtWanThirdStepFragment extends Fragment implements
+		OnClickListener {
+	private TextView tvTalentMoney, tvEnsure;
+	public ViewPagerFragment mVpFragment;
+	private LinearLayout llTalentMoneyChange;
+	private static final String TALENT = "但我才气更惊人";
+	private static final String KEY_TALENT = "才气";
+	private static final String MONEY = "但我财富更炫目";
+	private static final String KEY_MONEY = "财富";
+	SpannableStringBuilder ssbMoney, ssbTalent;
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_doubt_wan_third_step, null);
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		initView();
+	}
+
+	private void initView() {
+		tvTalentMoney = (TextView) getActivity().findViewById(
+				R.id.tv_talent_money);
+		tvEnsure = (TextView) getView().findViewById(R.id.tv_ensure);
+		tvEnsure.setOnClickListener(this);
+		llTalentMoneyChange = (LinearLayout) getActivity().findViewById(
+				R.id.ll_talent_money_change);
+		llTalentMoneyChange.setOnClickListener(this);
+		mVpFragment = new ViewPagerFragment();
+		mVpFragment.setMaxCount(5);
+		getActivity().getSupportFragmentManager().beginTransaction()
+				.add(R.id.fl_vp_container, mVpFragment, "vf").commit();
+		setTalentMoneyFont();
+	}
+
+	private void setTalentMoneyFont() {
+		int indexMoney = MONEY.indexOf(KEY_MONEY);
+		ssbMoney = new SpannableStringBuilder(MONEY);
+		ssbMoney.setSpan(new ForegroundColorSpan(Color.YELLOW), indexMoney,
+				indexMoney + KEY_MONEY.length(),
+				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+		int indexTalent = TALENT.indexOf(KEY_TALENT);
+		ssbTalent = new SpannableStringBuilder(TALENT);
+		ssbTalent.setSpan(new ForegroundColorSpan(Color.YELLOW), indexMoney,
+				indexMoney + KEY_TALENT.length(),
+				Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		tvTalentMoney.setText(ssbTalent);
+	}
+
+	public interface OnDoubtWanThirdClickListener {
+		void OnDoubtWanThirdClick(View view);
+	}
+
+	private OnDoubtWanThirdClickListener mOnDoubtWanThirdClickListener;
+
+	public void setOnDoubtWanThirdClickListener(
+			OnDoubtWanThirdClickListener onDoubtWanThirdClickListener) {
+		mOnDoubtWanThirdClickListener = onDoubtWanThirdClickListener;
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.ll_talent_money_change:
+			if (TALENT.equals(tvTalentMoney.getText().toString())) {
+				tvTalentMoney.setText(ssbMoney);
+			} else {
+				tvTalentMoney.setText(ssbTalent);
+			}
+			break;
+		default:
+			if (mOnDoubtWanThirdClickListener != null) {
+				mOnDoubtWanThirdClickListener.OnDoubtWanThirdClick(v);
+			}
+			break;
+		}
+
+	}
+
+}

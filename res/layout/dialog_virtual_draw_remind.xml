@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="286dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@color/white"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:text="确认兑现到"
+            android:textColor="@color/black"
+            android:textSize="@dimen/text_size_18" />
+
+        <TextView
+            android:id="@+id/tv_virtual_draw_remind_realname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:text="张三"
+            android:textColor="@color/gray"
+            android:textSize="@dimen/text_size_20" />
+
+        <TextView
+            android:id="@+id/tv_virtual_draw_remind_cardname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:text="中国工商银行"
+            android:textColor="@color/gray"
+            android:textSize="@dimen/text_size_20" />
+
+        <TextView
+            android:id="@+id/tv_virtual_draw_remind_account"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="32dp"
+            android:text="6222 **** **** 0900"
+            android:textColor="@color/gray"
+            android:textSize="@dimen/text_size_20" />
+
+        <Button
+            android:id="@+id/btn_virtual_draw_remind_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/btn_income"
+            android:text="确认"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+</LinearLayout>

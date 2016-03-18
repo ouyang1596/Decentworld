@@ -1,0 +1,9 @@
+1.使用业务类：UserInfoEngine进行操作；
+2.在LoadNetdataActivity中初始化数据；
+3.在其它任何地方调用
+1）获取值：
+ UserInfoEngine.getInstance().getUserInfo().getWorth()
+2）设置值：
+ UserInfo userInfo= UserInfoEngine.getInstance().getUserInfo();
+userInfo.setSign(newData);
+ userInfo.save();

@@ -1,0 +1,271 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.benefit;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.RecommendBenefitListAdapter;
+import cn.sx.decentworld.bean.RecommendBenefitList;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.utils.DataConvertUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+import cn.sx.decentworld.widget.ListViewForScrollView;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: CashBenefitFragment.java
+ * @Description: 现金收益界面
+ * @author: cj
+ * @date: 2016年1月14日 上午11:01:28
+ */
+@EFragment(R.layout.fragment_cash_benefit)
+public class CashBenefitFragment extends BaseFragment implements OnClickListener
+{
+    private static final String TAG = "CashBenefitFragment";
+    private boolean isPrepared = false;
+    private static final int GET_RECOMMEND_BENEFIT_LIST = 1;// 获得推荐收益列表
+    
+    /**
+     * 工具类
+     */
+    @Bean
+    GetUserInfo getUserInfo;
+    @Bean
+    ToastComponent toast;
+    
+    /**
+     * 界面资源
+     */
+    /** 可预期总额 **/
+    @ViewById(R.id.tv_cash_benefit_total_big)
+    TextView tv_cash_benefit_total_big;
+    @ViewById(R.id.tv_cash_benefit_total_small)
+    TextView tv_cash_benefit_total_small;
+    /** 历史返现 **/
+    @ViewById(R.id.tv_cash_benefit_back_big)
+    TextView tv_cash_benefit_back_big;
+    @ViewById(R.id.tv_cash_benefit_back_small)
+    TextView tv_cash_benefit_back_small;
+    /** 未提零钱 **/
+    @ViewById(R.id.tv_cash_benefit_not_big)
+    TextView tv_cash_benefit_not_big;
+    @ViewById(R.id.tv_cash_benefit_not_small)
+    TextView tv_cash_benefit_not_small;
+    
+    /** 提现按钮 **/
+    @ViewById(R.id.rl_cash_benefit_draw)
+    RelativeLayout rl_cash_benefit_draw;
+    /** 可提现的零钱 **/
+    @ViewById(R.id.tv_cash_benefit_not_draw)
+    TextView tv_cash_benefit_not_draw;
+    
+    /** 变为手动提取按钮 **/
+    @ViewById(R.id.tv_cash_benefit_autoTransfer)
+    TextView tv_cash_benefit_autoTransfer;
+    /** 绑定支付宝按钮 **/
+    @ViewById(R.id.tv_cash_benefit_alipay)
+    TextView tv_cash_benefit_alipay;
+    /** 绑定微信按钮 **/
+    @ViewById(R.id.tv_cash_benefit_wx)
+    TextView tv_cash_benefit_wx;
+    
+    /** 推荐收益账单 **/
+    @ViewById(R.id.lv_cash_benefit)
+    ListViewForScrollView  listView;
+    
+    /** 没有任何推荐人的提示 **/
+    @ViewById(R.id.ll_cash_benefit_remind)
+    LinearLayout ll_cash_benefit_remind;
+    
+    
+    /**
+     * 变量
+     */
+    private String userID = "";
+    private List<RecommendBenefitList> listData;
+    private RecommendBenefitListAdapter listAdapter;
+    
+
+    
+    @AfterViews
+    void init()
+    {
+        initVar();
+        initListener();
+        
+        isPrepared = true;
+        lazyLoad();
+    }
+
+    /**
+     * 
+     */
+    private void initVar()
+    {
+        userID = DecentWorldApp.getInstance().getDwID();
+        
+        listData = new ArrayList<RecommendBenefitList>();
+        listAdapter = new RecommendBenefitListAdapter(getActivity() , listData);
+        listView.setAdapter(listAdapter);
+        
+    }
+
+    /**
+     * 初始化监听
+     */
+    private void initListener()
+    {
+        rl_cash_benefit_draw.setOnClickListener(this);
+        tv_cash_benefit_autoTransfer.setOnClickListener(this);
+        tv_cash_benefit_alipay.setOnClickListener(this);
+        tv_cash_benefit_wx.setOnClickListener(this);
+    }
+
+    @Override
+    protected void lazyLoad()
+    {
+        getUserInfo.getRecommendBenefitList(userID, handler, GET_RECOMMEND_BENEFIT_LIST);
+
+    }
+
+
+    @Override
+    public void turnToTab(int tab)
+    {
+        // TODO Auto-generated method stub
+
+    }
+    
+    /**
+     * 请求回调
+     */
+    Handler handler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            switch (msg.what)
+            {
+                case GET_RECOMMEND_BENEFIT_LIST:
+                    // 解析数据，保存
+                    listData.clear();
+                    String result = msg.obj.toString();
+                    LogUtils.i(TAG, "数据为：" + result);
+                    JSONObject jsonObject = JSON.parseObject(result);
+                    String totalBenefit = jsonObject.getString("totalBenefit");
+                    JSONArray jsonArray = jsonObject.getJSONArray("recommendList");
+                    RecommendBenefitList temp;
+                    float allBenefit = 0;//应得总金额
+                    float hasBenefit = 0;//已经获得的收益
+                    float notTakeout = 0;//还未提现
+                    if (jsonArray.size() > 0)
+                    {
+                        for (int i = 0; i < jsonArray.size(); i++)
+                        {
+                            JSONObject object = jsonArray.getJSONObject(i);
+                            temp = new RecommendBenefitList();
+                            float amount = object.getFloatValue("amount");
+                            temp.setAmount(amount*amount);
+                            allBenefit += amount*amount;
+                            
+                            float benefit = object.getFloatValue("benefit");
+                            temp.setBenefit(benefit);
+                            hasBenefit+= benefit;
+                            
+                            temp.setName(object.getString("name"));
+                            temp.setPhoneNum(object.getString("phoneNum"));
+                            
+                            float stored = object.getFloatValue("stored");
+                            temp.setStored(stored);
+                            notTakeout += stored;
+                            
+                            temp.setOtherID(object.getString("dwID"));
+                            listData.add(temp);
+                        }
+                        listAdapter.notifyDataSetChanged();
+                        // 计算已经获得的收益和未提现的收益并显示
+                        String[] total = DataConvertUtils.splitFloat(allBenefit);
+                        tv_cash_benefit_total_big.setText(total[0]);
+                        tv_cash_benefit_total_small.setText(total[1]);
+                        
+                        String[] back = DataConvertUtils.splitFloat(hasBenefit);
+                        tv_cash_benefit_back_big.setText(back[0]);
+                        tv_cash_benefit_back_small.setText(back[1]);
+                        
+                        String[] not = DataConvertUtils.splitFloat(notTakeout);
+                        tv_cash_benefit_not_big.setText(not[0]);
+                        tv_cash_benefit_not_small.setText(not[1]);
+                        
+                        if(((int)notTakeout) == 0)
+                            tv_cash_benefit_not_draw.setText("0.00");
+                        else
+                            tv_cash_benefit_not_draw.setText(DataConvertUtils.formatFloat(notTakeout));
+                        
+                        listView.setVisibility(View.VISIBLE);
+                        ll_cash_benefit_remind.setVisibility(View.GONE);
+                    }
+                    else
+                    {
+                        LogUtils.i(TAG, "你还没有推荐过任何人哦！");
+                        listView.setVisibility(View.GONE);
+                        ll_cash_benefit_remind.setVisibility(View.VISIBLE);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        };
+    };
+
+
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.rl_cash_benefit_draw:
+                /** 提现 **/
+                toast.show("提现");
+                break;
+            case R.id.tv_cash_benefit_autoTransfer:
+                /** 自动提现与手动提现切换 **/
+                toast.show("自动提现与手动提现切换");
+                break;
+            case R.id.tv_cash_benefit_alipay:
+                /** 绑定支付宝  **/
+                toast.show("绑定支付宝");
+                break;
+            case R.id.tv_cash_benefit_wx:
+                /** 绑定微信 **/
+                toast.show("绑定微信");
+                break;
+            default:
+                break;
+        }
+    }
+
+}

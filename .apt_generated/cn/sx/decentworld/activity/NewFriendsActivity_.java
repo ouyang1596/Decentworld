@@ -37,16 +37,16 @@ public final class NewFriendsActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        getUserInfo = GetUserInfo_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
         getFriendInfo = GetFriendInfo_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
-        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         lv_newfriends = ((ListViewForScrollView) findViewById(id.lv_newfriends));
-        main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
         bt_to_add = ((Button) findViewById(id.bt_to_add));
+        main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
         {
             View view = findViewById(id.main_header_right_tv);
             if (view!= null) {
@@ -77,10 +77,10 @@ public final class NewFriendsActivity_
                 );
             }
         }
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
         ((GetFriendInfo_) getFriendInfo).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

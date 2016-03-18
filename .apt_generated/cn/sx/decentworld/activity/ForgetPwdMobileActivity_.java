@@ -18,7 +18,6 @@ import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.KeyboardComponent_;
-import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.network.request.ResetPwdInfo_;
 import cn.sx.decentworld.widget.ClearEditText;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -36,21 +35,19 @@ public final class ForgetPwdMobileActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        resetPwdInfo = ResetPwdInfo_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
+        resetPwdInfo = ResetPwdInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        etMobile = ((ClearEditText) findViewById(id.et_mobile));
-        ivback = ((ImageView) findViewById(id.iv_back));
         tvNoReceive = ((TextView) findViewById(id.tv_no_receive_code));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        etCode = ((ClearEditText) findViewById(id.et_code));
+        etMobile = ((ClearEditText) findViewById(id.et_mobile));
         btnOk = ((Button) findViewById(id.btn_OK));
-        ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();
+        etCode = ((ClearEditText) findViewById(id.et_code));
+        ivback = ((ImageView) findViewById(id.iv_back));
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
+        ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();
         init();
     }
 

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_layout_news_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F6F9FB"
+    android:orientation="vertical" >
+
+    <include layout="@layout/top_title" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <com.handmark.pulltorefresh.library.PullToRefreshListView
+            android:id="@+id/main_layout_news_lv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:divider="@color/white" >
+        </com.handmark.pulltorefresh.library.PullToRefreshListView>
+
+        <ImageView
+            android:id="@+id/iv_me"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="15dp"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/me" />
+    </RelativeLayout>
+
+</LinearLayout>

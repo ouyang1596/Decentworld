@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_recharge_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <EditText
+            android:id="@+id/et_recharge_amount"
+            style="@style/TextField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="40dp"
+            android:ems="10"
+            android:hint="@string/amount"
+            android:inputType="number" />
+
+        <Button
+            android:id="@+id/btn_recharge_alipay"
+            style="@style/GrayBoaderButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/alipay" />
+
+        <Button
+            android:id="@+id/btn_recharge_wechat"
+            style="@style/GrayBoaderButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/wechat" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="接下来时模拟测试："
+            android:textSize="40px" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:padding="10px" >
+
+            <EditText
+                android:id="@+id/et_recharge_worth"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="自定义身价"
+                android:inputType="number" />
+
+            <Button
+                android:id="@+id/btn_recharge_worth_set"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="设置身价" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0px"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:padding="10px"
+            android:visibility="invisible" >
+
+            <EditText
+                android:id="@+id/et_recharge_wealth"
+                android:layout_width="0px"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="自定义身家"
+                android:inputType="number" />
+
+            <Button
+                android:id="@+id/btn_recharge_wealth_set"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="设置身家" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,47 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.common;
+
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.listener.MsgProcessListener;
+
+/**
+ * @ClassName: MsgProThread.java
+ * @Description: 消息处理线程，
+ * @author: cj
+ * @date: 2016年1月5日 下午7:07:45
+ */
+public class MsgProThread extends Thread
+{
+    private static final String TAG = "MsgProThread";
+    private DWMessage dwMessage;
+    private MsgProcessListener msgProCallBack;
+    private long time = 4000;
+
+    public MsgProThread(DWMessage dwMessage,MsgProcessListener msgProCallBack)
+    {
+        this.dwMessage = dwMessage;
+        this.msgProCallBack = msgProCallBack;
+    }
+
+    @Override
+    public void run()
+    {
+        try
+        {
+            Thread.sleep(time);
+            if (dwMessage.getSendSuccess() == 2)
+            {
+                dwMessage.setSendSuccess(1);
+                dwMessage.save();
+                msgProCallBack.finish();
+            }
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+}

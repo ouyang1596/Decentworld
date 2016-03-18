@@ -1,0 +1,224 @@
+package cn.sx.decentworld.activity;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.SubjectBean;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ViewUtil;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_chat_room_my_subject_list)
+public class ChatRoomMySubjectListActivity extends BaseFragmentActivity {
+	@ViewById(R.id.lv_subject)
+	ListView lvSubject;
+	List<SubjectBean> subjects;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	@ViewById(R.id.root_activity_chat_room_my_subject_list)
+	LinearLayout llMySubjectList;
+	@Bean
+	ChatRoomInfoSettingAndGetting ChatRoomInfoSettingAndGetting;
+	private Handler mHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			try {
+				JSONObject object = new JSONObject(msg.obj.toString());
+				JSONArray ja = object.getJSONArray("subjects");
+				subjects = (List<SubjectBean>) JsonUtils.json2BeanArray(
+						ja.toString(), SubjectBean.class);
+				adapter.notifyDataSetChanged();
+			} catch (JSONException e) {
+				return;
+			}
+		};
+	};
+
+	@AfterViews
+	public void init() {
+		ViewUtil.scaleContentView(llMySubjectList);
+		CGetIntent();
+		initView();
+		initAdapter();
+		initRequest();
+	}
+
+	private void initView() {
+		ivBack.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				finish();
+			}
+		});
+	}
+
+	SubjectAdapter adapter;
+
+	private void initAdapter() {
+		adapter = new SubjectAdapter();
+		lvSubject.setAdapter(adapter);
+	}
+
+	private void initRequest() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("roomID", roomID);
+		ChatRoomInfoSettingAndGetting.getSubjectList(map, mHandler);
+	}
+
+	private String roomID;
+
+	private void CGetIntent() {
+		roomID = getIntent().getStringExtra("roomID");
+	}
+
+	class SubjectAdapter extends BaseAdapter {
+
+		@Override
+		public int getCount() {
+			return subjects == null ? 0 : subjects.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return subjects.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View con, ViewGroup arg2) {
+			ViewHolder vh = null;
+			if (null == con) {
+				vh = new ViewHolder();
+				con = View.inflate(mContext, R.layout.item_subject, null);
+				vh.llContent = (LinearLayout) con.findViewById(R.id.ll_content);
+				vh.llContent1 = (LinearLayout) con
+						.findViewById(R.id.ll_content1);
+				vh.llContent2 = (LinearLayout) con
+						.findViewById(R.id.ll_content2);
+				vh.tvSubjectContent = (TextView) con
+						.findViewById(R.id.et_content);
+				vh.tvSubjectContent1 = (TextView) con
+						.findViewById(R.id.et_content1);
+				vh.tvSubjectContent2 = (TextView) con
+						.findViewById(R.id.et_content2);
+				vh.ivSubjectBackground = (ImageView) con
+						.findViewById(R.id.iv_cover);
+				vh.ivImgUrl = (ImageView) con.findViewById(R.id.iv_add_pic);
+				vh.ivImgUrl1 = (ImageView) con.findViewById(R.id.iv_add_pic1);
+				vh.ivImgUrl2 = (ImageView) con.findViewById(R.id.iv_add_pic2);
+				vh.tvSubjectName = (TextView) con
+						.findViewById(R.id.tv_subj_name);
+				con.setTag(vh);
+			} else {
+				vh = (ViewHolder) con.getTag();
+			}
+			SubjectBean info = subjects.get(position);
+			String subjectBackground = info.subjectBackground;
+			if (CommUtil.isNotBlank(subjectBackground)) {
+				// Picasso.with(mContext).load(subjectBackground)
+				// .error(R.drawable.solid_heart)
+				// .into(vh.ivSubjectBackground);
+				ImageLoaderHelper.mImageLoader.displayImage(subjectBackground,
+						vh.ivSubjectBackground, ImageLoaderHelper.mOptions);
+			}
+			vh.tvSubjectName.setText(info.subjectName);
+			setContent(vh, info);
+			setContent1(vh, info);
+			setContent2(vh, info);
+			return con;
+		}
+
+		private void setContent(ViewHolder vh, SubjectBean info) {
+			String imgUrl = info.imgUrl;
+			String subjectContent = info.subjectContent;
+			if (null != imgUrl || null != subjectContent) {
+				vh.llContent.setVisibility(View.VISIBLE);
+				vh.tvSubjectContent.setText(subjectContent);
+				if (CommUtil.isNotBlank(imgUrl)) {
+					// Picasso.with(mContext).load(imgUrl)
+					// .error(R.drawable.solid_heart).into(vh.ivImgUrl);
+					ImageLoaderHelper.mImageLoader.displayImage(imgUrl,
+							vh.ivImgUrl, ImageLoaderHelper.mOptions);
+				}
+			} else {
+				vh.llContent.setVisibility(View.GONE);
+			}
+		}
+
+		private void setContent1(ViewHolder vh, SubjectBean info) {
+			String imgUrl1 = info.imgUrl1;
+			String subjectContent1 = info.subjectContent1;
+			if (null != imgUrl1 || null != subjectContent1) {
+				vh.llContent1.setVisibility(View.VISIBLE);
+				vh.tvSubjectContent1.setText(subjectContent1);
+				if (CommUtil.isNotBlank(imgUrl1)) {
+					// Picasso.with(mContext).load(imgUrl1)
+					// .error(R.drawable.solid_heart).into(vh.ivImgUrl1);
+					ImageLoaderHelper.mImageLoader.displayImage(imgUrl1,
+							vh.ivImgUrl1, ImageLoaderHelper.mOptions);
+				}
+			} else {
+				vh.llContent1.setVisibility(View.GONE);
+			}
+		}
+
+		private void setContent2(ViewHolder vh, SubjectBean info) {
+			String imgUrl2 = info.imgUrl2;
+			String subjectContent2 = info.subjectContent2;
+			if (null != imgUrl2 || null != subjectContent2) {
+				vh.llContent.setVisibility(View.VISIBLE);
+				vh.tvSubjectContent.setText(subjectContent2);
+				if (CommUtil.isNotBlank(imgUrl2)) {
+					// Picasso.with(mContext).load(imgUrl2)
+					// .error(R.drawable.solid_heart).into(vh.ivImgUrl2);
+					ImageLoaderHelper.mImageLoader.displayImage(imgUrl2,
+							vh.ivImgUrl2, ImageLoaderHelper.mOptions);
+				}
+			} else {
+				vh.llContent2.setVisibility(View.GONE);
+			}
+		}
+
+		// public String beginDate;
+		// public String endDate;
+		// public String imgUrl;
+		// public String imgUrl1;
+		// public String imgUrl2;
+		// public String subjectBackground;
+		// public String subjectName;
+		// public String subjectContent;
+		// public String subjectContent1;
+		// public String subjectContent2;
+		class ViewHolder {
+			LinearLayout llContent, llContent1, llContent2;
+			TextView tvSubjectName, tvSubjectContent, tvSubjectContent1,
+					tvSubjectContent2;
+			ImageView ivSubjectBackground, ivImgUrl, ivImgUrl1, ivImgUrl2;
+		}
+	}
+}

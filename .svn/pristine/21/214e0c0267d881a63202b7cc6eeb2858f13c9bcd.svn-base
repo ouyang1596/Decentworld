@@ -1,0 +1,296 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.view.View;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.UserExtraInfo;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.component.TitleBar;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.ReminderDialog;
+import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+import cn.sx.decentworld.wxapi.WXEntryActivity;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.Click;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: BindAccountActivity.java
+ * @Description: 绑定账号（支付宝或者微信），用于推荐返现
+ * @author: cj
+ * @date: 2015年12月23日 上午11:05:55
+ */
+@EActivity(R.layout.activity_bind_account)
+public class BindAccountActivity extends BaseFragmentActivity
+{
+    private static final String TAG = "BindAccountActivity";
+    @Bean
+    ToastComponent toast;
+    @Bean
+    TitleBar titleBar;
+
+    /**
+     * 绑定的账号类型
+     */
+    public static final int ALIPAY = RechargePayMethodActivity.ALIPAY;// 支付宝
+    public static final int WX = RechargePayMethodActivity.WX;// 微信
+    public static final int NO = 2;// 没有绑定
+
+    /**
+     * 必要参数
+     */
+    private int accountType = NO;// 绑定的账号类型
+    private String accountName = "";// 账号名字
+
+    /**
+     * 支付宝
+     */
+    @ViewById(R.id.tv_bind_account_alipay)
+    TextView tv_bind_account_alipay;
+
+    /**
+     * 微信
+     */
+    @ViewById(R.id.tv_bind_account_wx)
+    TextView tv_bind_account_wx;
+
+    @Bean
+    GetUserInfo getUserInfo;
+    private static final int GET_USER_ACCOUNT = 1;
+
+    /**
+     * 初始化
+     */
+    @AfterViews
+    void init()
+    {
+        titleBar.setTitleBar("返回", "绑定推荐返利账号");
+        if (NetworkUtils.isNetWorkConnected(this))
+        {
+            getUserInfo.getUserAccount(DecentWorldApp.getInstance().getDwID(), handler, GET_USER_ACCOUNT);
+        }
+        else
+        {
+            UserExtraInfo extraInfo = UserExtraInfo.queryBy(DecentWorldApp.getInstance().getDwID());
+            if (extraInfo != null)
+            {
+                int t_accountType = extraInfo.getAccountType();
+                String t_accountName = extraInfo.getAccountName();
+                if (t_accountType != -1 && CommUtil.isNotBlank(t_accountName))
+                {
+                    accountType = t_accountType;
+                    accountName = t_accountName;
+                }
+            }
+            afterNetReq();
+        }
+
+    }
+
+    Handler handler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            switch (msg.what)
+            {
+                case GET_USER_ACCOUNT:
+                    String result = msg.obj.toString();
+                    JSONObject object = JSON.parseObject(result);
+                    int type = object.getIntValue("type");
+                    String account = object.getString("account");
+                    LogUtils.i(TAG, "type=" + type + "，account = " + account);
+                    UserExtraInfo extraInfo = UserExtraInfo.queryBy(DecentWorldApp.getInstance().getDwID());
+                    if (extraInfo == null)
+                        extraInfo = new UserExtraInfo();
+                    accountType = type;
+                    extraInfo.setAccountType(type);
+                    if (CommUtil.isNotBlank(account))
+                    {
+                        accountName = account;
+                        extraInfo.setAccountName(account);
+                    }
+                    else
+                    {
+                        accountName = "";
+                        extraInfo.setAccountName(account);
+                    }
+                    extraInfo.save();
+                    break;
+                default:
+                    break;
+            }
+            afterNetReq();
+        };
+    };
+
+    /**
+     * 完成网络请求之后
+     */
+    private void afterNetReq()
+    {
+        initView();
+    }
+
+    /**
+     * 初始化界面控件
+     */
+    private void initView()
+    {
+        if (accountType == NO)
+        {
+            tv_bind_account_alipay.setBackgroundResource(R.color.white);
+            tv_bind_account_wx.setBackgroundResource(R.color.white);
+        }
+        else if (accountType == ALIPAY)
+        {
+            tv_bind_account_alipay.setBackgroundResource(R.color.blue);
+            tv_bind_account_wx.setBackgroundResource(R.color.white);
+        }
+        else if (accountType == WX)
+        {
+            tv_bind_account_alipay.setBackgroundResource(R.color.white);
+            tv_bind_account_wx.setBackgroundResource(R.color.blue);
+        }
+    }
+
+    /**
+     * 选择支付宝
+     * 
+     * @param v
+     */
+    @Click(R.id.tv_bind_account_alipay)
+    void bindAlipay(View v)
+    {
+        /** 无网络 **/
+        if (!NetworkUtils.isNetWorkConnected(this))
+        {
+            toast.show("请检查网络");
+            return;
+        }
+        /** 有网络 **/
+        if (accountType != WX)
+        {
+            // 跳转
+            setAlipay(0);
+        }
+        else
+        {
+            ReminderDialog dialog = new ReminderDialog();
+            dialog.setInfo("你目前绑定的是微信，\n确定修改吗？");
+            dialog.setListener(new ReminderListener()
+            {
+                @Override
+                public void confirm()
+                {
+                    setAlipay(1);
+                }
+            });
+            dialog.show(getSupportFragmentManager(), "alipay");
+        }
+    }
+
+    /**
+     * 跳转到设置支付宝账号界面
+     */
+    private void setAlipay(int type)
+    {
+        Intent intent = new Intent(BindAccountActivity.this , BindAccountAlipayActivity_.class);
+        intent.putExtra("accountType", ALIPAY);
+        if (type == 0)
+        {
+            intent.putExtra("accountName", accountName);
+        }
+        else
+            intent.putExtra("accountName", "");
+        startActivity(intent);
+    }
+
+    /**
+     * 选择微信
+     * 
+     * @param v
+     */
+    @Click(R.id.tv_bind_account_wx)
+    void bindWx(View v)
+    {
+        /** 无网络 **/
+        if (!NetworkUtils.isNetWorkConnected(this))
+        {
+            toast.show("请检查网络");
+            return;
+        }
+        /** 有网络 **/
+        if (accountType != ALIPAY)
+        {
+            // 跳转
+            setWx(0);
+        }
+        else
+        {
+            ReminderDialog dialog = new ReminderDialog();
+            dialog.setInfo("你目前绑定的是支付宝，\n确定修改吗？");
+            dialog.setListener(new ReminderListener()
+            {
+                @Override
+                public void confirm()
+                {
+                    setWx(1);
+                }
+            });
+            dialog.show(getSupportFragmentManager(), "wx");
+        }
+    }
+
+    /**
+     * 跳转到绑定微信账号的界面
+     */
+    private void setWx(int type)
+    {
+        Intent intent = new Intent(BindAccountActivity.this , WXEntryActivity.class);
+        intent.putExtra("accountType", WX);
+        if (type == 0)
+            intent.putExtra("accountName", accountName);
+        else
+            intent.putExtra("accountName", "");
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent)
+    {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        LogUtils.i(TAG, "进入onNewIntent");
+        if (getIntent().getIntExtra("accountType", 3) != 3)
+        {
+            accountType = getIntent().getIntExtra("accountType", 3);
+            accountName = getIntent().getStringExtra("accountName");
+            initView();
+            LogUtils.i(TAG, "进入onNewIntent，并重新修改数据，accountType=" + accountType + ",accountName=" + accountName);
+        }
+    }
+
+    /**
+     * 返回
+     */
+    @Click(R.id.main_header_left)
+    void back()
+    {
+        finish();
+    }
+
+}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="286dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@color/white"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:text="请先确认支付宝账户"
+            android:textSize="@dimen/text_size_18" />
+
+        <EditText
+            android:id="@+id/et_set_alipay_account"
+            android:layout_width="240dp"
+            android:layout_height="43dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:hint="请输入支付宝账号"
+            android:background="@drawable/bg_et_yellow_selector"
+            android:inputType="numberPassword" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:text="注：确认支付宝账户收钱\n后，自动返现将不可用,\n需要手动返现。"
+            android:textSize="@dimen/text_size_18" />
+
+        <Button
+            android:id="@+id/btn_set_alipay_account_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/btn_income"
+            android:text="确认"
+            android:layout_marginBottom="20dp"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+</LinearLayout>

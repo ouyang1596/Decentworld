@@ -1,0 +1,359 @@
+package cn.sx.decentworld.utils;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.os.Environment;
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.service.DownloadListenService;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+
+/**
+ * 
+ * @ClassName: UpgradeVersion.java
+ * @Description: 软件升级模块
+ * @author: cj
+ * @date: 2015年12月16日 下午4:30:23
+ */
+public class UpgradeVersion
+{
+	private static final String TAG = "Upgrade";
+	/**
+	 * 传入参数
+	 */
+	private Context context;
+	private String url = Constants.CONTEXTPATH+"/version/getVersionNum";
+	/**
+	 * 显示对话框
+	 */
+	private Dialog dialog;
+	private TextView tv_progress;
+	private ProgressBar pb_progress;
+	private Button btn_ok;
+	private Button btn_cancel;
+
+	/**
+	 * 网络请求
+	 */
+	private SendUrl sendUrl;
+
+	/** 版本Code */
+	private int currentVersionCode;
+	/** 版本Name */
+	private String currentVersionName;
+	/** 更新描述 */
+	private String description;
+	/** 下载地址 */
+	private String downLoadUrl;
+	
+	/** 下载的目录 **/
+	public File updateDir = null;
+	/** 下载的文件 **/
+	public File updateFile = null;
+	public boolean hasToast ;//是否有提示
+	
+	public UpgradeVersion(Context context)
+	{
+		this(context,false);
+	}
+	
+	public UpgradeVersion(Context context,boolean hasToast)
+	{
+		this.context = context;
+		this.hasToast = hasToast;
+		sendUrl = new SendUrl(context);
+		getVersionInfo();
+	}
+
+	/**
+	 * 从服务器上获取应用的最新版本信息
+	 * */
+	public void getVersionInfo()
+	{
+		final Handler handler  = new Handler()
+		{
+			public void handleMessage(android.os.Message msg) 
+			{
+				showDialog();
+			};
+		};
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("appType", "ANDROID");
+		LogUtils.i(TAG, "getVersionInfo...begin");
+		SendUrl sendUrl = new SendUrl(context);
+		sendUrl.httpRequestWithParams(map, url, Method.GET, new HttpCallBack()
+		{
+			@Override
+			public void onSuccess(String response, ResultBean msg)
+			{
+				LogUtils.i(TAG, "getVersionInfo...begin,msg.getResultCode="+msg.getResultCode()+",msg.getMsg="+msg.getMsg()+",msg.getData="+msg.getData());
+				if(msg.getResultCode() == 2222)
+				{
+					/**
+					 * 解析
+					 */
+					JSONObject object = JSON.parseObject(msg.getData().toString());
+					JSONObject result = object.getJSONObject("version");
+					currentVersionCode = result.getIntValue("versionNum");
+					currentVersionName = result.getString("versionName");
+					description = result.getString("description");
+					downLoadUrl = result.getString("downLoadUrl");
+					if (checkUpdate(currentVersionName, currentVersionCode))
+					{
+						handler.sendEmptyMessage(1);
+					}
+					else
+					{
+						if(hasToast)
+						{
+							ToastUtils.toast(context, "已经是最新版本了！");
+						}
+					}
+				}
+				else if(msg.getResultCode() == 3333)
+				{
+					LogUtils.i(TAG, "getVersionInfo...failure,cause by:"+msg.getMsg());
+					ToastUtils.toast(context, msg.getMsg());
+				}
+			}
+			
+			@Override
+			public void onFailure(String e)
+			{
+				LogUtils.i(TAG, "getVersionInfo...failure,cause by:"+e);
+				ToastUtils.toast(context, Constants.NET_WRONG);
+			}
+		});
+	}
+	
+
+	/***
+	 * 检测是否有新版本
+	 * 首先比较Code
+	 */
+	private boolean checkUpdate(String versionName, int versionCode)
+	{
+		if (versionCode > getVersionCode())
+		{
+			// 校验是否有新版本
+			if (!getVersionName().equals(versionName))
+			{
+				// 有新版本，弹出一升级对话框
+				return true;
+			}
+			else
+			{
+				LogUtils.i(TAG, "版本名相同");
+			}
+		}
+		else
+		{
+//			LogUtils.i(TAG, "已经是最新版本");
+			
+		}
+		return false;
+	}
+
+	/***
+	 * 显示升级对话框
+	 */
+	public Dialog showDialog()
+	{
+		View view = View.inflate(context, R.layout.dialog_update, null);
+		tv_progress = (TextView) view.findViewById(R.id.tv_progress);
+		pb_progress = (ProgressBar) view.findViewById(R.id.pb_progress);
+		btn_cancel = (Button) view.findViewById(R.id.btn_cancel);
+		btn_ok = (Button) view.findViewById(R.id.btn_ok);
+		btn_cancel.setOnClickListener(new MyOnClickListener());
+		btn_ok.setOnClickListener(new MyOnClickListener());
+		tv_progress.setVisibility(View.VISIBLE);
+		tv_progress.setText(description);
+		int width = context.getResources().getDisplayMetrics().widthPixels;
+		dialog = showDialog(context, view, width * 0.9f, 0);
+		dialog.setCancelable(false);
+		return dialog;
+	}
+
+	/***
+	 * 弹出框消失
+	 */
+	public void dismiss()
+	{
+		if (dialog != null && dialog.isShowing())
+		{
+			dialog.dismiss();
+			dialog = null;
+		}
+	}
+
+	/**
+	 * 获取应用程序的版本名称（Name）
+	 */
+
+	private String getVersionName()
+	{
+		// 用来管理手机的APK
+		PackageManager pm = context.getPackageManager();
+		try
+		{
+			// 得到知道APK的功能清单文件
+			PackageInfo info = pm.getPackageInfo(context.getPackageName(), 0);
+			LogUtils.i(TAG, "versionName="+info.versionName);
+			return info.versionName;
+		}
+		catch (NameNotFoundException e)
+		{
+			LogUtils.i(TAG, "获取软件版本名出现异常："+e);
+			return "";
+		}
+	}
+	
+
+	/***
+	 *获取应用程序的版本名号（Code）
+	 */
+	private int getVersionCode()
+	{
+		// 用来管理手机的APK
+		PackageManager pm = context.getPackageManager();
+		try
+		{
+			// 得到知道APK的功能清单文件
+			PackageInfo info = pm.getPackageInfo(context.getPackageName(), 0);
+			LogUtils.i(TAG, "versionCode="+info.versionCode);
+			return info.versionCode;
+		}
+		catch (NameNotFoundException e)
+		{
+			LogUtils.i(TAG, "获取软件版本号出现异常："+e);
+			return 0;
+		}
+	}
+
+	class MyOnClickListener implements OnClickListener
+	{
+
+		@Override
+		public void onClick(View v)
+		{
+			switch (v.getId())
+			{
+				case R.id.btn_ok:
+					LogUtils.i(TAG, "点击了确定");
+					tv_progress.setVisibility(View.GONE);
+					pb_progress.setVisibility(View.VISIBLE);
+					btn_ok.setEnabled(false);
+					btn_ok.setBackgroundResource(R.drawable.btn_bg_grey);
+//					doUpgrade();
+					Intent intent = new Intent(context, DownloadListenService.class);
+					intent.putExtra("url", downLoadUrl);
+					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+					context.startService(intent);
+					dismiss();
+					break;
+				case R.id.btn_cancel:
+					LogUtils.i(TAG, "点击了取消");
+					// 消失
+					dismiss();
+					break;
+			}
+
+		}
+	}
+
+
+	public Dialog showDialog(Context context, View view, float width, float height)
+	{
+		Dialog dialog = new Dialog(context , R.style.ActionSheetDialogStyle);
+		dialog.setContentView(view);
+		dialog = setLayoutParams(dialog, width, height);
+		dialog.show();
+		return dialog;
+	}
+
+	/***
+	 * 设置Dialog的宽高
+	 * 
+	 * @param dialog
+	 * @param width
+	 *            宽度
+	 * @param height
+	 *            高度
+	 * @return
+	 */
+	public Dialog setLayoutParams(Dialog dialog, float width, float height)
+	{
+		// 设置大小
+		WindowManager.LayoutParams layoutParams = dialog.getWindow().getAttributes();
+		if (width > 0)
+		{
+			layoutParams.width = (int) width;
+		}
+		if (height > 0)
+		{
+			layoutParams.height = (int) height;
+		}
+		dialog.getWindow().setAttributes(layoutParams);
+		return dialog;
+	}
+
+
+
+	/***
+	 * 创建文件路径以及文件
+	 * <p>
+	 * 2015年4月21日下午3:05:19
+	 * 
+	 * @author Frewen
+	 * @param path
+	 *            文件路径
+	 * @param name
+	 *            文件
+	 */
+	public void createFile(String path, String name)
+	{
+		if (android.os.Environment.MEDIA_MOUNTED.equals(android.os.Environment.getExternalStorageState()))
+		{
+			updateDir = new File(Environment.getExternalStorageDirectory() + "/" + path);
+			updateFile = new File(updateDir + "/" + name + ".apk");
+
+			if (!updateDir.exists())
+			{
+				updateDir.mkdirs();
+			}
+			if (!updateFile.exists())
+			{
+				try
+				{
+					updateFile.createNewFile();
+				}
+				catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+
+		}
+	}
+}

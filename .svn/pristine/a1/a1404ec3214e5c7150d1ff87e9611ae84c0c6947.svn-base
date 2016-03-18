@@ -1,0 +1,78 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.LogUtils;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+
+/**
+ * @ClassName: IconPagerAdapter.java
+ * @Description:
+ * @author: cj
+ * @date: 2016年1月11日 下午6:06:18
+ */
+public class IconPagerAdapter extends PagerAdapter
+{
+
+    private List<String> picUrls;
+    private List<ImageView> imgvs;
+
+    /**
+     * 
+     */
+    public IconPagerAdapter(List<String> picUrls, List<ImageView> imgvs)
+    {
+        this.picUrls = picUrls;
+        this.imgvs = imgvs;
+    }
+
+    @Override
+    public int getCount()
+    {
+        return picUrls.size();
+    }
+
+    @Override
+    public Object instantiateItem(View arg0, int position)
+    {
+        ImageView imageView = imgvs.get(position);
+        LogUtils.e("bm", "url---" + picUrls.get(position));
+        ImageLoaderHelper.mImageLoader.displayImage(picUrls.get(position), imageView, ImageLoaderHelper.mOptions);
+        ((ViewPager) arg0).addView(imageView);
+        return imageView;
+    }
+
+    @Override
+    public void destroyItem(View arg0, int arg1, Object arg2)
+    {
+        ((ViewPager) arg0).removeView((View) arg2);
+    }
+
+    @Override
+    public boolean isViewFromObject(View arg0, Object arg1)
+    {
+        return arg0 == arg1;
+    }
+
+    @Override
+    public void finishUpdate(ViewGroup container)
+    {
+        super.finishUpdate(container);
+    }
+
+    @Override
+    public int getItemPosition(Object object)
+    {
+        return POSITION_NONE;
+    }
+
+}

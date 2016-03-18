@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="286dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@color/white"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="40dp"
+            android:text="联系找回密码专线"
+            android:textColor="@color/yellow"
+            android:textSize="@dimen/text_size_18" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="38dp"
+            android:textSize="@dimen/text_size_20"
+            android:text="152173382716" />
+
+        <Button
+            android:id="@+id/btn_retrieve_income_pwd_submit"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="66dp"
+            android:layout_marginRight="66dp"
+            android:layout_marginTop="36dp"
+            android:layout_marginBottom="20dp"
+            android:text="确认" />
+    </LinearLayout>
+
+</LinearLayout>

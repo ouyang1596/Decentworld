@@ -26,8 +26,8 @@ public final class DWMMessageManager_
         if (!(context_ instanceof Activity)) {
             return ;
         }
-        ((GetRoomInfo_) getRoomInfo).afterSetContentView_();
         ((ToastComponent_) toastComponent).afterSetContentView_();
+        ((GetRoomInfo_) getRoomInfo).afterSetContentView_();
         init();
     }
 
@@ -45,12 +45,12 @@ public final class DWMMessageManager_
         if (context_ instanceof Activity) {
             Activity activity = ((Activity) context_);
         }
-        context = context_;
         if (context_ instanceof Activity) {
             activity = ((Activity) context_);
         }
-        getRoomInfo = GetRoomInfo_.getInstance_(context_);
+        context = context_;
         toastComponent = ToastComponent_.getInstance_(context_);
+        getRoomInfo = GetRoomInfo_.getInstance_(context_);
     }
 
     public static DWMMessageManager_ getInstance_(Context context) {

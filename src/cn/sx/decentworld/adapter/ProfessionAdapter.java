@@ -1,0 +1,84 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.util.List;
+
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.OccupationBean;
+
+/**
+ * @ClassName: ProfessionAdapter.java
+ * @Description:
+ * @author: yj
+ * @date: 2016年1月1日 上午10:57:11
+ */
+public class ProfessionAdapter extends BaseAdapter {
+	private Context mContext;
+	private List<OccupationBean> mData;
+	private int positionPress = 0;
+
+	public ProfessionAdapter(Context context, List<OccupationBean> data) {
+		mContext = context;
+		mData = data;
+	}
+
+	@Override
+	public int getCount() {
+		return mData == null ? 0 : mData.size();
+	}
+
+	@Override
+	public OccupationBean getItem(int position) {
+		return mData.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View con, ViewGroup parent) {
+		ViewHolder vh;
+		if (null == con) {
+			con = View.inflate(mContext, R.layout.item_profession, null);
+			vh = new ViewHolder();
+			vh.tvProfession = (TextView) con.findViewById(R.id.tv_profession);
+			vh.llProfession = (LinearLayout) con
+					.findViewById(R.id.ll_profession);
+			con.setTag(vh);
+		} else {
+			vh = (ViewHolder) con.getTag();
+		}
+		if (position == positionPress) {
+			vh.llProfession.setBackgroundResource(R.color.gray_e);
+		} else {
+			vh.llProfession.setBackgroundResource(R.color.white);
+		}
+		OccupationBean data = mData.get(position);
+		vh.tvProfession.setText(data.profession);
+		return con;
+	}
+
+	public void setPositionPress(int positionPress) {
+		this.positionPress = positionPress;
+		notifyDataSetChanged();
+	}
+
+	public int getPositionPress() {
+		return positionPress;
+	}
+
+	class ViewHolder {
+		TextView tvProfession;
+		LinearLayout llProfession;
+	}
+}

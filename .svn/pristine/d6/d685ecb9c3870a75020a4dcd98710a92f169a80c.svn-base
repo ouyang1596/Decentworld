@@ -1,0 +1,21 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+/**
+ * @ClassName: ContactBean.java
+ * @Description:
+ * @author: yj
+ * @date: 2016年1月10日 上午10:14:31
+ */
+public class ContactBean {
+	public String name;
+	public String occupation;
+	public String dwID;
+	public String worth;
+	public String userType;
+	public String sex;
+	public String phoneNum;
+	public String introduce;
+}

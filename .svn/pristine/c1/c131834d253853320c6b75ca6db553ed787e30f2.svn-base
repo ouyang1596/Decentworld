@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/chat_find_background"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/chat_find_background" >
+
+        <LinearLayout
+            android:id="@+id/root_fragment_chat_chat_group_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:orientation="vertical" >
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="26px"
+                android:background="@color/white" />
+
+            <cn.sx.decentworld.widget.ExpandGridView
+                android:id="@+id/group_chat_gridview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white"
+                android:gravity="start"
+                android:horizontalSpacing="12px"
+                android:listSelector="@android:color/transparent"
+                android:numColumns="4"
+                android:paddingLeft="34px"
+                android:verticalSpacing="20px" >
+            </cn.sx.decentworld.widget.ExpandGridView>
+            <!-- android:layout_marginBottom="10dp" -->
+            <!-- android:layout_marginLeft="10dp" -->
+            <!-- android:layout_marginRight="10dp" -->
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:background="@color/chat_find_background" />
+
+            <RelativeLayout
+                android:id="@+id/group_chat_name"
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:background="@color/white" >
+
+                <TextView
+                    android:id="@+id/group_chat_name_tv1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="40px"
+                    android:text="@string/group_chat_name"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_px_30" />
+
+                <TextView
+                    android:id="@+id/real_groupname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="40px"
+                    android:text="twer"
+                    android:textColor="@color/darkgrey"
+                    android:textSize="@dimen/text_size_px_30" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_alignParentBottom="true"
+                    android:background="#E6E6E6" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/group_chat_icon"
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:background="@color/white" >
+
+                <TextView
+                    android:id="@+id/group_chat_icon_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="20dip"
+                    android:text="@string/group_chat_icon"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_px_30" />
+
+                <ImageView
+                    android:id="@+id/group_chat_group_more"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="40px"
+                    android:src="@drawable/more" />
+
+                <ImageView
+                    android:id="@+id/group_chat_group_icon"
+                    android:layout_width="82px"
+                    android:layout_height="82px"
+                    android:layout_toLeftOf="@id/group_chat_group_more"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="10px"
+                    android:src="@drawable/ic_launcher" />
+
+                 <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_alignParentBottom="true"
+                    android:background="#E6E6E6" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/group_chat_capacity"
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:background="@color/white" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="40px"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_px_30"
+                    android:text="@string/group_chat_capacity"
+                    />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="40px"
+                    android:src="@drawable/more" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="40px"
+                android:background="@color/chat_find_background" />
+
+            <RelativeLayout
+                android:id="@+id/set_chat_top"
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:background="@color/white" >
+
+                <TextView
+                    android:id="@+id/set_chat_top_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="40px"
+                    android:text="@string/set_top"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_px_30" />
+
+                <ImageView
+                    android:id="@+id/set_top_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="80px"
+                    android:src="@drawable/switch_rectangle_close" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_alignParentBottom="true"
+                    android:background="#E6E6E6" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/no_interrupt"
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:background="@color/white" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical|left"
+                    android:paddingLeft="40px"
+                    android:text="@string/message_no_interrupt"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_px_30" />
+
+                <ImageView
+                    android:id="@+id/interrupt_switcher"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:paddingRight="80px"
+                    android:src="@drawable/switch_rectangle_close" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:background="@color/chat_find_background" />
+
+            <RelativeLayout
+                android:id="@+id/nick_name"
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:background="@color/white" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical|left"
+                    android:paddingLeft="40px"
+                    android:text="@string/my_nickname"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_px_30"
+                     />
+
+                <ImageView
+                    android:id="@+id/change_nick_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:paddingRight="20dip"
+                    android:src="@drawable/more" />
+
+                <TextView
+                    android:id="@+id/my_name_groupchat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="5dip"
+                    android:layout_toLeftOf="@id/change_nick_name"
+                    android:textSize="@dimen/text_size_px_30"
+                    android:text="味精"
+                    android:textColor="@color/darkgrey" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="20dp"
+                android:background="@color/chat_find_background" />
+
+            <RelativeLayout
+                android:id="@+id/chat_group_backgroup"
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:background="@color/white" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical|left"
+                    android:paddingLeft="40px"
+                    android:text="@string/set_chat_backgroup"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_px_30" />
+
+                <ImageView
+                    android:id="@+id/change_chat_backgroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:paddingRight="40px"
+                    android:src="@drawable/more" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_alignParentBottom="true"
+                    android:background="#E6E6E6" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="40px"
+                android:background="@color/chat_find_background" />
+
+            <RelativeLayout
+                android:id="@+id/clear_all_history"
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:background="@color/white" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical|left"
+                    android:layout_marginLeft="40px"
+                    android:text="@string/clear_chat_history"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_px_30" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="40px"
+                android:background="@color/chat_find_background" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:background="@color/white" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:gravity="center_vertical|left"
+                    android:layout_marginLeft="40px"
+                    android:text="@string/report"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/text_size_px_30" />
+
+                <ImageView
+                    android:id="@+id/change_chat_backgroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:paddingRight="40px"
+                    android:src="@drawable/more" />
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/btn_exit_grp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="22px"
+                android:background="@drawable/bt_delete"
+                android:paddingBottom="14px"
+                android:paddingTop="7dp"
+                android:text="@string/delete_exit_group_chat"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_size_px_36"
+                 />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

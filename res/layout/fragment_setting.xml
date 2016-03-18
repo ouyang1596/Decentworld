@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/iv_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="6dp"
+        android:src="@drawable/back_doubt" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="设置"
+        android:textColor="@color/one_black"
+        android:textSize="@dimen/new_textsize_16sp" />
+
+    <TextView
+        android:id="@+id/tv_about_us"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/find_item_selector"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="关于我们"
+        android:textColor="@color/two_black"
+        android:textSize="@dimen/new_textsize_16sp" />
+
+    <TextView
+        android:id="@+id/tv_privacy_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/find_item_selector"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="隐私设置"
+        android:textColor="@color/two_black"
+        android:textSize="@dimen/new_textsize_16sp" />
+
+    <TextView
+        android:id="@+id/tv_advanced_setting"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/find_item_selector"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="高级设置"
+        android:textColor="@color/two_black"
+        android:textSize="@dimen/new_textsize_16sp" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/tv_exit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:background="@drawable/find_item_selector"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="退出登录"
+        android:textColor="@color/two_black"
+        android:textSize="@dimen/new_textsize_16sp" />
+
+</LinearLayout>

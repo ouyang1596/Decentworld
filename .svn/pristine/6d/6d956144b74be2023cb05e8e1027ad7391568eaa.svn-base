@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#EBEEF0"
+        android:orientation="vertical" >
+
+        <RadioGroup
+            android:id="@+id/rg_fee_Scale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#F6F9FB"
+            android:orientation="horizontal"
+            android:paddingLeft="13dp"
+            android:paddingRight="13dp"
+            android:paddingTop="13dp" >
+
+            <RadioButton
+                android:id="@+id/rb_fixed"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:checked="true"
+                android:drawableBottom="@drawable/rb_fixed_triangle_checked"
+                android:drawableTop="@drawable/rb_fixed_checked"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:textColor="@color/new_black_one"
+                android:textSize="@dimen/new_textsize_15sp" />
+
+            <!--
+                 <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <RadioButton
+                android:id="@+id/rb_scale"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="60dp"
+                android:button="@null"
+                android:drawableBottom="@drawable/rb_percent_triangle_checked"
+                android:drawableTop="@drawable/rb_percent_checked"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp"
+                android:textColor="@color/new_black_one"
+                android:textSize="@dimen/new_textsize_15sp" />s
+            -->
+        </RadioGroup>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="@color/bottom_blue" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:text="固定一个值，所有进来的游客都将执行一个标准，来支付费用"
+            android:textColor="@color/three_black"
+            android:textSize="@dimen/new_textsize_12sp" />
+
+        <LinearLayout
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="50dp"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:src="@drawable/yuansmall" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <EditText
+                    android:id="@+id/et_fee"
+                    android:layout_width="125dp"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_line_press"
+                    android:gravity="center"
+                    android:hint="请输入一个值"
+                    android:inputType="number"
+                    android:padding="5dp"
+                    android:textColor="@color/one_black"
+                    android:textSize="@dimen/new_textsize_13sp" />
+
+                <TextView
+                    android:id="@+id/tv_percent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="%"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_fee_scale_save"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="14dp"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/rg_btn_bg_selector"
+            android:text="确定"
+            android:textColor="@drawable/rg_tv_color_selector"
+            android:textSize="@dimen/new_textsize_15sp" />
+    </LinearLayout>
+
+</FrameLayout>

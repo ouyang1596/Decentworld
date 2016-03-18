@@ -1,0 +1,88 @@
+package cn.sx.decentworld.activity;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.EditText;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.ConstantIntent;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_achievement)
+public class AchievementActivity extends BaseFragmentActivity implements
+		OnClickListener {
+	@ViewById(R.id.tv_career_start)
+	TextView tvCareerStart;
+	@ViewById(R.id.tv_career_isto_success)
+	TextView tvCareerIsToStart;
+	@ViewById(R.id.tv_career_success)
+	TextView tvCareerSuccess;
+	@ViewById(R.id.tv_wan)
+	TextView tvWan;
+	@ViewById(R.id.et_introduce_detail)
+	EditText etIntroduceDetail;
+
+	@AfterViews
+	public void init() {
+		tvCareerStart.setOnClickListener(this);
+		tvCareerIsToStart.setOnClickListener(this);
+		tvCareerSuccess.setOnClickListener(this);
+		tvWan.setOnClickListener(this);
+	}
+
+	@Override
+	public void onClick(View v) {
+		Intent intent = null;
+		int requestCode = 0;
+		switch (v.getId()) {
+		case R.id.tv_career_start:
+			intent = new Intent(this, TempletActivity_.class);
+			requestCode = ConstantIntent.ACTIVITY_ACHIEVEMENT_CAREER_START;
+			break;
+		case R.id.tv_career_isto_success:
+			intent = new Intent(this, TempletActivity_.class);
+			requestCode = ConstantIntent.ACTIVITY_ACHIEVEMENT_CAREER_ISTO_SUCCESS;
+			break;
+		case R.id.tv_career_success:
+			intent = new Intent(this, TempletActivity_.class);
+			requestCode = ConstantIntent.ACTIVITY_ACHIEVEMENT_CAREER_SUCCESS;
+			break;
+		case R.id.tv_wan:
+			intent = new Intent(this, TempletActivity_.class);
+			requestCode = ConstantIntent.ACTIVITY_ACHIEVEMENT_WAN;
+			break;
+		}
+		intent.putExtra(ConstantIntent.ACTIVITY_ACHIEVEMENT_CAREER_PERIOD,
+				requestCode);
+		startActivityForResult(intent, requestCode);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		String tvData = null;
+		if (null != data) {
+			tvData = data
+					.getStringExtra(ConstantIntent.ACTIVITY_ACHIEVEMENT_INTRODUCE_DETAIL);
+		}
+		switch (requestCode) {
+		case ConstantIntent.ACTIVITY_ACHIEVEMENT_CAREER_START:
+			etIntroduceDetail.setText(tvData);
+			break;
+
+		case ConstantIntent.ACTIVITY_ACHIEVEMENT_CAREER_ISTO_SUCCESS:
+			etIntroduceDetail.setText(tvData);
+			break;
+		case ConstantIntent.ACTIVITY_ACHIEVEMENT_CAREER_SUCCESS:
+			etIntroduceDetail.setText(tvData);
+			break;
+		case ConstantIntent.ACTIVITY_ACHIEVEMENT_WAN:
+			etIntroduceDetail.setText(tvData);
+			break;
+		}
+	}
+}

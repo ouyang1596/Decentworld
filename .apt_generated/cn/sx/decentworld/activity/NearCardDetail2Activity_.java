@@ -40,18 +40,18 @@ public final class NearCardDetail2Activity_
     }
 
     private void afterSetContentView_() {
-        ivSex = ((ImageView) findViewById(id.iv_sex));
-        tvRealNameNickname = ((TextView) findViewById(id.tv_realname_nickname));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        btnOK = ((Button) findViewById(id.btn_OK));
-        tvUserSign = ((TextView) findViewById(id.tv_user_detail_info_sign));
-        imgv3 = ((ImageView) findViewById(id.imgv3));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        imgv1 = ((ImageView) findViewById(id.imgv1));
+        btnOK = ((Button) findViewById(id.btn_OK));
         tvAddr = ((TextView) findViewById(id.tv_addr));
+        tvUserSign = ((TextView) findViewById(id.tv_user_detail_info_sign));
+        tvAge = ((TextView) findViewById(id.tv_age));
+        ivSex = ((ImageView) findViewById(id.iv_boy));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        imgv1 = ((ImageView) findViewById(id.imgv1));
+        imgv3 = ((ImageView) findViewById(id.imgv3));
+        tvRealNameNickname = ((TextView) findViewById(id.tv_realname_nickname));
         ivShowIcon = ((ImageView) findViewById(id.iv_show_icon));
         imgv2 = ((ImageView) findViewById(id.imgv2));
-        tvAge = ((TextView) findViewById(id.tv_age));
         lvAnonymousInfo = ((ListView) findViewById(id.lv_anonymous_info));
         ((ToastComponent_) toast).afterSetContentView_();
         ((GetStrangerInfo_) getStrangerInfo).afterSetContentView_();

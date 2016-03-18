@@ -1,0 +1,284 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+import java.util.List;
+
+import cn.sx.decentworld.DecentWorldApp;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Select;
+
+/**
+ * @ClassName: RecommendBenefitList.java
+ * @Description: 推荐别人所得收益的展示列表
+ * @author: cj
+ * @date: 2015年12月20日 下午4:16:33
+ */
+@Table(name = "recommendBenefitList")
+public class RecommendBenefitList extends Model
+{
+    /**
+     * 推荐状态
+     */
+    public static final int status_OK = 1;//表示正常
+    public static final int status_DELETED = 2;//表示用户已被删除
+    public static final int status_FINISHED = 3;//表示用户收益全部获得
+    
+    /**
+     * 用户ID
+     */
+    @Column(name = "userID")
+    String userID;
+
+    /**
+     * 对方ID
+     */
+    @Column(name = "otherID")
+    String otherID;
+
+    /**
+     * 状态（0 [还不是朋友] | 1 [已经是好友了]）
+     */
+    @Column(name = "isFriend")
+    boolean isFriend;
+
+    /**
+     * 是否注册（0[否] | 1[是]） 如果0，则代表没有注册 如果1，则代表注册了
+     */
+    @Column(name = "isRegister")
+    boolean isRegister;
+    
+    
+    
+
+    /** 推荐时缴纳的推荐金 **/
+    @Column(name = "amount")
+    float amount;
+
+    /** 该条记录的目前总收益 **/
+    @Column(name = "benefit")
+    float benefit;
+
+    /** 被推荐人名字（优先级：备注、实名、昵称） **/
+    @Column(name = "name")
+    String name;
+    
+    /** 被推荐人电话号码 **/
+    @Column(name = "phoneNum")
+    String phoneNum;
+    
+    /** 被推荐人的存储收益 **/
+    @Column(name = "stored")
+    float stored;
+    
+    /** 推荐状态(1表示正常，2表示用户已被删除，3表示用户收益全部获得) **/
+    @Column(name = "")
+    int status;
+
+    /**
+	 * 
+	 */
+    public RecommendBenefitList()
+    {
+        this.userID = DecentWorldApp.getInstance().getDwID();
+        this.otherID = "";
+        this.name = "";
+        this.amount = 0;
+        this.benefit = 0;
+        this.isFriend = false;
+        this.isRegister = false;
+        this.status = -1;
+    }
+
+    /**
+     * @return the userID
+     */
+    public String getUserID()
+    {
+        return userID;
+    }
+
+    /**
+     * @param userID the userID to set
+     */
+    public void setUserID(String userID)
+    {
+        this.userID = userID;
+    }
+
+    /**
+     * @return the otherID
+     */
+    public String getOtherID()
+    {
+        return otherID;
+    }
+
+    /**
+     * @param otherID the otherID to set
+     */
+    public void setOtherID(String otherID)
+    {
+        this.otherID = otherID;
+    }
+
+    /**
+     * @return the isFriend
+     */
+    public boolean isFriend()
+    {
+        return isFriend;
+    }
+
+    /**
+     * @param isFriend the isFriend to set
+     */
+    public void setFriend(boolean isFriend)
+    {
+        this.isFriend = isFriend;
+    }
+
+    /**
+     * @return the isRegister
+     */
+    public boolean isRegister()
+    {
+        return isRegister;
+    }
+
+    /**
+     * @param isRegister the isRegister to set
+     */
+    public void setRegister(boolean isRegister)
+    {
+        this.isRegister = isRegister;
+    }
+
+    /**
+     * @return the amount
+     */
+    public float getAmount()
+    {
+        return amount;
+    }
+
+    /**
+     * @param amount the amount to set
+     */
+    public void setAmount(float amount)
+    {
+        this.amount = amount;
+    }
+
+    /**
+     * @return the benefit
+     */
+    public float getBenefit()
+    {
+        return benefit;
+    }
+
+    /**
+     * @param benefit the benefit to set
+     */
+    public void setBenefit(float benefit)
+    {
+        this.benefit = benefit;
+    }
+
+    /**
+     * @return the name
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * @param name the name to set
+     */
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+
+    /**
+     * @return the phoneNum
+     */
+    public String getPhoneNum()
+    {
+        return phoneNum;
+    }
+
+    /**
+     * @param phoneNum the phoneNum to set
+     */
+    public void setPhoneNum(String phoneNum)
+    {
+        this.phoneNum = phoneNum;
+    }
+
+    /**
+     * @return the stored
+     */
+    public float getStored()
+    {
+        return stored;
+    }
+
+    /**
+     * @param stored the stored to set
+     */
+    public void setStored(float stored)
+    {
+        this.stored = stored;
+    }
+    
+    
+    
+    /**
+     * @return the status
+     */
+    public int getStatus()
+    {
+        return status;
+    }
+
+    /**
+     * @param status the status to set
+     */
+    public void setStatus(int status)
+    {
+        this.status = status;
+    }
+
+    /**
+     * 删除对应ID的信息
+     * @param userID
+     */
+    public static void deleteBy(String userID)
+    {
+        List<RecommendBenefitList> list = new Select().from(RecommendBenefitList.class).where("userID = ?", userID).execute();
+        if(list.size()>0)
+        {
+            for (RecommendBenefitList t:list)
+            {
+                t.delete();
+            }
+        }
+    }
+    
+    public static List<RecommendBenefitList> queryBy(String userID)
+    {
+        List<RecommendBenefitList> list = new Select().from(RecommendBenefitList.class).where("userID=?", userID).execute();
+        return list;
+    }
+    
+    
+
+  
+}

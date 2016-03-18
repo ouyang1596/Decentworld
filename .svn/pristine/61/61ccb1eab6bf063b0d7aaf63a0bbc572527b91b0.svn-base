@@ -1,0 +1,485 @@
+package cn.sx.decentworld.fragment.main;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentManager;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.ChatActivity;
+import cn.sx.decentworld.activity.ChatActivity_;
+import cn.sx.decentworld.activity.NearCardDetailForMessageActivity_;
+import cn.sx.decentworld.activity.NewFriendsActivity_;
+import cn.sx.decentworld.activity.RecommendActivity_;
+import cn.sx.decentworld.activity.SearchActivity_;
+import cn.sx.decentworld.activity.ShareActivity_;
+import cn.sx.decentworld.adapter.FragmentContactAdapter;
+import cn.sx.decentworld.adapter.FragmentContactAdapter.OnContactClickListener;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.ConversationList;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.NewFriend;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.common.CharacterParser;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.PinyinComparatorForContact;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.CommomPromptDialogFragment;
+import cn.sx.decentworld.dialog.CommomPromptDialogFragment.OnCommomPromptListener;
+import cn.sx.decentworld.dialog.EditAndModificationDialog;
+import cn.sx.decentworld.dialog.EditAndModificationDialog.EditAndModificationListener;
+import cn.sx.decentworld.dialog.ReminderDialog;
+import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.network.request.SetFriendInfo;
+import cn.sx.decentworld.utils.FileUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+import cn.sx.decentworld.widget.ContactScrollView;
+import cn.sx.decentworld.widget.ListViewForScrollView;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: ContactFragment.java
+ * @Description: 联系人界面
+ * @author: cj
+ * @date: 2016年1月11日 上午11:16:28
+ */
+@EFragment(R.layout.fragment_main_contact)
+public class ContactFragment extends BaseFragment implements OnClickListener, OnContactClickListener, OnCommomPromptListener {
+	private static final String TAG = "ContactFragment";
+	/**
+	 * 工具类
+	 */
+	@Bean
+	ToastComponent toast;
+	@Bean
+	SetFriendInfo setFriendInfo;
+	@ViewById(R.id.ll_contact)
+	LinearLayout llContact;
+	@ViewById(R.id.sclView)
+	ContactScrollView sclView;
+
+	/**
+	 * 界面资源
+	 */
+	/** 推荐 **/
+	@ViewById(R.id.iv_recommend)
+	ImageView ivRecommend;
+	/** 邀请 **/
+	@ViewById(R.id.iv_invite)
+	ImageView ivInvite;
+	@ViewById(R.id.tv_add_new_friends)
+	TextView tvAddNewFriends;
+	/** 新的朋友 **/
+	@ViewById(R.id.ll_new_friend)
+	LinearLayout llNewFriend;
+
+	@ViewById(R.id.fragment_chat_contact_lv)
+	ListViewForScrollView fragment_chat_contact_lv;
+	/** 未读消息数 **/
+	@ViewById(R.id.new_friends_ll_unread_msg_number)
+	TextView new_friends_ll_unread_msg_number;
+
+	@ViewById(R.id.iv_search)
+	ImageView ivSearch;
+	@ViewById(R.id.ll_contact_list)
+	LinearLayout llContactList;
+	private CommomPromptDialogFragment mCommomDialogFragment;
+
+	/**
+	 * 变量
+	 */
+	private Context context;
+	private String dwID;
+	private FragmentManager fragmentManager;
+	private List<ContactUser> mDatas;
+	private FragmentContactAdapter contactAdapter;
+
+	/**
+	 * 当上下文菜单被点击时触发事件 return true 代表截断 return false 代表继续分发 1.修改备注 2.删除好友
+	 */
+	private String friendID;
+	private String remark;
+	private EditAndModificationDialog editAndModificationDialog;
+	private ReminderDialog reminderDialog;
+
+	/**
+	 * 入口
+	 */
+	@AfterViews
+	void init() {
+		LogUtils.i(TAG, "init");
+		getViewWidthAndHeight();
+		EventBus.getDefault().register(this);
+		ivSearch.setVisibility(View.VISIBLE);
+		ivSearch.setOnClickListener(this);
+		tvAddNewFriends.setOnClickListener(this);
+		dwID = DecentWorldApp.getInstance().getDwID();
+		fragmentManager = getActivity().getSupportFragmentManager();
+		mDatas = new ArrayList<ContactUser>();
+		contactAdapter = new FragmentContactAdapter(getActivity(), mDatas);
+		fragment_chat_contact_lv.setAdapter(contactAdapter);
+		contactAdapter.setOnContactClickListener(this);
+		initListener();
+		isPrepared = true;
+		lazyLoad();
+	}
+
+	public void getViewWidthAndHeight() {
+		ViewTreeObserver observer = llContact.getViewTreeObserver();
+		observer.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+			public boolean onPreDraw() {
+				if (llContact.getHeight() != 0) {
+					LogUtils.i("bm", "llCeshiWidth--" + llContact.getWidth() + "--llCeshiHeight--" + llContact.getHeight());
+					llContactList.setPadding(0, llContact.getHeight(), 0, 0);
+					llContact.getViewTreeObserver().removeOnPreDrawListener(this);
+					sclView.setHeight(llContact.getHeight());
+				}
+				return true;
+			}
+		});
+	}
+
+	public void setScrollY() {
+		sclView.smoothScrollTo(0, 0);
+	}
+
+	private void initListener() {
+		ivRecommend.setOnClickListener(this);
+		ivInvite.setOnClickListener(this);
+		llNewFriend.setOnClickListener(this);
+	}
+
+	/**
+	 * 加载数据
+	 */
+	@Override
+	protected void lazyLoad() {
+		LogUtils.i(TAG, "lazyLoad");
+		if (isPrepared) {
+			if (NetworkUtils.isNetWorkConnected(getActivity())) {
+				/** 有网络，从网络拿取数据，并解析和显示 **/
+				refreshContact();
+			} else {
+				/** 没有网络，从本地拿取数据 **/
+			}
+		}
+	}
+
+	/**
+	 * 跳转到指定的页面
+	 */
+	@Override
+	public void turnToTab(int tab) {
+
+	}
+
+	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		LogUtils.i(TAG, "onAttach");
+		this.context = activity;
+	}
+
+	/**
+	 * 将汉字转成拼音并获取首个字母的大写
+	 */
+	public void setNameLetters(List<ContactUser> contactUsers) {
+		/** 汉字转换成拼音的类 **/
+		CharacterParser mCharacterParser = CharacterParser.getInstance();
+		if (contactUsers == null) {
+			return;
+		}
+		for (int i = 0; i < contactUsers.size(); i++) {
+			ContactUser conversationData = contactUsers.get(i);
+			// 汉字转换成拼音
+			String pinyin = mCharacterParser.getSelling(conversationData.getShowName());
+			// String pinyin = mCharacterParser.getSelling("厦门");
+			String firstLetter = pinyin.substring(0, 1).toUpperCase();
+
+			// 正则表达式，判断首字母是否是英文字母
+			if (firstLetter.matches("[A-Z]")) {
+				conversationData.setNameLetter(firstLetter);
+			} else {
+				conversationData.setNameLetter("#");
+			}
+		}
+	}
+
+	/**
+	 * 按拼音进行排序
+	 * */
+	private void sort() {
+		PinyinComparatorForContact mPinyinComparatorForContact = new PinyinComparatorForContact();
+		setNameLetters(mDatas);
+		// 根据a-z进行排序
+		Collections.sort(mDatas, mPinyinComparatorForContact);
+	}
+
+	/**
+	 * 有参 dwID 刷新联系人列表
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_REFRESH_CONTACT)
+	public void refreshContact(String dwID) {
+		LogUtils.i(TAG, "收到一条通知【更新联系人列表】：" + dwID);
+		refreshContact();
+	}
+
+	/**
+	 * 刷新联系人列表，从数据库中获取数据，并显示；
+	 */
+	public void refreshContact() {
+		mDatas.clear();
+		List<ContactUser> temp = ContactUser.queryAll();
+		if (temp.size() > 0) {
+			mDatas.addAll(temp);
+			if (contactAdapter != null) {
+				sort();
+			}
+		}
+		if (mDatas.size() <= 0) {
+			tvAddNewFriends.setVisibility(View.VISIBLE);
+		} else {
+			tvAddNewFriends.setVisibility(View.GONE);
+		}
+		if (contactAdapter != null)
+			contactAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public void onClick(View v) {
+		int position;
+		Intent intent;
+		switch (v.getId()) {
+		case R.id.iv_search:
+			startActivity(new Intent(getActivity(), SearchActivity_.class));
+			break;
+		case R.id.iv_recommend:
+			startActivity(new Intent(getActivity(), RecommendActivity_.class));
+			break;
+		case R.id.iv_invite:
+			invite();
+			break;
+		case R.id.ll_new_friend:
+			startActivity(new Intent(context, NewFriendsActivity_.class));
+			break;
+		case R.id.fragment_chat_contact_lv_item_icon:
+			position = (Integer) v.getTag(Constants.ITEM_POSITION);
+			intent = new Intent(getActivity(), NearCardDetailForMessageActivity_.class);
+			intent.putExtra(Constants.DW_ID, mDatas.get(position).getFriendID());
+			intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
+			intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+			startActivity(intent);
+			break;
+		case R.id.fragment_chat_contact_lv_item_name:
+			if (FileUtils.getPromptStatus(getActivity(), Constants.FRIEND) == CommomPromptDialogFragment.FRIEND) {
+				position = (Integer) v.getTag(Constants.ITEM_POSITION);
+				intent = new Intent(getActivity(), ChatActivity_.class);
+				intent.putExtra(ChatActivity.OTHER_ID, mDatas.get(position).getFriendID());
+				intent.putExtra(ChatActivity.OTHER_NICKNAME, mDatas.get(position).getShowName());
+				intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
+				intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+				intent.putExtra(ChatActivity.OTHER_WORTH, mDatas.get(position).getWorth());
+				startActivity(intent);
+				return;
+			}
+			mCommomDialogFragment = new CommomPromptDialogFragment();
+			mCommomDialogFragment.setTips("你与他是朋友关系，他与你每说一句话，将按照他的身价向你付费。同理，注意你的身价哦!");
+			mCommomDialogFragment.setEnter(CommomPromptDialogFragment.FRIEND);
+			mCommomDialogFragment.setObject((Integer) v.getTag(Constants.ITEM_POSITION));
+			mCommomDialogFragment.setOnCommomPromptListener(ContactFragment.this);
+			mCommomDialogFragment.show(ContactFragment.this.getActivity().getSupportFragmentManager(), "mCommomDialogFragment");
+			break;
+		case R.id.tv_add_new_friends:
+			startActivity(new Intent(getActivity(), SearchActivity_.class));
+			break;
+		}
+	}
+
+	/**
+	 * 邀请
+	 */
+	private void invite() {
+		Intent intent = new Intent(getActivity(), ShareActivity_.class);
+		startActivity(intent);
+	}
+
+	/**
+	 * 由ProcessFriendMessageThread路由过来的【申请加为好友】的通知 刷新新的朋友Item上的小红点数
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_SHOW_FRIENDS_ADDED)
+	public void refreshUnreadContactMsg(String name) {
+		LogUtils.i(TAG, "接到通知【申请加为好友】");
+		int newfriend_count = NewFriend.selectAllIsNotShown();
+		if (newfriend_count > 0) {
+			// 新的朋友的小红点
+			new_friends_ll_unread_msg_number.setVisibility(View.VISIBLE);
+			new_friends_ll_unread_msg_number.setText(String.valueOf(newfriend_count));
+		} else {
+			LogUtils.i(TAG, "refreshNewFriendList---NotShown---count=0");
+			new_friends_ll_unread_msg_number.setVisibility(View.INVISIBLE);
+		}
+		/** Tab处小红点 **/
+		EventBus.getDefault().post(newfriend_count, NotifyByEventBus.NT_UNREAD_CONTACT_COUNT);
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		LogUtils.i(TAG, "onDestroy");
+		EventBus.getDefault().unregister(this);
+	}
+
+	@Override
+	public boolean onContextItemSelected(final MenuItem item) {
+		// 如果Fragment可见，则截取事件，否则继续分发
+		final int SET_REMARK = 1;
+		final int DELETE_CONTACT = 2;
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case SET_REMARK:
+					afterSetRemark(friendID, remark);
+					break;
+				case DELETE_CONTACT:
+					afterDeleteContact(friendID);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+		if (getUserVisibleHint()) {
+			if (item.getItemId() == 1) {
+				LogUtils.i(TAG, "ChatFragment可见,点击了菜单 修改备注");
+				editAndModificationDialog = new EditAndModificationDialog();
+				editAndModificationDialog.setTitle("修改备注");
+				editAndModificationDialog.setListener(new EditAndModificationListener() {
+					@Override
+					public void confirm(String info) {
+						friendID = mDatas.get(item.getIntent().getIntExtra("position", -1)).getFriendID();
+						remark = info;
+						setFriendInfo.setRemark(dwID, friendID, info, handler, SET_REMARK);
+					}
+				});
+				editAndModificationDialog.show(fragmentManager, "setremark");
+			} else if (item.getItemId() == 2) {
+				LogUtils.i(TAG, "ChatFragment可见,点击了菜单 删除好友");
+				reminderDialog = new ReminderDialog();
+				reminderDialog.setInfo("删除好友");
+				reminderDialog.setListener(new ReminderListener() {
+					@Override
+					public void confirm() {
+						try {
+							LogUtils.i(TAG, "删除联系1");
+							int num = item.getIntent().getIntExtra("position", -1);
+							LogUtils.i(TAG, "删除联系2,num=" + num);
+							friendID = mDatas.get(num).getFriendID();
+							LogUtils.i(TAG, "删除联系3");
+							setFriendInfo.deleteContact(dwID, friendID, handler, DELETE_CONTACT);
+							LogUtils.i(TAG, "删除联系4");
+						} catch (Exception e) {
+							e.printStackTrace();
+							LogUtils.i(TAG, "删除联系人失败,cause by:" + e);
+						}
+					}
+				});
+				reminderDialog.show(fragmentManager, "deleteFriend");
+			}
+			return super.onContextItemSelected(item);
+		}
+		LogUtils.i(TAG, "ChatFragment不可见");
+		return false;
+	}
+
+	/**
+	 * 设置备注后的处理
+	 */
+	private void afterSetRemark(String friendID, String remark) {
+		LogUtils.i(TAG, "设置备注成功，修改为:" + remark);
+		/** 修改会话列表 **/
+		ConversationList temp = ConversationList.queryByDwID(friendID, DWMessage.CHAT_TYPE_SINGLE,
+				DWMessage.CHAT_RELATIONSHIP_FRIEND);
+		if (temp != null) {
+			temp.setTitle(remark);
+			temp.save();
+			EventBus.getDefault().post("修改完昵称", NotifyByEventBus.NT_INIT_FRIEND_CONVERSATION);
+		}
+		/** 修改指定ID好友数据库 ，并刷新列表 **/
+		ContactUser contactUser = ContactUser.queryByDwID(friendID);
+		if (contactUser != null) {
+			contactUser.setShowName(remark);
+			contactUser.save();
+			refreshContact();
+		}
+		toast.show("设置备注成功");
+	}
+
+	/**
+	 * 删除联系人后的处理
+	 */
+	private void afterDeleteContact(String friendID) {
+		List<ConversationList> conversationList = ConversationList.queryByDwID(friendID, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+		/** 将好友的会话列表移到陌生人处 **/
+		if (conversationList.size() > 0) {
+			for (ConversationList t : conversationList) {
+				t.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+				// t.setTitle("");//设置为昵称
+				t.save();
+			}
+			EventBus.getDefault().post("【删除好友，通知主页面更新会话列表】", NotifyByEventBus.NT_INIT_FRIEND_CONVERSATION);
+			EventBus.getDefault().post("【删除好友，通知陌生人页面更新会话列表】", NotifyByEventBus.NT_INIT_STRANGER_CONVERSATION);
+		}
+		/** 将指定ID好友从数据库中删除，并刷新列表 **/
+		ContactUser user = ContactUser.queryByDwID(friendID);
+		if (user != null) {
+			user.delete();
+			refreshContact(user.getFriendID());
+		}
+		/** 删除该好友的本地聊天记录 **/
+		DWMessage.deleteByDwID(friendID);
+		LogUtils.i(TAG, "删除好友成功");
+		toast.show("删除好友成功");
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (contactAdapter != null) {
+			refreshContact();
+		}
+	}
+
+	@Override
+	public void onCommomPromtClick(View view) {
+		int position = (Integer) mCommomDialogFragment.getObject();
+		Intent intent = new Intent(getActivity(), ChatActivity_.class);
+		intent.putExtra(ChatActivity.OTHER_ID, mDatas.get(position).getFriendID());
+		intent.putExtra(ChatActivity.OTHER_NICKNAME, mDatas.get(position).getShowName());
+		intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
+		intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+		intent.putExtra(ChatActivity.OTHER_WORTH, mDatas.get(position).getWorth());
+		startActivity(intent);
+	}
+}

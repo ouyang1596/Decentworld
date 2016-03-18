@@ -1,0 +1,62 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+
+/**
+ * @ClassName: DoubtVerifyFragment.java
+ * @author: yj
+ * @date: 2016年1月12日 下午3:25:20
+ */
+public class DoubtFirstStepFragment extends Fragment implements OnClickListener {
+	private TextView tvCheck;
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_doubt_first_step, null);
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		initView();
+	}
+
+	private void initView() {
+		tvCheck = (TextView) getActivity().findViewById(R.id.tv_check);
+		tvCheck.setOnClickListener(this);
+	}
+
+	public interface OnDoubtFirstClickListener {
+		void OnDoubtFirstClick(View view);
+	}
+
+	private OnDoubtFirstClickListener mOnDoubtFirstClickListener;
+
+	public void setOnDoubtFirstClickListener(
+			OnDoubtFirstClickListener onDoubtFirstClickListener) {
+		mOnDoubtFirstClickListener = onDoubtFirstClickListener;
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.tv_check:
+			if (mOnDoubtFirstClickListener != null) {
+				mOnDoubtFirstClickListener.OnDoubtFirstClick(v);
+			}
+			break;
+		}
+	}
+
+}

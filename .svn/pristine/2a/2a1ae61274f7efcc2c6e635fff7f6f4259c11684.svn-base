@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <RelativeLayout
+            android:id="@+id/root_activitiy_chat_room_build"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="聊天室背景图片" />
+
+            <ImageView
+                android:id="@+id/iv_chat_room_build_background"
+                android:layout_width="680px"
+                android:layout_height="392px"
+                android:layout_alignParentTop="true"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="20px"
+                android:src="@drawable/chat_room_topic_icon" />
+
+            <LinearLayout
+                android:id="@+id/add_topic_ll_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/iv_chat_room_build_background"
+                android:layout_alignRight="@id/iv_chat_room_build_background"
+                android:layout_below="@id/iv_chat_room_build_background"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/add_topic_title1"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_weight="0.1154"
+                    android:text="@string/title"
+                    android:textSize="36px" />
+
+                <TextView
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.077" />
+
+                <EditText
+                    android:id="@+id/et_chat_room_build_name"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_weight="0.838"
+                    android:hint="聊天室的名字" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/add_topic_diver1"
+                android:layout_width="match_parent"
+                android:layout_height="2px"
+                android:layout_below="@id/add_topic_ll_1"
+                android:layout_marginTop="36px"
+                android:background="#E6E6E6" />
+
+            <LinearLayout
+                android:id="@+id/add_topic_ll_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/iv_chat_room_build_background"
+                android:layout_alignRight="@id/iv_chat_room_build_background"
+                android:layout_below="@id/add_topic_diver1"
+                android:layout_marginTop="25px"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/add_topic_content1"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_weight="0.1154"
+                    android:text="@string/description"
+                    android:textSize="36px" />
+
+                <TextView
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.077" />
+
+                <TextView
+                    android:id="@+id/add_topic_content2"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_weight="0.838"
+                    android:text="@string/click_to_modify"
+                    android:textSize="30px" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/add_topic_diver2"
+                android:layout_width="match_parent"
+                android:layout_height="2px"
+                android:layout_below="@id/add_topic_ll_2"
+                android:layout_marginTop="36px"
+                android:background="#E6E6E6" />
+
+            <LinearLayout
+                android:id="@+id/add_topic_ll_3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/iv_chat_room_build_background"
+                android:layout_alignRight="@id/iv_chat_room_build_background"
+                android:layout_below="@id/add_topic_diver2"
+                android:layout_marginTop="25px"
+                android:orientation="horizontal" >
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/add_topic_rl_4"
+                android:layout_width="match_parent"
+                android:layout_height="98px"
+                android:layout_below="@id/add_topic_ll_3"
+                android:layout_marginTop="36px"
+                android:background="#E6E6E6" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="@string/introduce_myself"
+                    android:textSize="36px" />
+            </RelativeLayout>
+
+            <ImageView
+                android:id="@+id/iv_chat_room_build_modif_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@id/iv_chat_room_build_background"
+                android:layout_below="@id/add_topic_rl_4"
+                android:layout_marginTop="8px"
+                android:src="@drawable/add_topic_modify" />
+
+            <ImageView
+                android:id="@+id/iv_chat_room_build_icon"
+                android:layout_width="120px"
+                android:layout_height="120px"
+                android:layout_below="@id/add_topic_rl_4"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="40px"
+                android:src="@drawable/ic_launcher" />
+
+            <TextView
+                android:id="@+id/add_topic_my_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/iv_chat_room_build_icon"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="26px"
+                android:text="@string/my_icon"
+                android:textSize="36px" />
+
+            <ImageView
+                android:id="@+id/add_topic_diver3"
+                android:layout_width="match_parent"
+                android:layout_height="2px"
+                android:layout_below="@id/add_topic_my_icon"
+                android:layout_marginTop="36px"
+                android:background="#E6E6E6" />
+
+            <RelativeLayout
+                android:id="@+id/add_topic_ll_5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/iv_chat_room_build_background"
+                android:layout_alignRight="@id/iv_chat_room_build_background"
+                android:layout_below="@id/add_topic_diver3"
+                android:layout_marginTop="25px"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/add_topic_doorsill1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="@string/my_name"
+                    android:textSize="36px" />
+
+                <ImageView
+                    android:id="@+id/iv_chat_room_build_modif_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/add_topic_modify" />
+            </RelativeLayout>
+
+            <LinearLayout
+                android:id="@+id/add_topic_rl_6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/iv_chat_room_build_background"
+                android:layout_alignRight="@id/iv_chat_room_build_background"
+                android:layout_below="@id/add_topic_ll_5"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.2129" />
+
+                <TextView
+                    android:id="@+id/tv_chat_room_build_hostname"
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.787"
+                    android:text="姓名"
+                    android:textSize="30px" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/chat_room_build_host_introduce"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/add_topic_rl_6"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="主持人简介：" />
+
+                <EditText
+                    android:id="@+id/et_chat_room_build_owner_introduction"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/add_topic_diver4"
+                android:layout_width="match_parent"
+                android:layout_height="2px"
+                android:layout_below="@id/chat_room_build_host_introduce"
+                android:layout_marginTop="25px"
+                android:background="#E6E6E6" />
+
+            <LinearLayout
+                android:id="@+id/ll_chat_room_build_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/add_topic_diver4"
+                android:layout_centerVertical="true"
+                android:layout_marginTop="34px"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center" >
+
+                    <Button
+                        android:id="@+id/btn_chat_room_build_save"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_sure"
+                        android:text="暂存" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0px"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center" >
+
+                    <Button
+                        android:id="@+id/add_topic_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_sure"
+                        android:text="@string/sure" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/add_topic_diver5"
+                android:layout_width="match_parent"
+                android:layout_height="2px"
+                android:layout_below="@id/ll_chat_room_build_1"
+                android:layout_marginTop="40px"
+                android:background="#E6E6E6" />
+        </RelativeLayout>
+    </ScrollView>
+
+</LinearLayout>

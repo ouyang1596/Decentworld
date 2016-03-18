@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item 
+        android:id="@+id/delete_conversation"
+        android:title="@string/fragment_delete_dialog"
+        />
+	<item 
+	    android:id="@+id/delete_message"
+	    android:title="@string/fragment_delete_dia_and_mess"
+	    />
+</menu>

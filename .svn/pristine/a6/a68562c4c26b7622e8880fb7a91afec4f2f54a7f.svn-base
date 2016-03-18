@@ -1,0 +1,213 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+
+/**
+ * @ClassName: SearchResult.java
+ * @Description: 搜索结果
+ * @author: cj
+ * @date: 2015年12月10日 上午9:58:37
+ */
+@Table(name = "searchResult")
+public class SearchResult extends Model {
+	private static final String TAG = "SearchResult";
+
+	/** 存疑用户 **/
+	private static final int USER_TYPE_IMPEACH = 0;
+	/** 普通用户 **/
+	private static final int USER_TYPE_NORMAL = 1;
+	/** 大腕用户 **/
+	private static final int USER_TYPE_VIP = 2;
+
+	/**
+	 * 搜索类型
+	 */
+	public final static int SEARCH_TYPE_PHONE = 0;// 电话号码
+	public final static int SEARCH_TYPE_DWID = 1;// dwID
+	public final static int SEARCH_TYPE_NICKNAME = 2;// 昵称
+	public final static int SEARCH_TYPE_REALNAME = 3;// 实名
+
+	/** 用户ID **/
+	@Column(name = "userID")
+	public int userID;
+
+	/** 对方dwID **/
+	@Column(name = "dwID")
+	public String dwID;
+
+	/** 对方名字 **/
+	@Column(name = "name")
+	public String name;
+
+	/** 对方身价 **/
+	@Column(name = "worth")
+	public String worth;
+
+	/** 对方职业 **/
+	@Column(name = "occupation")
+	public String occupation;
+
+	/** 用户类型: 疑、真、腕 */
+	@Column(name = "userType")
+	public int userType;
+
+	/** 陌生人搜索类型 **/
+	@Column(name = "searchType")
+	public int searchType;// 表示搜索类型而得来的结果
+
+	/** 性别 **/
+	@Column(name = "gender")
+	private String gender;
+
+	/** 保留字段，用于扩展 */
+	@Column(name = "remain")
+	private String remain;
+
+	/**
+	 * 构造函数
+	 */
+	public SearchResult() {
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * @return the userID
+	 */
+	public int getUserID() {
+		return userID;
+	}
+
+	/**
+	 * @param userID
+	 *            the userID to set
+	 */
+	public void setUserID(int userID) {
+		this.userID = userID;
+	}
+
+	/**
+	 * @return the dwID
+	 */
+	public String getDwID() {
+		return dwID;
+	}
+
+	/**
+	 * @param dwID
+	 *            the dwID to set
+	 */
+	public void setDwID(String dwID) {
+		this.dwID = dwID;
+	}
+
+	/**
+	 * @return the name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
+	 * @param name
+	 *            the name to set
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * @return the worth
+	 */
+	public String getWorth() {
+		return worth;
+	}
+
+	/**
+	 * @param worth
+	 *            the worth to set
+	 */
+	public void setWorth(String worth) {
+		this.worth = worth;
+	}
+
+	/**
+	 * @return the occupation
+	 */
+	public String getOccupation() {
+		return occupation;
+	}
+
+	/**
+	 * @param occupation
+	 *            the occupation to set
+	 */
+	public void setOccupation(String occupation) {
+		this.occupation = occupation;
+	}
+
+	/**
+	 * @return the userType
+	 */
+	public int getUserType() {
+		return userType;
+	}
+
+	/**
+	 * @param userType
+	 *            the userType to set
+	 */
+	public void setUserType(int userType) {
+		this.userType = userType;
+	}
+
+	/**
+	 * @return the searchType
+	 */
+	public int getSearchType() {
+		return searchType;
+	}
+
+	/**
+	 * @param searchType
+	 *            the searchType to set
+	 */
+	public void setSearchType(int searchType) {
+		this.searchType = searchType;
+	}
+
+	/**
+	 * @return the gender
+	 */
+	public String getGender() {
+		return gender;
+	}
+
+	/**
+	 * @param gender
+	 *            the gender to set
+	 */
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	/**
+	 * @return the remain
+	 */
+	public String getRemain() {
+		return remain;
+	}
+
+	/**
+	 * @param remain
+	 *            the remain to set
+	 */
+	public void setRemain(String remain) {
+		this.remain = remain;
+	}
+
+}

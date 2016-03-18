@@ -16,6 +16,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
@@ -38,8 +39,9 @@ public final class BindAccountAlipayActivity_
     }
 
     private void afterSetContentView_() {
-        et_bind_account_alipay = ((EditText) findViewById(id.et_bind_account_alipay));
+        tvInfo = ((TextView) findViewById(id.tv_bind_account_info));
         ll_band_alipay_back = ((LinearLayout) findViewById(id.ll_band_alipay_back));
+        et_bind_account_alipay = ((EditText) findViewById(id.et_bind_account_alipay));
         btn_bind_account_confirm = ((Button) findViewById(id.btn_bind_account_confirm));
         {
             View view = findViewById(id.btn_bind_account_confirm);

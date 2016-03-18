@@ -1,0 +1,62 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.main;
+
+import android.widget.TextView;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.utils.LogUtils;
+
+/**
+ * @ClassName: FindFragment.java
+ * @Description: 
+ * @author: cj
+ * @date: 2016年1月11日 上午11:17:09
+ */
+@EFragment(R.layout.fragment_main_find)
+public class FindFragment extends BaseFragment
+{
+    private static final String TAG = "FindFragment";
+    /**
+     * 工具类
+     */
+    
+    /**
+     * 界面资源
+     */
+    @ViewById(R.id.tv_header_title)
+    TextView tvTitle;
+    
+    /**
+     * 变量
+     */
+
+
+    @AfterViews
+    void init()
+    {
+        LogUtils.i(TAG, "init");
+        tvTitle.setText(getResources().getString(R.string.main_bottom_find));
+    }
+    
+    @Override
+    protected void lazyLoad()
+    {
+        LogUtils.i(TAG, "lazyLoad");
+
+    }
+    
+    @Override
+    public void turnToTab(int tab)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+}

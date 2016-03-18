@@ -1,0 +1,107 @@
+/**
+ * 
+ */
+package cn.sx.decentworld;
+
+import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
+
+import cn.sx.decentworld.utils.LogUtils;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+
+/**
+ * @ClassName: SendPic.java
+ * @Description: 发送图片
+ * 1.发送单张
+ * 2.发送多张
+ * 
+ * @author: cj
+ * @date: 2015年11月19日 下午4:39:40
+ */
+public class SendPic
+{
+	public static final String TAG = "SendPic";
+	private Context context;
+	private static SendPic sendPic;
+	ExecutorService executorService ;//= Executors.newCachedThreadPool();
+	Semaphore semaphore;// = new Semaphore(1);
+	
+	/**
+	 *  
+	 */
+	private SendPic()
+	{
+		
+	}
+	
+	private SendPic(Context context)
+	{
+		this.context = context;
+	}
+	
+	/**
+	 * 获取实例
+	 * @param context
+	 * @return
+	 */
+	public static SendPic getInstance(Context context)
+	{
+		if(sendPic==null)
+		{
+			sendPic = new SendPic(context);
+		}
+		return sendPic;
+	}
+	
+	
+	/**
+	 * 发送多张图片
+	 */
+	public void sendMultiPic(File[] files)
+	{
+//		executorService = Executors.newCachedThreadPool();
+//		semaphore = new Semaphore(1);
+//		LogUtils.i(TAG, "sendMultiPic...begin");
+//		for(int i=0;i<10;i++)
+//		{
+//			final Handler handler = new Handler()
+//			{
+//				@Override
+//				public void handleMessage(Message msg)
+//				{
+//					//释放许可
+//					semaphore.release();
+//				}
+//			};
+//			final int index = i;
+//			Runnable run = new Runnable()
+//			{
+//				@Override
+//				public void run()
+//				{
+//					try
+//					{
+//						//获取许可
+//						semaphore.acquire();
+//						LogUtils.i(TAG, "index="+index);
+//						//调用接口，直到onsuccess返回2222，发送一个handler
+//						handler.sendMessageDelayed(Message.obtain(), 5000);
+//					}
+//					catch (InterruptedException e)
+//					{
+//						e.printStackTrace();
+//					}
+//				}
+//			};
+//			executorService.execute(run);
+//		}
+//		//退出线程池
+//		executorService.shutdown();
+//		LogUtils.i(TAG, "sendMultiPic...end");
+	}
+
+}

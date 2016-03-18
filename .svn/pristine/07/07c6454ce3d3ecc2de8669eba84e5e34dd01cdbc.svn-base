@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_main_layout_chat"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <include layout="@layout/top_title" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/main_bottom_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:orientation="horizontal" >
+
+            <include layout="@layout/main_bottom" />
+        </LinearLayout>
+
+        <cn.sx.decentworld.widget.ScrollLayout
+            android:id="@+id/chat_scrollLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/main_bottom_ll"
+            android:layout_marginBottom="2dp" >
+
+            <!-- 主界面聊天 -->
+
+            <include layout="@layout/fragment_chat_chat" />
+            <!-- 主界面通讯录 -->
+
+            <include layout="@layout/fragment_chat_contact" />
+            <!-- 主界面发现 -->
+
+            <include layout="@layout/fragment_chat_find" />
+            <!-- 主界面设置 -->
+
+            <include layout="@layout/fragment_chat_me" />
+        </cn.sx.decentworld.widget.ScrollLayout>
+    </RelativeLayout>
+
+</LinearLayout>

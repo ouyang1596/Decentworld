@@ -1,0 +1,304 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+import java.util.List;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+import com.alibaba.fastjson.annotation.JSONField;
+
+/**
+ * @ClassName: ContactUsers.java
+ * @Description: 本地数据库存放用户好友的表
+ * @author: dyq
+ * @date: 2015年9月8日 下午4:57:52
+ */
+@Table(name = "contactUser")
+public class ContactUser extends Model
+{
+	private static final String TAG = "ContactUser";
+
+	private String sortLetters;
+
+	/** 存放用户的朋友对应的dw服务器的id */
+	@Column(name = "dwID")
+	private String dwID;
+
+	/** 存放用户的朋友的头像 */
+	@Column(name = "icon")
+	private String icon;
+
+	/** 存放用户的朋友的用户名 */
+	@Column(name = "nickName")
+	private String nickName;
+
+	/** 存放用户的朋友的备注 */
+	@Column(name = "remark")
+	private String remark;
+
+	/** 存放用户的朋友的实名 */
+	@Column(name = "realName")
+	private String realName;
+	
+	/** 存放用户的朋友的身价 */
+	@Column(name = "worth")
+	private String worth;
+	
+	/**
+	 *用户dwID
+	 */
+	@JSONField(serialize=false)
+	@Column(name = "userID")
+	private String userID;
+
+	/**
+	 * @return the dwID
+	 */
+	public String getDwID()
+	{
+		return dwID;
+	}
+
+	/**
+	 * @return the sortLetters
+	 */
+	public String getSortLetters()
+	{
+		return sortLetters;
+	}
+
+	/**
+	 * @param sortLetters
+	 *            the sortLetters to set
+	 */
+	public void setSortLetters(String sortLetters)
+	{
+		this.sortLetters = sortLetters;
+	}
+
+	/**
+	 * @param dwID
+	 *            the dwID to set
+	 */
+	public void setDwID(String dwID)
+	{
+		this.dwID = dwID;
+	}
+
+	/**
+	 * @return the icon
+	 */
+	public String getIcon()
+	{
+		return icon;
+	}
+
+	/**
+	 * @param icon
+	 *            the icon to set
+	 */
+	public void setIcon(String icon)
+	{
+		this.icon = icon;
+	}
+
+	/**
+	 * @return the nickName
+	 */
+	public String getNickName()
+	{
+		return nickName;
+	}
+
+	/**
+	 * @param nickName
+	 *            the nickName to set
+	 */
+	public void setNickName(String nickName)
+	{
+		this.nickName = nickName;
+	}
+
+	/**
+	 * @return the remark
+	 */
+	public String getRemark()
+	{
+		return remark;
+	}
+
+	/**
+	 * @param remark
+	 *            the remark to set
+	 */
+	public void setRemark(String remark)
+	{
+		this.remark = remark;
+	}
+
+	/**
+	 * @return the realName
+	 */
+	public String getRealName()
+	{
+		return realName;
+	}
+
+	
+	
+	/**
+	 * @return the worth
+	 */
+	public String getWorth()
+	{
+		return worth;
+	}
+
+	/**
+	 * @param worth the worth to set
+	 */
+	public void setWorth(String worth)
+	{
+		this.worth = worth;
+	}
+
+	/**
+	 * @param realName
+	 *            the realName to set
+	 */
+	public void setRealName(String realName)
+	{
+		this.realName = realName;
+	}
+
+	/**
+	 * @return the userID
+	 */
+	public String getUserID()
+	{
+		return userID;
+	}
+
+	/**
+	 * @param userID the userID to set
+	 */
+	public void setUserID(String userID)
+	{
+		this.userID = userID;
+	}
+	
+	/**
+	 * 获取登录用户所有的联系人
+	 * @return
+	 */
+	public static List<ContactUser> queryAllList()
+	{
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		String sql = "userID=?";
+		return new Select().from(ContactUser.class).where(sql,dwID).execute();
+	}
+
+	/**
+	 * 删除登录用户的联系人列表
+	 */
+	public static void deleteAll()
+	{
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		String sql = "userID=?";
+		new Delete().from(ContactUser.class).where(sql,dwID).execute();
+	}
+
+	/**
+	 * @param friendID
+	 * @return
+	 */
+	public static ContactUser queryByDwID(String friendID)
+	{
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		String sql = "userID=? and dwID = ?";
+		return new Select().from(ContactUser.class).where(sql, dwID,friendID).executeSingle();
+	}
+	
+	public static void deleteContactsBydw_id(String friendID){
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		String sql = "userID=? and dwID = ?";
+		new Delete().from(ContactUser.class).where(sql,dwID,friendID).execute();
+	}
+
+	/**
+	 * 根据dwID找到对应的记录，再根据显示 备注、实名、昵称的优先级顺序得到要显示的名字
+	 * 
+	 * @param dwID
+	 * @return
+	 */
+	public static final String getDisplayNameByDwID(String friendID)
+	{
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		String sql = "userID=? and dwID = ?";
+		ContactUser contactUser = new Select().from(ContactUser.class).where(sql, dwID,friendID).executeSingle();
+		if (CommUtil.isNotBlank(contactUser.getRemark()))
+		{
+			return contactUser.getRemark();
+		}
+		else if (CommUtil.isNotBlank(contactUser.getRealName()))
+		{
+			return contactUser.getRealName();
+		}
+		else if (CommUtil.isNotBlank(contactUser.getNickName()))
+		{
+			return contactUser.getNickName();
+		}
+		LogUtils.i(TAG, dwID +"的备注、实名、昵称全部为空，why？");
+		return "";
+	}
+	
+	/**
+	 * 根据显示 备注、实名、昵称的优先级顺序得到要显示的名字
+	 * @param contactUser
+	 * @return
+	 */
+	public static final String getDisplayNameByBean(ContactUser contactUser)
+	{
+		if (CommUtil.isNotBlank(contactUser.getRemark()))
+		{
+			return contactUser.getRemark();
+		}
+		else if (CommUtil.isNotBlank(contactUser.getRealName()))
+		{
+			return contactUser.getRealName();
+		}
+		else if (CommUtil.isNotBlank(contactUser.getNickName()))
+		{
+			return contactUser.getNickName();
+		}
+		LogUtils.i(TAG, contactUser.getDwID() +"的备注、实名、昵称全部为空，why？");
+		return "";
+	}
+	
+	/**
+	 * 验证指定dwID的用户是否为好友
+	 * @param dwID
+	 * @return
+	 */
+	public static boolean isContact(String friendID)
+	{
+		String userID = DecentWorldApp.getInstance().getDwID();
+		String sql = "userID=? and dwID = ?";
+		ContactUser list = new Select().from(ContactUser.class).where(sql, userID,friendID).executeSingle();
+		if(list!=null)
+		{
+			return true;
+		}
+		return false;
+	}
+
+}

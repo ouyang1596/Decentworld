@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/user_detail_info_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <!-- 个性签名 -->
+
+    <LinearLayout
+        android:id="@+id/ll_user_detail_info_sign"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/user_detail_title_height"
+            android:background="#E0E2E9"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/user_detail_margin_left"
+            android:text="@string/user_detail_info_sign"
+            android:textColor="@color/user_detail_2"
+            android:textSize="@dimen/text_size_px_30"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:id="@+id/ll_user_detail_info_sign"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" >
+
+            <TextView
+                android:id="@+id/tv_user_detail_info_sign"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginBottom="@dimen/user_detail_margin_bottom"
+                android:layout_marginLeft="@dimen/user_detail_margin_left"
+                android:layout_marginRight="@dimen/user_detail_margin_right3"
+                android:layout_marginTop="@dimen/user_detail_margin_top"
+                android:textColor="@color/user_detail_3"
+                android:textSize="@dimen/text_size_px_30" />
+
+            <ImageView
+                android:id="@+id/iv_user_detail_info_more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/user_detail_margin_right2"
+                android:src="@drawable/more"
+                android:visibility="invisible" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!-- 基本信息 -->
+
+    <LinearLayout
+        android:id="@+id/ll_user_detail_info_base"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/four_black"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="16dp"
+            android:paddingTop="6dp" >
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/tag_base_info" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/user_detail_title_height"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:text="基本资料"
+                android:textColor="@color/two_black" />
+        </LinearLayout>
+
+        <cn.sx.decentworld.widget.ListViewForScrollView
+            android:id="@+id/lv_anonymous_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@null" >
+        </cn.sx.decentworld.widget.ListViewForScrollView>
+    </LinearLayout>
+
+</LinearLayout>

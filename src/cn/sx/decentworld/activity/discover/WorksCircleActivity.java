@@ -1,0 +1,175 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity.discover;
+
+import java.util.HashMap;
+import java.util.List;
+
+import android.view.View;
+import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.BaseFragmentActivity;
+import cn.sx.decentworld.adapter.WorkCircleAdapter;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.entity.db.MomentEntity;
+import cn.sx.decentworld.entity.db.WorkEntity;
+import cn.sx.decentworld.fragment.PublishFragment;
+import cn.sx.decentworld.fragment.PublishFragment.OnPublishChangeListener;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.nui.multiphotopicker.model.ImageItem;
+
+/**
+ * @ClassName: WorksCircleActivity.java
+ * @Description: 作品圈界面
+ * @author: yj
+ * @date: 2016年2月22日 下午3:42:08
+ */
+@EActivity(R.layout.activity_works_cicle)
+public class WorksCircleActivity extends BaseFragmentActivity implements OnPublishChangeListener, OnRefreshListener2
+{
+    @ViewById(R.id.plv_work_circle)
+    PullToRefreshListView plvWorkCircle;
+    private WorkCircleAdapter mWorkCircleAdapter;
+    private PublishFragment mPublishFragment;
+    private int height;
+    private SendUrl mSendurl;
+
+    @AfterViews
+    void inti()
+    {
+        measureHeight();
+        initView();
+        loadData();
+    }
+
+    /**
+     * 获取屏幕的宽高
+     */
+    private void measureHeight()
+    {
+        WindowManager wm = this.getWindowManager();
+        height = wm.getDefaultDisplay().getHeight();
+    }
+
+    private void initView()
+    {
+        mSendurl = new SendUrl(this);
+        mPublishFragment = new PublishFragment();
+        mPublishFragment.setOnPublishChangeListener(this);
+        plvWorkCircle.setMode(Mode.BOTH);
+        View view = View.inflate(mContext, R.layout.layout_work_circle_head, null);
+        plvWorkCircle.getRefreshableView().addHeaderView(view);
+        plvWorkCircle.setOnRefreshListener(this);
+        mWorkCircleAdapter = new WorkCircleAdapter(mContext);
+        plvWorkCircle.setAdapter(mWorkCircleAdapter);
+        getSupportFragmentManager().beginTransaction().add(R.id.fl_publish, mPublishFragment, "mpf").commit();
+    }
+
+    /**
+     * 加载数据
+     */
+    private void loadData()
+    {
+        if (NetworkUtils.isNetWorkConnected(this))
+        {
+            HashMap<String, String> map = new HashMap<String, String>();
+            map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+            mSendurl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_WORK_REFRESH, Method.POST, new HttpCallBack()
+            {
+
+                @Override
+                public void onSuccess(String resultJSON, ResultBean resultBean)
+                {
+                    LogUtils.i("bm", "resultBean--" + resultBean.toString());
+                }
+
+                @Override
+                public void onFailure(String e)
+                {
+                    showToast(Constants.NET_WRONG);
+                }
+
+            });
+        }
+        else
+        {
+            ToastUtil.showToast("网络连接断开");
+        }
+    }
+
+    private void showToast(final String msg)
+    {
+        runOnUiThread(new Runnable()
+        {
+
+            @Override
+            public void run()
+            {
+                ToastUtil.showToast(msg);
+            }
+        });
+    }
+
+    /**
+     * 获取屏幕高度
+     * */
+    public int getHeight()
+    {
+        return height;
+    }
+
+    @Override
+    public void onPublishChange(int choose)
+    {
+        String text = mPublishFragment.getText();
+        if (mPublishFragment.isVoice())
+        {
+            String voiceCoverPath = mPublishFragment.getVoiceCoverPath();
+            String voiceFilePath = mPublishFragment.getVoiceFilePath();
+        }
+        else
+        {
+            List<ImageItem> imageItems = mPublishFragment.getImageItems();
+        }
+    }
+
+    @Override
+    public void onHeightChnage(int height)
+    {
+        LogUtils.i("bm", "height--" + height);
+        LayoutParams layoutParams = plvWorkCircle.getLayoutParams();
+        layoutParams.height = this.height - height - 50;
+        plvWorkCircle.setLayoutParams(layoutParams);
+    }
+
+    @Override
+    public void onPullDownToRefresh(PullToRefreshBase refreshView)
+    {
+        plvWorkCircle.onRefreshComplete();
+    }
+
+    @Override
+    public void onPullUpToRefresh(PullToRefreshBase refreshView)
+    {
+        plvWorkCircle.onRefreshComplete();
+    }
+
+}

@@ -1,0 +1,171 @@
+/**
+ * Copyright (C) 2013-2014 EaseMob Technologies. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package cn.sx.decentworld.adapter;
+
+public class User {
+	
+	private int unreadMsgCount;
+	/** 存放联系人用户名的拼音首位大写（根据username生成）*/
+	private String sortLetters;
+	
+	/** 存放联系人对应的dw服务器的id */
+	private String dw_id;
+	
+	/** 存放联系人的头像	 */
+	private String avatar;
+	
+	/** 存放联系人的用户名 	 */
+	private String username;
+
+	public User() {
+	}
+
+	/**
+	 * @param username
+	 */
+	public User(String username) {
+		super();
+		this.username = username;
+	}
+
+	/**
+	 * @param dw_id
+	 * @param username
+	 */
+	public User(String dw_id, String username) {
+		super();
+		this.dw_id = dw_id;
+		this.username = username;
+	}
+
+	/**
+	 * @param dw_id
+	 * @param avatar
+	 * @param username
+	 */
+	public User(String dw_id, String avatar, String username) {
+		super();
+		this.dw_id = dw_id;
+		this.avatar = avatar;
+		this.username = username;
+	}
+
+	/**
+	 * @param unreadMsgCount
+	 * @param sortLetters
+	 * @param dw_id
+	 * @param avatar
+	 * @param username
+	 */
+	public User(int unreadMsgCount, String sortLetters, String dw_id,
+			String avatar, String username) {
+		super();
+		this.unreadMsgCount = unreadMsgCount;
+		this.sortLetters = sortLetters;
+		this.dw_id = dw_id;
+		this.avatar = avatar;
+		this.username = username;
+	}
+
+
+	/**
+	 * @return the unreadMsgCount
+	 */
+	public int getUnreadMsgCount() {
+		return unreadMsgCount;
+	}
+
+	/**
+	 * @param unreadMsgCount the unreadMsgCount to set
+	 */
+	public void setUnreadMsgCount(int unreadMsgCount) {
+		this.unreadMsgCount = unreadMsgCount;
+	}
+
+	/**
+	 * @return the sortLetters
+	 */
+	public String getSortLetters() {
+		return sortLetters;
+	}
+
+	/**
+	 * @param sortLetters the sortLetters to set
+	 */
+	public void setSortLetters(String sortLetters) {
+		this.sortLetters = sortLetters;
+	}
+
+	/**
+	 * @return the dw_id
+	 */
+	public String getDw_id() {
+		return dw_id;
+	}
+
+	/**
+	 * @param dw_id the dw_id to set
+	 */
+	public void setDw_id(String dw_id) {
+		this.dw_id = dw_id;
+	}
+
+	/**
+	 * @return the avatar
+	 */
+	public String getAvatar() {
+		return avatar;
+	}
+
+	/**
+	 * @param avatar the avatar to set
+	 */
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
+	}
+
+	/**
+	 * @return the username
+	 */
+	public String getUsername() {
+		return username;
+	}
+
+	/**
+	 * @param username the username to set
+	 */
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	@Override
+	public int hashCode() {
+		// return 17 * getUsername().hashCode();
+		return 0;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof User)) {
+			return false;
+		}
+		// return getUsername().equals(((User) o).getUsername());
+		return false;
+	}
+
+	@Override
+	public String toString() {
+		return null;
+	}
+}

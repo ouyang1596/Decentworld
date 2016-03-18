@@ -1,0 +1,303 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.main;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.ChatActivity;
+import cn.sx.decentworld.activity.ChatActivity_;
+import cn.sx.decentworld.activity.SearchActivity_;
+import cn.sx.decentworld.adapter.ConversationListAdapter;
+import cn.sx.decentworld.bean.ConversationList;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.MsgAndInfo;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.manager.ConversationManager;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.network.request.SetFriendInfo;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: ConversationFragment.java
+ * @Description:
+ * @author: cj
+ * @date: 2016年1月11日 上午11:12:06
+ */
+@EFragment(R.layout.fragment_main_conversation)
+public class ConversationFragment extends BaseFragment implements OnClickListener
+{
+    private static final String TAG = "ConversationFragment";
+    /**
+     * 工具类
+     */
+    @Bean
+    ToastComponent toast;
+    @Bean
+    GetUserInfo getUserInfo;
+    @Bean
+    SetFriendInfo setFriendInfo;
+
+    /**
+     * 界面资源
+     */
+
+    @ViewById(R.id.tv_header_title)
+    TextView tvTitle;
+    @ViewById(R.id.iv_search)
+    ImageView ivSearch;
+    
+    /** 网络错误 **/
+    @ViewById(R.id.tv_connect_errormsg)
+    TextView errorText;
+
+    @ViewById(R.id.fragment_chat_chat_lv)
+    ListView fragment_chat_chat_lv;
+
+    /**
+     * 变量
+     */
+    /** 消息资源list */
+    private List<ConversationList> conversationData;
+    private ConversationListAdapter conversationAdapter;
+    /** 保存会话数据  **/
+    private Map<String, ConversationList> conversationMap;
+
+    
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        LogUtils.i(TAG, "init");
+        EventBus.getDefault().register(this);
+        tvTitle.setText(getResources().getString(R.string.main_bottom_chat));
+        ivSearch.setVisibility(View.VISIBLE);
+        ivSearch.setOnClickListener(this);
+        // TODO
+        isPrepared = true;
+        lazyLoad();
+    }
+
+    /**
+     * 加载数据
+     */
+    @Override
+    protected void lazyLoad()
+    {
+        LogUtils.i(TAG, "lazyLoad");
+        if (isPrepared)
+        {
+            if (NetworkUtils.isNetWorkConnected(getActivity()))
+            {
+                /** 有网络，从网络拿取数据，并解析和显示 **/
+                initConversation();
+            }
+            else
+            {
+                /** 没有网络，从本地拿取数据 **/
+
+            }
+        }
+    }
+
+    @Override
+    public void turnToTab(int tab)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * 初始化会话列表 包括初始化变量、数据、未读消息
+     */
+    public void initConversation()
+    {
+        initVar();
+        initData();
+        initUnReadMsgCount();
+    }
+
+    /**
+     * 初始化会话列表相关变量 list map adapter listview
+     */
+    private void initVar()
+    {
+        if(conversationData==null || conversationMap == null)
+        {
+            conversationData = new ArrayList<ConversationList>();
+            conversationMap = new HashMap<String, ConversationList>();
+            conversationAdapter = new ConversationListAdapter(getActivity() , conversationData);
+            fragment_chat_chat_lv.setAdapter(conversationAdapter);
+            fragment_chat_chat_lv.setOnItemClickListener(new OnItemClickListener()
+            {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                {
+                    ConversationList conversationList = conversationData.get(position);
+                    Intent intent = new Intent(getActivity() , ChatActivity_.class);
+                    intent.putExtra(ChatActivity.OTHER_ID, conversationList.getDwID());
+                    intent.putExtra(ChatActivity.OTHER_NICKNAME, conversationList.getTitle());
+                    intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, conversationList.getChatRelationship());
+                    intent.putExtra(ChatActivity.CHAT_TYPE, conversationList.getChatType());
+                    intent.putExtra(ChatActivity.OTHER_WORTH, Float.valueOf(conversationList.getWorth()));
+                    startActivity(intent);
+                }
+            });
+        }
+    }
+
+    /**
+     * 初始化会话列表数据
+     */
+    private void initData()
+    {
+        conversationData.clear();
+        conversationMap.clear();
+        List<ConversationList> convList = ConversationManager.getInstance().getFriendConversationList();
+        /** 将从数据库获取的会话列表加载到内存中 **/
+        if (convList.size() > 0)
+        {
+            for (ConversationList con : convList)
+            {
+                String key = con.getDwID() + con.getChatType();
+                conversationData.add(con);
+                conversationMap.put(key, con);
+            }
+        }
+        /** 刷新界面 **/
+        if (conversationAdapter != null)
+        {
+            conversationAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * 初始化未读消息数 根据list中的数据计算未读消息数
+     */
+    private void initUnReadMsgCount()
+    {
+        // 从会话列表中计算未读消息总数
+        int count = 0;
+        if (conversationData == null)
+            count = 0;
+        else
+        {
+            for (ConversationList conv : conversationData)
+            {
+                if (conv.getChatRelationship() == DWMessage.CHAT_RELATIONSHIP_FRIEND)
+                    count += conv.getUnReadCount();
+            }
+        }
+        /** 将消息通知到MainFragment **/
+        EventBus.getDefault().post(count, NotifyByEventBus.NT_UNREAD_CONVERSATION_COUNT);
+    }
+
+    /**
+     * 接收到刷新会话列表的通知
+     * @param tag
+     */
+    @Subscriber(tag = NotifyByEventBus.NT_INIT_FRIEND_CONVERSATION)
+    public void initConversation(String tag)
+    {
+        LogUtils.i(TAG, "初始化会话列表，tag ="+tag);
+        initConversation();
+    }
+    
+
+    /**
+     * 刷新会话列表和chatTab选项卡(5个地方会调用)
+     */
+    @Subscriber(tag = NotifyByEventBus.NT_REFRESH_CONVERSATION)
+    public void refreshConversation(MsgAndInfo msgAndInfo)
+    {
+        ConversationManager.getInstance().refreshFriendConvByMsg(msgAndInfo, conversationData, conversationMap);
+        if (conversationAdapter != null)
+        {
+            Collections.sort(conversationData);
+            conversationAdapter.notifyDataSetChanged();
+        }
+        // 显示小红点
+        initUnReadMsgCount();
+    }
+
+
+    /**
+     * 清除指定联系人会话列表
+     * @param conversationKey
+     */
+    @Subscriber(tag = NotifyByEventBus.NT_CLEAR_CONVERSATION_UNREAD)
+    public void clearUnread(String conversationKey)
+    {
+        ConversationList conversation = conversationMap.get(conversationKey);
+        if (conversation != null)
+        {
+            conversation.setUnReadCount(0);
+            conversation.updateUnReadCount();
+            initUnReadMsgCount();
+            conversationAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onResume()
+    {
+        LogUtils.i(TAG, "onResume");
+        super.onResume();
+//        if (conversationData == null)
+//        {
+//            initConversation();
+//        }
+    }
+    
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.iv_search:
+                startActivity(new Intent(getActivity(), SearchActivity_.class));
+                break;
+
+            default:
+                break;
+        }
+    }
+
+}

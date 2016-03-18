@@ -1,0 +1,395 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.UserInfoItemAdapter;
+import cn.sx.decentworld.bean.DisplayAuthority;
+import cn.sx.decentworld.bean.EditUserInfoItem;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.bean.manager.UserInfoManager;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ChoceAndTakePictureComponent;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.fragment.ChatFragment;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.network.request.SetUserInfo;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.widget.ListViewForScrollView;
+
+import com.alibaba.fastjson.JSON;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.Click;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: EditUserInfoActivity.java
+ * @Description:编辑自己的详细资料
+ * @author: cj
+ * @date: 2015年10月9日 下午4:01:14
+ */
+@EActivity(R.layout.activity_edit_user_info)
+public class EditUserInfoActivity extends BaseFragmentActivity implements OnClickListener {
+    private static final String TAG = "EditUserInfoActivity";
+    private String dwID;
+    // 加载图片时的请求码
+    private static final int REQUESTCODE_GET_ICON_1 = 1;
+    private static final int REQUESTCODE_GET_ICON_2 = 2;
+    private static final int REQUESTCODE_GET_ICON_3 = 3;
+    public static final int REQUESTCODE_EDIT_SIGN = 4;
+    public static final int REQUESTCODE_EDIT_REALNAME = 5;
+    public static final int REQUESTCODE_EDIT_NICKNAME = 6;
+    public static final int REQUESTCODE_EDIT_AGE = 7;
+    public static final int REQUESTCODE_EDIT_SEX = 8;
+    public static final int REQUESTCODE_EDIT_POSITION = 9;
+
+    public static final int REQUESTCODE_EDIT_SCHOOL = 10;
+    public static final int REQUESTCODE_EDIT_DEPARTMENT = 11;
+    public static final int REQUESTCODE_EDIT_CLASSES = 12;
+
+    public static final int REQUESTCODE_EDIT_OCCUPATION = 13;
+    public static final int REQUESTCODE_EDIT_CORPORATION = 14;
+    public static final int REQUESTCODE_EDIT_JOB = 15;
+
+    public static final int REQUESTCODE_EDIT_COMMON1 = 16;// 既可以自定义，也可以选择
+    public static final int REQUESTCODE_EDIT_COMMON2 = 17;// 只可以自定义
+    public static final int REQUESTCODE_EDIT_COMMON3 = 18;// 只可以选择
+
+    @Bean
+    ToastComponent toast;
+    // 根布局
+    @ViewById(R.id.ll_edit_user_info_root)
+    LinearLayout ll_edit_user_info_root;
+    @ViewById(R.id.sl_edit_user_info)
+    ScrollView sl_edit_user_info;
+
+    // 图片一
+    @ViewById(R.id.iv_edit_user_info_icon_1)
+    ImageView iv_edit_user_info_icon_1;
+    // 图片二
+    @ViewById(R.id.iv_edit_user_info_icon_2)
+    ImageView iv_edit_user_info_icon_2;
+    // 图片三
+    @ViewById(R.id.iv_edit_user_info_icon_3)
+    ImageView iv_edit_user_info_icon_3;
+    @ViewById(R.id.tv_finish)
+    TextView tvFinish;
+    @ViewById(R.id.iv_back)
+    ImageView ivBack;
+
+    @ViewById(R.id.lv_edit_user_info)
+    ListViewForScrollView lv_edit_user_info;
+    // 用于保存用户详细信息
+    private List<EditUserInfoItem> mDatas;
+    private UserInfoItemAdapter userInfoItemAdapter;
+    private UserInfo userInfo;
+    private UserInfo userInfoDB;
+
+    // 用于将ScrollView滚动到最顶端
+    Handler handler = new Handler();
+    Runnable runnable = new Runnable() {
+        public void run() {
+            sl_edit_user_info.scrollTo(0, 0);
+        }
+    };
+
+    // 用于保存三张图片
+    private File[] fileIcons = new File[3];
+    @Bean
+    ChoceAndTakePictureComponent choceAndTakePictureComponent;
+
+    @AfterViews
+    void init() {
+        dwID = DecentWorldApp.getInstance().getDwID();
+        iv_edit_user_info_icon_1.setOnClickListener(this);
+        iv_edit_user_info_icon_2.setOnClickListener(this);
+        iv_edit_user_info_icon_3.setOnClickListener(this);
+        tvFinish.setVisibility(View.VISIBLE);
+        tvFinish.setText("完成");
+        ivBack.setVisibility(View.VISIBLE);
+        ivBack.setOnClickListener(this);
+        handler.postDelayed(runnable, 80);
+        mDatas = ChatFragment.userInfoDatas;
+
+        userInfoDB = UserInfo.queryByDwID(dwID);
+        if (userInfoDB == null) {
+            LogUtils.i(TAG, "数据库中的数据为空");
+        } else
+            LogUtils.i(TAG, "数据库中的数据不为空");
+        /**
+         * 将图片数据显示到界面上
+         */
+        userInfo = UserInfoManager.getUserInfoInstance();
+        if (userInfo != null) {
+            LogUtils.i(TAG,
+                    "额外三张照片路径为：userInfo.getIcon=" + userInfo.getIcon() + ",userInfo.getIcon2=" + userInfo.getIcon2()
+                            + ",userInfo.getIcon3=" + userInfo.getIcon3());
+            if (CommUtil.isNotBlank(userInfo.getIcon())) {
+                ImageLoaderHelper.mImageLoader.displayImage(userInfo.getIcon(), iv_edit_user_info_icon_1,
+                        ImageLoaderHelper.mOptions);
+            }
+            if (CommUtil.isNotBlank(userInfo.getIcon2())) {
+                ImageLoaderHelper.mImageLoader.displayImage(userInfo.getIcon2(), iv_edit_user_info_icon_2,
+                        ImageLoaderHelper.mOptions);
+            }
+            if (CommUtil.isNotBlank(userInfo.getIcon3())) {
+                ImageLoaderHelper.mImageLoader.displayImage(userInfo.getIcon3(), iv_edit_user_info_icon_3,
+                        ImageLoaderHelper.mOptions);
+            }
+        } else {
+            LogUtils.i(TAG, "userInfo为空");
+        }
+        /**
+         * 将详细信息数据显示到界面上
+         */
+        userInfoItemAdapter = new UserInfoItemAdapter(getSupportFragmentManager(), this, mDatas, true);
+        lv_edit_user_info.setAdapter(userInfoItemAdapter);
+    }
+
+    @Bean
+    GetUserInfo getUserInfo;
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.iv_edit_user_info_icon_1:
+                // choceAndTakePictureComponent.choicePicture(REQUESTCODE_GET_ICON_1);//
+                // 选择第一张照片
+                selectLocalPic(REQUESTCODE_GET_ICON_1);
+                break;
+            case R.id.iv_edit_user_info_icon_2:
+                // choceAndTakePictureComponent.choicePicture(REQUESTCODE_GET_ICON_2);//
+                // 选择第二张照片
+                selectLocalPic(REQUESTCODE_GET_ICON_2);
+                break;
+            case R.id.iv_edit_user_info_icon_3:
+                // choceAndTakePictureComponent.choicePicture(REQUESTCODE_GET_ICON_3);//
+                // 选择第三张照片
+                selectLocalPic(REQUESTCODE_GET_ICON_3);
+                break;
+            case R.id.iv_back:// 返回不保存数据
+                //				setResult(RESULT_OK);
+                finish();
+            default:
+                break;
+        }
+    }
+
+    public void selectLocalPic(int tag) {
+        Intent intentPic = new Intent(getApplicationContext(), PictureClipActivity_.class);
+        intentPic.putExtra(Constants.ASPECTX, 1);
+        intentPic.putExtra(Constants.ASPECTY, 1);
+        intentPic.putExtra(Constants.OUTPUTX, 400);
+        intentPic.putExtra(Constants.OUTPUTY, 400);
+        startActivityForResult(intentPic, tag);
+    };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        LogUtils.i(TAG, "进入到onActivityResult");
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((resultCode == RESULT_OK) && (data != null)) {
+            if ((requestCode == REQUESTCODE_GET_ICON_1) || (requestCode == REQUESTCODE_GET_ICON_2)
+                    || (requestCode == REQUESTCODE_GET_ICON_3)) {
+                String filePath = data.getStringExtra("filePath");
+                File file = new File(filePath);
+                if (requestCode == REQUESTCODE_GET_ICON_1) {
+                    ImageLoaderHelper.clearCacheByUrl(UserInfoManager.getUserInfoInstance().getIcon());
+                    ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE + file.getAbsolutePath(),
+                            iv_edit_user_info_icon_1, ImageLoaderHelper.mOptions);
+                    fileIcons[0] = file;
+                    setUserInfo.setUserIcon(dwID, fileIcons, 1);
+                } else if (requestCode == REQUESTCODE_GET_ICON_2) {
+                    ImageLoaderHelper.clearCacheByUrl(UserInfoManager.getUserInfoInstance().getIcon2());
+                    ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE + file.getAbsolutePath(),
+                            iv_edit_user_info_icon_2, ImageLoaderHelper.mOptions);
+                    fileIcons[0] = file;
+                    setUserInfo.setUserIcon(dwID, fileIcons, 2);
+                } else if (requestCode == REQUESTCODE_GET_ICON_3) {
+                    ImageLoaderHelper.clearCacheByUrl(UserInfoManager.getUserInfoInstance().getIcon3());
+                    ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE + file.getAbsolutePath(),
+                            iv_edit_user_info_icon_3, ImageLoaderHelper.mOptions);
+                    fileIcons[0] = file;
+                    setUserInfo.setUserIcon(dwID, fileIcons, 3);
+                }
+            } else if (requestCode == REQUESTCODE_EDIT_REALNAME) {
+                int position = data.getIntExtra("position", -1);
+                LogUtils.i(TAG, ",position=" + position);
+                if (position != -1) {
+                    String newData = data.getStringExtra("newData");
+                    refreshData(position, newData);
+                }
+            } else if (requestCode == REQUESTCODE_EDIT_SIGN || requestCode == REQUESTCODE_EDIT_NICKNAME
+                    || requestCode == REQUESTCODE_EDIT_SCHOOL) {
+                int position = data.getIntExtra("position", -1);
+                if (position != -1) {
+                    String newData = data.getStringExtra("newData");
+                    refreshData(position, newData);
+                }
+            } else if (requestCode == REQUESTCODE_EDIT_AGE || requestCode == REQUESTCODE_EDIT_SEX
+                    || requestCode == REQUESTCODE_EDIT_POSITION) {
+                // 不能修改
+            }
+
+            else if (requestCode == REQUESTCODE_EDIT_DEPARTMENT) {
+                int position = data.getIntExtra("position", -1);
+                if (position != -1) {
+                    String newDepartment = data.getStringExtra("newDepartment");
+                    refreshData(position, newDepartment);
+                }
+            } else if (requestCode == REQUESTCODE_EDIT_CLASSES) {
+                int position = data.getIntExtra("position", -1);
+                if (position != -1) {
+                    String newClasses = data.getStringExtra("newClasses");
+                    refreshData(position, newClasses);
+                }
+            } else if (requestCode == REQUESTCODE_EDIT_OCCUPATION) {
+                int position = data.getIntExtra("position", -1);
+                if (position != -1) {
+                    String newOccupation = data.getStringExtra("newOccupation");
+                    refreshData(position, newOccupation);
+                }
+            } else if (requestCode == REQUESTCODE_EDIT_CORPORATION) {
+                int position = data.getIntExtra("position", -1);
+                if (position != -1) {
+                    String newCorporation = data.getStringExtra("newCorporation");
+                    refreshData(position, newCorporation);
+
+                }
+            } else if (requestCode == REQUESTCODE_EDIT_JOB) {
+                int position = data.getIntExtra("position", -1);
+                if (position != -1) {
+                    String newJob = data.getStringExtra("newJob");
+                    refreshData(position, newJob);
+
+                }
+            } else if (requestCode == REQUESTCODE_EDIT_COMMON1 || requestCode == REQUESTCODE_EDIT_COMMON2
+                    || requestCode == REQUESTCODE_EDIT_COMMON3) {
+                int position = data.getIntExtra("position", -1);
+                if (position != -1) {
+                    String newData = data.getStringExtra("newData");
+                    refreshData(position, newData);
+                }
+            }
+        }
+    }
+
+    /**
+     * 刷新数据
+     * 
+     * @param position
+     * @param date
+     */
+    private void refreshData(int position, String date) {
+        LogUtils.i(TAG, "position=" + position + ",newData=" + date);
+        toast.show(date);
+        LogUtils.i(TAG, date);
+        // 保存到变量中
+        mDatas.get(position).setValue(date);
+        userInfoItemAdapter.notifyDataSetChanged();
+
+        String index = mDatas.get(position).getIndex();
+        try {
+            Field field = userInfo.getClass().getDeclaredField(index);
+            field.setAccessible(true);
+            field.set(userInfo, date);
+
+            Field fieldDB = userInfoDB.getClass().getDeclaredField(index);
+            fieldDB.setAccessible(true);
+            fieldDB.set(userInfoDB, date);
+        } catch (Exception e) {
+            LogUtils.i(TAG, "获取参数异常" + e);
+        }
+    }
+
+    @Bean
+    SetUserInfo setUserInfo;
+
+    /**
+     * 关闭当前对话框，并提交修改的数据到服务器
+     */
+    @Click(R.id.tv_finish)
+    void complete() {
+        DisplayAuthority displayAuthority = DisplayAuthority.queryByDwID(dwID);
+        Field[] fields = displayAuthority.getClass().getDeclaredFields();
+        HashMap<String, String> mapValue = new HashMap<String, String>();
+        mapValue.put("userId", dwID);
+        for (int i = 0; i < mDatas.size(); i++) {
+            boolean isShow = mDatas.get(i).isShow();
+            String index = mDatas.get(i).getIndex();
+            String key = mDatas.get(i).getKey();
+            String value = mDatas.get(i).getValue();
+            if (!key.equals("年龄") && !key.equals("性别") && !key.equals("位置") && !key.equals("进入类型") && !key.equals("身家")) {
+                // 年龄、性别、位置、进入类型 、身家 值不可修改，所以不用上传
+                LogUtils.i(TAG, "可修改的信息修改为：index = " + index + ",value=" + value + "\n");
+                mapValue.put(index, value);
+            }
+            for (Field field : fields) {
+                if (field.getName().toLowerCase().endsWith(index.toLowerCase())) {
+                    try {
+                        field.setAccessible(true);
+                        field.set(displayAuthority, isShow);
+                    } catch (Exception e) {
+                        LogUtils.e(TAG, e.toString());
+                    }
+                }
+            }
+            // 将修改的个人信息保存到数据库
+        }
+        displayAuthority.setDwID(dwID);
+        displayAuthority.save();
+
+        String jsonValue = JSON.toJSONString(mapValue);
+        setUserInfo.setUserInfo(jsonValue, setDataToServer, SET_USERINFO_TO_SERVER);
+        LogUtils.i(TAG, jsonValue);
+
+        String jsonIsShow = JsonUtils.bean2json(DisplayAuthority.queryByDwID(dwID));
+        setUserInfo.setUserAuthority(dwID, jsonIsShow);
+        LogUtils.i(TAG, jsonIsShow);
+    }
+
+	private static final int SET_USERINFO_TO_SERVER = 1;
+	private static final int SET_USERINFO_TO_SERVER_FAIL = 2;
+	Handler setDataToServer = new Handler()
+	{
+		public void handleMessage(android.os.Message msg)
+		{
+			switch (msg.what)
+			{
+				case SET_USERINFO_TO_SERVER:
+					if(msg.arg1 == 0)
+					{
+						LogUtils.i(TAG, "提交失败");
+					}else if(msg.arg1 == 1)
+					{
+						userInfoDB.save();
+						setResult(RESULT_OK);
+						finish();
+					}
+					break;
+				default:
+					break;
+			}
+		};
+	};
+}

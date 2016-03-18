@@ -35,8 +35,8 @@ public final class RecommendBenefitDetailActivity_
 
     private void init_(Bundle savedInstanceState) {
         titleBar = TitleBar_.getInstance_(this);
-        getUserInfo = GetUserInfo_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
@@ -57,8 +57,8 @@ public final class RecommendBenefitDetailActivity_
             }
         }
         ((TitleBar_) titleBar).afterSetContentView_();
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

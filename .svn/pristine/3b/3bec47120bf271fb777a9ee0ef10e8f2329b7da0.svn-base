@@ -1,0 +1,30 @@
+package cn.sx.decentworld.bean;
+
+import java.io.Serializable;
+import java.util.List;
+
+/**
+ * @ClassName: CheckResultBean.java
+ * @Description:
+ * @author: yj
+ * @date: 2016年1月14日 上午9:14:39
+ */
+public class CheckResultBean implements Serializable {
+	private static final long serialVersionUID = -3841095661687120996L;
+	public String dwID;
+	public int fakeAmount;
+	public int passAmount;
+	public int standard;
+	public int status;
+	public int unpassAmount;
+	public List<SupporterBean> supporters;
+
+	@Override
+	public String toString() {
+		return "CheckResultBean [dwID=" + dwID + ", fakeAmount=" + fakeAmount
+				+ ", passAmount=" + passAmount + ", standard=" + standard
+				+ ", status=" + status + ", unpassAmount=" + unpassAmount
+				+ ", supporters=" + supporters + "]";
+	}
+
+}

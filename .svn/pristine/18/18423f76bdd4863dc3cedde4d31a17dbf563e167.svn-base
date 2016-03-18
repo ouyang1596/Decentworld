@@ -1,0 +1,137 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_activity_register_appearance"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_gray"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <include layout="@layout/top_register_title" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/stroke_bg_white"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <FrameLayout
+            android:id="@+id/fl_vp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <ImageView
+                android:id="@+id/iv_leftTips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left|center_vertical"
+                android:src="@drawable/icon"
+                android:visibility="gone" />
+
+            <android.support.v4.view.ViewPager
+                android:id="@+id/vp_pic"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp" />
+
+            <LinearLayout
+                android:id="@+id/ll_dots"
+                android:layout_width="180dp"
+                android:layout_height="10dp"
+                android:layout_gravity="bottom|center"
+                android:layout_marginTop="10dp"
+                android:background="#00000000"
+                android:gravity="center"
+                android:orientation="horizontal" >
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/iv_rightTips"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right|center_vertical"
+                android:src="@drawable/icon"
+                android:visibility="gone" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
+            android:text="素颜靓照（不超过三张） 长按删除"
+            android:textColor="@color/three_black"
+            android:textSize="@dimen/new_textsize_13sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/stroke_bg_white"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/iv_identify_card"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginBottom="15dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="15dp"
+            android:src="@drawable/camera" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/iv_appearance"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="32dp"
+            android:src="@drawable/camera" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/btn_OK"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginRight="50dp"
+            android:background="@drawable/bg_btn_yellow_selector"
+            android:padding="10dp"
+            android:text="确定"
+            android:textColor="@color/white"
+            android:textSize="@dimen/new_textsize_15sp" />
+    </FrameLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="10dp"
+        android:text="颜值高？身材好？问问“魔镜”吧——DW内的异性目光决定您是否能进入"
+        android:textColor="@color/three_black"
+        android:textSize="@dimen/new_textsize_13sp" />
+
+</LinearLayout>

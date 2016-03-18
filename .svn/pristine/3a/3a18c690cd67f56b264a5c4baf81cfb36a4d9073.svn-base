@@ -1,0 +1,101 @@
+package cn.sx.decentworld.activity;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_edit_is_married)
+public class EditIsMarriedActivity extends BaseFragmentActivity implements
+		OnCheckedChangeListener, OnClickListener {
+	@ViewById(R.id.tv_header_title)
+	TextView tvTitle;
+	@ViewById(R.id.tv_finish)
+	TextView tvFinish;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	@ViewById(R.id.rg_is_married)
+	RadioGroup rgIsMarried;
+	@ViewById(R.id.rb_married)
+	RadioButton rbMarried;
+	@ViewById(R.id.rb_no_married)
+	RadioButton rbNoMarried;
+	private int position = -1;
+	private String oldData = "";
+	private String title = "";
+	private String newData = "";
+
+	@AfterViews
+	public void init() {
+		EGetIntent();
+		tvTitle.setText(title);
+		tvFinish.setVisibility(View.VISIBLE);
+		tvFinish.setOnClickListener(this);
+		ivBack.setVisibility(View.VISIBLE);
+		ivBack.setOnClickListener(this);
+		ifMarried();
+		rgIsMarried.setOnCheckedChangeListener(this);
+	}
+
+	private void ifMarried() {
+		if ("已婚".equals(oldData)) {
+			rbMarried.setChecked(true);
+		} else {
+			rbNoMarried.setChecked(true);
+			newData = "未婚";
+		}
+	}
+
+	@Override
+	public void onCheckedChanged(RadioGroup group, int checkId) {
+		switch (checkId) {
+		case R.id.rb_married:
+			newData = "已婚";
+			break;
+
+		case R.id.rb_no_married:
+			newData = "未婚";
+			break;
+		}
+	}
+
+	public void EGetIntent() {
+		position = getIntent().getIntExtra("position", -1);
+		oldData = getIntent().getStringExtra("oldData");
+		newData = oldData;
+		title = getIntent().getStringExtra("title");
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.tv_finish:
+			if (!newData.equals(oldData)) {
+				Intent intent = new Intent();
+				intent.putExtra("position", position);
+				intent.putExtra("newData", newData);
+				setResult(RESULT_OK, intent);
+				LogUtils.i(Constants.TAG_BM, "修改" + title + "为：" + newData);
+			} else {
+				LogUtils.i(Constants.TAG_BM, "没有修改" + title);
+			}
+			finish();
+			break;
+
+		case R.id.iv_back:
+			finish();
+			break;
+		}
+	}
+}

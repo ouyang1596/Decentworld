@@ -1,0 +1,91 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_activity_edit"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <include layout="@layout/layout_register_title_bg2" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="82px"
+            android:layout_marginRight="82px"
+            android:text="编辑"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textsize_30px" />
+
+        <TextView
+            android:id="@+id/tv_send"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="42px"
+            android:padding="20px"
+            android:text="发送"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textsize_28px" />
+    </RelativeLayout>
+    <RadioGroup
+        android:id="@+id/rg_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="26px" >
+
+        <RadioButton
+            android:id="@+id/rb_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="121px"
+            android:button="@null"
+            android:checked="true"
+            android:drawablePadding="10px"
+            android:drawableTop="@drawable/rb_content_checked"
+            android:padding="20px"
+            android:text="内容"
+            android:textColor="@color/new_black_two"
+            android:textSize="@dimen/textsize_28px" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <RadioButton
+            android:id="@+id/rb_fee_scale"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="121px"
+            android:button="@null"
+            android:drawablePadding="10px"
+            android:drawableTop="@drawable/rb_fee_scale_checked"
+            android:padding="20px"
+            android:text="收费标准"
+            android:textColor="@color/new_black_two"
+            android:textSize="@dimen/textsize_28px" />
+    </RadioGroup>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/bottom_blue" />
+
+    <cn.sx.decentworld.widget.ScrollLayout
+        android:id="@+id/sl_fee"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <include layout="@layout/item_add_theme" />
+
+        <include layout="@layout/fee_scale" />
+    </cn.sx.decentworld.widget.ScrollLayout>
+
+</LinearLayout>

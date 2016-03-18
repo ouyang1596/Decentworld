@@ -1,0 +1,50 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.broadcast;
+
+import cn.sx.decentworld.utils.LogUtils;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
+/**
+ * @ClassName: NetStatReceiver.java
+ * @Description: 接收网络状态的改变
+ * @author: cj
+ * @date: 2015年12月22日 上午10:42:03
+ */
+public class NetStatReceiver extends BroadcastReceiver
+{
+	private static final String TAG = "NetStatReceiver";
+	public static final String NET_ACTION = "android.net.conn.CONNECTIVITY_CHANGE";
+
+	@Override
+	public void onReceive(Context context, Intent intent)
+	{
+		if (intent.getAction().equals(NET_ACTION))
+		{
+			LogUtils.i(TAG, "网络发生变化了");
+			// 有网络变化
+			// Intent中ConnectivityManager.EXTRA_NO_CONNECTIVITY这个关键字表示着当前是否连接上了网络
+			boolean isBreak = intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
+			if (!isBreak)
+			{
+				// 有网络
+				// 3G跟WIFI切换的时候，会收到三个这样的广播，第一个广播把wifi连接上，第二个广播到3G关闭掉，第三个广播把wifi连接上。但是我这里只想提醒用户一次啊，怎么把另外两次提醒屏蔽掉呢？谁有好的方法，android方面着手的，或者java方面着手的。
+			}
+			else
+			{
+
+			}
+		}
+	}
+	
+	
+	
+
+
+
+}

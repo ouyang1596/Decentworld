@@ -33,16 +33,16 @@ public final class PayDialogActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        rechargeComponent = RechargeComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        rechargeComponent = RechargeComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         ivPayZhifubao = ((ImageView) findViewById(id.iv_pay_zhifubao));
         tvRenminbi = ((TextView) findViewById(id.tv_renminbi));
         ivPayWeixin = ((ImageView) findViewById(id.iv_pay_weixin));
-        ((RechargeComponent_) rechargeComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((RechargeComponent_) rechargeComponent).afterSetContentView_();
         init();
     }
 

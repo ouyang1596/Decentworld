@@ -1,0 +1,146 @@
+package cn.sx.decentworld.listener;
+
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+
+import org.jivesoftware.smack.ConnectionListener;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.StreamError;
+import org.simple.eventbus.EventBus;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.utils.LogUtils;
+
+/**
+ * Created by HH on 2015/11/8. openfire连接监听
+ */
+public class ViConnectionListener extends Handler implements ConnectionListener
+{
+	private static final String TAG = "ViConnectionListener";
+
+	/**
+	 * 关闭连接
+	 */
+	@Override
+	public void connectionClosed()
+	{
+		LogUtils.i(TAG, "connectionClosed");
+		first_connect_error_time = 0;
+	}
+
+	/**
+	 * 发生错误时关闭连接 错误的情况有： 1.被挤下线 2.网络断开
+	 */
+	@Override
+	public void connectionClosedOnError(Exception e)
+	{
+		LogUtils.i(TAG, "connectionClosedOnError..."+e.toString());
+		if (e instanceof XMPPException)
+		{
+			XMPPException xmppEx = (XMPPException) e;
+			StreamError error = xmppEx.getStreamError();
+
+			// Make sure the error is not null
+			if (error != null)
+			{
+				String reason = error.getCode();
+
+				if ("conflict".equals(reason))
+				{
+					LogUtils.i(TAG, "被挤下线");
+					// 将消息路由到MainActivity
+					EventBus.getDefault().post("该账号在异地登陆，即将退出！", NotifyByEventBus.NT_CRUSH_OFF_LINE);
+				}
+			}
+		}
+		 
+		if (e.getMessage().contains("Connection timed out"))
+		{
+			// 连接超时
+			LogUtils.i(TAG, "连接超时");
+			if (first_connect_error_time == 0)
+			{
+				first_connect_error_time = System.currentTimeMillis();
+			}
+			sendEmptyMessage(REQUEST_RECONNECT);
+		}
+	}
+
+	/**
+	 * 重连中
+	 */
+	@Override
+	public void reconnectingIn(int seconds)
+	{
+		LogUtils.i(TAG, "reconnectingIn");
+	}
+
+	/**
+	 * 重连成功
+	 */
+	@Override
+	public void reconnectionSuccessful()
+	{
+		LogUtils.i(TAG, "reconnectionSuccessful");
+		first_connect_error_time = 0;
+		// 处理未发送的信息
+	}
+
+	/**
+	 * 重连失败
+	 */
+	@Override
+	public void reconnectionFailed(Exception e)
+	{
+		LogUtils.i(TAG, "reconnectionFailed");
+		if (first_connect_error_time == 0)
+		{
+			first_connect_error_time = System.currentTimeMillis();
+		}
+		sendEmptyMessage(REQUEST_RECONNECT);
+	}
+
+	public static final int RECONNECT = 0;
+	public static final int REQUEST_RECONNECT = 1;
+	public static final int RECONNECT_INTERVAL = 10000;// 10秒钟
+	public static long first_connect_error_time = 0;
+
+	@Override
+	public void handleMessage(Message msg)
+	{
+		switch (msg.what)
+		{
+			case RECONNECT:
+				removeMessages(RECONNECT);
+				EventBus.getDefault().post(null, NotifyByEventBus.NT_CONNECTION);
+				break;
+			case REQUEST_RECONNECT:
+				if (first_connect_error_time == 0)
+				{
+					break;
+				}
+				long curr = System.currentTimeMillis();
+				if (curr - first_connect_error_time < 120000)
+				{
+					// 两分钟内延迟10秒钟发一次重新链接请求
+					sendEmptyMessageDelayed(RECONNECT, RECONNECT_INTERVAL);
+					Log.w(ViConnectionListener.class.getName(), "两分钟内延迟10秒钟发一次重新链接请求");
+				}
+				else if (curr - first_connect_error_time < 300000)
+				{
+					// 两分钟到五分钟延迟30秒发一次
+					sendEmptyMessageDelayed(RECONNECT, 3 * RECONNECT_INTERVAL);
+					Log.w(ViConnectionListener.class.getName(), "两分钟到五分钟延迟30秒发一次");
+				}
+				else
+				{
+					// 五分钟以后延迟2分钟发一次
+					sendEmptyMessageDelayed(RECONNECT, 12 * RECONNECT_INTERVAL);
+					Log.w(ViConnectionListener.class.getName(), "五分钟以后延迟2分钟发一次");
+				}
+				break;
+		}
+	}
+}

@@ -44,40 +44,40 @@ public final class ChatActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        chatComponent = ChatComponent_.getInstance_(this);
-        dwsMessageManager = DWSMessageManager_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
-        KeyboardComponent = KeyboardComponent_.getInstance_(this);
-        getUserInfo = GetUserInfo_.getInstance_(this);
+        chatComponent = ChatComponent_.getInstance_(this);
         choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
+        KeyboardComponent = KeyboardComponent_.getInstance_(this);
+        dwsMessageManager = DWSMessageManager_.getInstance_(this);
+        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        main_header_right_btn = ((ImageView) findViewById(id.main_header_right_btn));
-        btnContainer = ((LinearLayout) findViewById(id.ll_btn_container));
         main_header_right_tv = ((TextView) findViewById(id.main_header_right_tv));
-        emojiIconContainer = ((LinearLayout) findViewById(id.ll_face_container));
-        more = ((LinearLayout) findViewById(id.more));
-        iv_chat_bg = ((ImageView) findViewById(id.activity_chat_bg));
-        listView = ((PullToRefreshListView) findViewById(id.list));
-        mEditTextContent = ((PasteEditText) findViewById(id.et_sendmessage));
-        btn_send = ((Button) findViewById(id.btn_send));
-        buttonPressToSpeak = ((RecorderButton) findViewById(id.btn_press_to_speak));
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
-        iv_emoticons_normal = ((ImageView) findViewById(id.iv_emoticons_normal));
         edittext_layout = ((RelativeLayout) findViewById(id.edittext_layout));
-        btn_more = ((Button) findViewById(id.btn_more));
-        main_header_title = ((TextView) findViewById(id.tv_header_title));
-        btn_set_mode_voice = ((Button) findViewById(id.btn_set_mode_voice));
-        expressionViewpager = ((ViewPager) findViewById(id.vPager));
-        iv_emoticons_checked = ((ImageView) findViewById(id.iv_emoticons_checked));
+        iv_emoticons_normal = ((ImageView) findViewById(id.iv_emoticons_normal));
+        iv_chat_bg = ((ImageView) findViewById(id.activity_chat_bg));
         btn_set_mode_keyboard = ((Button) findViewById(id.btn_set_mode_keyboard));
-        ((ChatComponent_) chatComponent).afterSetContentView_();
-        ((DWSMessageManager_) dwsMessageManager).afterSetContentView_();
+        more = ((LinearLayout) findViewById(id.more));
+        buttonPressToSpeak = ((RecorderButton) findViewById(id.btn_press_to_speak));
+        btn_send = ((Button) findViewById(id.btn_send));
+        mEditTextContent = ((PasteEditText) findViewById(id.et_sendmessage));
+        expressionViewpager = ((ViewPager) findViewById(id.vPager));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
+        btnContainer = ((LinearLayout) findViewById(id.ll_btn_container));
+        main_header_title = ((TextView) findViewById(id.tv_header_title));
+        emojiIconContainer = ((LinearLayout) findViewById(id.ll_face_container));
+        main_header_right_btn = ((ImageView) findViewById(id.main_header_right_btn));
+        btn_more = ((Button) findViewById(id.btn_more));
+        iv_emoticons_checked = ((ImageView) findViewById(id.iv_emoticons_checked));
+        listView = ((PullToRefreshListView) findViewById(id.list));
+        btn_set_mode_voice = ((Button) findViewById(id.btn_set_mode_voice));
         ((ToastComponent_) toast).afterSetContentView_();
-        ((KeyboardComponent_) KeyboardComponent).afterSetContentView_();
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
+        ((ChatComponent_) chatComponent).afterSetContentView_();
         ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
+        ((KeyboardComponent_) KeyboardComponent).afterSetContentView_();
+        ((DWSMessageManager_) dwsMessageManager).afterSetContentView_();
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

@@ -1,0 +1,103 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import android.content.Intent;
+import android.text.Selection;
+import android.text.Spannable;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: EditNicknameActivity.java
+ * @Description: 包涵一个EditText（手动填写）
+ * @author: cj
+ * @date: 2015年10月21日 上午10:43:25
+ */
+
+@EActivity(R.layout.activity_edit_common_2)
+public class EditCommon2Activity extends BaseFragmentActivity implements
+		OnClickListener {
+	private static final String TAG = "EditCommon2Activity";
+	@Bean
+	ToastComponent toast;
+
+	@ViewById(R.id.et_edit_common2_content)
+	EditText et_edit_common2_content;
+	@ViewById(R.id.tv_header_title)
+	TextView tvTitle;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	@ViewById(R.id.btn_edit_sign_complete)
+	Button btnOk;
+	//
+	// @ViewById(R.id.main_header_left)
+	// LinearLayout btn_edit_common2_back;
+	//
+	// @ViewById(R.id.main_header_right)
+	// RelativeLayout btn_edit_common2_complete;
+
+	private int position = -1;
+	private String oldData = "";
+	private String title = "";
+
+	@AfterViews
+	void init() {
+		position = getIntent().getIntExtra("position", -1);
+		oldData = getIntent().getStringExtra("oldData");
+		title = getIntent().getStringExtra("title");
+		tvTitle.setText(title);
+		ivBack.setVisibility(View.VISIBLE);
+		ivBack.setOnClickListener(this);
+		btnOk.setOnClickListener(this);
+		LogUtils.i(TAG, "position=" + position + ",oldData=" + oldData);
+		if (!oldData.equals("")) {
+			et_edit_common2_content.setText(oldData);
+		}
+
+		/**
+		 * 将光标设置到文字的末尾
+		 */
+		CharSequence text = et_edit_common2_content.getText();
+		if (text instanceof Spannable) {
+			Spannable spanText = (Spannable) text;
+			Selection.setSelection(spanText, text.length());
+		}
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.btn_edit_sign_complete:
+			String newData = et_edit_common2_content.getText().toString();
+			if (!newData.equals(oldData)) {
+				Intent intent = new Intent();
+				intent.putExtra("position", position);
+				intent.putExtra("newData", newData);
+				setResult(RESULT_OK, intent);
+				LogUtils.i(TAG, "修改" + title + "为：" + newData);
+			} else {
+				LogUtils.i(TAG, "没有修改" + title);
+			}
+			finish();
+			break;
+
+		case R.id.iv_back:
+			finish();
+			break;
+		}
+	}
+}

@@ -1,0 +1,311 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.helper;
+
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.View;
+import android.view.View.MeasureSpec;
+import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.ExpressionAdapter;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.common.SmileUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.widget.ExpandGridView;
+import cn.sx.decentworld.widget.PasteEditText;
+
+/**
+ * @ClassName: ChatHelper.java
+ * @Description: 
+ * @author: cj
+ * @date: 2015年12月28日 上午10:51:49
+ */
+public class ChatHelper
+{
+    private static final String TAG = "ChatHelper";
+    private Context context;
+    
+    /**
+     * 无参构造函数
+     */
+    public ChatHelper()
+    {
+        
+    }
+    
+    /**
+     * 构造函数
+     * @param context
+     */
+    public ChatHelper(Context context)
+    {
+        this.context = context;
+    }
+    
+    /**
+     * 获取表情数据
+     * @param context
+     * @param buttonSetModeKeyboard
+     * @param mEditTextContent
+     * @param i
+     * @return
+     */
+    public List<View> getExpressionData(Context context,Button buttonSetModeKeyboard, PasteEditText mEditTextContent,int i)
+    {
+        List<View> views = new ArrayList<View>();
+        View gv1 = getGridChildView(context,buttonSetModeKeyboard,mEditTextContent,1);
+        View gv2 = getGridChildView(context,buttonSetModeKeyboard,mEditTextContent,2);
+        views.add(gv1);
+        views.add(gv2);
+        return views;
+    }
+    
+    /**
+     * 获得表情资源
+     * @param getSum
+     * @return
+     */
+    private List<String> getExpressionRes(int getSum)
+    {
+        List<String> reslist = new ArrayList<String>();
+        for (int x = 1; x <= getSum; x++)
+        {
+            String filename = "ee_" + x;
+            reslist.add(filename);
+        }
+        return reslist;
+    }
+    
+
+    
+    /**
+     * 获取表情的gridview的子view
+     * 
+     * @param i
+     * @return
+     */
+    private View getGridChildView(final Context context,final Button buttonSetModeKeyboard,final PasteEditText mEditTextContent, int i)
+    {
+        List<String> reslist = getExpressionRes(35);
+        View view = View.inflate(context, R.layout.expression_gridview, null);
+        ExpandGridView gv = (ExpandGridView) view.findViewById(R.id.gridview);
+        List<String> list = new ArrayList<String>();
+        if (i == 1)
+        {
+            List<String> list1 = reslist.subList(0, 20);
+            list.addAll(list1);
+        }
+        else if (i == 2)
+        {
+            list.addAll(reslist.subList(20, reslist.size()));
+        }
+        list.add("delete_expression");
+        final ExpressionAdapter expressionAdapter = new ExpressionAdapter(context , 1 , list);
+        gv.setAdapter(expressionAdapter);
+        gv.setOnItemClickListener(new OnItemClickListener()
+        {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+
+            int position, long id)
+            {
+                String filename = expressionAdapter.getItem(position);
+                try
+                {
+                    // 文字输入框可见时，才可输入表情
+                    // 按住说话可见，不让输入表情
+                    if (buttonSetModeKeyboard.getVisibility() != View.VISIBLE)
+                    {
+
+                        if (filename != "delete_expression")
+                        { // 不是删除键，显示表情
+                          // 这里用的反射，所以混淆的时候不要混淆SmileUtils这个类
+                            Class clz = Class.forName("cn.sx.decentworld.common.SmileUtils");
+                            Field field = clz.getField(filename);
+                            mEditTextContent.append(SmileUtils.getSmiledText(context, (String) field.get(null)));
+                        }
+                        else
+                        { // 删除文字或者表情
+                            if (!TextUtils.isEmpty(mEditTextContent.getText()))
+                            {
+
+                                int selectionStart = mEditTextContent.getSelectionStart();// 获取光标的位置
+                                if (selectionStart > 0)
+                                {
+                                    String body = mEditTextContent.getText().toString();
+                                    String tempStr = body.substring(0, selectionStart);
+                                    int i = tempStr.lastIndexOf("[");// 获取最后一个表情的位置
+                                    if (i != -1)
+                                    {
+                                        CharSequence cs = tempStr.substring(i, selectionStart);
+                                        if (SmileUtils.containsKey(cs.toString()))
+                                            mEditTextContent.getEditableText().delete(i, selectionStart);
+                                        else
+                                            mEditTextContent.getEditableText().delete(selectionStart - 1, selectionStart);
+                                    }
+                                    else
+                                    {
+                                        mEditTextContent.getEditableText().delete(selectionStart - 1, selectionStart);
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+
+            }
+        });
+        return view;
+    }
+    
+    /**
+     * 编辑框文本变化监听
+     * @param mEditTextContent
+     * @param more +
+     * @param send 发送
+     */
+    public void initEditText(PasteEditText mEditTextContent,final Button btn_more,final Button btn_send,final RelativeLayout edittext_layout)
+    {
+        // 监听文字框
+        mEditTextContent.addTextChangedListener(new TextWatcher()
+        {
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+                if (!TextUtils.isEmpty(s))
+                {
+                    btn_more.setVisibility(View.GONE);
+                    btn_send.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    btn_more.setVisibility(View.VISIBLE);
+                    btn_send.setVisibility(View.GONE);
+                }
+            }
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+
+            }
+        });
+        
+        mEditTextContent.setOnFocusChangeListener(new OnFocusChangeListener()
+        {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus)
+            {
+                if (hasFocus)
+                    edittext_layout.setBackgroundResource(R.drawable.input_bar_bg_active);
+                else
+                    edittext_layout.setBackgroundResource(R.drawable.input_bar_bg_normal);
+            }
+        });
+    }
+    
+    /**
+     * 获得临时的mid
+     * @return
+     */
+    public long getTempMid(List<DWMessage> listMsg)
+    {
+        long tempMid;
+        if (listMsg.size() > 0)
+        {
+            tempMid = listMsg.get(listMsg.size() - 1).getMid();
+        }
+        else
+        {
+            tempMid = 0;
+        }
+        LogUtils.i(TAG, "临时的mid=" + tempMid);
+        return tempMid;
+    }
+    
+    /**
+     * 初始化编辑框数据
+     * * 设置编辑框显示的内容，格式如下： 1）好友单聊：自己身家 + 2）陌生人单聊 ：自己身家 - 3）好友匿名:自己身家 -
+     * 4）陌生人匿名自己身家-
+     * @param mEditTextContent
+     * @param chatType
+     * @param chatRelationship
+     * @param wealth
+     */
+    public void initEditTextData(PasteEditText mEditTextContent,int chatType,int chatRelationship,String wealth)
+    {
+        if (chatType == DWMessage.CHAT_TYPE_SINGLE)
+        {
+            if (chatRelationship == DWMessage.CHAT_RELATIONSHIP_FRIEND)
+            {
+                mEditTextContent.setHint(wealth + "+");
+            }
+            else if (chatRelationship == DWMessage.CHAT_RELATIONSHIP_STRANGER)
+            {
+                mEditTextContent.setHint(wealth + "-");
+            }
+        }
+        else if (chatType == DWMessage.CHAT_TYPE_SINGLE_ANONYMITY)
+        {
+            if (chatRelationship == DWMessage.CHAT_RELATIONSHIP_FRIEND)
+            {
+                mEditTextContent.setHint(wealth + "-");
+            }
+            else if (chatRelationship == DWMessage.CHAT_RELATIONSHIP_STRANGER)
+            {
+                mEditTextContent.setHint(wealth + "-");
+            }
+        }
+    }
+    
+    public void showPopWindow(Context context ,View v,PopupWindow mPop,View transmitView,OnClickListener mOnClicklistener)
+    {
+        int[] location = new int[2];
+        v.getLocationOnScreen(location);
+        if (null == mPop || null == transmitView)
+        {
+            transmitView = View.inflate(context, R.layout.layout_copy_transmit, null);
+            TextView tvCopy = (TextView) transmitView.findViewById(R.id.tv_copy);
+            tvCopy.setOnClickListener(mOnClicklistener);
+            TextView tvTransmit = (TextView) transmitView.findViewById(R.id.tv_transmit);
+            tvTransmit.setOnClickListener(mOnClicklistener);
+            mPop = new PopupWindow(transmitView , ViewGroup.LayoutParams.WRAP_CONTENT , ViewGroup.LayoutParams.WRAP_CONTENT , true);
+            mPop.setBackgroundDrawable(new BitmapDrawable());
+            transmitView.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
+            mPop.setOutsideTouchable(true);
+        }
+        int popupWidth = transmitView.getMeasuredWidth();
+        int popupHeight = transmitView.getMeasuredHeight();
+        mPop.showAtLocation(v, Gravity.NO_GRAVITY, (location[0] + v.getWidth() / 2) - popupWidth / 2, location[1] - popupHeight);
+ 
+    }
+
+}

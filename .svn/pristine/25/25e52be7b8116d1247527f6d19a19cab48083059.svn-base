@@ -1,0 +1,142 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.manager;
+
+import java.util.Collections;
+import java.util.List;
+
+import com.activeandroid.query.Select;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.ConversationList;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.db.ContactUser;
+import cn.sx.decentworld.utils.LogUtils;
+
+/**
+ * @ClassName: ConversationManager.java
+ * @Description: 管理会话列表
+ * @author: cj
+ * @date: 2015年12月11日 上午9:50:12
+ */
+public class ConversationManager
+{
+	private static final String TAG = "ConversationManager";
+	private static ConversationManager instance = new ConversationManager();
+	private ConversationManager()
+	{
+		
+	}
+	
+	/**
+	 * 获得实例
+	 * @return
+	 */
+	public static ConversationManager getInstance()
+	{
+		if(instance==null)
+		{
+			instance = new ConversationManager();
+		}
+		return instance;
+	}
+	
+	
+	/**
+	 * 获得所有好友的会话列表
+	 */
+	public List<ConversationList> getFriendConversationList()
+	{
+		// 查询朋友的会话列表
+		String userID = DecentWorldApp.getInstance().getDwID();
+		String sql = "userID=? and chatRelationship=?";
+		List<ConversationList> list = new Select().from(ConversationList.class).where(sql, userID, DWMessage.CHAT_RELATIONSHIP_FRIEND).orderBy("time desc").execute();
+		// 是否全部满足条件
+		for(ConversationList temp:list)
+		{
+			if(!ContactUser.isContact(temp.getDwID()))
+			{
+				LogUtils.i(TAG, "dwID="+temp.getDwID()+",已经不是自己的好友，将会话列表移到陌生人处");
+				list.remove(temp);
+				temp.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+				temp.setTitle("重新获取昵称");
+				temp.save();
+			}
+		}
+		// 排序
+		Collections.sort(list);
+		return list;
+	}
+	
+	
+	/**
+	 * 获得所有陌生人的会话列表
+	 */	
+	public static List<ConversationList> getStrangerConversationList()
+	{
+		// 查询陌生人的会话列表
+		String userID = DecentWorldApp.getInstance().getDwID();
+		String sql = "userID=? and chatRelationship=?";
+		List<ConversationList> list = new Select().from(ConversationList.class).where(sql, userID, DWMessage.CHAT_RELATIONSHIP_STRANGER).orderBy("time desc").execute();
+		// 判断是否全部满足条件
+		for (ConversationList temp : list)
+		{
+			if (ContactUser.isContact(temp.getDwID()))
+			{
+				LogUtils.i(TAG, "dwID=" + temp.getDwID() + ",已经是自己的好友，将会话列表移到好友处");
+				list.remove(temp);
+				temp.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_FRIEND);
+//				temp.setTitle("重新获取昵称");
+				temp.save();
+			}
+		}
+		// 排序
+		Collections.sort(list);
+		return list;
+	}
+	
+	/**
+	 * 更加消息更新会话列表
+	 * @param dwMessage
+	 */
+	public void refreshConvByMsg(DWMessage dwMessage)
+	{
+		//新来一条消息，更新会话列表（消息可能是自己发送的，也可能是接收到的）
+		
+		//更新内存
+		
+		//更新数据库
+	}
+	
+	/**
+	 * 添加朋友时更新会话列表
+	 */
+	public void refreshConvByAddFriend()
+	{
+		//更新好友会话列表
+		
+		//更新陌生人会话列表
+		
+		
+	}
+	
+	/**
+	 * 删除好友时更新会话列表
+	 */
+	public void refreshConvByDelFriend()
+	{
+		//更新好友会话列表
+		
+		//更新陌生人会话列表
+		
+		
+	}
+	
+	
+
+	
+
+	
+	
+}

@@ -1,0 +1,273 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import org.simple.eventbus.EventBus;
+
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.EditAndModificationDialog;
+import cn.sx.decentworld.dialog.EditAndModificationDialog.EditAndModificationListener;
+import cn.sx.decentworld.network.request.SetUserInfo;
+import cn.sx.decentworld.utils.AES;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: DrawCashSettingActivity.java
+ * @Description: 虚拟币提现的设置界面
+ * @author: cj
+ * @date: 2016年3月3日 下午4:22:25
+ */
+@EActivity(R.layout.activity_draw_cash_setting)
+public class DrawCashSettingActivity extends BaseFragmentActivity implements OnClickListener
+{
+    /**
+     * 常量
+     */
+    private static final String TAG = "DrawCashSettingActivity";
+    private static final int REQUEST_CODE_SET_ACCOUNT = 1;
+    private static final int REQUEST_CODE_SET_PWD = 2;
+    private static final int REQUEST_CODE_DRAW = 3;
+
+    /**
+     * 工具类
+     */
+    @Bean
+    ToastComponent toast;
+    @Bean
+    SetUserInfo setUserInfo;
+
+    /**
+     * 界面资源
+     */
+    // 账户
+    @ViewById(R.id.et_draw_cash_setting_account)
+    EditText etAccount;
+    // 账户名字
+    @ViewById(R.id.tv_draw_cash_setting_account)
+    TextView tvAccountName;
+    // 提交账户
+    @ViewById(R.id.btn_draw_cash_setting_account_submit)
+    Button btnAccountSubmit;
+    // 密码
+    @ViewById(R.id.et_draw_cash_setting_pwd)
+    EditText etPwd;
+    // 确认密码
+    @ViewById(R.id.et_draw_cash_setting_pwd1)
+    EditText etPwd1;
+    // 提交密码
+    @ViewById(R.id.btn_draw_cash_setting_pwd_submit)
+    Button btnPwdSubmit;
+    // 填写提取金额
+    @ViewById(R.id.et_draw_cash_setting_amount)
+    EditText etAmount;
+    // 提交密码
+    @ViewById(R.id.btn_draw_cash_setting_draw)
+    Button btnDraw;
+
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        initVariables();
+        initListener();
+        intiViews();
+        intiData();
+    }
+
+    /**
+     * 初始化变量
+     */
+    private void initVariables()
+    {
+        
+    }
+
+    /**
+     * 初始化监听
+     */
+    private void initListener()
+    {
+        btnAccountSubmit.setOnClickListener(this);
+        btnPwdSubmit.setOnClickListener(this);
+        btnDraw.setOnClickListener(this);
+    }
+
+    /**
+     * 初始化视图
+     */
+    private void intiViews()
+    {
+        
+    }
+
+    /**
+     * 初始化变量
+     */
+    private void intiData()
+    {
+        
+    }
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.btn_draw_cash_setting_account_submit:
+                submitAccount();
+
+                break;
+            case R.id.btn_draw_cash_setting_pwd_submit:
+                submitPwd();
+                break;
+            case R.id.btn_draw_cash_setting_draw:
+                draw();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 提交账号
+     */
+    private void submitAccount()
+    {
+        String account = etAccount.getText().toString();
+        if(CommUtil.isBlank(account))
+        {
+            toast.show("内容为空");
+            return;
+        }
+        String dwID = DecentWorldApp.getInstance().getDwID();
+        setUserInfo.setDrawCashAccount(dwID, account, handler, REQUEST_CODE_SET_ACCOUNT);
+        
+    }
+
+    /**
+     * 提交密码
+     */
+    private void submitPwd()
+    {
+        String password = etPwd.getText().toString();
+        String password1 = etPwd1.getText().toString();
+        if(CommUtil.isBlank(password))
+        {
+            toast.show("请输入密码");
+            return;
+        }
+        if(CommUtil.isBlank(password1))
+        {
+            toast.show("请确认密码");
+            return;
+        }
+        
+        if(!password.equals(password1))
+        {
+            toast.show("两次输入的密码不一致");
+            etPwd.setText("");
+            etPwd1.setText("");
+            return;
+        }
+        //加密
+        password = AES.encode(password);
+        String dwID = DecentWorldApp.getInstance().getDwID();
+        setUserInfo.setDrawCashPwd(dwID, password, handler, REQUEST_CODE_SET_PWD);
+    }
+    
+
+    /**
+     * 提取
+     */
+    private void draw()
+    {
+        final String dwID = DecentWorldApp.getInstance().getDwID();
+        final String amount = etAmount.getText().toString();
+        if(CommUtil.isBlank(amount))
+        {
+            toast.show("请输入金额");
+            return;
+        }
+        EditAndModificationDialog dialog = new EditAndModificationDialog();
+        dialog.setTitle("请输入提取密码");
+        dialog.setListener(new EditAndModificationListener()
+        {
+            @Override
+            public void confirm(String info)
+            {
+                info = AES.encode(info);
+                setUserInfo.withDrawWealth(dwID, info, amount, handler, REQUEST_CODE_DRAW);
+            }
+        });
+        dialog.show(getSupportFragmentManager(), "");
+    }
+
+    
+    
+    Handler handler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg) 
+        {
+            String result = msg.obj.toString();
+            switch (msg.what)
+            {
+                case REQUEST_CODE_SET_ACCOUNT:
+                    if(msg.arg1 == ConstantNet.NET_REQUEST_SUCCESS)
+                    {
+                        toast.show("设置账号成功"+result);
+                    }else
+                    {
+                        toast.show("设置账号失败"+result);
+                    }
+                    
+                    break;
+                case REQUEST_CODE_SET_PWD:
+                    if(msg.arg1 == ConstantNet.NET_REQUEST_SUCCESS)
+                    {
+                        toast.show("设置密码成功"+result);
+                    }else
+                    {
+                        toast.show("设置密码失败"+result);
+                    }
+                    break;
+                    
+                case REQUEST_CODE_DRAW:
+                    if(msg.arg1 == ConstantNet.NET_REQUEST_SUCCESS)
+                    {
+                        toast.show("提取成功"+result);
+                        EventBus.getDefault().post("兑换成功，更新身家", NotifyByEventBus.NT_REFRESH_WEALTH);
+                    }else
+                    {
+                        toast.show("设提取失败"+result);
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        };
+    };
+
+}

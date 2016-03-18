@@ -1,0 +1,226 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.PickContactAdapter;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.component.TitleBar;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.component.ui.MainFragmentComponent;
+import cn.sx.decentworld.network.request.SetUserInfo;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * 
+ * @ClassName: PickContactActivity.java
+ * @Description: 选择联系人
+ * 启动：
+ *      Intent intent = new Intent(MagnateWindowActivity.this , PickContactActivity_.class);
+        intent.putExtra(PickContactActivity.PICK_TYPE, PickContactActivity.PICK_TYPE_SINGLE);
+        startActivityForResult(intent, RequestCode);
+        接收返回结果：
+ * // 转发名片,被转发人的dwID如下
+        ArrayList<String> result = data.getStringArrayListExtra(PickContactActivity.CONTACT_DWID);
+        String forwardDwId = result.get(0);
+ * @author: cj
+ * @date: 2016年1月4日 下午5:14:17
+ */
+@EActivity(R.layout.activity_pick_contact)
+public class PickContactActivity extends BaseFragmentActivity implements OnClickListener
+{
+    private static final String TAG = "PickContactActivity";
+    /**
+     * 工具类
+     */
+    @Bean
+    TitleBar titleBar;
+    @Bean
+    ToastComponent toast;
+    @Bean
+    MainFragmentComponent maincompon;
+    @Bean
+    SetUserInfo setUserInfo;
+    
+    /** 接收结果的关键字**/
+    public static final String CONTACT_DWID = "contactDwID";
+    
+    /**
+     * 选择类型
+     */
+    public static final String PICK_TYPE = "pickType";
+    /** 单人 **/
+    public static final int PICK_TYPE_SINGLE = 1;
+    /** 多人 **/
+    public static final int PICK_TYPE_MULTI = 2;
+    
+    
+    /**
+     * 界面资源
+     */
+    /** 返回 **/
+    @ViewById(R.id.main_header_left)
+    LinearLayout main_header_left;
+    /** 确定 **/
+    @ViewById(R.id.main_header_right)
+    RelativeLayout main_header_right;
+    /** 联系人列表 **/
+    @ViewById(R.id.lv_contact)
+    ListView lv_contact;
+    
+    
+    /**
+     * 变量
+     */
+    /** 选择类型 **/
+    private int mPickType;
+    private String userID;
+    /** 所有联系人 **/
+    private List<ContactUser> mContancts;
+    /** 已经选择的联系人 **/
+    private PickContactAdapter contactAdapter;
+
+
+
+    /**
+     * 创建群聊的线程
+     */
+    @AfterViews
+    public void init()
+    {
+        parseIntent();
+        initData();
+        initView();
+        initVar();
+        initListener();
+    }
+
+    /**
+     * 解析传递过来的参数
+     */
+    private void parseIntent()
+    {
+        mPickType = getIntent().getIntExtra(PICK_TYPE, -1);
+        if(mPickType == PICK_TYPE_SINGLE)
+        {
+            LogUtils.i(TAG, "单选");
+        }else if(mPickType == PICK_TYPE_MULTI)
+        {
+            LogUtils.i(TAG, "多选");
+        }else
+        {
+            LogUtils.i(TAG, "请传入选择类型");
+        }
+    }
+    
+    /**
+     * 初始化数据
+     */
+    private void initData()
+    {
+        userID = DecentWorldApp.getInstance().getDwID();
+        mContancts = new ArrayList<ContactUser>();
+        List<ContactUser> temp = ContactUser.queryAll();
+        if(temp.size()>0)
+        {
+            mContancts.addAll(temp);
+        }
+    }
+
+    /**
+     * 初始化界面资源
+     */
+    private void initView()
+    {
+        /** 初始化标题栏 **/
+        if(mPickType == PICK_TYPE_SINGLE)
+        {
+            titleBar.setTitleBar("取消", "选择联系人");
+        }else if(mPickType == PICK_TYPE_MULTI)
+        {
+            titleBar.setTitleBar("取消", "选择联系人", "确定");
+        }
+    }
+
+    /**
+     * 初始化变量
+     */
+    private void initVar()
+    {
+        contactAdapter = new PickContactAdapter(this , mContancts,mPickType);
+        lv_contact.setAdapter(contactAdapter);
+    }
+
+    /**
+     * 初始化监听
+     */
+    private void initListener()
+    {
+        main_header_left.setOnClickListener(this);
+        main_header_right.setOnClickListener(this);
+    }
+  
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.main_header_left:
+                finish();
+                break;
+            case R.id.main_header_right:
+                confirm();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 确定
+     */
+    private void confirm()
+    {
+        if(mContancts.size()>0)
+        {
+            ArrayList<String> mCheckedContacts = new ArrayList<String>();
+            for(ContactUser user:mContancts)
+            {
+                if(user.isChecked())
+                {
+                    mCheckedContacts.add(user.getFriendID());
+                }
+            }
+            
+            if(mCheckedContacts.size()>0)
+            {
+                Intent intent = new Intent();
+                intent.putStringArrayListExtra(CONTACT_DWID, mCheckedContacts);
+                setResult(RESULT_OK,intent);
+                finish();
+            }
+            else
+            {
+                toast.show("请选择联系人");
+            }
+        }
+       
+    }
+}

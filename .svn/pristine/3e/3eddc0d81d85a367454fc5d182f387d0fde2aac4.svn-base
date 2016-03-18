@@ -1,0 +1,344 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import java.util.ArrayList;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.ChatSettingGridAdapter;
+import cn.sx.decentworld.bean.ChatSetting;
+import cn.sx.decentworld.bean.ConversationList;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.TitleBar;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.EmptyMsgDialog;
+import cn.sx.decentworld.dialog.EmptyMsgDialog.EmptyMsgListener;
+import cn.sx.decentworld.widget.ExpandGridView;
+
+import com.activeandroid.query.Select;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.Click;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: ChatDetailsActivity.java
+ * @Description:聊天设置界面
+ * @author: cj
+ * @date: 2015年7月13日 下午1:47:28
+ */
+
+@EActivity(R.layout.chat_setting)
+public class ChatSettingActivity extends BaseFragmentActivity implements OnClickListener,OnItemClickListener
+{
+    private static final String TAG = "ChatSettingActivity";
+    /** 工具 **/
+    @Bean
+    ToastComponent toast;
+    @Bean
+    TitleBar titleBar;
+
+    /** 头像列表 **/
+    @ViewById(R.id.chat_setting_gridview)
+    ExpandGridView chat_setting_gridview;
+
+    /** 消息置顶 **/
+    @ViewById(R.id.iv_switch_top)
+    ImageView iv_switch_top;
+    /** 消息免打扰 **/
+    @ViewById(R.id.iv_switch_no_disturb)
+    ImageView iv_switch_no_disturb;
+    
+    @ViewById(R.id.rl_switch_msg_top)
+    RelativeLayout rl_switch_msg_top;
+    
+    @ViewById(R.id.rl_switch_msg_no_disturb)
+    RelativeLayout rl_switch_msg_no_disturb;
+    
+    /** 设置聊天背景 **/
+    @ViewById(R.id.rl_chat_details_set_bg)
+    RelativeLayout rl_chat_details_set_bg;
+    /** 情况消息记录 **/
+    @ViewById(R.id.rl_chat_details_empty_record)
+    RelativeLayout rl_chat_details_empty_record;
+    /** 举报 **/
+    @ViewById(R.id.rl_chat_details_whistleblowing)
+    RelativeLayout rl_chat_details_whistleblowing;
+
+    @ViewById(R.id.main_header_left)
+    LinearLayout main_header_left;
+
+    /** 参数 **/
+    private ArrayList<String[]> members = new ArrayList<String[]>();
+    private ChatSettingGridAdapter gridAdapter;
+    private FragmentManager fragmentManager;
+
+    /** 启动传递的参数 **/
+    private String otherID = "";
+    private String otherNick = "";
+
+    /** 内部临时变量 **/
+    /** 消息是否置顶 **/
+    private boolean isMsgTop = false;
+    /** 消息免打扰 **/
+    private boolean isMsgNoDisturb = false;
+    /** 消息清空 **/
+    private boolean isMsgClear = false;
+    private String bgPath = "";
+
+    @AfterViews
+    public void init()
+    {
+        parseIntent();
+        initView();
+        initData();
+        initListener();
+    }
+
+    /**
+     * 解析传递过来的参数
+     */
+    private void parseIntent()
+    {
+        otherID = getIntent().getStringExtra("otherID");
+        otherNick = getIntent().getStringExtra("otherNick");
+    }
+
+    /**
+     * 初始化界面资源
+     */
+    private void initView()
+    {
+        titleBar.setTitleBar("聊天详情", null);
+    }
+
+    /**
+     * 初始化数据
+     */
+    private void initData()
+    {
+        fragmentManager = getSupportFragmentManager();
+        ChatSetting chatSetting = ChatSetting.queryByDwID(otherID);
+        if (chatSetting != null)
+        {
+            if (chatSetting.isMsgTop())
+            {
+                isMsgTop = true;
+                iv_switch_top.setImageResource(R.drawable.switch_rectangle_open);
+            }
+            if (chatSetting.isMsgNoDisturb())
+            {
+                isMsgNoDisturb = true;
+                iv_switch_no_disturb.setImageResource(R.drawable.switch_rectangle_open);
+            }
+            if(CommUtil.isNotBlank(chatSetting.getChatBg()))
+            {
+                bgPath = chatSetting.getChatBg();
+            }
+        }
+        members.add(new String[]{ otherID, otherNick });
+        gridAdapter = new ChatSettingGridAdapter(ChatSettingActivity.this , R.layout.chat_setting_gridview_item , members);
+        chat_setting_gridview.setAdapter(gridAdapter);
+    }
+
+    /**
+     * 初始化监听
+     */
+    private void initListener()
+    {
+        iv_switch_top.setOnClickListener(this);
+        iv_switch_no_disturb.setOnClickListener(this);
+        rl_switch_msg_top.setOnClickListener(this);
+        rl_switch_msg_no_disturb.setOnClickListener(this);
+        rl_chat_details_set_bg.setOnClickListener(this);
+        rl_chat_details_empty_record.setOnClickListener(this);
+        rl_chat_details_whistleblowing.setOnClickListener(this);
+        main_header_left.setOnClickListener(this);
+        chat_setting_gridview.setOnItemClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.rl_switch_msg_top:
+                msgTop();
+                break;
+            case R.id.rl_switch_msg_no_disturb:
+                msgNoDisturb();
+                break;
+            case R.id.rl_chat_details_set_bg:
+                setChatBg();
+                break;
+            case R.id.rl_chat_details_empty_record:
+                emptyMsgRecord();
+                break;
+            case R.id.rl_chat_details_whistleblowing:
+                whistleBlowing();
+                break;
+            case R.id.main_header_left:
+                back();
+                break;
+        }
+    }
+
+    /**
+     * 消息置顶
+     */
+    private void msgTop()
+    {
+        if (isMsgTop)
+        {
+            isMsgTop = false;
+            iv_switch_top.setImageResource(R.drawable.switch_rectangle_close);
+        }
+        else
+        {
+            isMsgTop = true;
+            iv_switch_top.setImageResource(R.drawable.switch_rectangle_open);
+        }
+    }
+
+    /**
+     * 消息免打扰
+     */
+    private void msgNoDisturb()
+    {
+        if (isMsgNoDisturb)
+        {
+            isMsgNoDisturb = false;
+            iv_switch_no_disturb.setImageResource(R.drawable.switch_rectangle_close);
+        }
+        else
+        {
+            isMsgNoDisturb = true;
+            iv_switch_no_disturb.setImageResource(R.drawable.switch_rectangle_open);
+        }
+    }
+
+    /**
+     * 设置聊天背景
+     */
+    private void setChatBg()
+    {
+        Intent intent = new Intent(ChatSettingActivity.this , ChatSettingSetBgActivity_.class);
+        startActivity(intent);
+    }
+
+    /**
+     * 清除消息记录
+     */
+    private void emptyMsgRecord()
+    {
+        EmptyMsgListener listener = new EmptyMsgListener()
+        {
+            @Override
+            public void onEmpty()
+            {
+                // 删除本地消息
+                DWMessage.deleteByDwID(otherID);
+                // 清除该人的会话
+                ConversationList.deleteByDwID(otherID);
+                isMsgClear = true;
+                toast.show("完成");
+            }
+            @Override
+            public void onCancel()
+            {
+                toast.show("取消");
+            }
+        };
+        // 弹出确定对话框
+        EmptyMsgDialog transmitConfirmfDialog = new EmptyMsgDialog();
+        transmitConfirmfDialog.setOnListener(listener);
+        transmitConfirmfDialog.setCancelable(false);
+        transmitConfirmfDialog.show(fragmentManager, "EmptyMsgDialog");
+    }
+
+    /**
+     * 举报
+     */
+    private void whistleBlowing()
+    {
+        toast.show(Constants.DEVELOPING_NOTIFY);
+        // Intent intent = new Intent(ChatSettingActivity.this ,
+        // ChatSettingWhistleblowingActivity_.class);
+        // startActivity(intent);
+    }
+
+    /**
+     * 返回
+     */
+    private void back()
+    {
+        /** 将结果上传到服务器 （置顶、免打扰）**/
+        
+        
+        /** 保存数据 **/
+        ChatSetting chatSetting = ChatSetting.queryByDwID(otherID);
+        if (chatSetting == null)
+        {
+            chatSetting = new ChatSetting();
+            chatSetting.setUserID(DecentWorldApp.getInstance().getDwID());
+            chatSetting.setOtherID(otherID);
+        }
+        chatSetting.setMsgTop(isMsgTop);
+        chatSetting.setMsgTopTime(String.valueOf(System.currentTimeMillis()));
+        chatSetting.setMsgNoDisturb(isMsgNoDisturb);
+        chatSetting.setChatBg(bgPath);
+        chatSetting.save();
+        /** 回传参数 **/
+        Intent intent = new Intent();
+        intent.putExtra("isMsgClear", isMsgClear);
+        setResult(RESULT_OK, intent);
+        finish();
+    }
+
+    /** 
+     * 点击头像
+     */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+    {
+        if (position == gridAdapter.getCount() - 1)
+        {
+            toast.show(Constants.DEVELOPING_NOTIFY);
+//            ArrayList<String> temp = new ArrayList<String>();
+//            for (int i = 0; i < members.size(); i++)
+//            {
+//                temp.add(members.get(i)[0]);
+//            }
+//            Intent intent = new Intent(ChatSettingActivity.this , ChatPickContactActivity_.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putStringArrayList("members_had_included", temp);
+//            bundle.putBoolean("turn_another_activity", true);
+//            bundle.putInt("execute", PickContactActivity_.EXECUTE_NOW);
+//            intent.putExtras(bundle);
+//            startActivity(intent);
+        }
+        else
+        {
+            // 跳到查看对方详情的界面
+            Intent intent = new Intent(ChatSettingActivity.this , NearCardDetailActivity_.class);
+            intent.putExtra(Constants.DW_ID, members.get(position));
+            startActivity(intent);
+        }
+    }
+
+}

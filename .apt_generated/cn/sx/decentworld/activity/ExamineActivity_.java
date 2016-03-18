@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -40,14 +41,18 @@ public final class ExamineActivity_
     }
 
     private void afterSetContentView_() {
-        tvOccupation = ((TextView) findViewById(id.tv_occupation));
-        ivPass = ((ImageView) findViewById(id.iv_pass));
-        ivNoPass = ((ImageView) findViewById(id.iv_no_pass));
-        vpExamine = ((HackyViewPager) findViewById(id.vp_examine));
-        llDots = ((LinearLayout) findViewById(id.ll_dots));
         tvName = ((TextView) findViewById(id.tv_name));
+        vpExamine = ((HackyViewPager) findViewById(id.vp_examine));
+        tvNoPass = ((TextView) findViewById(id.tv_nopass));
         tvSex = ((TextView) findViewById(id.tv_sex));
-        tvIntroduce = ((TextView) findViewById(id.tv_introduce));
+        tvPass = ((TextView) findViewById(id.tv_pass));
+        tvOccupation = ((TextView) findViewById(id.tv_occupation_shortIntroduce));
+        ivPass = ((ImageView) findViewById(id.iv_pass));
+        tvCondition = ((TextView) findViewById(id.tv_condition));
+        ivNoPass = ((ImageView) findViewById(id.iv_no_pass));
+        llDots = ((LinearLayout) findViewById(id.ll_dots));
+        etIntroduce = ((EditText) findViewById(id.et_introduce));
+        tvIfEnter = ((TextView) findViewById(id.tv_ifEnter));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

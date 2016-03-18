@@ -1,0 +1,91 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.dialog;
+
+import android.app.Dialog;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+
+/**
+ * 照相机与拍照选择对话框
+ */
+public class CameraAlbumDialogFragment extends DialogFragment implements OnClickListener {
+	private Dialog mDialog;
+	private TextView tvCamera, tvAlbum, tvCancel;
+	private int position = -1;
+
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		if (null == mDialog) {
+			mDialog = new Dialog(getActivity(), R.style.ShouchangDialog);
+		}
+		mDialog.show();
+		return mDialog;
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		setFullScreen();
+	}
+
+	/**
+	 * 设置让DialogFragment的布局充满全屏
+	 * */
+	private void setFullScreen() {
+		DisplayMetrics dm = new DisplayMetrics();
+		getActivity().getWindowManager().getDefaultDisplay().getMetrics(dm);
+		getDialog().getWindow().setLayout(dm.widthPixels, getDialog().getWindow().getAttributes().height);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return View.inflate(getActivity(), R.layout.dialog_camera_album_selector, null);
+	}
+
+	@Override
+	public void onActivityCreated(Bundle arg0) {
+		super.onActivityCreated(arg0);
+		tvCamera = (TextView) getView().findViewById(R.id.tv_camera);
+		tvCamera.setOnClickListener(this);
+		tvAlbum = (TextView) getView().findViewById(R.id.tv_album);
+		tvAlbum.setOnClickListener(this);
+		tvCancel = (TextView) getView().findViewById(R.id.tv_cancel);
+		tvCancel.setOnClickListener(this);
+		if (position == 0) {
+			tvAlbum.setVisibility(View.GONE);
+		} else {
+			tvAlbum.setVisibility(View.VISIBLE);
+		}
+	}
+
+	@Override
+	public void onClick(View view) {
+		if (null != onCameraAlbumClickListener) {
+			onCameraAlbumClickListener.onCameraAlbumClick(view);
+		}
+		dismiss();
+	}
+
+	public void setPosition(int position) {
+		this.position = position;
+	}
+
+	private OnCameraAlbumClickListener onCameraAlbumClickListener;
+
+	public void setOnCameraAlbumClickListener(OnCameraAlbumClickListener onCameraAlbumClickListener) {
+		this.onCameraAlbumClickListener = onCameraAlbumClickListener;
+	};
+
+	public interface OnCameraAlbumClickListener {
+		public void onCameraAlbumClick(View view);
+	}
+}

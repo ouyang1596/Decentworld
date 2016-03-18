@@ -37,22 +37,22 @@ public final class ForgetPwdIdentifyingCodeActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        toast = ToastComponent_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
         resetPwdInfo = ResetPwdInfo_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvMobile = ((TextView) findViewById(id.tv_mobile));
-        btnOk = ((Button) findViewById(id.btn_OK));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        llForgetPwdIdentifyingCode = ((LinearLayout) findViewById(id.root__forget_pwd_identifying_code));
-        tvReSend = ((TextView) findViewById(id.tv_re_send));
         etvIdentifyingCode = ((EditText) findViewById(id.etv_identifying_code));
+        tvReSend = ((TextView) findViewById(id.tv_re_send));
+        btnOk = ((Button) findViewById(id.btn_OK));
+        llForgetPwdIdentifyingCode = ((LinearLayout) findViewById(id.root__forget_pwd_identifying_code));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        tvMobile = ((TextView) findViewById(id.tv_mobile));
         tvTimeCount = ((TextView) findViewById(id.time_count));
+        ((ToastComponent_) toast).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

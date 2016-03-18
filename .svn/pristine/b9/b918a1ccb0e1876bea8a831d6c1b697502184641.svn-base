@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="538px"
+    android:layout_height="394px"
+    android:background="@drawable/dialog_bg" 
+    android:id="@+id/root_dialog_group_change_nickname"
+    android:layout_gravity="center"
+    >
+
+    <ImageView
+        android:id="@+id/group_name_nickname_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:paddingRight="44px"
+        android:layout_marginTop="28px"
+        android:src="@drawable/close_button" />
+
+    <TextView
+        android:id="@+id/title_group_chat_nickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="42px"
+        android:text="你在本群的昵称"
+        android:textColor="#4A4A4A"
+        android:textSize="32px" />
+
+
+    <EditText
+        android:id="@+id/editT_nickname"
+        android:layout_width="450px"
+        android:layout_height="80px"
+        android:textSize="30px"
+        android:layout_below="@id/title_group_chat_nickname"
+        android:layout_centerHorizontal="true"
+        android:gravity="center"
+        android:singleLine="true"
+        android:text="123"
+        android:background="@drawable/edittext_selector"
+         >
+    </EditText>
+
+    <TextView
+        android:id="@+id/info_group_chat_nickname"
+        android:layout_width="450px"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/editT_nickname"
+        android:layout_below="@id/editT_nickname"
+        android:layout_marginTop="10px"
+        android:layout_centerHorizontal="true"
+        android:text="@string/group_name_info"
+        android:textColor="#9b9b9b"
+        android:textSize="28px" />
+
+    <Button
+        android:id="@+id/group_name_nickname_yes"
+        android:layout_width="228px"
+        android:layout_height="52px"
+        android:layout_below="@id/info_group_chat_nickname"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30px"
+        android:background="@drawable/dialog_click_selector"
+        android:text="@string/save" />
+
+</RelativeLayout>

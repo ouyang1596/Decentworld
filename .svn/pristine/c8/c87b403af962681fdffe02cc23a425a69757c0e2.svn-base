@@ -1,0 +1,94 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_activity_register_mobile"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="308px" >
+
+        <include layout="@layout/layout_register_title_bg" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center_horizontal"
+            android:orientation="vertical" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/triangle_down" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32px"
+                android:text="中国"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textsize_70px" />
+
+            <View
+                android:layout_width="60px"
+                android:layout_height="2px"
+                android:layout_marginTop="18px"
+                android:background="@color/rg_yellow" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="74px"
+        android:text="+86"
+        android:textColor="@color/rg_gray"
+        android:textSize="@dimen/textsize_26px" />
+
+    <EditText
+        android:id="@+id/et_mobile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="70px"
+        android:background="@drawable/bg_line_press"
+        android:gravity="center_horizontal"
+        android:hint="手机号"
+        android:inputType="number"
+        android:textColor="@color/rg_gray"
+        android:textSize="@dimen/textsize_26px" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8px"
+        android:src="@drawable/triangle_up" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20px"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/btn_OK"
+            android:layout_width="match_parent"
+            android:layout_height="90px"
+            android:layout_marginLeft="28px"
+            android:layout_marginRight="28px"
+            android:layout_marginTop="25px"
+            android:background="@drawable/rg_btn_bg_selector"
+            android:text="OK"
+            android:textColor="@drawable/rg_tv_color_selector"
+            android:textSize="@dimen/textsize_30px" />
+    </LinearLayout>
+
+</LinearLayout>

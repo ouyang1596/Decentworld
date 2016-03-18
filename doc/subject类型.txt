@@ -1,0 +1,22 @@
+文档更新时间 2016-03-08
+
+subject = “类型有如下”
+
+1."chat":接收到[单聊文字消息]的通知；
+2."wealth":发送消息的回执；
+3."add_friend_reason":接收到添加好友申请的消息；
+4."accept_Friend":接收到“同意”添加为好友的回执；
+5."refuse_Friend":接收到“拒绝”添加为好友的回执；
+6."delete_Friend":接收到“删除”好友的消息；
+7."picture":接收到[图片消息]的通知；（通过chatType判断是单聊or聊天室消息）
+8."audio":接收到[语音消息]的通知；（通过chatType判断是单聊or聊天室消息）
+9."roomMSG":接收到[聊天室文字消息]的通知；
+10."room_presence":接收到聊天室成员上线的通知；
+11."room_leave":接收到聊天室成员下线的通知；
+12."error":接收到错误的通知（错误类型包括："身家不足"、"找不到用户"）
+13."broadcast_benefit":有新的收益；[推荐功能]
+14:"broadcast_worth":身价改变通知
+15."broadcast_check":向审核者推送去疑
+16."CheckResult":向被审核者推送去疑
+17."match":匹配成功
+18."card":接收到[单聊名片消息]的通知；

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_chat_me_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/main_header_bg" >
+
+        <TextView
+            android:id="@+id/tv_header_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="@string/main_bottom_me"
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size_16" />
+    </RelativeLayout>
+
+    <!-- 下拉刷新布局 -->
+
+    <com.handmark.pulltorefresh.library.PullToRefreshScrollView
+        xmlns:ptr="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/grament_me_work_sv"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        ptr:ptrAnimationStyle="flip"
+        ptr:ptrMode="both" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="360px" >
+
+                <!-- 头像 -->
+
+                <ImageView
+                    android:id="@+id/iv_chat_me_avatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="360px"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/chat_me_header_icon1_" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="142px" >
+
+                <LinearLayout
+                    android:id="@+id/ll_chat_me_setting"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/user_detail_margin_left"
+                    android:background="@drawable/chat_me_header_icon_circle"
+                    android:clickable="true" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="设置" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/tv_chat_me_refer_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="10px"
+                    android:text="我自己" />
+
+                <TextView
+                    android:id="@+id/tv_chat_me_worth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/tv_chat_me_refer_1"
+                    android:text="100"
+                    android:textColor="@color/red" />
+
+                <TextView
+                    android:id="@+id/tv_chat_me_refer_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@id/tv_chat_me_worth"
+                    android:text="身价" />
+
+                <TextView
+                    android:id="@+id/tv_chat_me_refer_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/tv_chat_me_refer_1"
+                    android:text="身家 " />
+
+                <TextView
+                    android:id="@+id/tv_chat_me_wealth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/tv_chat_me_refer_3"
+                    android:text="200"
+                    android:textColor="@color/red" />
+
+                <LinearLayout
+                    android:id="@+id/ll_chat_me_recharge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="@dimen/user_detail_margin_left"
+                    android:layout_marginRight="@dimen/user_detail_margin_right"
+                    android:background="@drawable/chat_me_header_icon_circle"
+                    android:clickable="true" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="充值" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="30px"
+                android:background="#dfe2eb" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="100px"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:id="@+id/ll_chat_me_user_detail"
+                    android:layout_width="0px"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true" >
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+
+                        <TextView
+                            android:id="@+id/tv_chat_me_refer_4"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="简介" />
+
+                        <TextView
+                            android:id="@+id/tv_chat_me_edit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_marginLeft="30px"
+                            android:layout_toRightOf="@id/tv_chat_me_refer_4"
+                            android:gravity="center_vertical"
+                            android:text="编辑"
+                            android:textColor="@color/blue" />
+                    </RelativeLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/ll_chat_me_work_circle"
+                    android:layout_width="0px"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="作品圈" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/iv_chat_me_tab"
+                android:layout_width="match_parent"
+                android:layout_height="12px"
+                android:background="@drawable/user_detail_info_tab_left" />
+
+            <LinearLayout
+                android:id="@+id/ll_chat_me_container"
+                android:layout_width="match_parent"
+                android:layout_height="0px"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </LinearLayout>
+    </com.handmark.pulltorefresh.library.PullToRefreshScrollView>
+
+</LinearLayout>

@@ -1,0 +1,154 @@
+package cn.sx.decentworld.utils;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import android.app.Activity;
+import android.util.Log;
+
+/**
+ * 
+ * @ClassName: ExitAppUtils.java
+ * @Description: 管理app的activity界面，方便程序退出时自动清理所有的Activity
+ * @author: cj
+ * @date: 2015年9月5日 下午6:50:13
+ */
+public class ExitAppUtils
+{
+    private static final String TAG = "ExitAppUtils";
+
+    /**
+     * 转载Activity的容器
+     */
+    public List<Activity> mActivityList = new LinkedList<Activity>();
+    private static ExitAppUtils instance = new ExitAppUtils();
+
+    /**
+     * 将构造函数私有化
+     */
+    private ExitAppUtils()
+    {
+    };
+
+    /**
+     * 获取ExitAppUtils的实例，保证只有一个ExitAppUtils实例存在
+     * 
+     * @return
+     */
+    public static ExitAppUtils getInstance()
+    {
+        return instance;
+    }
+
+    /**
+     * 添加Activity实例到mActivityList中，在onCreate()中调用
+     * 
+     * @param activity
+     */
+    public void addActivity(Activity activity)
+    {
+        mActivityList.add(activity);
+    }
+
+    /**
+     * 从容器中删除多余的Activity实例，在onDestroy()中调用
+     * 
+     * @param activity
+     */
+    public void delActivity(Activity activity)
+    {
+        mActivityList.remove(activity);
+    }
+
+    /**
+     * 根据activity所在的位置，从容器中删除多余的Activity实例
+     * 
+     * @param position
+     */
+    public void delActivity_position(int position)
+    {
+        mActivityList.remove(position);
+    }
+
+    /**
+     * 退出程序的方法（有问题） 将所有的Acitvity finish,然后退出
+     */
+    public void exit()
+    {
+        if(mActivityList != null && mActivityList.size()>0)
+        {
+            for (Activity activity : mActivityList)
+            {
+                activity.finish();
+            }
+        }
+        
+        try
+        {
+            /** 下面两句代码待考虑 **/
+            android.os.Process.killProcess(android.os.Process.myPid());
+            System.exit(0);
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "退出出错，"+e);
+        }
+    }
+
+    /**
+     * 退出返回到登录界面
+     */
+    public void loginout()
+    {
+        for (Activity activity : mActivityList)
+        {
+            activity.finish();
+        }
+    }
+
+    /**
+     * 获取当前的Activity列表
+     * 
+     * @return
+     */
+    public List<Activity> getActivityList()
+    {
+        return mActivityList;
+    }
+
+    /**
+     * 通过类名删除
+     * 
+     * @param localClassName
+     */
+    public void deleteBy(String localClassName)
+    {
+        for (Activity activity : mActivityList)
+        {
+            if (activity.getLocalClassName().equals(localClassName))
+            {
+                activity.finish();
+                break;
+            }
+        }
+    }
+
+    /**
+     * 销毁所有页面回到主界面
+     * 
+     * @param localClassName
+     */
+    public void toMainActivity(String localClassName)
+    {
+        for (Activity activity : mActivityList)
+        {
+            // 格式
+            // activity.MainActivity_
+            LogUtils.i(TAG, "此时：" + activity.getLocalClassName());
+            if (!activity.getLocalClassName().equals(localClassName))
+            {
+                activity.finish();
+            }
+        }
+    }
+}

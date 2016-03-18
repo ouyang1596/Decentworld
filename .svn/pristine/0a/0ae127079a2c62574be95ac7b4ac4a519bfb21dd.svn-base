@@ -1,0 +1,96 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.component.ui;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.activity.LoginActivity_;
+import cn.sx.decentworld.bean.StrangerInfo;
+import cn.sx.decentworld.service.PacketListenerService;
+import cn.sx.decentworld.utils.ExitAppUtils;
+import cn.sx.decentworld.utils.LoginHelper;
+
+import com.googlecode.androidannotations.annotations.AfterInject;
+import com.googlecode.androidannotations.annotations.EBean;
+import com.googlecode.androidannotations.annotations.RootContext;
+
+/**
+ * @ClassName: MainFragmentComponent.java
+ * @Description: 主界面的4个功能模块的组件
+ * @author: yj
+ * @date: 2015年7月17日 下午5:19:46
+ */
+
+@EBean
+public class MainFragmentComponent {
+
+	@RootContext
+	Context context;
+
+	@RootContext
+	Activity activity;
+
+	@AfterInject
+	public void init() {
+
+	}
+
+	/**
+	 * 登出注销操作
+	 */
+	public void loginout() {
+        ProgressDialog pd=null;
+        try {
+            pd = new ProgressDialog(context);
+            pd.setMessage("正在退出登录...");
+            pd.setCanceledOnTouchOutside(false);
+            pd.show();
+        } catch (Exception e) {
+            Log.e(MainFragmentComponent.class.getName(),"退出出错",e);
+        }
+
+		/** 清除SharedPre和Application中的数据 **/
+		LoginHelper.clearLoginInfo(context);
+		/** 删除数据库中的某些表 **/
+		StrangerInfo.deleteAll();
+		/** 停止服务 **/
+		Intent service = new Intent(context, PacketListenerService.class);
+		context.stopService(service);
+		
+		/** 断开与服务器的连接 **/
+		DecentWorldApp.getInstance().closeConnection();
+		//返回到LoginActivity
+//		String username = DecentWorldApp.getInstance().getUserName();
+		Intent intent = new Intent(context, LoginActivity_.class);
+//		intent.putExtra("loginout", true);
+//		intent.putExtra("username", username);
+		context.startActivity(intent);
+		/** 销毁所有Activity **/
+		ExitAppUtils.getInstance().loginout();
+		///////////////////////////
+        
+        try {
+            if(pd!=null){
+                pd.dismiss();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 主界面中fragment跳转
+     * @param ac
+     *            跳转activity
+     */
+    public <T> void toActivity(Class<T> ac)
+    {
+        Intent intent = new Intent(activity , ac);
+        activity.startActivity(intent);
+    }
+}

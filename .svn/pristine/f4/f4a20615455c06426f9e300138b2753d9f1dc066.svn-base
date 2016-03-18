@@ -1,0 +1,171 @@
+package cn.sx.decentworld.activity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.Intent;
+import android.view.View;
+import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.ContactAdapter;
+import cn.sx.decentworld.adapter.ContactAdapter.OnContactClickListener;
+import cn.sx.decentworld.bean.ContactBean;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
+@EActivity(R.layout.activity_contact)
+public class ContactActivity extends BaseFragmentActivity implements
+		OnContactClickListener {
+	@ViewById(R.id.lv_contact)
+	PullToRefreshListView lvContact;
+	@Bean
+	ToastComponent toast;
+	private String data;
+	private List<ContactBean> contactBeans;
+	public static final String JSON_DATA = "JSON_DATA";
+	private String mSearchType;
+	private ContactAdapter contactAdapter;
+	private SendUrl mSendUrl;
+
+	@AfterViews
+	public void init() {
+		CGetIntent();
+		initData();
+		parserJsonData();
+	}
+
+	private HashMap<String, String> mobileNameMap;
+
+	private void CGetIntent() {
+		data = getIntent().getStringExtra(JSON_DATA);
+		mobileNameMap = (HashMap<String, String>) getIntent()
+				.getSerializableExtra("mobileNameMap");
+	}
+
+	private void initData() {
+		mSendUrl = new SendUrl(this);
+		contactBeans = new ArrayList<ContactBean>();
+		contactAdapter = new ContactAdapter(this, contactBeans);
+		contactAdapter.setOnContactClickListener(this);
+		lvContact.setAdapter(contactAdapter);
+	}
+
+	private void parserJsonData() {
+		try {
+			JSONObject object = new JSONObject(data);
+			mSearchType = object.getString("searchType");
+			JSONArray array = object.getJSONArray("recommend_contact");
+			LogUtils.e("bm", "array--" + array.toString());
+			List<ContactBean> datas = (List<ContactBean>) JsonUtils
+					.json2BeanArray(array.toString(), ContactBean.class);
+			replaceName(datas);
+			// contactAdapter.setTag(Constants.SEARCH_TYPE, mSearchType);
+			if (null != datas) {
+				contactBeans.addAll(datas);
+				contactAdapter.notifyDataSetChanged();
+			}
+		} catch (JSONException e) {
+			toast.show("解析错误");
+		}
+	}
+
+	private void replaceName(List<ContactBean> datas) {
+		for (int i = 0; i < datas.size(); i++) {
+			ContactBean contactBean = datas.get(i);
+			if (null != mobileNameMap.get(contactBean.phoneNum)) {
+				contactBean.name = mobileNameMap.get(contactBean.phoneNum);
+			}
+		}
+	}
+
+	@Override
+	public void OnContactClick(View v) {
+		int position = (Integer) v.getTag(Constants.ITEM_POSITION);
+		ContactBean contactBean = contactBeans.get(position);
+		Intent intent;
+		switch (v.getId()) {
+		case R.id.ll_contact_talk:
+			intent = new Intent(this, ChatActivity_.class);
+			intent.putExtra(ChatActivity.OTHER_ID, contactBean.dwID);
+			intent.putExtra(ChatActivity.OTHER_NICKNAME, contactBean.name);
+			intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
+			if (ContactUser.isContact(contactBean.dwID)) {
+				intent.putExtra("chatRelationship",
+						DWMessage.CHAT_RELATIONSHIP_FRIEND);
+			} else {
+				intent.putExtra("chatRelationship",
+						DWMessage.CHAT_RELATIONSHIP_STRANGER);
+			}
+			intent.putExtra(ChatActivity.OTHER_WORTH, contactBean.worth);
+			startActivity(intent);
+			break;
+
+		case R.id.iv_contact_avatar:
+			intent = new Intent(this, NearCardDetailActivity_.class);
+			intent.putExtra(Constants.DW_ID, contactBean.dwID);
+			startActivity(intent);
+			break;
+		case R.id.iv_contact_add:
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+			map.put("friendID", contactBean.dwID);
+			map.put("remark", contactBean.name);
+			addFriendRequest(map);
+			break;
+		}
+	}
+
+	/**
+	 * 申请添加朋友
+	 * */
+	private void addFriendRequest(HashMap<String, String> map) {
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH
+				+ Constants.CONTACT_ADD_FRIEDN, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						if (2222 == msg.getResultCode()) {
+							showToastInfo("申请已发送");
+						} else {
+							showToastInfo(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToastInfo(Constants.NET_WRONG);
+					}
+				});
+	}
+
+	private void showToastInfo(final String data) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				Toast.makeText(mContext, data, Toast.LENGTH_SHORT).show();
+			}
+		});
+	}
+}

@@ -38,8 +38,8 @@ public final class SocialStatusActivity_
 
     private void afterSetContentView_() {
         btnOk = ((Button) findViewById(id.btn_OK));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         etSocialStatus = ((EditText) findViewById(id.et_social_status));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

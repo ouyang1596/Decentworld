@@ -1,0 +1,493 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.benefit;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.PickContactActivity;
+import cn.sx.decentworld.activity.PickContactActivity_;
+import cn.sx.decentworld.adapter.GrListAdapter;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.NoblePerson;
+import cn.sx.decentworld.bean.UserExtraInfo;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.ReminderDialog;
+import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.network.request.SetUserInfo;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+import cn.sx.decentworld.utils.ToastUtils;
+import cn.sx.decentworld.widget.CircularImage;
+import cn.sx.decentworld.widget.ExpandGridView;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: GrBenefitFragment.java
+ * @Description: 贵人窗口
+ * @author: cj
+ * @date: 2016年1月14日 上午11:02:31
+ */
+@EFragment(R.layout.fragment_gr_benefit)
+public class GrBenefitFragment extends BaseFragment implements OnClickListener
+{
+    /**
+     * 常量
+     */
+    private static final String TAG = "GrBenefitFragment";
+    private static final int GET_MY_GR = 1;// 获取谁是我的贵人
+    private static final int GET_GR_ALL_BENEFIT = 2;// 获得作为比人的贵人的总收益
+    private static final int GET_MY_MAGNATE = 3;// 我是谁的贵人列表
+    private static final int ADD_GR = 4;// 添加贵人
+    private static final int MODIFY_GR = 5;// 修改贵人
+    private static final int DELETE_GR = 6;// 删除贵人
+
+    /**
+     * 工具类
+     */
+    @Bean
+    ToastComponent toast;
+    @Bean
+    GetUserInfo getUserInfo;
+    @Bean
+    SetUserInfo setUserInfo;
+
+    /**
+     * 界面资源
+     */
+    /** 贵人的规则 **/
+    @ViewById(R.id.tv_gr_benefit_rule)
+    TextView tv_gr_benefit_rule;
+
+    /** 我的贵人头像 **/
+    @ViewById(R.id.iv_gr_benefit_icon)
+    CircularImage iv_gr_benefit_icon;
+
+    /** 点击提取贵人所得收益 **/
+    @ViewById(R.id.rl_gr_benefit_draw)
+    RelativeLayout rl_gr_benefit_draw;
+    /** 贵人收益额 **/
+    @ViewById(R.id.tv_gr_benefit_income)
+    TextView tv_gr_benefit_income;
+
+    /** 点击添加贵人或修改贵人 **/
+    @ViewById(R.id.rl_gr_benefit_add)
+    RelativeLayout rl_gr_benefit_add;
+    /** 显示添加还是修改贵人 **/
+    @ViewById(R.id.tv_gr_benefit_add)
+    TextView tv_gr_benefit_add;
+    /** 点击添加删除贵人 **/
+    @ViewById(R.id.rl_gr_benefit_delete)
+    RelativeLayout rl_gr_benefit_delete;
+    /** 贵人头像列表 **/
+    @ViewById(R.id.gv_gr_benefit_icon)
+    ExpandGridView gv_gr_benefit_icon;
+    /** 不是别人的贵人的提示 **/
+    @ViewById(R.id.ll_gr_benefit_remind)
+    LinearLayout ll_gr_benefit_remind;
+
+    /**
+     * 变量
+     */
+    private boolean isPrepared = false;
+    private String userID = "";
+    private List<NoblePerson> myProteges;
+    private GrListAdapter grListAdapter;
+
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        initVar();
+        initListener();
+        isPrepared = true;
+        lazyLoad();
+    }
+
+    /**
+     * 
+     */
+    private void initVar()
+    {
+        userID = DecentWorldApp.getInstance().getDwID();
+        myProteges = new ArrayList<NoblePerson>();
+        grListAdapter = new GrListAdapter(getActivity() , myProteges , getFragmentManager());
+        gv_gr_benefit_icon.setAdapter(grListAdapter);
+    }
+
+    /**
+     * 初始化监听
+     */
+    private void initListener()
+    {
+        iv_gr_benefit_icon.setOnClickListener(this);
+        rl_gr_benefit_draw.setOnClickListener(this);
+        rl_gr_benefit_add.setOnClickListener(this);
+        rl_gr_benefit_delete.setOnClickListener(this);
+    }
+
+    @Override
+    protected void lazyLoad()
+    {
+        if (isPrepared)
+        {
+            /** 有网络 **/
+            if (NetworkUtils.isNetWorkConnected(getActivity()))
+            {
+                /** 谁是我的贵人 **/
+                getUserInfo.getMyGr(userID, handler, GET_MY_GR);
+                /** 获取我作为别人的贵人获得的总收益 **/
+                getUserInfo.getGrAllBenefit(userID, handler, GET_GR_ALL_BENEFIT);
+                /** 获取我的贵人列表 **/
+                getUserInfo.getMyProteges(userID, handler, GET_MY_MAGNATE);
+            }
+            else
+            /** 没有网络 **/
+            {
+                /** 谁是我的贵人 **/
+                NoblePerson noblePerson = NoblePerson.queryToMe();
+                if (noblePerson != null)
+                {
+                    String grID = noblePerson.getOtherID();
+                    String icon = ImageUtils.getIconByDwID(grID, ImageUtils.ICON_SMALL);
+                    if (CommUtil.isNotBlank(icon))
+                    {
+                        ImageLoaderHelper.mImageLoader.displayImage(icon, iv_gr_benefit_icon, ImageLoaderHelper.mOptions);
+                    }
+                }
+
+                /** 获取我作为别人的贵人获得的总收益 **/
+                UserExtraInfo extraInfo = UserExtraInfo.queryBy(userID);
+                if (extraInfo != null)
+                {
+                    float grTotalBenefit = extraInfo.getGrTotalBenefit();
+                    tv_gr_benefit_income.setText(grTotalBenefit + "");
+                }
+
+                /** 获取我是谁的贵人的列表 **/
+                List<NoblePerson> list = NoblePerson.queryToOther();
+                if (list.size() > 0)
+                {
+                    myProteges.addAll(list);
+                    grListAdapter.notifyDataSetChanged();
+                    gv_gr_benefit_icon.setVisibility(View.VISIBLE);
+                    ll_gr_benefit_remind.setVisibility(View.GONE);
+                }
+                else
+                {
+                    gv_gr_benefit_icon.setVisibility(View.GONE);
+                    ll_gr_benefit_remind.setVisibility(View.VISIBLE);
+                }
+            }
+        }
+
+    }
+
+    Handler handler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            switch (msg.what)
+            {
+                case GET_MY_GR:
+                    if (msg.arg1 == 0)
+                    {
+                        LogUtils.i(TAG, "没有贵人");
+                        tv_gr_benefit_add.setText("添加");
+                        rl_gr_benefit_delete.setVisibility(View.INVISIBLE);
+                    }
+                    else if (msg.arg1 == 1)
+                    {
+                        NoblePerson noblePerson = NoblePerson.queryToMe();
+                        if(noblePerson!=null)
+                        {
+                            noblePerson.delete();
+                        }
+
+                        String resultStr = msg.obj.toString();
+                        /** 解析 **/
+                        JSONObject jsonObject = JSON.parseObject(resultStr);
+                        JSONObject object = jsonObject.getJSONObject("userInfo");
+                        NoblePerson myProtege = new NoblePerson(NoblePerson.GR_TO_ME);
+                        myProtege.setGender(object.getString("gender"));
+                        myProtege.setOtherID(object.getString("id"));
+                        myProtege.setOccupation(object.getString("occupation"));
+                        myProtege.setShowName(object.getString("showName"));
+                        myProtege.setUserType(object.getIntValue("userType"));
+                        myProtege.setWorth(object.getFloatValue("worth"));
+                        myProtege.save();
+                        
+                        String id = object.getString("id");
+                        LogUtils.i(TAG, "id="+id);
+
+                        String icon = ImageUtils.getIconByDwID(id, ImageUtils.ICON_SMALL);
+                        ImageLoaderHelper.mImageLoader.displayImage(icon, iv_gr_benefit_icon);
+                        tv_gr_benefit_add.setText("修改");
+                        rl_gr_benefit_delete.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                case GET_GR_ALL_BENEFIT:
+                    JSONObject resultObject = (JSONObject) JSON.parse(msg.obj.toString());
+                    float grTotalBenefit = resultObject.getFloatValue("totalBenefit");
+                    tv_gr_benefit_income.setText(grTotalBenefit + "");
+
+                    UserExtraInfo extraInfo = UserExtraInfo.queryBy(userID);
+                    if (extraInfo == null)
+                    {
+                        extraInfo = new UserExtraInfo();
+                    }
+                    extraInfo.setGrTotalBenefit(grTotalBenefit);
+                    extraInfo.save();
+
+                    LogUtils.i(TAG, "我作为别人的贵人获取的总收益为：" + grTotalBenefit);
+                    break;
+                case GET_MY_MAGNATE:
+                    /** 清除历史数据 **/
+                    NoblePerson.deleteBy(DecentWorldApp.getInstance().getDwID(), NoblePerson.GR_TO_OTHER);
+                    myProteges.clear();
+                    /** 解析Json数据 **/
+                    String json_result = (String) msg.obj;
+                    JSONObject jsonObject = JSON.parseObject(json_result);
+                    String result = jsonObject.getString("result");
+                    JSONArray array = JSON.parseArray(result);
+                    if (array.size() > 0)
+                    {
+                        for (int i = 0; i < array.size(); i++)
+                        {
+                            JSONObject object = array.getJSONObject(i);
+                            NoblePerson myProtege = new NoblePerson(NoblePerson.GR_TO_OTHER);
+                            myProtege.setGender(object.getString("gender"));
+                            myProtege.setOtherID(object.getString("id"));
+                            myProtege.setOccupation(object.getString("occupation"));
+                            myProtege.setShowName(object.getString("showName"));
+                            myProtege.setUserType(object.getIntValue("userType"));
+                            myProtege.setWorth(object.getFloatValue("worth"));
+                            myProtege.save();
+                            myProteges.add(myProtege);
+                        }
+                        /** 刷新界面 **/
+                        grListAdapter.notifyDataSetChanged();
+                        gv_gr_benefit_icon.setVisibility(View.VISIBLE);
+                        ll_gr_benefit_remind.setVisibility(View.GONE);
+                    }
+                    else
+                    {
+                        gv_gr_benefit_icon.setVisibility(View.GONE);
+                        ll_gr_benefit_remind.setVisibility(View.VISIBLE);
+                    }
+                    LogUtils.i(TAG, "获取我是谁的贵人的列表完成,我是 " + myProteges.size() + " 个人的贵人");
+                    break;
+
+                case ADD_GR:
+                {
+                    String grID = msg.obj.toString();
+                    setAndModifyGr(grID);
+                    tv_gr_benefit_add.setText("修改");
+                    rl_gr_benefit_delete.setVisibility(View.VISIBLE);
+                    ToastUtils.toast(getActivity(), "添加贵人成功");
+                }
+                    break;
+                case MODIFY_GR:
+                {
+                    String grID = msg.obj.toString();
+                    setAndModifyGr(grID);
+                    ToastUtils.toast(getActivity(), "修改贵人成功");
+                }
+                    break;
+                case DELETE_GR:
+                {
+                    String grID = msg.obj.toString();
+                    setAndModifyGr(grID);
+                    tv_gr_benefit_add.setText("添加");
+                    rl_gr_benefit_delete.setVisibility(View.INVISIBLE);
+                    ToastUtils.toast(getActivity(), "删除贵人成功");
+                }
+                    break;
+                default:
+                    break;
+            }
+        };
+    };
+
+    /**
+     * 
+     * @param grID
+     */
+    private void setAndModifyGr(String grID)
+    {
+        if (CommUtil.isNotBlank(grID))
+        {
+            String icon = ImageUtils.getIconByDwID(grID, ImageUtils.ICON_SMALL);
+            if (CommUtil.isNotBlank(icon))
+                ImageLoaderHelper.mImageLoader.displayImage(icon, iv_gr_benefit_icon, ImageLoaderHelper.mOptions);
+        }
+        else
+        {
+            iv_gr_benefit_icon.setImageResource(R.drawable.loading_pic);
+        }
+        
+        if(CommUtil.isBlank(grID))
+        {
+            NoblePerson noblePerson = NoblePerson.queryToMe();
+            if(noblePerson!=null)
+            {
+                noblePerson.delete();
+            }
+        }
+        else
+        {
+            NoblePerson noblePerson = NoblePerson.queryToMe();
+            if(noblePerson == null)
+                noblePerson = new NoblePerson(NoblePerson.GR_TO_ME);
+            ContactUser contactUser = ContactUser.queryByDwID(grID);
+            if(contactUser!=null)
+            {
+                noblePerson.setGender(contactUser.getGender());
+                noblePerson.setOtherID(contactUser.getFriendID());
+                noblePerson.setOccupation(contactUser.getOccupation());
+                noblePerson.setShowName(contactUser.getShowName());
+                noblePerson.setUserType(contactUser.getUserType());
+                noblePerson.setWorth(contactUser.getWorth());
+                noblePerson.save();
+            }
+        }
+
+    }
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void turnToTab(int tab)
+    {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.iv_gr_benefit_icon:
+                /** 点击我的贵人头像，查看贵人的详细资料 **/
+                toast.show("查看贵人资料");
+                break;
+            case R.id.rl_gr_benefit_draw:
+                /** 点击提现 **/
+                toast.show("提现");
+                break;
+            case R.id.rl_gr_benefit_add:
+                /** 点击添加或修改贵人 **/
+                addAndModifyGr();
+                break;
+            case R.id.rl_gr_benefit_delete:
+                /** 点击删除贵人 **/
+                deleteGr();
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 删除贵人
+     */
+    private void deleteGr()
+    {
+        NoblePerson noblePerson = NoblePerson.queryToMe();
+        if (noblePerson!=null)
+        {
+            setUserInfo.setUserGr(userID, "", handler, DELETE_GR);
+        }
+        else
+        {
+            toast.show("你还没有设置贵人哦");
+        }
+    }
+
+    /**
+     * 添加或修改贵人
+     */
+    private void addAndModifyGr()
+    {
+        if (tv_gr_benefit_add.getText().toString().equals("添加"))
+        {
+            setGr();
+        }
+        else
+        {
+            /** 提示需要100虚拟币 **/
+            ReminderDialog dialog = new ReminderDialog();
+            dialog.setInfo("修改贵人需要100虚拟币\n\n是否继续？");
+            dialog.setListener(new ReminderListener()
+            {
+                @Override
+                public void confirm()
+                {
+                    setGr();
+                }
+            });
+            dialog.show(getFragmentManager(), "setGr");
+        }
+    }
+
+    /**
+     * 设置贵人，打开联系人列表，选择联系人
+     */
+    private void setGr()
+    {
+        Intent intent = new Intent(getActivity() , PickContactActivity_.class);
+        intent.putExtra(PickContactActivity.PICK_TYPE, PickContactActivity.PICK_TYPE_SINGLE);
+        startActivityForResult(intent, ADD_GR);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK)
+        {
+            if (requestCode == ADD_GR)
+            {
+                ArrayList<String> result = data.getStringArrayListExtra(PickContactActivity.CONTACT_DWID);
+                String grID = result.get(0);
+                LogUtils.i(TAG, "设置或修改贵人返回了结果,grID=" + grID);
+                if (CommUtil.isNotBlank(grID))
+                {
+                    // 将信息上传到服务器（设置和修改）
+                    setUserInfo.setUserGr(userID, grID, handler, ADD_GR);
+                }
+            }
+        }
+    }
+
+}

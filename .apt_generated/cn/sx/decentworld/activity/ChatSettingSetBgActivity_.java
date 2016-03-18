@@ -33,17 +33,17 @@ public final class ChatSettingSetBgActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        titleBar = TitleBar_.getInstance_(this);
         picture = ChoceAndTakePictureComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         chat_setting_set_bg_take_picture = ((RelativeLayout) findViewById(id.chat_setting_set_bg_take_picture));
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         chat_setting_set_bg_choice_picture = ((RelativeLayout) findViewById(id.chat_setting_set_bg_choice_picture));
         chat_setting_set_bg_fromlocal = ((RelativeLayout) findViewById(id.chat_setting_set_bg_fromlocal));
-        ((TitleBar_) titleBar).afterSetContentView_();
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         ((ChoceAndTakePictureComponent_) picture).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

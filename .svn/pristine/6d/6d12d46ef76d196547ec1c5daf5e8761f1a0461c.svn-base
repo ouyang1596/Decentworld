@@ -1,0 +1,95 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.engine;
+
+import java.util.HashMap;
+
+import android.os.Message;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.android.volley.Request.Method;
+
+/**
+ * @ClassName: IncomeEngine.java
+ * @Description: 收益业务类
+ * @author: cj
+ * @date: 2016年3月16日 下午4:31:29
+ */
+public class IncomeEngine
+{
+    private static final String TAG = "IncomeEngine";
+    private String userID = "";
+    private SendUrl sendUrl;
+    
+    /**
+     * 初始化函数
+     */
+    public IncomeEngine()
+    {
+        userID = DecentWorldApp.getInstance().getDwID();
+        sendUrl = new SendUrl(DecentWorldApp.getInstance().getApplicationContext());
+    }
+    
+    
+    
+    /**
+     * 验证用户是否曾经设置过提现密码
+     * @param listener
+     */
+    public void isSetIncomePwd(final IsSetIncomeListener listener)
+    {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("dwID", userID);
+        LogUtils.i(TAG, "isSetIncomePwd...begin,dwID=" + userID );
+        sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_HAS_INCOME_PWD, Method.GET, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String resultJSON, ResultBean resultBean)
+            {
+                LogUtils.i(TAG,
+                        "isSetIncomePwd...onSuccess,resultBean.getResultCode=" + resultBean.getResultCode() + ",resultBean.getMsg=" + resultBean.getMsg() + ",resultBean.getData=" + resultBean.getData());
+                if (resultBean.getResultCode() == 2222)
+                {
+                    LogUtils.i(TAG, "isSetIncomePwd...success");
+                    boolean isSet = Boolean.getBoolean(resultBean.getData().toString());
+                    listener.onSuccess(isSet);
+                }
+                else if (resultBean.getResultCode() == 3333)
+                {
+                    LogUtils.i(TAG, "isSetIncomePwd...failure");
+                    listener.onFailure("请求出错");
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.i(TAG, "isSetIncomePwd...onFailure");
+                listener.onFailure(Constants.NET_WRONG);
+            }
+        });
+
+        
+    }
+    
+    /**
+     * 验证用户是否曾经设置过提现密码的回调监听
+     */
+    public interface IsSetIncomeListener
+    {
+        public void onSuccess(boolean isSet);
+        public void onFailure(String cause);
+    }
+    
+    
+    
+    
+
+}

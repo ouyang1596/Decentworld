@@ -40,22 +40,22 @@ public final class RegisterNickActivity_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
-        keyboardComponent = KeyboardComponent_.getInstance_(this);
         registerComponent = RegisterComponent_.getInstance_(this);
+        keyboardComponent = KeyboardComponent_.getInstance_(this);
         getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         etNickName = ((EditText) findViewById(id.et_nickname));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
         btnOk = ((Button) findViewById(id.btn_OK));
-        llRegisterNick = ((LinearLayout) findViewById(id.root_activity_register_nick));
-        tvOccupation = ((TextView) findViewById(id.tv_occupation));
         rgSex = ((RadioGroup) findViewById(id.rg_sex));
+        tvOccupation = ((TextView) findViewById(id.tv_occupation_shortIntroduce));
+        llRegisterNick = ((LinearLayout) findViewById(id.root_activity_register_nick));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((ToastComponent_) toast).afterSetContentView_();
-        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((RegisterComponent_) registerComponent).afterSetContentView_();
+        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }

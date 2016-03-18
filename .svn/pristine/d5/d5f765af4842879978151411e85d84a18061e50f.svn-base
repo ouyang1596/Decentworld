@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/chat_find_background"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.2635"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/fragment_chat_chat_ll1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:focusable="false"
+            android:gravity="bottom" >
+
+            <RelativeLayout
+                android:id="@+id/fragment_chat_find_work_circle"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/find_item_selector"
+                android:clickable="true"
+                android:focusable="true" >
+
+                <ImageView
+                    android:id="@+id/fragment_chat_chat_iv1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/work_circle" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_toRightOf="@+id/fragment_chat_chat_iv1"
+                    android:text="@string/work_circle"
+                    android:textColor="@color/chat_find_text_color"
+                    android:textSize="@dimen/text_size_16" />
+            </RelativeLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/fragment_chat_chat_ll2"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:focusable="false"
+            android:gravity="bottom" >
+
+            <RelativeLayout
+                android:id="@+id/fragment_chat_find_group_interested"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/find_item_selector"
+                android:clickable="true"
+                android:focusable="true" >
+
+                <ImageView
+                    android:id="@+id/fragment_chat_chat_iv2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@drawable/group_interested" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_toRightOf="@+id/fragment_chat_chat_iv2"
+                    android:text="@string/string_group_interested"
+                    android:textColor="@color/chat_find_text_color"
+                    android:textSize="@dimen/text_size_15" />
+            </RelativeLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.7365" />
+
+</LinearLayout>

@@ -1,0 +1,93 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.utils;
+
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import cn.sx.decentworld.bean.NearbyStrangerInfo;
+
+/**
+ * @ClassName: DWUtils.java
+ * @Description:
+ * @author: cj
+ * @date: 2015年12月10日 下午5:34:25
+ */
+public class DWUtils {
+	/**
+	 * 按照距离进行排序
+	 * */
+	public static void sortList(List<NearbyStrangerInfo> nearByStrangerInfoList) {
+		// Collections.sort(groupMemberInfoList,
+		// new Comparator<GroupMemberInfo>() {
+		// @Override
+		// public int compare(GroupMemberInfo con1,
+		// GroupMemberInfo con2) {
+		//
+		// }
+		//
+		// });
+		Collections.sort(nearByStrangerInfoList,
+				new Comparator<NearbyStrangerInfo>() {
+
+					@Override
+					public int compare(NearbyStrangerInfo near1,
+							NearbyStrangerInfo near2) {
+						if (near1 == null && near2 != null) {
+							return -1;
+						}
+						if (near1 != null && near2 == null) {
+							return 1;
+						}
+						if (near1 == null && near2 == null) {
+							return 0;
+						}
+						String distance1 = near1.getDistance();
+						Float d1 = Float.valueOf(distance1);
+						String distance2 = near2.getDistance();
+						Float d2 = Float.valueOf(distance2);
+						if (d1 == d2) {
+							return 0;
+						} else if (d1 > d2) {
+							return 1;
+						} else {
+							return -1;
+						}
+					}
+				});
+	}
+
+	/**
+	 * 计算地球上任意两点(经纬度)距离
+	 * 
+	 * @param long1
+	 *            第一点经度
+	 * @param lat1
+	 *            第一点纬度
+	 * @param long2
+	 *            第二点经度
+	 * @param lat2
+	 *            第二点纬度
+	 * @return 返回距离 单位：米
+	 */
+	public static double getDistance(double long1, double lat1, double long2,
+			double lat2) {
+		double a, b, R;
+		R = 6378137; // 地球半径
+		lat1 = lat1 * Math.PI / 180.0;
+		lat2 = lat2 * Math.PI / 180.0;
+		a = lat1 - lat2;
+		b = (long1 - long2) * Math.PI / 180.0;
+		double d;
+		double sa2, sb2;
+		sa2 = Math.sin(a / 2.0);
+		sb2 = Math.sin(b / 2.0);
+		d = 2
+				* R
+				* Math.asin(Math.sqrt(sa2 * sa2 + Math.cos(lat1)
+						* Math.cos(lat2) * sb2 * sb2));
+		return d / 1000.0;
+	}
+}

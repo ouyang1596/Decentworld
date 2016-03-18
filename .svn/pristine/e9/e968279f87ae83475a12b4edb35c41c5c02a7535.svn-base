@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    
+    android:layout_width="match_parent"
+    android:layout_height="649px"
+    android:background="@drawable/item_first_chatroom_bg"
+    android:orientation="vertical"
+    android:paddingLeft="20px"
+    android:paddingTop="28px" >
+
+    <FrameLayout
+        android:id="@+id/item_first_chat_fl"
+        android:layout_width="680px"
+        android:layout_height="392px"
+        android:layout_alignParentTop="true" >
+
+        <ImageView
+            android:id="@+id/iv_item_first_chatroom_background"
+            android:layout_width="680px"
+            android:layout_height="384px"
+            android:scaleType="fitXY"
+            android:src="@drawable/item_first_chatroom_image" />
+
+        <RelativeLayout
+            android:layout_width="680px"
+            android:layout_height="82px"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="8px"
+            android:background="@drawable/item_first_chatroom_author_intro" >
+
+            <TextView
+                android:id="@+id/tv_item_first_chatroom_owner_introduction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="118px"
+                android:layout_marginRight="5px"
+                android:layout_marginTop="15px"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="娱乐节目的主持人一般是host/hostess 或compere. 新闻报道的主持人是broadcaster (如中央电视台的新闻联播).在西方, 主持人经常集广播,采访和编辑工作"
+                android:textColor="@color/white"
+                android:textSize="20px" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/iv_item_first_chatroom_owner_icon"
+            android:layout_width="98px"
+            android:layout_height="98px"
+            android:layout_gravity="bottom|left"
+            android:src="@drawable/item_first_chatroom_hoster" />
+    </FrameLayout>
+
+    <LinearLayout
+        android:layout_width="576px"
+        android:layout_height="match_parent"
+        android:layout_below="@id/item_first_chat_fl"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/tv_item_first_chatroom_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12px"
+            android:text="热点解读|  《捉妖记》的刷卡等级"
+            android:textColor="@color/item_first_chatroom_title"
+            android:textSize="30px"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_item_first_chatroom_description"
+            android:layout_width="wrap_content"
+            android:layout_height="100px"
+            android:layout_marginTop="12px"
+            android:ellipsize="end"
+            android:maxLines="4"
+            android:text="SSE 指面向英特尔架构(IA)的SIMD 流指令扩展。 目前，英特尔® 凌动™ 最高支持 SSSE3（补充 SIMD 流指令扩展 3）。 凌动™ 暂不支持 SSE4.x。后者也是一个 128 位引擎，用于打包浮点数据。 这一执行模式开始于 MMX 技术。SSx 是较新的技术，取代了 MMX。。 如欲了解详细信息，请参阅英特尔《IA-32 和 IA-64 软件开发人员手册》中的“第一卷： 基础架构”部分。"
+            android:textColor="@color/contact_choice_default"
+            android:textSize="20px" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20px" >
+			<TextView
+                android:id="@+id/tv_item_first_chatroom_online"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_gravity="start"
+                android:text="在线人数:"
+                android:textColor="@color/contact_choice_default"
+                android:textSize="20px" />
+            <TextView
+                android:id="@+id/tv_item_first_chatroom_online_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@id/tv_item_first_chatroom_online"
+                android:text="1223"
+                android:textColor="@color/contact_choice_default"
+                android:textSize="20px" />
+
+        </RelativeLayout>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/iv_item_first_chatroom_enter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="5px"
+        android:src="@drawable/chatroom_icon_tojoin" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="14px"
+        android:text="@string/click_tojoin"
+        android:textColor="@color/white"
+        android:textSize="26px" />
+
+</RelativeLayout>

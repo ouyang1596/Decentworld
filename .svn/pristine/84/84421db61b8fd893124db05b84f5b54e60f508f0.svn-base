@@ -1,0 +1,370 @@
+package cn.sx.decentworld.activity;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.HashMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.Handler;
+import android.os.Message;
+import android.text.TextUtils;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.PayResult;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.component.ui.RechargeComponent;
+import cn.sx.decentworld.utils.SignUtils;
+
+import com.alipay.sdk.app.PayTask;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_pay_dialog)
+public class PayDialogActivity extends BaseFragmentActivity implements
+		OnClickListener {
+	@ViewById(R.id.iv_pay_weixin)
+	ImageView ivPayWeixin;
+	@ViewById(R.id.iv_pay_zhifubao)
+	ImageView ivPayZhifubao;
+	@ViewById(R.id.tv_renminbi)
+	TextView tvRenminbi;
+	// 支付类型
+	public static final int ALIPAY = 0;// 手机
+	public static final int WX = 4;
+	private static final int REQUEST_CODE_PAYMENT = 0;
+	@Bean
+	RechargeComponent rechargeComponent;
+	@Bean
+	ToastComponent toast;
+	private int check;
+	private String retryTimes;
+	private int money;
+	private String moneyCount;
+	private String out_trade_no;
+	private Handler mCheckHandle = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			switch (msg.what) {
+			case 2222:
+				try {
+					JSONObject object = new JSONObject(msg.obj.toString());
+					out_trade_no = object.getString("orderNum");
+					startPayment(out_trade_no);
+				} catch (JSONException e) {
+					toast.show("解析错误");
+				}
+				break;
+			default:
+				break;
+			}
+		};
+	};
+
+	public void startPayment(String charge) {
+		if (null == charge) {
+			toast.show("请求出错,请检查URL,URL无法获取订单号");
+			return;
+		}
+		if (TextUtils.isEmpty(PARTNER) || TextUtils.isEmpty(RSA_PRIVATE)
+				|| TextUtils.isEmpty(SELLER)) {
+			new AlertDialog.Builder(this)
+					.setTitle("警告")
+					.setMessage("需要配置PARTNER | RSA_PRIVATE| SELLER")
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+								public void onClick(
+										DialogInterface dialoginterface, int i) {
+									//
+									finish();
+								}
+							}).show();
+			return;
+		}
+		if (TextUtils.isEmpty(moneyCount)) {
+			toast.show("充值失败");
+		}
+		// 订单
+		String orderInfo = getOrderInfo("充值", DecentWorldApp.getInstance()
+				.getDwID(), moneyCount);
+
+		// 对订单做RSA 签名
+		String sign = sign(orderInfo);
+		try {
+			// 仅需对sign 做URL编码
+			sign = URLEncoder.encode(sign, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+		// 完整的符合支付宝参数规范的订单信息
+		final String payInfo = orderInfo + "&sign=\"" + sign + "\"&"
+				+ getSignType();
+
+		Runnable payRunnable = new Runnable() {
+
+			@Override
+			public void run() {
+				// 构造PayTask 对象
+				PayTask alipay = new PayTask(PayDialogActivity.this);
+				// 调用支付接口，获取支付结果
+				String result = alipay.pay(payInfo);
+				Message msg = new Message();
+				msg.what = SDK_PAY_FLAG;
+				msg.obj = result;
+				mHandler.sendMessage(msg);
+			}
+		};
+
+		// 必须异步调用
+		Thread payThread = new Thread(payRunnable);
+		payThread.start();
+		// Intent intent = new Intent();
+		// String packageName = getPackageName();
+		// ComponentName componentName = new ComponentName(packageName,
+		// packageName + ".wxapi.WXPayEntryActivity");
+		// intent.setComponent(componentName);
+		// intent.putExtra(com.pingplusplus.android.PaymentActivity.EXTRA_CHARGE,
+		// charge);
+		// startActivityForResult(intent, REQUEST_CODE_PAYMENT);
+	}
+
+	@AfterViews
+	public void init() {
+		PGetIntent();
+		initData();
+	}
+
+	private void initData() {
+		tvRenminbi.setText("" + money);
+		ivPayWeixin.setOnClickListener(this);
+		ivPayZhifubao.setOnClickListener(this);
+	}
+
+	private void PGetIntent() {
+		retryTimes = getIntent().getStringExtra("retryTimes");
+		if (null != retryTimes) {
+			money = Integer.valueOf(retryTimes);
+			money = money + 1;
+			moneyCount = "" + money;
+		} else {
+			moneyCount = "0";
+		}
+		check = getIntent().getIntExtra(Constants.CHECK, -100);
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.iv_pay_weixin:
+			getCheckCharge(WX, moneyCount, DecentWorldApp.getInstance()
+					.getDwID());
+			break;
+
+		case R.id.iv_pay_zhifubao:
+			getCheckCharge(ALIPAY, moneyCount, DecentWorldApp.getInstance()
+					.getDwID());
+			break;
+		}
+	}
+
+	public void getCheckCharge(int payType, String amount, String dwID) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("type", "" + payType);
+		map.put("dwID", dwID);
+		map.put("amount", amount);
+		rechargeComponent.getCheckCharge(map, mCheckHandle);
+	}
+
+	// @Override
+	// protected void onActivityResult(int requestCode, int resultCode, Intent
+	// data) {
+	// super.onActivityResult(requestCode, resultCode, data);
+	// // 支付页面返回处理
+	// if (requestCode == REQUEST_CODE_PAYMENT) {
+	// if (resultCode == Activity.RESULT_OK) {
+	// String result = data.getExtras().getString("pay_result");
+	// String errorMsg = data.getExtras().getString("error_msg"); // 错误信息
+	// String extraMsg = data.getExtras().getString("extra_msg"); // 错误信息
+	// if ("success".equals(result)) {
+	// toast.show("充值成功");
+	// if (check == Constants.CHECK_TRY_AGAIN) {
+	// setResult(100);
+	// } else if (check == Constants.CHECK_ANOTHER_METHOD) {
+	// Intent intent = new Intent(mContext,
+	// RegisterAppearanceCheckActivity_.class);
+	// startActivity(intent);
+	// }
+	// } else {
+	// toast.show("充值失败");
+	// }
+	// finish();
+	// }
+	// }
+	// }
+
+	// ----------------支付宝支付功能-----------------------
+	// 商户PID
+	public static final String PARTNER = "2088121118480062";
+	// 商户收款账号
+	public static final String SELLER = "95372537@qq.com";
+	// 商户私钥，pkcs8格式
+	public static final String RSA_PRIVATE = "MIICXAIBAAKBgQDUFRSMLh4ZpWol4v/4voWXZJlGFifrf7k1plavy2xwJACL9B8FgcVRqyvZbthTO9BV1frD0/82akBA25viaUcWVNtUc7AJ+KeAXQApxKmbOmYGw+V52+FCO+E7q9g6buO0O9cUrum7vw3/N7kr8QFj2UF8ufJtjo0H0EBqBYRwNQIDAQABAoGABVy3FUhBOJLHGUghArAGfqpreasrvTeQfjvDa1RwXHF8lg1JD4GVdJgoVqoHzCrx/ImZeoQMqtqK31juGw5gXrNZvzyoef6jCYtyXQ6N8kFwFN2lU5skPBZKyIHvu7ys7VDdE6YwkGEh2IfgznlquslSRV4lqfJYPGAdcMXtSa0CQQD9NUQZptuIhWKSFxNF7S09eDmeLyaro1uw8yXnCzVM3oxYzlEwaV6w9N1xTKmGbVwftxh1i5cjhqpRdT04iWWzAkEA1mu6Y6iszFzL/UpXtIAND0MJSdWmFJySQszmOi4/n61nQzmBVCL1vn913RUqKh8zIVpkM92hbLI1RaiVzSAudwJADfOQZAVwlS4cR0ZkNnciBgAI1LFuZQikNbTAAuH4NtsQSphbmtpDcGadiO+ba5+88rZo75kYY8m4urJGBEZ1xwJAfLI/vi9c9qhM1WvDn6wMbEC/CRpfsILxqDmC9njo9VKhx/2MUcLXCUcU41Kop8BnOtFXjrYoZ48n3e/R1m4NtwJBAKaSRswLyjn2TBfFpBt7WseP+BTAeOTIMLBCmyfDtE4PBwe8hCIvdtlaCy/y3VXIxHAYq9GDTaJODZQcc3jPW30=";
+	// 支付宝公钥
+	public static final String RSA_PUBLIC = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCnxj/9qwVfgoUh/y2W89L6BkRAFljhNhgPdyPuBV64bfQNN1PjbCzkIM6qRdKBoLPXmKKMiFYnkd6rAoprih3/PrQEB/VsW8OoM8fxn67UDYuyBTqA23MML9q1+ilIZwBC2AQ2UBVOrFXfFl75p6/B5KsiNG9zpgmLCUYuLkxpLQIDAQAB";
+	private static final int SDK_PAY_FLAG = 1;
+
+	private static final int SDK_CHECK_FLAG = 2;
+
+	private Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case SDK_PAY_FLAG: {
+				PayResult payResult = new PayResult((String) msg.obj);
+
+				// 支付宝返回此次支付结果及加签，建议对支付宝签名信息拿签约时支付宝提供的公钥做验签
+				String resultInfo = payResult.getResult();
+
+				String resultStatus = payResult.getResultStatus();
+
+				// 判断resultStatus 为“9000”则代表支付成功，具体状态码代表含义可参考接口文档
+				if (TextUtils.equals(resultStatus, "9000")) {
+					Toast.makeText(PayDialogActivity.this, "支付成功",
+							Toast.LENGTH_SHORT).show();
+				} else {
+					// 判断resultStatus 为非“9000”则代表可能支付失败
+					// “8000”代表支付结果因为支付渠道原因或者系统原因还在等待支付结果确认，最终交易是否成功以服务端异步通知为准（小概率状态）
+					if (TextUtils.equals(resultStatus, "8000")) {
+						Toast.makeText(PayDialogActivity.this, "支付结果确认中",
+								Toast.LENGTH_SHORT).show();
+					} else {
+						// 其他值就可以判断为支付失败，包括用户主动取消支付，或者系统返回的错误
+						Toast.makeText(PayDialogActivity.this, "支付失败",
+								Toast.LENGTH_SHORT).show();
+					}
+				}
+				break;
+			}
+			case SDK_CHECK_FLAG: {
+				Toast.makeText(PayDialogActivity.this, "检查结果为：" + msg.obj,
+						Toast.LENGTH_SHORT).show();
+				break;
+			}
+			default:
+				break;
+			}
+		};
+	};
+
+	/**
+	 * get the sdk version. 获取SDK版本号
+	 * 
+	 */
+	public void getSDKVersion() {
+		PayTask payTask = new PayTask(this);
+		String version = payTask.getVersion();
+		Toast.makeText(this, version, Toast.LENGTH_SHORT).show();
+	}
+
+	/**
+	 * create the order info. 创建订单信息
+	 * 
+	 */
+	public String getOrderInfo(String subject, String body, String price) {
+
+		// 签约合作者身份ID
+		String orderInfo = "partner=" + "\"" + PARTNER + "\"";
+
+		// 签约卖家支付宝账号
+		orderInfo += "&seller_id=" + "\"" + SELLER + "\"";
+
+		// 商户网站唯一订单号
+		orderInfo += "&out_trade_no=" + "\"" + getOutTradeNo() + "\"";
+
+		// 商品名称
+		orderInfo += "&subject=" + "\"" + subject + "\"";
+
+		// 商品详情
+		orderInfo += "&body=" + "\"" + body + "\"";
+
+		// 商品金额
+		orderInfo += "&total_fee=" + "\"" + price + "\"";
+
+		// 服务器异步通知页面路径
+		orderInfo += "&notify_url="
+				+ "\""
+				+ "http://183.37.107.153:8888/DecentWorldServer/charge/getOrderResponse"
+				+ "\"";
+		// 服务接口名称， 固定值
+		orderInfo += "&service=\"mobile.securitypay.pay\"";
+
+		// 支付类型， 固定值
+		orderInfo += "&payment_type=\"1\"";
+
+		// 参数编码， 固定值
+		orderInfo += "&_input_charset=\"utf-8\"";
+
+		// 设置未付款交易的超时时间
+		// 默认30分钟，一旦超时，该笔交易就会自动被关闭。
+		// 取值范围：1m～15d。
+		// m-分钟，h-小时，d-天，1c-当天（无论交易何时创建，都在0点关闭）。
+		// 该参数数值不接受小数点，如1.5h，可转换为90m。
+		orderInfo += "&it_b_pay=\"30m\"";
+
+		// extern_token为经过快登授权获取到的alipay_open_id,带上此参数用户将使用授权的账户进行支付
+		// orderInfo += "&extern_token=" + "\"" + extern_token + "\"";
+
+		// 支付宝处理完请求后，当前页面跳转到商户指定页面的路径，可空
+		orderInfo += "&return_url=\"m.alipay.com\"";
+
+		// 调用银行卡支付，需配置此参数，参与签名， 固定值 （需要签约《无线银行卡快捷支付》才能使用）
+		// orderInfo += "&paymethod=\"expressGateway\"";
+
+		return orderInfo;
+	}
+
+	/**
+	 * get the out_trade_no for an order. 生成商户订单号，该值在商户端应保持唯一（可自定义格式规范）
+	 * 
+	 */
+	public String getOutTradeNo() {
+		// SimpleDateFormat format = new SimpleDateFormat("MMddHHmmss",
+		// Locale.getDefault());
+		// Date date = new Date();
+		// String key = format.format(date);
+		//
+		// Random r = new Random();
+		// key = key + r.nextInt();
+		// key = key.substring(0, 15);
+		// return key;
+		return out_trade_no;
+	}
+
+	/**
+	 * sign the order info. 对订单信息进行签名
+	 * 
+	 * @param content
+	 *            待签名订单信息
+	 */
+	public String sign(String content) {
+		return SignUtils.sign(content, RSA_PRIVATE);
+	}
+
+	/**
+	 * get the sign type we use. 获取签名方式
+	 * 
+	 */
+	public String getSignType() {
+		return "sign_type=\"RSA\"";
+	}
+}

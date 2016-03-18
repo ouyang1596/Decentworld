@@ -1,0 +1,133 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+import java.util.List;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+
+/**
+ * @author: yj
+ */
+@Table(name = "StrangerInfo")
+public class StrangerInfo extends Model {
+	private static String TAG = "StrangerInfo";
+	// 1 主键
+	@Column(name = "strangerDwID")
+	public String strangerDwID = "1";
+	@Column(name = "age")
+	public String age = "100";
+	@Column(name = "sex")
+	public String sex = "男";
+	@Column(name = "lastworld")
+	public String lastworld;
+	@Column(name = "distance")
+	public String distance = "100";
+	@Column(name = "addr")
+	public String location;
+	@Column(name = "nickname")
+	public String nickname;
+	@Column(name = "icon")
+	public String icon;
+
+	
+	/**
+	 * @return the nickname
+	 */
+	public String getNickname() {
+		return nickname;
+	}
+
+	/**
+	 * @param nickname the nickname to set
+	 */
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	/**
+	 * @return the icon
+	 */
+	public String getIcon() {
+		return icon;
+	}
+
+	/**
+	 * @param icon the icon to set
+	 */
+	public void setIcon(String icon) {
+		this.icon = icon;
+	}
+
+	public StrangerInfo() {
+
+	}
+
+	public StrangerInfo(String strangerDwID) {
+		this.strangerDwID = strangerDwID;
+	}
+
+	
+	/**
+	 * @param strangerDwID
+	 * @param nickname
+	 * @param icon
+	 */
+	public StrangerInfo(String strangerDwID, String nickname, String icon) {
+		super();
+		this.strangerDwID = strangerDwID;
+		this.nickname = nickname;
+		this.icon = icon;
+	}
+
+	/**
+	 * 查询一条指定 字段 名 和 字段值 的记录
+	 * 
+	 * @param fieldName
+	 *            字段名
+	 * @param fieldValue
+	 *            字段值
+	 * @return
+	 */
+	public static StrangerInfo queryByField(String fieldName, String fieldValue) {
+		return new Select().from(StrangerInfo.class)
+				.where(fieldName + "=?", fieldValue).executeSingle();
+	}
+
+	/**
+	 * 查询指定dwID号的记录并返回结果
+	 * 
+	 * @param dwID
+	 */
+	public static StrangerInfo queryByDwID(String dwID) {
+		return new Select().from(StrangerInfo.class)
+				.where("strangerDwID=?", dwID).executeSingle();
+	}
+
+	// public RegisterInfo(String university, String college, String classRoom)
+	// {
+	// this.university = university;
+	// this.college = college;
+	// this.classRoom = classRoom;
+	// }
+	/**
+	 * 查找全部个人设置信息
+	 */
+	public static List<StrangerInfo> queryAll() {
+		return new Select().from(StrangerInfo.class).execute();
+	}
+	
+	/**
+	 * 删除消息列表
+	 */
+	public static void deleteAll()
+	{
+		new Delete().from(StrangerInfo.class).execute();
+	}
+	
+}

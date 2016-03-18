@@ -1,0 +1,108 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.recharge;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.RechargeAliPayWXActivity_;
+import cn.sx.decentworld.fragment.BaseFragment;
+
+/**
+ * @ClassName: RechargeFragment.java
+ * @Description: 充值界面
+ * @author: cj
+ * @date: 2016年1月14日 上午9:17:20
+ */
+@EFragment(R.layout.fragment_recharge)
+public class RechargeFragment extends BaseFragment implements OnClickListener
+{
+    private static final String TAG = "RechargeFragment";
+    private boolean isPrepared = false;
+    /**
+     * 工具类
+     */
+
+    /**
+     * 界面资源
+     */
+    @ViewById(R.id.btn_recharge_temp)
+    Button btn_recharge_temp;
+
+    /**
+     * 变量
+     */
+
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        initVar();
+        initListener();
+
+        isPrepared = true;
+        lazyLoad();
+    }
+
+    /**
+     * 
+     */
+    private void initVar()
+    {
+
+    }
+
+    /**
+     * 
+     */
+    private void initListener()
+    {
+        btn_recharge_temp.setOnClickListener(this);
+    }
+
+    /**
+     * 数据延迟加载
+     */
+    @Override
+    protected void lazyLoad()
+    {
+
+    }
+
+    @Override
+    public void turnToTab(int tab)
+    {
+
+    }
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.btn_recharge_temp:
+                // 跳转到充值界面
+                Intent intent = new Intent(getActivity() , RechargeAliPayWXActivity_.class);
+                startActivity(intent);
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
+}

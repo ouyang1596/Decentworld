@@ -41,11 +41,11 @@ public final class ForgetPwdIdCardActivity_
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
         llForgetPwdIdCard = ((LinearLayout) findViewById(id.root_forget_pwd_id_card));
         etvIdCard = ((EditText) findViewById(id.et_idcard));
         btnOk = ((Button) findViewById(id.btn_OK));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();
         init();

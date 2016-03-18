@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_public_work_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20px"
+        android:layout_marginLeft="20px"
+        android:layout_marginRight="20px"
+        android:layout_marginTop="20px"
+        android:background="@drawable/public_work_text_bg" >
+
+        <EditText
+            android:id="@+id/tv_public_work_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="这一刻的想法..."
+            android:padding="20px"
+            android:textStyle="@null" />
+    </LinearLayout>
+
+    <cn.sx.decentworld.widget.ImageViewForGridView
+        android:id="@+id/gv_public_work_pictures"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+    </cn.sx.decentworld.widget.ImageViewForGridView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="20px"
+        android:background="@drawable/public_work_divide_gb" />
+
+    <RelativeLayout
+        android:id="@+id/rl_public_work_see"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_row_height"
+        android:background="@drawable/me_setting_row_selector"
+        android:clickable="true" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20px"
+            android:text="部分朋友可见（选择的朋友可见）" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20px"
+            android:src="@drawable/more" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2px"
+        android:background="@drawable/public_work_divide_line" />
+
+    <RelativeLayout
+        android:id="@+id/rl_public_work_no_see"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/common_row_height"
+        android:background="@drawable/me_setting_row_selector"
+        android:clickable="true" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20px"
+            android:text="不给谁看（选择的朋友不可见）" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20px"
+            android:src="@drawable/more" />
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2px"
+        android:background="@drawable/public_work_divide_line" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:id="@+id/ll_public_work_friend"
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/me_setting_row_selector"
+            android:clickable="true"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="20px" >
+
+            <RadioButton
+                android:id="@+id/rb_public_work_friend"
+                android:layout_width="44px"
+                android:layout_height="44px"
+                android:button="@drawable/public_work_no_checked"
+                android:clickable="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10px"
+                android:text="仅我的朋友可见" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_public_work_stranger"
+            android:layout_width="0px"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/me_setting_row_selector"
+            android:clickable="true"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="20px" >
+
+            <RadioButton
+                android:id="@+id/rb_public_work_stranger"
+                android:layout_width="44px"
+                android:layout_height="44px"
+                android:button="@drawable/public_work_no_checked"
+                android:clickable="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10px"
+                android:text="陌生人可见" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/tv_public_work_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/public_work_confirm_bg"
+        android:gravity="center"
+        android:text="确定" />
+
+</LinearLayout>

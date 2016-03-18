@@ -1,0 +1,121 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_activity_register_nick"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <include layout="@layout/top_register_title" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <cn.sx.decentworld.widget.ClearEditText
+            android:id="@+id/et_nickname"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/bg_line_press"
+            android:gravity="center_horizontal"
+            android:hint="此处抢注唯一昵称"
+            android:paddingBottom="5dp"
+            android:paddingTop="5dp"
+            android:textColor="@color/two_black"
+            android:textColorHint="@color/three_black"
+            android:textCursorDrawable="@drawable/color_cursor"
+            android:textSize="@dimen/new_textsize_13sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="修改需要收费10大洋"
+            android:textColor="@color/three_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+
+        <ImageView
+            android:id="@+id/iv_nickname"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:src="@drawable/camera" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:text="头像上传"
+            android:textColor="@color/three_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+
+        <TextView
+            android:id="@+id/tv_occupation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_line_press"
+            android:ems="10"
+            android:gravity="center_horizontal"
+            android:hint="您所在的行业"
+            android:padding="5dp"
+            android:textColor="@color/two_black"
+            android:textColorHint="@color/three_black"
+            android:textCursorDrawable="@drawable/color_cursor"
+            android:textSize="@dimen/new_textsize_13sp" >
+        </TextView>
+
+        <RadioGroup
+            android:id="@+id/rg_sex"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:padding="10dp" >
+
+            <RadioButton
+                android:id="@+id/rb_boy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:checked="true"
+                android:drawableLeft="@drawable/rb_sex_selector"
+                android:drawablePadding="5dp"
+                android:text="男"
+                android:textColor="@color/two_black" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <RadioButton
+                android:id="@+id/rb_girl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:button="@null"
+                android:drawableLeft="@drawable/rb_sex_selector"
+                android:drawablePadding="5dp"
+                android:text="女"
+                android:textColor="@color/two_black" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/btn_OK"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="30dp"
+            android:background="@drawable/bg_btn_yellow_selector"
+            android:padding="10dp"
+            android:text="确定"
+            android:textColor="@color/white"
+            android:textSize="@dimen/new_textsize_15sp" />
+    </LinearLayout>
+
+</LinearLayout>

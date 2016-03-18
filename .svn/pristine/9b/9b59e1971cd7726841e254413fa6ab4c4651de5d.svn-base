@@ -1,0 +1,94 @@
+package cn.sx.decentworld.activity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.Intent;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.OccupationAdapter;
+import cn.sx.decentworld.adapter.ProfessionAdapter;
+import cn.sx.decentworld.bean.OccupationBean;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_occupation)
+public class OccupationActivity extends BaseFragmentActivity {
+	@ViewById(R.id.lv_profession)
+	ListView lvProfession;
+	@ViewById(R.id.lv_occupation)
+	ListView lvOccupation;
+	public static final String OCCUPATION = "OCCUPATION";
+	private List<OccupationBean> occupationBeanList;
+	private OccupationAdapter occupationAdapter;
+	ProfessionAdapter professionAdapter;
+	private String[] data = { "学生", "IT/互联网/金融", "媒体/公关", "金融", "法律", "咨询",
+			"文化/艺术", "影视/娱乐", "教育/科研", "房地产/建筑", "医药/健康", "能源/环保", "政府机构" };
+
+	@AfterViews
+	public void init() {
+		initOccupation();
+	}
+
+	private void initOccupation() {
+		occupationBeanList = new ArrayList<OccupationBean>();
+		// for (int i = 0; i < 10; i++) {
+		// OccupationBean bean = new OccupationBean();
+		// bean.occupationList = new ArrayList<String>();
+		// bean.profession = "item--" + i;
+		// for (int j = 0; j < 10; j++) {
+		// bean.occupationList.add("item" + i + "ouyang" + j);
+		// }
+		// occupationBeanList.add(bean);
+		// }
+		for (int i = 0; i < data.length; i++) {
+			OccupationBean bean = new OccupationBean();
+			bean.profession = data[i];
+			occupationBeanList.add(bean);
+		}
+		professionAdapter = new ProfessionAdapter(this, occupationBeanList);
+		lvProfession.setAdapter(professionAdapter);
+		lvProfession.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				OccupationBean occupationBean = professionAdapter
+						.getItem(position);
+				// if (null == occupationAdapter) {
+				// occupationAdapter = new OccupationAdapter(mContext,
+				// occupationBean.occupationList);
+				// lvOccupation.setAdapter(occupationAdapter);
+				// } else {
+				// occupationAdapter
+				// .updataListView(occupationBean.occupationList);
+				// }
+				// if (!lvOccupation.isShown()) {
+				// lvOccupation.setVisibility(View.VISIBLE);
+				// }
+				String occupation = occupationBean.profession;
+				Intent intent = new Intent();
+				intent.putExtra(OCCUPATION, occupation);
+				setResult(-1, intent);
+				finish();
+			}
+		});
+		lvOccupation.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				String occupation = occupationAdapter.getItem(position);
+				Intent intent = new Intent();
+				intent.putExtra(OCCUPATION, occupation);
+				setResult(-1, intent);
+				finish();
+			}
+		});
+	}
+}

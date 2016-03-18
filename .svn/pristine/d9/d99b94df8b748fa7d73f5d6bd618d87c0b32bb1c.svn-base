@@ -1,0 +1,350 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.main;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Handler;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.DoubtActivity_;
+import cn.sx.decentworld.activity.EditUserInfoActivity_;
+import cn.sx.decentworld.adapter.IconPagerAdapter;
+import cn.sx.decentworld.bean.EditUserInfoItem;
+import cn.sx.decentworld.bean.UserExtraInfo;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.bean.manager.UserInfoManager;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.component.ui.MeComponent;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.fragment.UserDetailFragment;
+import cn.sx.decentworld.fragment.UserDetailFragment_;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.MsgVerify;
+import cn.sx.decentworld.utils.SPUtils;
+import cn.sx.decentworld.widget.HackyViewPager;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: MeFragment.java
+ * @Description:
+ * @author: cj
+ * @date: 2016年1月11日 上午11:17:51
+ */
+@EFragment(R.layout.fragment_main_me)
+public class MeFragment extends BaseFragment implements OnClickListener
+{
+    private static final String TAG = "MeFragment";
+    public static final int R_GET_USER_THREE_ICON = 1;// 获取用户的三张头像
+
+    /**
+     * 工具类
+     */
+    @Bean
+    ToastComponent toast;
+    @Bean
+    GetUserInfo getUserInfo;
+    @Bean
+    MeComponent meComponent;
+
+    /**
+     * 界面资源
+     */
+    /** 用户头像(圆形) **/
+    @ViewById(R.id.iv_chat_me_avatar)
+    ImageView iv_chat_me_avatar;
+    @ViewById(R.id.iv_doubt)
+    ImageView ivDoubt;
+    @ViewById(R.id.tv_chat_me_worth)
+    TextView tv_chat_me_worth;
+    @ViewById(R.id.tv_chat_me_wealth)
+    TextView tv_chat_me_wealth;
+
+    /** 打开聊天室 **/
+    @ViewById(R.id.ll_chat_me_chat_room)
+    LinearLayout ll_chat_me_chat_room;
+    /** 发送消息 **/
+    @ViewById(R.id.btn_chat_me_send_msg)
+    Button btn_chat_me_send_msg;
+    /** 自己的名字 **/
+    @ViewById(R.id.tv_chat_me_name)
+    TextView tv_chat_me_name;
+    /** 自己的毕业院校 或 职业 **/
+    @ViewById(R.id.tv_chat_me_school)
+    TextView tv_chat_me_school;
+    /** 自己的毕业院校 **/
+    @ViewById(R.id.tv_chat_me_sign)
+    TextView tv_chat_me_sign;
+
+    @ViewById(R.id.tv_chat_me_introduce)
+    TextView tv_chat_me_introduce;
+    /** 编辑 **/
+    @ViewById(R.id.tv_chat_me_edit)
+    TextView tv_chat_me_edit;
+
+    @ViewById(R.id.vp_near_card_detail_pager)
+    HackyViewPager mPager;
+
+    /**
+     * 变量
+     */
+    private static final int GET_USER_WEALTH = 1;
+    private static final int GET_USER_WORTH = 2;
+    private String dwID;
+    /** 是否是学生 **/
+    private static final String IS_STUDENT = "1";
+
+    private List<String> picUrls;
+    private List<ImageView> imgvs;
+    private IconPagerAdapter pagerAdapter;
+    // 用户信息（唯一）
+    public static List<EditUserInfoItem> userInfoDatas;
+    public static UserDetailFragment userDetailFragment;
+
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        LogUtils.i(TAG, "init");
+        // TODO
+        dwID = DecentWorldApp.getInstance().getDwID();
+        picUrls = new ArrayList<String>();
+        imgvs = new ArrayList<ImageView>();
+        ivDoubt.setOnClickListener(this);
+        pagerAdapter = new IconPagerAdapter(picUrls , imgvs);
+        mPager.setAdapter(pagerAdapter);
+        initListener();
+        isPrepared = true;
+        lazyLoad();
+    }
+
+    /**
+     * 
+     */
+    private void initListener()
+    {
+        ll_chat_me_chat_room.setOnClickListener(this);
+        btn_chat_me_send_msg.setOnClickListener(this);
+        tv_chat_me_edit.setOnClickListener(this);
+    }
+
+    /**
+     * 加载数据
+     * 
+     */
+    @Override
+    protected void lazyLoad()
+    {
+        LogUtils.i(TAG, "lazyLoad");
+        if (isPrepared)
+        {
+            /** 获取身价、身家 **/
+            getUserInfo.getWealth(dwID, meHandler, GET_USER_WEALTH);
+            getUserInfo.getWorth(dwID, meHandler, GET_USER_WORTH);
+            /** **/
+            meComponent.setFragmentManager(getFragmentManager());
+            initHeader(UserInfoManager.getUserInfoInstance());
+            initIntroduction();
+            meComponent.getIconPath(dwID);
+            initPicUrl();
+        }
+    }
+
+    @Override
+    public void turnToTab(int tab)
+    {
+
+    }
+
+    Handler meHandler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            switch (msg.what)
+            {
+                case GET_USER_WEALTH:
+                    tv_chat_me_wealth.setText(msg.obj.toString());
+                    break;
+                case GET_USER_WORTH:
+                    tv_chat_me_worth.setText(msg.obj.toString());
+                    break;
+                default:
+                    break;
+            }
+        };
+    };
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.ll_chat_me_chat_room:
+                /** 如果自己有多个聊天室，则点击可以打开自己创建的聊天室列表 **/
+                toast.show("打开聊天室列表");
+                break;
+            case R.id.btn_chat_me_send_msg:
+                toast.show("给自己发送短信");
+                break;
+            case R.id.tv_chat_me_edit:
+                LogUtils.i(TAG, "点击了个人信息的中的编辑按钮");
+                Intent intent = new Intent(getActivity() , EditUserInfoActivity_.class);
+                startActivityForResult(intent, R_GET_USER_THREE_ICON);
+                break;
+
+            case R.id.iv_doubt:
+                startActivity(new Intent(getActivity() , DoubtActivity_.class));
+                break;
+        }
+    }
+
+    /**
+     * 初始化我的资料处的头部信息
+     */
+    private void initHeader(UserInfo userInfo)
+    {
+        // 显示用户的实名
+        tv_chat_me_name.setText(userInfo.getRealName());
+        // 学生的话显示用户的身份信息
+        if (userInfo.getIfStudent().equals(IS_STUDENT))
+        {
+            tv_chat_me_school.setText(userInfo.getSchool());
+        }
+        else
+        {
+            tv_chat_me_school.setText(userInfo.getOccupation());
+        }
+        // 显示用户的个性签名
+        tv_chat_me_sign.setText(userInfo.getSign());
+    }
+
+    /**
+     * 初始化显示用户的详细资料
+     */
+    private void initIntroduction()
+    {
+        LogUtils.i(TAG, "从网络获取数据 2");
+        userInfoDatas = meComponent.initUserInfoDatas();
+        tv_chat_me_introduce.setVisibility(View.GONE);
+        tv_chat_me_edit.setVisibility(View.VISIBLE);
+        userDetailFragment = new UserDetailFragment_();
+        userDetailFragment.setData(userInfoDatas);
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.ll_chat_me_container, userDetailFragment);
+        fragmentTransaction.commitAllowingStateLoss();
+        // fragmentTransaction.commit();
+    }
+
+    /**
+     * 初始化头像
+     */
+    private void initPicUrl()
+    {
+        picUrls.clear();
+        UserExtraInfo userInfo = UserExtraInfo.queryBy(dwID);
+        if (null == userInfo)
+        {
+            return;
+        }
+        if (CommUtil.isNotBlank(userInfo.getIcon()))
+        {
+            ImageView v = new ImageView(getActivity());
+            v.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imgvs.add(v);
+            picUrls.add(userInfo.getIcon());
+        }
+        if (CommUtil.isNotBlank(userInfo.getIcon2()))
+        {
+            ImageView v = new ImageView(getActivity());
+            v.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imgvs.add(v);
+            picUrls.add(userInfo.getIcon2());
+        }
+
+        if (CommUtil.isNotBlank(userInfo.getIcon3()))
+        {
+            ImageView v = new ImageView(getActivity());
+            v.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imgvs.add(v);
+            picUrls.add(userInfo.getIcon3());
+        }
+
+        if (pagerAdapter != null)
+        {
+            pagerAdapter.notifyDataSetChanged();
+        }
+
+        // 显示用户圆形头像
+        if (CommUtil.isNotBlank(userInfo.getIcon()))
+        {
+            ImageLoaderHelper.mImageLoader.displayImage(userInfo.getIcon(), iv_chat_me_avatar, ImageLoaderHelper.mOptions);
+        }
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        ImageLoaderHelper.clearCache();
+        if (null != pagerAdapter)
+        {
+            pagerAdapter.notifyDataSetChanged();
+        }
+
+        /**
+         * 获取身价、身家
+         */
+        getUserInfo.getWealth(dwID, meHandler, GET_USER_WEALTH);
+        getUserInfo.getWorth(dwID, meHandler, GET_USER_WORTH);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent intent)
+    {
+        LogUtils.i(TAG, "进入到：onActivityResult,requestCode=" + requestCode + ",resultCode" + resultCode);
+        if (resultCode == Activity.RESULT_OK)
+        {
+            if (requestCode == R_GET_USER_THREE_ICON)
+            {
+                LogUtils.i(TAG, "进入数据更新");
+                meComponent.getIconPath(dwID);
+                UserInfo info = UserInfoManager.getUserInfoInstance();
+                initHeader(info);
+                if (pagerAdapter != null)
+                {
+                    LogUtils.i(TAG, "pagerAdapter更新");
+                    pagerAdapter.notifyDataSetChanged();
+                }
+                else
+                {
+                    LogUtils.i(TAG, "pagerAdapter==null");
+                }
+                UserExtraInfo extraInfo = UserExtraInfo.queryBy(dwID);
+                ImageLoaderHelper.mImageLoader.displayImage(extraInfo.getIcon(), iv_chat_me_avatar, ImageLoaderHelper.mOptions);
+            }
+        }
+    }
+
+}

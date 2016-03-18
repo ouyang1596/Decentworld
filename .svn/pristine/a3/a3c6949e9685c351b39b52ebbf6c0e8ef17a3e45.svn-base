@@ -1,0 +1,196 @@
+package cn.sx.decentworld.activity;
+
+import java.util.HashMap;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.CheckResultBean;
+import cn.sx.decentworld.common.ConstantIntent;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.dialog.trueOrFalseDialogFragment.OnTrueOrFalseClickListener;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_doubt)
+public class DoubtActivity extends BaseFragmentActivity implements OnClickListener, OnTrueOrFalseClickListener {
+	@ViewById(R.id.ll_doubt)
+	LinearLayout llDoubt;
+	@ViewById(R.id.ll_wan)
+	LinearLayout llWan;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	private int doubtWan = -1;// 0 假的资料，再试一次 1不通过，直接买
+	private cn.sx.decentworld.dialog.trueOrFalseDialogFragment trueOrFalseDialogFragment;
+	private SendUrl mSendUrl;
+	private Handler mDoubtHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			CheckResultBean bean = JsonUtils.json2Bean(msg.obj.toString(), CheckResultBean.class);
+			switch (bean.status) {
+			case 0:
+				ToastUtil.showToast("用户资料正在审核中");
+				break;
+			case 1:
+				doubtWan = 0;
+				ToastUtil.showToast("您的身份为假");
+				trueOrFalseDialogFragment = new cn.sx.decentworld.dialog.trueOrFalseDialogFragment();
+				trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(DoubtActivity.this);
+				trueOrFalseDialogFragment.setTips("是否再试一次？");
+				trueOrFalseDialogFragment.show(getSupportFragmentManager(), "trueOrFalseDialogFragment");
+				break;
+			case 2:
+				ToastUtil.showToast("审核结束，已通过");
+				break;
+			case 3:
+				doubtWan = 1;
+				ToastUtil.showToast("审核结束，未通过");
+				trueOrFalseDialogFragment = new cn.sx.decentworld.dialog.trueOrFalseDialogFragment();
+				trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(DoubtActivity.this);
+				trueOrFalseDialogFragment.setTips("是否直接买通？");
+				trueOrFalseDialogFragment.show(getSupportFragmentManager(), "trueOrFalseDialogFragment");
+				break;
+			case 4:
+				Intent intent = new Intent(DoubtActivity.this, DoubtCancelDoubtActivity_.class);
+				startActivity(intent);
+				break;
+			}
+		};
+	};
+
+	private Handler mWanHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case 2222:
+				startActivity(new Intent(DoubtActivity.this, DoubtWanActivity.class));
+				break;
+			case 00:
+				ToastUtil.showToast("用户资料正在审核中");
+				break;
+			case 10:
+				ToastUtil.showToast("用户资料已审核，并且审核失败");
+				trueOrFalseDialogFragment = new cn.sx.decentworld.dialog.trueOrFalseDialogFragment();
+				trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(DoubtActivity.this);
+				trueOrFalseDialogFragment.setTips("是否直接买通？");
+				trueOrFalseDialogFragment.show(getSupportFragmentManager(), "trueOrFalseDialogFragment");
+				break;
+			case 11:
+				ToastUtil.showToast("用户资料已审核并且审核成功");
+				break;
+			case 3333:
+				showToast("获取状态失败");// 可能是没钱，也可能是其他原因
+				break;
+			}
+		};
+	};
+
+	@AfterViews
+	public void init() {
+		initData();
+	}
+
+	private void initData() {
+		mSendUrl = new SendUrl(this);
+		llDoubt.setOnClickListener(this);
+		llWan.setOnClickListener(this);
+		ivBack.setOnClickListener(this);
+	}
+
+	public void getDoubtCheckResult() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + Constants.API_GET_CHECK_STATUS, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						if (2222 == msg.getResultCode()) {
+							LogUtils.i("bm", "getCheckResult--" + msg.getData().toString());
+							Message message = mDoubtHandler.obtainMessage();
+							message.obj = msg.getData().toString();
+							mDoubtHandler.sendMessage(message);
+						} else {
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToast(Constants.NET_WRONG);
+					}
+				});
+	}
+
+	public void getWanCheckStatus() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_WAN_CHECH_STATE, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						mWanHandler.sendEmptyMessage(msg.getResultCode());
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToast(Constants.NET_WRONG);
+					}
+
+				});
+	}
+
+	private void showToast(final String data) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				Toast.makeText(mContext, data, Toast.LENGTH_SHORT).show();
+			}
+		});
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.ll_doubt:
+			getDoubtCheckResult();
+			break;
+		case R.id.ll_wan:
+			getWanCheckStatus();
+			break;
+		case R.id.iv_back:
+			finish();
+			break;
+		}
+	}
+
+	@Override
+	public void onTrueOrFalseClick(View view) {
+		switch (view.getId()) {
+		case R.id.tv_cancel:
+			break;
+		case R.id.tv_ensure:
+			Intent intent = new Intent(this, RechargePayMethodActivity_.class);
+			intent.putExtra(ConstantIntent.FRAGMENT_DIALOG_DOUBT_WAN, doubtWan);
+			startActivity(intent);
+			break;
+		}
+	}
+}

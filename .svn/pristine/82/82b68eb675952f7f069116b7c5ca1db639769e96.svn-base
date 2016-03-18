@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="smack"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="src" path=".apt_generated">
+		<attributes>
+			<attribute name="optional" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry exported="true" kind="lib" path="libs/alipaySdk-20151215.jar"/>
+	<classpathentry kind="lib" path="libs/xUtils-2.6.14.jar"/>
+	<classpathentry kind="lib" path="libs/ShareSDK-Wechat-2.6.3.jar"/>
+	<classpathentry kind="lib" path="libs/ShareSDK-Wechat-Core-2.6.3.jar"/>
+	<classpathentry kind="lib" path="libs/ShareSDK-Wechat-Moments-2.6.3.jar"/>
+	<classpathentry kind="lib" path="libs/ShareSDK-Core-2.6.3.jar"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>

@@ -1,0 +1,76 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment;
+
+import android.annotation.SuppressLint;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.CommUtil;
+
+/**
+ * @ClassName: AchievementFragment.java
+ * @Description:
+ * @author: yj
+ * @date: 2016年1月6日 下午3:28:18
+ */
+public class AchievementFragment extends Fragment implements OnClickListener {
+	private TextView tvAchievement;
+	private LinearLayout llIntroduce;
+	private TextView tvShortIntroduce, tvDetailintroduce;
+	private String shortIntroduce, detailIntroduce;
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_achievement, null);
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		initView();
+	}
+
+	private void initView() {
+		tvAchievement = (TextView) getView().findViewById(R.id.tv_achievement);
+		tvAchievement.setOnClickListener(this);
+		llIntroduce = (LinearLayout) getView().findViewById(R.id.ll_introduce);
+		tvShortIntroduce = (TextView) getView().findViewById(R.id.tv_short_introduce);
+		tvDetailintroduce = (TextView) getView().findViewById(R.id.tv_detail_introduce);
+	}
+
+	@Override
+	public void onClick(View v) {
+
+	}
+
+	public void setIntroduce(String shortIntroduce, String detailInroduce) {
+		this.shortIntroduce = shortIntroduce;
+		this.detailIntroduce = detailInroduce;
+		if (CommUtil.isBlank(this.shortIntroduce) && CommUtil.isBlank(this.detailIntroduce)) {
+			llIntroduce.setVisibility(View.GONE);
+			tvAchievement.setVisibility(View.VISIBLE);
+			tvAchievement.setText("还没有添加简介哦");
+			return;
+		}
+		if (CommUtil.isBlank(this.shortIntroduce)) {
+			tvShortIntroduce.setVisibility(View.GONE);
+		} else {
+			tvShortIntroduce.setVisibility(View.VISIBLE);
+			tvShortIntroduce.setText(this.shortIntroduce);
+		}
+		if (CommUtil.isBlank(this.detailIntroduce)) {
+			tvDetailintroduce.setVisibility(View.GONE);
+		} else {
+			tvDetailintroduce.setVisibility(View.VISIBLE);
+			tvDetailintroduce.setText(detailInroduce);
+		}
+	}
+}

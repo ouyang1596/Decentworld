@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/item_work_comment_root"
+    android:orientation="horizontal" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="5px" >
+
+        <ImageView
+            android:id="@+id/item_work_comment_avatar"
+            android:layout_width="68px"
+            android:layout_height="68px"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="20px"
+            android:layout_marginTop="20px"
+            android:src="@drawable/item_work_avatar" />
+
+        <LinearLayout
+            android:id="@+id/item_work_comment_reply"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/item_work_comment_avatar"
+            android:layout_marginLeft="40px"
+            android:layout_toRightOf="@id/item_work_comment_avatar" 
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/item_work_comment_reply_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="回复者"
+                android:textColor="@color/bottom_blue"
+                android:textSize="@dimen/text_size_px_30" />
+
+            <TextView
+                android:id="@+id/item_work_comment_reply_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15px"
+                android:text="回复"
+                android:textColor="#000000"
+                android:textSize="@dimen/text_size_px_30" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/item_work_comment_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/item_work_comment_avatar"
+            android:layout_marginLeft="40px"
+            android:layout_toRightOf="@id/item_work_comment_reply"
+            android:text="评论者"
+            android:textColor="@color/bottom_blue"
+            android:textSize="@dimen/text_size_px_30" />
+
+        <TextView
+            android:id="@+id/item_work_comment_data"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/item_work_comment_name"
+            android:layout_marginLeft="40px"
+            android:layout_marginTop="16px"
+            android:layout_toRightOf="@id/item_work_comment_avatar"
+            android:text="08月6日 15:30"
+            android:textColor="#9b9b9b"
+            android:textSize="@dimen/text_size_px_20" />
+        
+        <TextView
+            android:id="@+id/item_work_comment_tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/item_work_comment_data"
+            android:layout_below="@id/item_work_comment_data"
+            android:layout_marginTop="16px"
+            android:text="评论信息"
+            android:textColor="#000000"
+            android:textSize="@dimen/text_size_px_30" />
+    </RelativeLayout>
+
+</LinearLayout>

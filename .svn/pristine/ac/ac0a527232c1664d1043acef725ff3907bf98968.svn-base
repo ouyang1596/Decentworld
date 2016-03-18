@@ -1,0 +1,141 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.text.SpannableStringBuilder;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.utils.ToastUtil;
+
+/**
+ * @ClassName: DoubtVerifyFragment.java
+ * @author: yj
+ * @date: 2016年1月12日 下午3:25:20
+ */
+public class DoubtWanThirdStepFragment extends Fragment implements OnClickListener {
+	private TextView tvTalentMoney, tvEnsure;
+	public ViewPagerFragment mVpFragment;
+	private EditText etMaterial, etAgentCode;
+	private LinearLayout llTalentMoneyChange;
+	// private static final String TALENT = "但我才气更惊人";
+	// private static final String KEY_TALENT = "才气";
+	// private static final String MONEY = "但我财富更炫目";
+	// private static final String KEY_MONEY = "财富";
+	private static final String TALENT = "男性博士，女性硕士（学历证明）；副教授，以及相当于副教授的职称；市级以上比赛1、2、3等奖获奖者（获奖证明）；真实粉丝数量过十万者（用您的方式上传图片证明）；实用新型专利三个以上者，发明专利一个以上者；其他才华证明。";
+	private static final String MONEY = "男性固定资产500万以上，女性固定资产５０万以上（房产、汽车等资产的所有权证明和其价值证明；也可通过比如某种银行卡（会员卡）的持有，侧面证明您的层次）";
+	private static final String COMMOM_SERVICE = "公务员、国企、事业单位、军队中，科长以上级别工作证明。";
+	SpannableStringBuilder ssbMoney, ssbTalent;
+	public int talentOrMoney;// 0财富1才华2公共服务级别
+	public String materail;
+	public String agentCode;
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_doubt_wan_third_step, null);
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		initView();
+	}
+
+	private void initView() {
+		etMaterial = (EditText) getView().findViewById(R.id.et_material);
+		tvTalentMoney = (TextView) getView().findViewById(R.id.tv_talent_money_commom_service);
+		tvEnsure = (TextView) getView().findViewById(R.id.tv_ensure);
+		tvEnsure.setOnClickListener(this);
+		etAgentCode = (EditText) getView().findViewById(R.id.et_agentCode);
+		llTalentMoneyChange = (LinearLayout) getView().findViewById(R.id.ll_talent_money_change);
+		llTalentMoneyChange.setOnClickListener(this);
+		mVpFragment = new ViewPagerFragment();
+		mVpFragment.setMaxCount(5);
+		getActivity().getSupportFragmentManager().beginTransaction().add(R.id.fl_vp_container, mVpFragment, "vf").commit();
+		setTalentMoneyFont();
+	}
+
+	private void setTalentMoneyFont() {
+		// int indexMoney = MONEY.indexOf(KEY_MONEY);
+		// ssbMoney = new SpannableStringBuilder(MONEY);
+		// ssbMoney.setSpan(new ForegroundColorSpan(Color.YELLOW), indexMoney,
+		// indexMoney + KEY_MONEY.length(),
+		// Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		// int indexTalent = TALENT.indexOf(KEY_TALENT);
+		// ssbTalent = new SpannableStringBuilder(TALENT);
+		// ssbTalent.setSpan(new ForegroundColorSpan(Color.YELLOW), indexMoney,
+		// indexMoney + KEY_TALENT.length(),
+		// Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+		if (0 == talentOrMoney) {
+			tvTalentMoney.setText(MONEY);
+			etMaterial.setHint("上传证明的名称，如”房产证“");
+		} else if (1 == talentOrMoney) {
+			tvTalentMoney.setText(TALENT);
+			etMaterial.setHint("上传证明的名称，如”学历“");
+		} else {
+			tvTalentMoney.setText(COMMOM_SERVICE);
+		}
+	}
+
+	public interface OnDoubtWanThirdClickListener {
+		void OnDoubtWanThirdClick(View view);
+	}
+
+	private OnDoubtWanThirdClickListener mOnDoubtWanThirdClickListener;
+
+	public void setOnDoubtWanThirdClickListener(OnDoubtWanThirdClickListener onDoubtWanThirdClickListener) {
+		mOnDoubtWanThirdClickListener = onDoubtWanThirdClickListener;
+	}
+
+	public void setTalentOrMoney(int talentOrMoney) {
+		this.talentOrMoney = talentOrMoney;
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.ll_talent_money_change:
+			// if (TALENT.equals(tvTalentMoney.getText().toString())) {
+			// tvTalentMoney.setText(ssbMoney);
+			// } else {
+			// tvTalentMoney.setText(ssbTalent);
+			// }
+			break;
+		case R.id.tv_ensure:
+			if (etMaterial.length() <= 0) {
+				ToastUtil.showToast("请先填写材料");
+				return;
+			}
+			materail = etMaterial.getText().toString();
+			if (etAgentCode.length() <= 0) {
+				// ToastUtil.showToast("请填写代理商码");
+				// return;
+				agentCode = "";
+			} else {
+				agentCode = etAgentCode.getText().toString();
+			}
+			if (mVpFragment.mPicPaths.size() <= 0) {
+				ToastUtil.showToast("请先选择至少一张图片");
+				return;
+			}
+			if (mOnDoubtWanThirdClickListener != null) {
+				mOnDoubtWanThirdClickListener.OnDoubtWanThirdClick(v);
+			}
+			break;
+		default:
+			if (mOnDoubtWanThirdClickListener != null) {
+				mOnDoubtWanThirdClickListener.OnDoubtWanThirdClick(v);
+			}
+			break;
+		}
+	}
+
+}

@@ -1,0 +1,118 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import android.content.Context;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+
+/**
+ * @ClassName: TransmitAdapter.java
+ * @Description:
+ * @author: yj
+ * @date: 2015年11月23日 上午8:33:42
+ */
+public class ChatPickContactAdapter extends BaseAdapter {
+	private Context mContext;
+	private List<ContactUser> mData;
+	private Map<Integer, Boolean> map;
+
+	public ChatPickContactAdapter(Context context, List<ContactUser> data) {
+		mContext = context;
+		mData = data;
+		map = new HashMap<Integer, Boolean>();
+	}
+
+	@Override
+	public int getCount() {
+		return mData == null ? 0 : mData.size();
+	}
+
+	@Override
+	public ContactUser getItem(int position) {
+		return mData.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View con, ViewGroup arg2) {
+		ViewHolder vh;
+		if (null == con) {
+			con = View.inflate(mContext, R.layout.item_chat_pick_contact, null);
+			vh = new ViewHolder();
+			vh.tvName = (TextView) con.findViewById(R.id.tv_contact_name);
+			vh.ivHead = (ImageView) con.findViewById(R.id.iv_contact_head);
+			vh.ivIsPicked = (ImageView) con.findViewById(R.id.iv_is_picked);
+			vh.ivIsPicked.setOnClickListener(mOnClickListener);
+			con.setTag(vh);
+		} else {
+			vh = (ViewHolder) con.getTag();
+		}
+		setIvIsPicked(position, vh);
+		vh.ivIsPicked.setTag(position);
+		ContactUser user = mData.get(position);
+		setUserName(vh, user);
+		String icon = ImageUtils.getIconByDwID(user.getFriendID(),
+				ImageUtils.ICON_SMALL);
+		setImageView(vh, icon);
+		return con;
+	}
+
+	private void setIvIsPicked(int position, ViewHolder vh) {
+		if (null == map.get(position) || false == map.get(position)) {
+			vh.ivIsPicked.setImageResource(R.drawable.hollow_heart);
+		} else {
+			vh.ivIsPicked.setImageResource(R.drawable.solid_heart);
+		}
+	}
+
+	private OnClickListener mOnClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View view) {
+			int position = (Integer) view.getTag();
+			if (null == map.get(position) || false == map.get(position)) {
+				map.put(position, true);
+			} else {
+				map.put(position, false);
+			}
+			notifyDataSetChanged();
+		}
+	};
+
+	private void setImageView(ViewHolder vh, String icon) {
+		if (CommUtil.isNotBlank(icon)) {
+			// Picasso.with(mContext).load(icon).into(vh.ivHead);
+			ImageLoaderHelper.mImageLoader.displayImage(icon, vh.ivHead,
+					ImageLoaderHelper.mOptions);
+		}
+	}
+
+    private void setUserName(ViewHolder vh, ContactUser user)
+    {
+        vh.tvName.setText(user.getShowName());
+    }
+
+	class ViewHolder {
+		ImageView ivHead, ivIsPicked;
+		TextView tvName;
+	}
+}

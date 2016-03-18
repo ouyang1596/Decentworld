@@ -1,0 +1,258 @@
+package cn.sx.decentworld;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.jivesoftware.smack.ChatManager;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.filter.AndFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.filter.PacketTypeFilter;
+import org.jivesoftware.smack.packet.Presence;
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+import org.simple.eventbus.ThreadMode;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.support.v4.app.FragmentManager;
+import cn.sx.decentworld.bean.ChatRoomInfo;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.EditUserInfoItem;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.bean.RegisterBean;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.CrashHandler;
+import cn.sx.decentworld.component.ui.MainFragmentComponent;
+import cn.sx.decentworld.inter.CommCallback;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.XmppHelper;
+
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.app.Application;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EApplication;
+
+/**
+ * @ClassName: DecentWorldApp.java
+ * @Description: 主要完成的工作 1.实例化全局变量 2.初始化ActiveAndroid数据库 3.保存全局XMPPConnecttion变量
+ * @author: cj
+ * @date: 2015年10月18日 下午4:55:25
+ */
+@EApplication
+public class DecentWorldApp extends Application {
+	private static final String TAG = "DecentWorldApp";
+	// 储存多张照片路径
+	public static ArrayList<String> mPicList;
+	// 储存一张照片路径
+	public static String tempPicPath = null;
+	// 全局变量（）
+	private static DecentWorldApp instance;
+	private static Context applicationContext;
+	private static EventBus eventBus;
+	private String dwID = "";// 用于与Dw服务器进行通信的dwID号
+	private String username = "";// 用户名（目前为手机号码）
+	private String password = "";// 密码
+	private String token = "";// 与dw服务器通信的令牌
+	public static List<EditUserInfoItem> userInfoDatas;
+	// 存放联系人列表
+	private List<ContactUser> list_contactuser;
+	public static final String MAIN_KEY = "1";
+	public Activity currentActivity;
+	public static RegisterBean registerBean;
+	public static String realName;
+	public static String ifGuarantee = "0";
+	public static boolean ifFromAppOwner;
+	@Bean
+	MainFragmentComponent mainComponent;
+	// 通过此来判断聊天室退出是否需要调用退出接口
+	public static boolean ifFixed;
+	public static ChatRoomInfo chatRoomInfo;
+	// 聊天管理器
+	private ChatManager chatManager;
+	private Intent messageListenerService;
+	private FragmentManager fm;
+	private String currentUserdwID = "";
+
+	/**
+	 * packet过滤器
+	 */
+	PacketFilter filter = new AndFilter(new PacketTypeFilter(Presence.class));
+
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		initFile();
+		LogUtils.i(TAG, "创建Application");
+		ImageLoaderHelper.initImageLoader(this);
+		// 做初始化操作数据库
+		ActiveAndroid.initialize(this);
+		// 初始化全局变量...begin
+		applicationContext = this;
+		instance = this;
+		eventBus = EventBus.getDefault();
+		eventBus.register(this);
+		// 初始化全局变量...end
+		mPicList = new ArrayList<String>();
+		// 初始化重连管理者
+		try {
+			Class.forName("org.jivesoftware.smack.ReconnectionManager");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		ImageLoaderHelper.initImageLoader(applicationContext);
+		// 异常报告
+		CrashHandler.getInstance().init(this);
+		ImageUtils.saveBitmap(getResources());
+	}
+
+	/**
+	 * 获得DecentWorldApp的唯一实例
+	 *
+	 * @return
+	 */
+	public static DecentWorldApp getInstance() {
+		return instance;
+	}
+
+	/**
+	 * 获取全局的Context
+	 *
+	 * @return
+	 */
+	public static Context getGlobalContext() {
+		return applicationContext;
+	}
+
+	/**
+	 * 设置与Dw服务器通信的dwID
+	 */
+	public void setDwID(String dwID) {
+		this.dwID = dwID;
+	}
+
+	/**
+	 * 获取与Dw服务器进行通信的dwID
+	 */
+	public String getDwID() {
+		if (dwID == null || dwID.equals("")) {
+			SharedPreferences preferences = getSharedPreferences(
+					Constants.SETTING, 0);
+			dwID = preferences.getString(Constants.DW_ID, "");
+		}
+		return dwID;
+	}
+
+	/**
+	 * 设置用户名
+	 */
+	public void setUserName(String username) {
+		this.username = username;
+	}
+
+	/**
+	 * 获取当前登陆用户名
+	 */
+	public String getUserName() {
+		return username;
+	}
+
+	/**
+	 * 设置密码
+	 */
+	public void setPassword(String pwd) {
+		this.password = pwd;
+	}
+
+	/**
+	 * 获取密码
+	 */
+	public String getPassword() {
+		return password;
+	}
+
+	/**
+	 * @return the token
+	 */
+	public String getToken() {
+		return token;
+	}
+
+	/**
+	 * @param token
+	 *            the token to set
+	 */
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	/**
+	 * 获得xmppConnection实例
+	 *
+	 * @return
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_CONNECTION, mode = ThreadMode.ASYNC)
+	public XMPPConnection getConnection(CommCallback callback) {
+		return XmppHelper.getConnection(callback);
+	}
+
+	public XMPPConnection getNewConnectionImpl() {
+		return XmppHelper.getNewConnection();
+	}
+
+	/**
+	 * 与服务器断开连接
+	 */
+	public void closeConnection() {
+		XmppHelper.closeConnection();
+	}
+
+	public XMPPConnection getConnectionImpl() {
+		return XmppHelper.getConnection(null);
+	}
+
+	@Override
+	public void onTerminate() {
+		LogUtils.i(TAG, "销毁Application");
+		super.onTerminate();
+		// 数据库的清理工作
+		ActiveAndroid.dispose();
+	}
+
+	/**
+	 * @return the currentActivity
+	 */
+	public Activity getCurrentActivity() {
+		return currentActivity;
+	}
+
+	/**
+	 * @param currentActivity
+	 *            the currentActivity to set
+	 */
+	public void setCurrentActivity(Activity currentActivity) {
+		this.currentActivity = currentActivity;
+	}
+
+	public void initFile() {
+		File file = new File(Constants.HomePath);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		file = new File(Constants.CAMERA_PATH);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		file = new File(Constants.RecorderAudiosPath);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+	}
+
+}

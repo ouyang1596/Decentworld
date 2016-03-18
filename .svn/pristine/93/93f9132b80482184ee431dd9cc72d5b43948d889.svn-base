@@ -1,0 +1,379 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.UserExtraInfo;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.TitleBar;
+import cn.sx.decentworld.dialog.ReminderDialog;
+import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ViewUtil;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.*;
+
+/**
+ * @ClassName: AdvanceSettingActivity.java
+ * @Description:
+ * @author: cj
+ * @date: 2015年12月27日 上午9:27:04
+ */
+@EActivity(R.layout.activity_advance_setting)
+public class AdvanceSettingActivity extends BaseFragmentActivity implements OnClickListener
+{
+    private static String TAG = "AdvanceSettingActivity";
+    private SendUrl sendUrl;
+    private String dwID;
+
+    @ViewById(R.id.ll_advance_setting_root)
+    LinearLayout ll_advance_setting_root;
+
+    /** 开关控件 **/
+    /** 陌生人消息提醒 **/
+    @ViewById(R.id.iv_advance_setting_stranger_msg)
+    ImageView iv_advance_setting_stranger_msg;
+    /** 接收系统推送的消息 **/
+    @ViewById(R.id.iv_advance_setting_push_system)
+    ImageView iv_advance_setting_push_system;
+    /** 自动转账 **/
+    @ViewById(R.id.iv_advance_setting_autoTransfer)
+    ImageView iv_advance_setting_autoTransfer;
+    /** 接收审核信息（包括图像和审核信息）**/
+    @ViewById(R.id.iv_advance_setting_acceptCheckPush)
+    ImageView iv_advance_setting_acceptCheckPush;
+
+    private int items = 4;
+    private Boolean[] checkBoxIsChecked = new Boolean[items];
+    private List<ImageView> imageViewList;
+    private List<String> indexs;
+
+    @Bean
+    TitleBar titleBar;
+
+    @AfterViews
+    public void init()
+    {
+        ViewUtil.scaleContentView(ll_advance_setting_root);
+        sendUrl = new SendUrl(this);
+        dwID = DecentWorldApp.getInstance().getDwID();
+        titleBar.setTitleBar("设置", "高级设置");
+        iv_advance_setting_stranger_msg.setOnClickListener(this);
+        iv_advance_setting_push_system.setOnClickListener(this);
+        iv_advance_setting_autoTransfer.setOnClickListener(this);
+        iv_advance_setting_acceptCheckPush.setOnClickListener(this);
+
+        imageViewList = new ArrayList<ImageView>();
+        imageViewList.add(iv_advance_setting_stranger_msg);
+        imageViewList.add(iv_advance_setting_push_system);
+        imageViewList.add(iv_advance_setting_autoTransfer);
+        imageViewList.add(iv_advance_setting_acceptCheckPush);
+
+        indexs = new ArrayList<String>();
+        indexs.add("strangerMessageNotice");
+        indexs.add("acceptPush");
+        indexs.add("autoTransfer");
+        indexs.add("acceptCheckPush");
+
+        initData();
+    }
+
+    /**
+     * 初始化数据
+     */
+    private void initData()
+    {
+        UserExtraInfo info = UserExtraInfo.queryBy(dwID);
+        if (info == null || info.getNoticeStrangerMessage() == null || info.getAcceptPush() == null || info.getAutoTransfer() == null
+                || info.getAcceptCheckPush() ==null )
+        {
+            getAuthFromServer();
+        }
+        else
+        {
+            checkBoxIsChecked[0] = info.getNoticeStrangerMessage();
+            checkBoxIsChecked[1] = info.getAcceptPush();
+            checkBoxIsChecked[2] = info.getAutoTransfer();
+            checkBoxIsChecked[3] = info.getAcceptCheckPush();
+            initSwitch(checkBoxIsChecked);
+        }
+    }
+
+    /**
+     * 搜索开关控制
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.iv_advance_setting_stranger_msg:
+                clickSwitch(0);
+                break;
+            case R.id.iv_advance_setting_push_system:
+                clickSwitch(1);
+                break;
+            case R.id.iv_advance_setting_autoTransfer:
+                /** 此开关仅对微信有效，关闭时提示“关闭开关后，需要手动提现”,打开时提示“打开开关后，需要自己缴纳手续费” **/
+                final int index = 2;
+                String info = "";
+                if (checkBoxIsChecked[index])
+                {
+                    info = "关闭开关后，需要手动提现";
+                }
+                else
+                {
+                    info = "打开开关后，需要自己缴纳手续费";
+                }
+                ReminderDialog dialog = new ReminderDialog();
+                dialog.setInfo(info);
+                dialog.setListener(new ReminderListener()
+                {
+                    @Override
+                    public void confirm()
+                    {
+                        clickSwitch(index);
+                    }
+                });
+                dialog.show(getSupportFragmentManager(), "dialog");
+                break;
+            case R.id.iv_advance_setting_acceptCheckPush:
+                clickSwitch(3);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 点击开关时
+     * 
+     * @param i
+     */
+    private void clickSwitch(int i)
+    {
+        if (checkBoxIsChecked[i])
+        {
+            imageViewList.get(i).setImageResource(R.drawable.switch_rectangle_close);
+            checkBoxIsChecked[i] = false;
+        }
+        else
+        {
+            imageViewList.get(i).setImageResource(R.drawable.switch_rectangle_open);
+            checkBoxIsChecked[i] = true;
+        }
+    }
+
+    /**
+     * 返回
+     */
+    @Click(R.id.main_header_left)
+    void back()
+    {
+        updateAuthtoServer();
+        finish();
+    }
+
+    private void updateAuthtoServer()
+    {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("user_id", dwID);
+        for (int i = 0; i < checkBoxIsChecked.length; i++)
+        {
+            if (checkBoxIsChecked[i])
+                map.put(indexs.get(i), "true");
+            else
+                map.put(indexs.get(i), "false");
+        }
+
+        HashMap<String, String> container = new HashMap<String, String>();
+        container.put("auth", JSON.toJSONString(map));
+        String requestUrl = Constants.CONTEXTPATH + Constants.AUTH_SETTING;
+        LogUtils.i(TAG, "updateAuthtoServer...begin");
+        sendUrl.httpRequestWithParams(container, requestUrl, Method.GET, new HttpCallBack()
+        {
+
+            @Override
+            public void onSuccess(String response, ResultBean msg)
+            {
+                if (msg.getResultCode() == 2222)
+                {
+                    LogUtils.i(TAG, "updateAuthtoServer...success");
+                    handler.sendEmptyMessage(1);
+                }
+                if (msg.getResultCode() == 3333)
+                {
+                    LogUtils.i(TAG, "updateAuthtoServer...failure,cause by:" + msg.getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.i(TAG, "updateAuthtoServer...onFailure,cause by:" + e);
+            }
+        });
+    }
+
+    Handler handler = new Handler()
+    {
+        public void handleMessage(Message msg)
+        {
+            switch (msg.what)
+            {
+                case 0:
+                    initSwitch(checkBoxIsChecked);
+                    break;
+                case 1:
+                    UserExtraInfo userInfo = UserExtraInfo.queryBy(dwID);
+                    if (userInfo != null)
+                    {
+                        if (checkBoxIsChecked[0])
+                            userInfo.setNoticeStrangerMessage(true);
+                        else
+                            userInfo.setNoticeStrangerMessage(false);
+
+                        if (checkBoxIsChecked[1])
+                            userInfo.setAcceptPush(true);
+                        else
+                            userInfo.setAcceptPush(false);
+
+                        if (checkBoxIsChecked[2])
+                            userInfo.setAutoTransfer(true);
+                        else
+                            userInfo.setAutoTransfer(false);
+                        
+                        if (checkBoxIsChecked[3])
+                            userInfo.setAcceptCheckPush(true);
+                        else
+                            userInfo.setAcceptCheckPush(false);
+                        userInfo.save();
+                    }
+                    else
+                    {
+                        LogUtils.i(TAG, "保存修改的数据时，检测到UserInfo为空");
+                    }
+
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    /**
+     * 用网络请求的数据初始化开关
+     * 
+     * @param SW
+     */
+    private void initSwitch(Boolean[] SW)
+    {
+        for (int i = 0; i < SW.length; i++)
+        {
+            if (!SW[i])
+                imageViewList.get(i).setImageResource(R.drawable.switch_rectangle_close);
+            else
+                imageViewList.get(i).setImageResource(R.drawable.switch_rectangle_open);
+        }
+    };
+
+    /**
+     * 从服务器获取开关权限
+     */
+    private void getAuthFromServer()
+    {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("dwID", dwID);
+        String requestUrl = Constants.CONTEXTPATH + Constants.AUTH_GET;
+        LogUtils.i(TAG, requestUrl);
+        LogUtils.i(TAG, "getAuthFromServer...begin");
+        sendUrl.httpRequestWithParams(map, requestUrl, Method.GET, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String response, ResultBean msg)
+            {
+                if (msg.getResultCode() == 2222)
+                {
+                    JSONObject jObject = JSON.parseObject(msg.getData().toString());
+                    LogUtils.i(TAG, "getAuthFromServer...获取的权限为：" + msg.getData().toString());
+
+                    UserExtraInfo info = UserExtraInfo.queryBy(dwID);
+                    if (info == null)
+                    {
+                        info = new UserExtraInfo();
+                    }
+
+                    Boolean noticeStrangerMsg = jObject.getBooleanValue("strangerMsg");
+                    if (noticeStrangerMsg != null)
+                    {
+                        checkBoxIsChecked[0] = noticeStrangerMsg;
+                        info.setNoticeStrangerMessage(noticeStrangerMsg);
+                    }
+
+                    Boolean acceptPush = jObject.getBooleanValue("acceptPush");
+                    if (acceptPush != null)
+                    {
+                        checkBoxIsChecked[1] = acceptPush;
+                        info.setAcceptPush(acceptPush);
+                    }
+
+                    Boolean autoTransfer = jObject.getBooleanValue("autoTransfer");
+                    if (autoTransfer != null)
+                    {
+                        checkBoxIsChecked[2] = autoTransfer;
+                        info.setAutoTransfer(autoTransfer);
+                    }
+                    
+
+                    Boolean acceptCheckPush = jObject.getBooleanValue("acceptCheckPush");
+                    if (acceptCheckPush != null)
+                    {
+                        checkBoxIsChecked[3] = acceptCheckPush;
+                        info.setAcceptCheckPush(acceptCheckPush);
+                    }
+                    
+                    info.save();
+                    handler.sendEmptyMessage(0);
+                }
+                if (msg.getResultCode() == 3333)
+                {
+                    LogUtils.i(TAG, "getAuthFromServer...failure,cause by:" + msg.getMsg());
+                    for (int i = 0; i < items; i++)
+                    {
+                        checkBoxIsChecked[i] = false;
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.i(TAG, "getAuthFromServer...onFailure,cause by:" + e);
+                for (int i = 0; i < items; i++)
+                {
+                    checkBoxIsChecked[i] = false;
+                }
+            }
+        });
+    }
+
+}

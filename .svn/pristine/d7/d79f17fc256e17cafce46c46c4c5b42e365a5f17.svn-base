@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:padding="15dp" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@drawable/btn_anonymous_bg"
+        android:gravity="center"
+        android:text="没有了，还想了解更多，Q我吧"
+        android:textColor="@color/white"
+        android:textSize="@dimen/textsize_30px" />
+
+</RelativeLayout>

@@ -1,0 +1,65 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.ChatSelectBgAdapter;
+import cn.sx.decentworld.component.TitleBar;
+import cn.sx.decentworld.widget.ExpandGridView;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.Click;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: ChatDetailsBgSetActivity.java
+ * @Description: 从本地选择背景
+ * @author: cj
+ * @date: 2015年7月14日 上午11:26:21
+ */
+
+@EActivity(R.layout.chat_setting_set_bg_fromlocal)
+public class ChatSettingSetBgFromLocalActivity extends BaseFragmentActivity
+{
+	private static final String TAG= "ChatSettingSetBgFromLocalActivity";
+	@Bean
+	TitleBar titleBar;
+	@ViewById(R.id.chat_setting_set_bg_fromlocal_egv)
+	ExpandGridView chat_details_set_bg_fromlocal_egv;
+	
+	List<String> members = new ArrayList<String>();
+	
+	@AfterViews
+	public void init()
+	{
+		titleBar.setTitleBar("选择背景", "背景图片");
+		initData();
+	}
+
+	/**
+	 * 初始化数据
+	 */
+	private void initData()
+	{
+//		chat_details_set_bg_fromlocal_egv.setAdapter(new ChatSelectBgAdapter(ChatSettingSetBgFromLocalActivity.this,R.layout.chat_setting_set_bg_fromlocal_item, pictures));
+	}
+	
+	/**
+	 * 返回
+	 */
+	@Click(R.id.main_header_left)
+	void setBackBtn()
+	{
+		finish();
+	}
+}

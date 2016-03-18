@@ -37,16 +37,16 @@ public final class ModificationPhoneNumOne_
     }
 
     private void init_(Bundle savedInstanceState) {
-        titleBar = TitleBar_.getInstance_(this);
-        resetPwdInfo = ResetPwdInfo_.getInstance_(this);
-        privacySettingInfo = PrivacySettingInfo_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        resetPwdInfo = ResetPwdInfo_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
+        privacySettingInfo = PrivacySettingInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        etMobile = ((EditText) findViewById(id.et_modification_phone_num_one_number));
-        btn_modification_phone_num_one_next = ((Button) findViewById(id.btn_modification_phone_num_one_next));
         tvSend = ((TextView) findViewById(id.tv_send));
+        btn_modification_phone_num_one_next = ((Button) findViewById(id.btn_modification_phone_num_one_next));
+        etMobile = ((EditText) findViewById(id.et_modification_phone_num_one_number));
         etIdentifyingCode = ((EditText) findViewById(id.et_identifying_code));
         {
             View view = findViewById(id.main_header_left);
@@ -63,10 +63,10 @@ public final class ModificationPhoneNumOne_
                 );
             }
         }
-        ((TitleBar_) titleBar).afterSetContentView_();
-        ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();
-        ((PrivacySettingInfo_) privacySettingInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
+        ((PrivacySettingInfo_) privacySettingInfo).afterSetContentView_();
         init();
     }
 

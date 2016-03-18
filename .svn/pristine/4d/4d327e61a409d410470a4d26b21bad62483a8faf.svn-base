@@ -1,0 +1,38 @@
+package cn.sx.decentworld.activity;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.LinearLayout;
+import cn.sx.decentworld.R;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_doubt)
+public class DoubtActivity extends BaseFragmentActivity implements
+		OnClickListener {
+	@ViewById(R.id.ll_doubt)
+	LinearLayout llDoubt;
+	@ViewById(R.id.ll_wan)
+	LinearLayout llWan;
+
+	@AfterViews
+	public void init() {
+		llDoubt.setOnClickListener(this);
+	}
+
+	@Override
+	public void onClick(View v) {
+		Intent intent = null;
+		switch (v.getId()) {
+		case R.id.ll_doubt:
+			intent = new Intent(this, DoubtVerifyActivity_.class);
+			break;
+		case R.id.ll_wan:
+			break;
+		}
+		startActivity(intent);
+	}
+}

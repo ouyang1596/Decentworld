@@ -38,10 +38,10 @@ public final class EditRealnameActivity_
     }
 
     private void afterSetContentView_() {
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        et_edit_realname = ((EditText) findViewById(id.et_edit_realname));
         btn_edit_realname_complete = ((Button) findViewById(id.btn_edit_realname_complete));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        et_edit_realname = ((EditText) findViewById(id.et_edit_realname));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

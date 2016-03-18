@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="538px"
+    android:layout_height="382px"
+    android:background="@drawable/dialog_bg_382"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:id="@+id/root_build_group_location_dialog"
+     >
+
+    <TextView
+        android:id="@+id/tv_build_group_location_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40px"
+        android:text="@string/location_group"
+        android:textColor="#4A4A4A"
+        android:textSize="30px" />
+
+    <TextView
+        android:id="@+id/address1"
+        android:layout_width="400px"
+        android:layout_height="50px"
+        android:layout_below="@id/tv_build_group_location_1"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:text="前海XXX"
+        android:textColor="#4A4A4A"
+        android:textSize="24px" />
+
+    <EditText
+        android:id="@+id/address2"
+        android:layout_width="400px"
+        android:layout_height="90px"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/address1"
+        android:layout_marginTop="20px"
+        android:background="@drawable/edittext_selector"
+        android:hint="@string/location_info"
+        android:inputType="number"
+        android:paddingLeft="16px"
+        android:singleLine="true"
+        android:textColor="#4A4A4A"
+        android:textSize="22px" >
+    </EditText>
+
+    <Button
+        android:id="@+id/bt_to_next"
+        android:layout_width="228px"
+        android:layout_height="52px"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/address2"
+        android:layout_marginTop="30px"
+        android:background="@drawable/button_bg"
+        android:text="@string/next" 
+        android:textColor="@color/white"
+        android:textSize="28px"
+        />
+
+</RelativeLayout>

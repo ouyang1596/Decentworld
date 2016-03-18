@@ -37,22 +37,22 @@ public final class ForgertPwdResetPwdActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         resetPwdInfo = ResetPwdInfo_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        ivBack = ((ImageView) findViewById(id.iv_back));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        llForgetPwd = ((LinearLayout) findViewById(id.root_activity_register_set_password));
-        btnOk = ((Button) findViewById(id.btn_OK));
-        etvResetPwd = ((EditText) findViewById(id.etv_reset_pwd));
         ivPwdIsShow = ((ImageView) findViewById(id.iv_pwd_is_show));
         etvPwd = ((EditText) findViewById(id.etv_reset_pwd));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        ((ToastComponent_) toast).afterSetContentView_();
+        btnOk = ((Button) findViewById(id.btn_OK));
+        llForgetPwd = ((LinearLayout) findViewById(id.root_activity_register_set_password));
+        etvResetPwd = ((EditText) findViewById(id.etv_reset_pwd));
         ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

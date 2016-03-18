@@ -39,9 +39,9 @@ public final class EditNicknameActivity_
 
     private void afterSetContentView_() {
         ivBack = ((ImageView) findViewById(id.iv_back));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        btn_edit_nickname_complete = ((Button) findViewById(id.btn_edit_nickname_complete));
         et_edit_nickname = ((EditText) findViewById(id.et_edit_nickname));
+        btn_edit_nickname_complete = ((Button) findViewById(id.btn_edit_nickname_complete));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

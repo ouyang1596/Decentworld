@@ -1,0 +1,62 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.utils;
+
+import java.io.File;
+
+import android.content.Context;
+import android.graphics.Bitmap;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.FilePath;
+
+import com.nostra13.universalimageloader.cache.disc.impl.UnlimitedDiskCache;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
+import com.nostra13.universalimageloader.utils.DiskCacheUtils;
+import com.nostra13.universalimageloader.utils.MemoryCacheUtils;
+
+/**
+ * @ClassName: ImageLoaderHelper.java
+ * @Description:
+ * @author: yj
+ * @date: 2015年11月10日 上午10:32:58
+ */
+public class ImageLoaderHelper {
+	public static ImageLoader mImageLoader = ImageLoader.getInstance();
+	public static DisplayImageOptions mOptions;
+
+	public static void initImageLoader(Context context) {
+		if (null == mOptions) {
+			mOptions = new DisplayImageOptions.Builder().showImageOnLoading(R.drawable.loading_pic)
+					.showImageForEmptyUri(R.drawable.loading_pic).showImageOnFail(R.drawable.loading_pic).cacheInMemory(true)
+					.cacheOnDisk(true).bitmapConfig(Bitmap.Config.RGB_565) // 设置图片的解码类型
+					// .displayer(new FadeInBitmapDisplayer(500))//
+					// 是否图片加载好后渐入的动画时间
+					.build();
+			ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context).diskCache(
+					new UnlimitedDiskCache(new File(FilePath.HOME + "/imageLoader"))).build();
+			mImageLoader.init(config);
+			clearCache();
+		}
+	}
+
+	public static void clearCache() {
+		mImageLoader.clearMemoryCache();
+		mImageLoader.clearDiskCache();
+	}
+
+	/**
+	 * 删除指定url对应的图片
+	 */
+	public static void clearCacheByUrl(String url) {
+		if (mImageLoader != null) {
+			DiskCacheUtils.removeFromCache(url, mImageLoader.getDiskCache());
+			MemoryCacheUtils.removeFromCache(url, mImageLoader.getMemoryCache());
+		} else {
+		}
+	}
+}

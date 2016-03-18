@@ -1,0 +1,79 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root__forget_pwd_identifying_code"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="150dp" >
+
+        <include layout="@layout/layout_register_title_bg" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="接收短信大约需要"
+                android:textColor="@color/white"
+                android:textSize="@dimen/new_textsize_12sp" />
+
+            <TextView
+                android:id="@+id/time_count"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00"
+                android:textColor="@color/white"
+                android:textSize="@dimen/new_textsize_12sp" />
+        </LinearLayout>
+    </RelativeLayout>
+    <TextView
+        android:id="@+id/tv_mobile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="41dp"
+        android:text="+86"
+        android:textColor="@color/rg_gray"
+        android:textSize="@dimen/new_textsize_13sp" />
+
+    <EditText
+        android:id="@+id/etv_identifying_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="38dp"
+        android:background="@drawable/bg_line_press"
+        android:gravity="center_horizontal"
+        android:hint="验证码"
+        android:inputType="number"
+        android:textColor="@color/rg_gray"
+        android:textSize="@dimen/new_textsize_13sp" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:src="@drawable/triangle_up" />
+
+    <TextView
+        android:id="@+id/tv_re_send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:text="重新发送?"
+        android:textColor="@color/red" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <include layout="@layout/layout_register_btn_common" />
+
+</LinearLayout>

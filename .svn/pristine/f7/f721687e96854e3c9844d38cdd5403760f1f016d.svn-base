@@ -1,0 +1,28 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <cn.sx.decentworld.widget.ListViewForScrollView
+            android:id="@+id/lv_contact"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:listSelector="#00000000" >
+        </cn.sx.decentworld.widget.ListViewForScrollView>
+
+        <cn.sx.decentworld.widget.ListViewForScrollView
+            android:id="@+id/lv_recommend"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:listSelector="#00000000" >
+        </cn.sx.decentworld.widget.ListViewForScrollView>
+    </LinearLayout>
+
+</ScrollView>

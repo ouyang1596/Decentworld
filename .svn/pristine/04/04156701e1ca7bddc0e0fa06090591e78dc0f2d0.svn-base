@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="13dp" >
+
+    <TextView
+        android:id="@+id/timestamp"
+        style="@style/chat_text_date_style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_chat_activity" >
+
+        <ImageView
+            android:id="@+id/iv_userhead"
+            android:layout_width="@dimen/size_avatar"
+            android:layout_height="@dimen/size_avatar"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="@dimen/margin_chat_activity"
+            android:background="@drawable/mini_avatar_shadow"
+            android:scaleType="fitXY" />
+
+        <RelativeLayout
+            android:layout_marginLeft="5dp"
+            android:id="@+id/rl_card_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/margin_chat_activity"
+            android:layout_toRightOf="@id/iv_userhead"
+            android:background="@drawable/chatto_bg"
+            android:gravity="left|center"
+            android:maxWidth="225.0dip"
+            android:paddingLeft="8dip" >
+
+            <TextView
+                android:layout_marginTop="5dp"
+                android:id="@+id/tv_refer_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_marginLeft="10dp"
+                android:text="名片：" />
+
+            <TextView
+                android:layout_alignTop="@id/tv_refer_1"
+                android:id="@+id/tv_card_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_toRightOf="@id/tv_refer_1"
+                android:lines="1"
+                android:text="大我世界" />
+
+            <ImageView
+                android:layout_marginTop="5dp"
+                android:id="@+id/iv_card_icon"
+                android:layout_marginBottom="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/tv_refer_1"
+                android:layout_below="@id/tv_refer_1"
+                android:src="@drawable/default_avatar" />
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/iv_block"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/rl_card_container"
+            android:layout_toRightOf="@id/rl_card_container"
+            android:src="@drawable/me_location"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tv_userid"
+            style="@style/chat_text_name_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/iv_userhead"
+            android:layout_toLeftOf="@id/rl_card_container"
+            android:ellipsize="end"
+            android:maxWidth="50dp" />
+
+        <TextView
+            android:id="@+id/tv_user_worth"
+            style="@style/chat_text_name_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/tv_userid"
+            android:layout_toLeftOf="@id/rl_card_container"
+            android:ellipsize="end"
+            android:maxWidth="50dp"
+            android:visibility="visible" />
+    </RelativeLayout>
+
+</LinearLayout>

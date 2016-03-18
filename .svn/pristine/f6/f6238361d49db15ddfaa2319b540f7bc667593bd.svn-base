@@ -1,0 +1,116 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.benefit;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.MagnateWindowActivity_;
+import cn.sx.decentworld.activity.MeSettingActivity;
+import cn.sx.decentworld.fragment.BaseFragment;
+
+/**
+ * @ClassName: GrBenefitFragment.java
+ * @Description: 贵人窗口
+ * @author: cj
+ * @date: 2016年1月14日 上午11:02:31
+ */
+@EFragment(R.layout.fragment_gr_benefit)
+public class GrBenefitFragment extends BaseFragment implements OnClickListener
+{
+    private static final String TAG = "";
+    private boolean isPrepared = false;
+    
+    /**
+     * 工具类
+     */
+    
+    /**
+     * 界面资源
+     */
+    @ViewById(R.id.btn_gr_temp)
+    Button btn_gr_temp;
+    
+    /**
+     * 变量
+     */
+    
+    
+    
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        initVar();
+        initListener();
+        
+        
+        isPrepared = true;
+        lazyLoad();
+    }
+
+
+    /**
+     * 
+     */
+    private void initVar()
+    {
+        
+    }
+
+
+    /**
+     * 
+     */
+    private void initListener()
+    {
+        btn_gr_temp.setOnClickListener(this);
+        
+    }
+
+
+    @Override
+    protected void lazyLoad()
+    {
+    }
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void turnToTab(int tab)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.btn_gr_temp:
+                /** 打开贵人窗口界面 **/
+                Intent intent = new Intent(getActivity(), MagnateWindowActivity_.class);
+                startActivity(intent);
+                
+                break;
+
+            default:
+                break;
+        }
+        
+    }
+
+}

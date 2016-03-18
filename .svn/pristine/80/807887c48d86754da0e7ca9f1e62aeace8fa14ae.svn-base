@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/root_activity_interesting_group_build"
+     >
+
+    <include
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/main_header" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <ScrollView
+            
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true" >
+
+            <LinearLayout
+                android:id="@+id/build_activity_interesting_group_item_info_root"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <RelativeLayout
+                    android:layout_width="719px"
+                    android:layout_height="408px"
+                    android:background="@drawable/magnate_to_me_add_bg" >
+
+                    <ImageView
+                        android:layout_width="200px"
+                        android:layout_height="200px"
+                        android:layout_centerInParent="true"
+                        android:src="@drawable/magnate" />
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="30px"
+                    android:background="@color/chat_find_background" >
+                </LinearLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="108px"
+                    android:background="@drawable/me_setting_row_selector"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:id="@+id/tv_interesting_group_group_name_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="30px"
+                        android:text="@string/name_interesting_group"
+                        android:textSize="30px" />
+
+                    <TextView
+                        android:id="@+id/tv_interesting_group_group_name_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        android:layout_toRightOf="@id/tv_interesting_group_group_name_1"
+                        android:layout_marginLeft="20px"
+                        android:text="ID:123123"
+                        android:textSize="30px" />
+
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentRight="true"
+                        android:layout_toRightOf="@id/tv_interesting_group_group_name_2"
+                        android:gravity="center_vertical"
+                         >
+
+                        <ImageView
+                            android:id="@+id/build_group_name_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentRight="true"
+                            android:layout_centerVertical="true"
+                            android:layout_marginRight="40px"
+                            android:src="@drawable/show_more" />
+
+                        <TextView
+                            android:id="@+id/build_group_name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentRight="true"
+                            android:layout_marginRight="72px"
+                            android:text="未命名"
+                            android:textColor="@color/darkgrey"
+                            android:textSize="30px" />
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_marginLeft="20px"
+                    android:layout_marginRight="20px"
+                    android:background="#E6E6E6" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="108px"
+                    android:background="@drawable/me_setting_row_selector" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginLeft="30px"
+                        android:text="@string/manager_interesting_group"
+                        android:textSize="30px" />
+
+                    <TextView
+                        android:id="@+id/build_tv_manager_inter_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginRight="174px"
+                        android:text="组长"
+                        android:textColor="@color/darkgrey"
+                        android:textSize="30px" />
+
+                    <ImageView
+                        android:id="@+id/build_iv_manager_inter_group"
+                        android:layout_width="82px"
+                        android:layout_height="82px"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginRight="72px"
+                        android:src="@drawable/magnate" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginRight="40px"
+                        android:src="@drawable/show_more" />
+                </RelativeLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_marginLeft="20px"
+                    android:layout_marginRight="20px"
+                    android:background="#E6E6E6" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="108px"
+                    android:background="@drawable/me_setting_row_selector" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginLeft="30px"
+                        android:text="@string/date_interesting_group"
+                        android:textSize="30px" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginRight="72px"
+                        android:text="2015.4.4"
+                        android:textColor="@color/darkgrey"
+                        android:textSize="30px" />
+                </RelativeLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dip"
+                    android:layout_marginLeft="20px"
+                    android:layout_marginRight="20px"
+                    android:background="#E6E6E6" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="108px"
+                    android:background="@drawable/me_setting_row_selector" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginLeft="30px"
+                        android:text="@string/place_interesting_group"
+                        android:textSize="30px" />
+
+                    <TextView
+                        android:id="@+id/build_tv_place_inter_group"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginRight="72px"
+                        android:text="前海SPA"
+                        android:textColor="@color/darkgrey"
+                        android:textSize="30px" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginRight="40px"
+                        android:src="@drawable/show_more" />
+                </RelativeLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_marginLeft="20px"
+                    android:layout_marginRight="20px"
+                    android:background="#E6E6E6" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="108px"
+                    android:background="@drawable/me_setting_row_selector"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="30px"
+                        android:gravity="center_vertical"
+                        android:text="@string/detail_interesting_group"
+                        android:textSize="30px" />
+
+                    <TextView
+                        android:layout_width="390px"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="72px"
+                        android:textSize="30px"
+                        android:gravity="right"
+                        android:text="点击进行编辑"
+                        android:textColor="@color/darkgrey" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="40px"
+                        android:src="@drawable/show_more" />
+                    <!-- </RelativeLayout> -->
+                </RelativeLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_marginLeft="20px"
+                    android:layout_marginRight="20px"
+                    android:background="#E6E6E6" />
+
+                <RelativeLayout
+                    android:id="@+id/build_rl_toshow_something"
+                    android:layout_width="match_parent"
+                    android:layout_height="108px"
+                    android:background="@drawable/me_setting_row_selector" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginLeft="30px"
+                        android:text="@string/some_interesting_group"
+                        android:textSize="30px" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginRight="40px"
+                        android:src="@drawable/show_more" />
+                </RelativeLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_marginLeft="20px"
+                    android:layout_marginRight="20px"
+                    android:background="#E6E6E6" />
+
+                <RelativeLayout
+                    android:id="@+id/build_rl_if_toshow_member"
+                    android:layout_width="match_parent"
+                    android:layout_height="108px"
+                    android:background="@drawable/me_setting_row_selector" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginLeft="30px"
+                        android:text="@string/members_interesting_group"
+                        android:textSize="30px" />
+
+                    <ImageView
+                        android:id="@+id/build_iv_if_toshow_member"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerInParent="true"
+                        android:layout_marginRight="40px"
+                        android:src="@drawable/fragment_chat_contact_listitem_show" />
+                </RelativeLayout>
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="2px"
+                    android:layout_marginLeft="20px"
+                    android:layout_marginRight="20px"
+                    android:background="#E6E6E6" />
+
+                <cn.sx.decentworld.widget.ExpandGridView
+                    android:id="@+id/build_gv_members_inter_group"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/white"
+                    android:gravity="start"
+                    android:horizontalSpacing="12px"
+                    android:listSelector="@android:color/transparent"
+                    android:numColumns="4"
+                    android:paddingLeft="34px"
+                    android:paddingTop="30px"
+                    android:verticalSpacing="20px" >
+                </cn.sx.decentworld.widget.ExpandGridView>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="132px"
+                    android:background="@color/white" >
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </RelativeLayout>
+
+</LinearLayout>

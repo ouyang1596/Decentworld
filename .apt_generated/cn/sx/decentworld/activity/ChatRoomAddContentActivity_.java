@@ -37,23 +37,8 @@ public final class ChatRoomAddContentActivity_
     }
 
     private void afterSetContentView_() {
-        ll_chat_room_add_content_root = ((LinearLayout) findViewById(id.ll_chat_room_add_content_root));
         et_chat_room_add_content_decription = ((EditText) findViewById(id.et_chat_room_add_content_decription));
-        {
-            View view = findViewById(id.main_header_right);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        ChatRoomAddContentActivity_.this.complete();
-                    }
-
-                }
-                );
-            }
-        }
+        ll_chat_room_add_content_root = ((LinearLayout) findViewById(id.ll_chat_room_add_content_root));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -63,6 +48,21 @@ public final class ChatRoomAddContentActivity_
                     @Override
                     public void onClick(View view) {
                         ChatRoomAddContentActivity_.this.doback();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.main_header_right);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        ChatRoomAddContentActivity_.this.complete();
                     }
 
                 }

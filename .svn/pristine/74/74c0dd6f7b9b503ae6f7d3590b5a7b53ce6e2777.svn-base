@@ -1,0 +1,600 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="cn.sx.decentworld"
+    android:versionCode="11"
+    android:versionName="1.1.1" >
+
+    <uses-sdk
+        android:minSdkVersion="9"
+        android:targetSdkVersion="22" />
+
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.USE_CREDENTIALS" />
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="com.android.launcher.permission.READ_SETTINGS" />
+    <uses-permission android:name="android.permission.BROADCAST_STICKY" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+
+    <!-- ibeancon 需要蓝牙权限 -->
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <!-- 百度定位 -->
+    <!-- 这个权限用于进行网络定位 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" >
+    </uses-permission>
+    <!-- 这个权限用于访问GPS定位 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" >
+    </uses-permission>
+    <!-- 用于访问wifi网络信息，wifi信息会用于进行网络定位 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" >
+    </uses-permission>
+
+    <!-- 获取运营商信息，用于支持提供运营商信息相关的接口 -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" >
+    </uses-permission>
+    <!-- 这个权限用于获取wifi的获取权限，wifi信息会用来进行网络定位 -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" >
+    </uses-permission>
+    <!-- 用于读取手机当前的状态 -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" >
+    </uses-permission>
+    <!-- 写入扩展存储，向扩展卡写入数据，用于写入离线定位数据 -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
+    </uses-permission>
+    <!-- SD卡读取权限，用户写入离线定位数据 -->
+    <uses-permission android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.READ_LOGS" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+
+    <application
+        android:name="cn.sx.decentworld.DecentWorldApp_"
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:theme="@android:style/Theme.Light.NoTitleBar" >
+
+        <!-- ActiveAndroid框架配置 -->
+        <meta-data
+            android:name="AA_DB_NAME"
+            android:value="dw.db" />
+        <meta-data
+            android:name="AA_DB_VERSION"
+            android:value="8" />
+
+        <!-- ActiveAndroid框架配置 -->
+        <meta-data
+            android:name="com.amap.api.v2.apikey"
+            android:value="1c9489ff9cf9dcb96e069e2703265207" />
+
+        <service android:name="com.amap.api.location.APSService" >
+        </service>
+
+        <activity
+            android:name="cn.sx.decentworld.test.Test_"
+            android:label="@string/app_name"
+            android:theme="@style/horizontal_slide"
+            android:windowSoftInputMode="adjustResize" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.LoginActivity_"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.SplashActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.ChatActivity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.MainActivity_"
+            android:launchMode="singleTask"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterActivity"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ShowBigImage"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.ContextMenu" >
+        </activity>
+        <!-- 聊天设置界面 -->
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatSettingActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatSettingSetBgActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatSettingSetBgFromLocalActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatSettingWhistleblowingActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.GroupChatInfoActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatSettingWhistleblowingAddActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.UserDetailedInfoActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <!-- <activity android:name="cn.sx.decentworld.activity.Test_" > -->
+        <!-- </activity> -->
+        <activity
+            android:name="cn.sx.decentworld.activity.PictureChoiceActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.WorkActivity_"
+            android:launchMode="singleTask"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.ImagePagerActivity" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.InterestingGroupActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.InterestingGroupInfoActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.InterestingGroupJoinedActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.GroupContactActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.InterestingGroupJoinedInfoActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.InterestingGroupSomeThing_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.InterestingGroupBuildRuleActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.InterestingGroupBuildActivity_" >
+        </activity>
+        <!-- 我的设置 -->
+        <activity
+            android:name="cn.sx.decentworld.activity.MeSettingActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.MagnateToOtherActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.MagnateToMeActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.PrivacySettingActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.AdvanceSettingActivity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RecommendBenefitActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.AboutUsActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+
+        <!-- 隐私设置界面 -->
+        <activity
+            android:name="cn.sx.decentworld.activity.ModificationBankCardOne_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ModificationBankCardTwo_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ModificationBankCardThree_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ModificationPhoneNumOne_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ModificationPhoneNumTwo_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ModificationPasswordOne_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ModificationPasswordTwo_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.PublicWorkActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.MapActivity"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.CrowdfundedActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.MagnateToOtherDetailActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.PickContactActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+        <!-- 聊天室 -->
+        <activity android:name="cn.sx.decentworld.activity.ChatRoomTopicDetail_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.ChatRoomBuildActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.ChatRoomAddContentActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.ChatRoomActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.RechargeActivity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.WorkCircleCommentActivity_"
+            android:windowSoftInputMode="adjustResize" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.SearchActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.FriendDetailActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.FriendDetailSettingActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.PraiseActivity_" >
+        </activity>
+
+        <!-- 新的朋友 -->
+        <activity
+            android:name="cn.sx.decentworld.activity.NewFriendsActivity_"
+            android:theme="@style/horizontal_slide" >
+        </activity>
+
+        <!-- 测试ActiveAndroid数据库 -->
+        <!-- <activity android:name="cn.sx.decentworld.test.TestActiveAndroid_"></activity> -->
+        <!-- 消息监听 -->
+        <service android:name="cn.sx.decentworld.service.MessageListenerService" >
+        </service>
+
+        <activity android:name="cn.sx.decentworld.activity.ChatRoomChatActivity_" >
+        </activity>
+
+        <service android:name="cn.sx.decentworld.service.PacketListenerService" >
+        </service>
+        <service android:name="cn.sx.decentworld.service.FileTransferService" >
+        </service>
+
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterMobileActivity_"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterIdentifyingCodeActivity_"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterSetPasswordActivity_"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterPersonalMsgActivity_"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterIsStudentActivity_"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterStudentGreenPassActivity_"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterAppearanceActivity_"
+            android:label="@string/title_activity_register_view_pager_show"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterWhatYouHaveActivity_"
+            android:label="@string/title_activity_register_what_you_have"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterTalentActivity_"
+            android:label="@string/title_activity_register_talent"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterMoneyActivity_"
+            android:label="@string/title_activity_money"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RegisterNickActivity_"
+            android:label="@string/title_activity_register_nick"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.TakePhotosAndpictureActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="cn.sx.decentworld.activity.ForgetPwdMobileActivity_"
+            android:label="@string/title_activity_forget_pwd_mobile" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ForgetPwdIdentifyingCodeActivity_"
+            android:label="@string/title_activity_forget_pwd_identifying_code"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ForgetPwdIdCardActivity_"
+            android:label="@string/title_activity_forget_pwd_id_card" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ForgertPwdResetPwdActivity_"
+            android:label="@string/title_activity_forgert_pwd_reset_pwd" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditUserInfoActivity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.SelectedActivity_"
+            android:label="@string/title_activity_selected" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ShowToMeSchoolActivity_"
+            android:label="@string/title_activity_show_to_me" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ShowToMeOccupationActivity_"
+            android:label="@string/title_activity_occupation_show_to_me" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ShowToMeReligionActivity_"
+            android:label="@string/title_activity_Religion_show_to_me" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.ModifyIpActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.NearCardDetailActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditSignActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditRealnameActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditNicknameActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditSchoolActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditDepartmentActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditClassesActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditOccupationActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditCorporationActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditJobActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditCommon1Activity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditCommon2Activity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditCommon3Activity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RechargeAliPayWXActivity_"
+            android:label="@string/title_activity_recharge_ali_pay_wx" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.RechargePayMethodActivity_"
+            android:label="@string/title_activity_recharge_pay_method" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.MagnateWindowActivity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ShowToMeLvActivity_"
+            android:label="@string/title_activity_show_to_me_lv" >
+        </activity>
+        <!-- 分享 -->
+        <activity
+            android:name="com.mob.tools.MobUIShell"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:windowSoftInputMode="stateHidden|adjustResize" >
+            <intent-filter>
+                <data android:scheme="tencent100371282" />
+
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ShareActivity_"
+            android:label="@string/title_activity_share" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.SocialStatusActivity_"
+            android:label="@string/title_activity_social_status" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.DefaultActivity_" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="wx8a6304437033f400" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatRoomMeActivity_"
+            android:label="@string/title_activity_me" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatRoomEditMyInfoActivity_"
+            android:label="@string/title_activity_my_info" >
+        </activity>
+        <activity
+            android:name=".wxapi.WXPayEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTop" />
+        <activity
+            android:name="cn.sx.decentworld.activity.AddThemeActivity_"
+            android:label="@string/title_activity_add_theme" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.TopicContentActivity_"
+            android:label="@string/title_activity_topic_content" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatRoomEditActivity_"
+            android:label="@string/title_activity_edit" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatRoomMySubjectListActivity_"
+            android:label="@string/title_activity_chat_room_my_subject_list" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatRoomPayActivity_"
+            android:label="@string/title_activity_chat_room_pay" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.ChatRoomAddThemeActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.TakePhotosAndpictureSingleActivity" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.NearCardDetail2Activity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.PictureClipActivity_"
+            android:label="@string/title_activity_picture_clip" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.TransmitActivity_"
+            android:label="@string/title_activity_transmit" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ChatPickContactActivity_"
+            android:label="@string/title_activity_chat_pick_contact" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ExamineActivity_"
+            android:screenOrientation="portrait"
+            android:theme="@style/ExamineDialogStyle" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.FirstEyeActivity_"
+            android:label="@string/title_activity_first_eye" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ExamineWelcomeActivity_"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.test.JackTest_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.PayDialogActivity_"
+            android:theme="@style/ExamineDialogStyle" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.RegisterWhatYouHaveCheckActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.RegisterAppearanceCheckActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.RegisterTalentCheckActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.RegisterMoneyCheckActivity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.SendErrorActivity"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.CrushOffLine_"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.ModifyPaycardActivity_"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.EditIsMarriedActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.NearCardDetailForMessageActivity_" >
+        </activity>
+        <activity
+            android:name="com.alipay.sdk.app.H5PayActivity"
+            android:configChanges="orientation|keyboardHidden|navigation"
+            android:exported="false"
+            android:screenOrientation="behind" >
+        </activity>
+        <activity
+            android:name="com.alipay.sdk.auth.AuthActivity"
+            android:configChanges="orientation|keyboardHidden|navigation"
+            android:exported="false"
+            android:screenOrientation="behind" >
+        </activity>
+
+        <service android:name="cn.sx.decentworld.service.DownloadListenService" >
+        </service>
+
+        <activity android:name="cn.sx.decentworld.activity.RecommendBenefitDetailActivity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.BindAccountActivity_"
+            android:launchMode="singleInstance" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.wxapi.WXEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTask" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.BindAccountAlipayActivity_" >
+        </activity>
+    </application>
+
+</manifest>

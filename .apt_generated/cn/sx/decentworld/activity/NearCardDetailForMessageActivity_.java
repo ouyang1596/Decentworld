@@ -42,23 +42,25 @@ public final class NearCardDetailForMessageActivity_
     }
 
     private void afterSetContentView_() {
-        tvPerSex = ((TextView) findViewById(id.tv_per_sex));
-        tvPerName = ((TextView) findViewById(id.tv_per_name));
         flContainer = ((FrameLayout) findViewById(id.fl_fragment_container));
-        ivAddFriend = ((ImageView) findViewById(id.iv_add_friend));
         tvPerDistance = ((TextView) findViewById(id.tv_per_distance));
-        tvPerWorth = ((TextView) findViewById(id.tv_per_worth));
-        tvPerSign = ((TextView) findViewById(id.tv_per_sign));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        pScrollView = ((PullToRefreshScrollView) findViewById(id.pScrollView));
-        tvPerAge = ((TextView) findViewById(id.tv_per_age));
+        relTitle = ((RelativeLayout) findViewById(id.chat_room_title_root));
         ivLike = ((ImageView) findViewById(id.iv_per_like));
         tvPerJob = ((TextView) findViewById(id.tv_per_job));
+        tvPerSign = ((TextView) findViewById(id.tv_per_sign));
         llTalkToStranger = ((LinearLayout) findViewById(id.ll_talk_stranger));
-        mPager = ((HackyViewPager) findViewById(id.vp_near_card_detail_pager));
+        tvPerAge = ((TextView) findViewById(id.tv_per_age));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         mRgPerData = ((RadioGroup) findViewById(id.rg_per_data));
+        mPager = ((HackyViewPager) findViewById(id.vp_near_card_detail_pager));
+        ivRealNameOrNickName = ((ImageView) findViewById(id.iv_realname_nickname));
+        ivDoubt = ((ImageView) findViewById(id.iv_doubt));
+        ivAddFriend = ((ImageView) findViewById(id.iv_add_friend));
+        pScrollView = ((PullToRefreshScrollView) findViewById(id.pScrollView));
+        tvPerSex = ((TextView) findViewById(id.tv_per_sex));
         ivDisLike = ((ImageView) findViewById(id.iv_per_dislike));
-        relTitle = ((RelativeLayout) findViewById(id.chat_room_title_root));
+        tvPerName = ((TextView) findViewById(id.tv_per_name));
+        tvPerWorth = ((TextView) findViewById(id.tv_per_worth));
         ((GetStrangerInfo_) getStrangerInfo).afterSetContentView_();
         init();
     }

@@ -1,0 +1,119 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.dialog;
+
+import cn.sx.decentworld.R;
+import android.app.Dialog;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+/**
+ * @ClassName: MenuListDialog.java
+ * @Description:弹出的菜单列表对话框
+ * @author: cj
+ * @date: 2016年2月25日 下午8:34:40
+ */
+public class MenuListDialog extends DialogFragment implements OnClickListener
+{
+    private TextView tvTxt;
+    private TextView tvImage;
+    private TextView tvVoice;
+    private MenuListListener listener;
+
+    /**
+     * 设置监听
+     * 
+     * @param listener
+     */
+    public void setListener(MenuListListener listener)
+    {
+        this.listener = listener;
+    }
+
+    /**
+     * 初始化话对话框
+     */
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState)
+    {
+        Dialog dialog = new Dialog(getActivity() , R.style.dialogStyle);
+        return dialog;
+    }
+
+    /**
+     * 初始化视图
+     */
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        View view = inflater.inflate(R.layout.dialog_menu_list, null);
+        tvTxt = (TextView) view.findViewById(R.id.tv_menu_list_txt);
+        tvTxt.setOnClickListener(this);
+        tvImage = (TextView) view.findViewById(R.id.tv_menu_list_image);
+        tvImage.setOnClickListener(this);
+        tvVoice = (TextView) view.findViewById(R.id.tv_menu_list_voice);
+        tvVoice.setOnClickListener(this);
+        return view;
+    }
+
+    /**
+     * 初始化界面数据
+     */
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        // TODO something
+    }
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.tv_menu_list_txt:
+                if (listener != null)
+                {
+                    listener.selectItem(0);
+                    dismiss();
+                }
+                break;
+            case R.id.tv_menu_list_voice:
+                if (listener != null)
+                {
+                    listener.selectItem(1);
+                    dismiss();
+                }
+                break;
+            case R.id.tv_menu_list_image:
+                if (listener != null)
+                {
+                    listener.selectItem(2);
+                    dismiss();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 回调接口
+     * 
+     * @Description:
+     */
+    public interface MenuListListener
+    {
+        public void selectItem(int item);
+    }
+
+}

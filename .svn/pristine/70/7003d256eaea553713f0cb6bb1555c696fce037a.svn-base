@@ -1,0 +1,17 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.task;
+
+import android.app.Activity;
+
+/**
+ * @ClassName: TestActivity.java
+ * @Description: 
+ * @author: cj
+ * @date: 2016年1月4日 下午1:29:59
+ */
+public class TestActivity extends Activity
+{
+
+}

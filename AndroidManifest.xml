@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.sx.decentworld"
-    android:versionCode="5"
-    android:versionName="1.0.5" >
+    android:versionCode="8"
+    android:versionName="1.0.8" >
 
     <uses-sdk
         android:minSdkVersion="9"
@@ -68,7 +68,7 @@
     <application
         android:name="cn.sx.decentworld.DecentWorldApp_"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:largeHeap="true"
         android:theme="@android:style/Theme.Light.NoTitleBar" >
@@ -79,7 +79,7 @@
             android:value="dw.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="10" />
+            android:value="5" />
 
         <!--  -->
         <meta-data
@@ -93,16 +93,11 @@
         <!-- 消息监听服务 -->
         <service android:name="cn.sx.decentworld.service.PacketListenerService" >
         </service>
-        <service
-            android:name="cn.sx.decentworld.service.TestService"
-            android:process=":test"
-            android:singleUser="true" >
-        </service>
         <!-- 下载 -->
         <service android:name="cn.sx.decentworld.service.DownloadListenService" >
         </service>
         <!-- 接收系统广播 -->
-        <receiver android:name="cn.sx.decentworld.receive.ReceiveSysBC" >
+        <receiver android:name="cn.sx.decentworld.broadcast.ReceiveSysBC" >
         </receiver>
 
         <activity
@@ -156,54 +151,14 @@
             android:name="cn.sx.decentworld.activity.PictureChoiceActivity_"
             android:theme="@style/horizontal_slide" >
         </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.WorkActivity_"
-            android:launchMode="singleTask"
-            android:theme="@style/horizontal_slide" >
-        </activity>
         <activity android:name="cn.sx.decentworld.activity.ImagePagerActivity" >
         </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.InterestingGroupActivity_"
-            android:theme="@style/horizontal_slide" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.InterestingGroupInfoActivity_"
-            android:theme="@style/horizontal_slide" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.InterestingGroupJoinedActivity_"
-            android:theme="@style/horizontal_slide" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.InterestingGroupJoinedInfoActivity_"
-            android:theme="@style/horizontal_slide" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.InterestingGroupSomeThing_"
-            android:theme="@style/horizontal_slide" >
-        </activity>
-        <activity android:name="cn.sx.decentworld.activity.InterestingGroupBuildRuleActivity_" >
-        </activity>
-        <activity android:name="cn.sx.decentworld.activity.InterestingGroupBuildActivity_" >
-        </activity>
+
         <!-- 我的设置 -->
         <activity
             android:name="cn.sx.decentworld.activity.MeSettingActivity_"
             android:theme="@style/horizontal_slide" >
         </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.PrivacySettingActivity_"
-            android:launchMode="singleTask"
-            android:theme="@style/horizontal_slide" >
-        </activity>
-        <activity android:name="cn.sx.decentworld.activity.AdvanceSettingActivity_" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.AboutUsActivity_"
-            android:theme="@style/horizontal_slide" >
-        </activity>
-
         <!-- 隐私设置界面 -->
 
         <activity
@@ -212,10 +167,6 @@
         </activity>
         <activity
             android:name="cn.sx.decentworld.activity.ModificationPasswordOne_"
-            android:theme="@style/horizontal_slide" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.PublicWorkActivity_"
             android:theme="@style/horizontal_slide" >
         </activity>
         <activity
@@ -270,44 +221,16 @@
             android:launchMode="singleTask" >
         </activity>
         <activity
-            android:name="cn.sx.decentworld.activity.RegisterPersonalMsgActivity_"
-            android:launchMode="singleTask" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.RegisterIsStudentActivity_"
-            android:launchMode="singleTask" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.RegisterStudentGreenPassActivity_"
-            android:launchMode="singleTask" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.RegisterAppearanceActivity_"
-            android:label="@string/title_activity_register_view_pager_show"
-            android:launchMode="singleTask" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.RegisterWhatYouHaveActivity_"
-            android:label="@string/title_activity_register_what_you_have"
-            android:launchMode="singleTask" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.RegisterTalentActivity_"
-            android:label="@string/title_activity_register_talent"
-            android:launchMode="singleTask" >
-        </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.RegisterMoneyActivity_"
-            android:label="@string/title_activity_money"
-            android:launchMode="singleTask" >
-        </activity>
-        <activity
             android:name="cn.sx.decentworld.activity.RegisterNickActivity_"
             android:label="@string/title_activity_register_nick"
             android:launchMode="singleTask" >
         </activity>
         <activity
             android:name="cn.sx.decentworld.activity.TakePhotosAndpictureActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="cn.sx.decentworld.activity.MultipleTakePhotosAndpictureActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
@@ -331,7 +254,7 @@
         </activity>
         <activity
             android:name="cn.sx.decentworld.activity.SelectedActivity_"
-            android:label="@string/title_activity_selected" >
+            android:theme="@style/MyDialogStyleBottom" >
         </activity>
         <activity
             android:name="cn.sx.decentworld.activity.ShowToMeSchoolActivity_"
@@ -480,19 +403,9 @@
             android:name="cn.sx.decentworld.activity.ExamineWelcomeActivity_"
             android:launchMode="singleTask" >
         </activity>
-        <activity android:name="cn.sx.decentworld.test.JackTest_" >
-        </activity>
         <activity
             android:name="cn.sx.decentworld.activity.PayDialogActivity_"
             android:theme="@style/ExamineDialogStyle" >
-        </activity>
-        <activity android:name="cn.sx.decentworld.activity.RegisterWhatYouHaveCheckActivity_" >
-        </activity>
-        <activity android:name="cn.sx.decentworld.activity.RegisterAppearanceCheckActivity_" >
-        </activity>
-        <activity android:name="cn.sx.decentworld.activity.RegisterTalentCheckActivity_" >
-        </activity>
-        <activity android:name="cn.sx.decentworld.activity.RegisterMoneyCheckActivity_" >
         </activity>
         <activity
             android:name="cn.sx.decentworld.activity.SendErrorActivity"
@@ -553,9 +466,7 @@
             android:name="cn.sx.decentworld.activity.RecommendActivity_"
             android:launchMode="singleTask" >
         </activity>
-        <activity
-            android:name="cn.sx.decentworld.activity.RechargeBenefitActivity_"
-            android:launchMode="singleTask" >
+        <activity android:name="cn.sx.decentworld.activity.RechargeBenefitActivity_" >
         </activity>
         <activity
             android:name="cn.sx.decentworld.activity.DoubtWanActivity"
@@ -568,6 +479,54 @@
         <activity
             android:name="cn.sx.decentworld.activity.TempletActivity_"
             android:label="@string/title_activity_templet" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.RecommendUnavaliableActivity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.CustomerServiceActivity_"
+            android:label="@string/title_activity_customer_service" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.LoadNetdataActivity_" >
+        </activity>
+        <!-- 作品圈 -->
+        <activity android:name="cn.sx.decentworld.activity.discover.WorksCircleActivity_" >
+        </activity>
+        <!-- 朋友圈 -->
+        <activity android:name="cn.sx.decentworld.activity.discover.MomentActivity_" >
+        </activity>
+
+        <!-- 发布作品圈 -->
+        <activity android:name="cn.sx.decentworld.activity.discover.PublishWorksCircleActivity_" >
+        </activity>
+        <!-- 发布朋友圈 -->
+        <activity android:name="cn.sx.decentworld.activity.discover.PublishMomentActivity_" >
+        </activity>
+        <!-- 虚拟币提现的设置界面 -->
+        <activity android:name="cn.sx.decentworld.activity.DrawCashSettingActivity_" >
+        </activity>
+        <!-- 测试LogRecord的Activity -->
+        <activity android:name="cn.sx.decentworld.test.TestLogRecordActivity_" >
+        </activity>
+        <activity
+            android:name="com.nui.multiphotopicker.view.ImageChooseActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" >
+        </activity>
+        <activity
+            android:name="com.nui.multiphotopicker.view.ImageChooseSingleActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.CeshiActivity"
+            android:label="@string/title_activity_ceshi" >
+        </activity>
+        <!-- 设置虚拟币提现的银行卡卡号 -->
+        <activity android:name="cn.sx.decentworld.SetBankCardActivity_" >
         </activity>
     </application>
 

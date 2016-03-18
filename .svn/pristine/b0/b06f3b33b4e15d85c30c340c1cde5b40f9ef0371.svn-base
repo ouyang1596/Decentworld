@@ -1,0 +1,47 @@
+package cn.sx.decentworld.activity;
+
+import android.os.Bundle;
+import android.view.View;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.fragment.PublishFragment;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
+import com.handmark.pulltorefresh.library.PullToRefreshScrollView;
+
+public class CeshiActivity extends BaseFragmentActivity {
+	private PublishFragment mPublishFragment;
+	private PullToRefreshScrollView psl;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_ceshi);
+		psl = (PullToRefreshScrollView) findViewById(R.id.psl);
+		psl.setMode(Mode.BOTH);
+		psl.setOnRefreshListener(new OnRefreshListener2() {
+
+			@Override
+			public void onPullDownToRefresh(PullToRefreshBase refreshView) {
+				psl.onRefreshComplete();
+				ToastUtil.showToast("down");
+			}
+
+			@Override
+			public void onPullUpToRefresh(PullToRefreshBase refreshView) {
+				psl.onRefreshComplete();
+				ToastUtil.showToast("up");
+			}
+		});
+		mPublishFragment = new PublishFragment();
+	}
+
+	public void show(View view) {
+		if (mPublishFragment.isAdded()) {
+			return;
+		}
+		getSupportFragmentManager().beginTransaction().add(R.id.fl_publish_container, mPublishFragment, "mpf").commit();
+	}
+}

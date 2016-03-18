@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/rb_bg"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+
+                <TextView
+                    android:id="@+id/tv_gr_benefit_ref_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="26dp"
+                    android:text="贵人收益的添加、修改、删除规则"
+                    android:textColor="@color/white"
+                    android:textSize="13sp" />
+
+                <TextView
+                    android:id="@+id/tv_gr_benefit_rule"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@id/tv_gr_benefit_ref_1"
+                    android:layout_below="@id/tv_gr_benefit_ref_1"
+                    android:layout_marginTop="5dp"
+                    android:text="添加不收费\n修改扣除100虚拟币\n删除扣除100虚拟币"
+                    android:textColor="@color/white"
+                    android:textSize="12sp" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginLeft="26dp"
+                android:layout_marginRight="26dp"
+                android:layout_marginTop="10dp"
+                android:background="@color/dark_gray" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="我的贵人"
+                    android:textColor="@color/white"
+                    android:textSize="14dp" >
+                </TextView>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:padding="3dp"
+                    android:text="收益"
+                    android:textColor="@color/white"
+                    android:textSize="14dp" >
+                </TextView>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" >
+
+                    <RelativeLayout
+                        android:layout_width="143dp"
+                        android:layout_height="143dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/rb_draw_cash" >
+
+                        <cn.sx.decentworld.widget.CircularImage
+                            android:id="@+id/iv_gr_benefit_icon"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_margin="3dp"
+                            android:src="@drawable/loading_pic" 
+                            android:visibility="visible"/>
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1" >
+
+                    <RelativeLayout
+                        android:id="@+id/rl_gr_benefit_draw"
+                        android:layout_width="143dp"
+                        android:layout_height="143dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/rb_draw_cash"
+                        android:padding="26dp" >
+
+                        <TextView
+                            android:id="@+id/tv_gr_benefit_income"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="0.00"
+                            android:textColor="@color/white"
+                            android:textSize="25sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_above="@id/tv_gr_benefit_income"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginBottom="12dp"
+                            android:text="大洋"
+                            android:textColor="@color/white"
+                            android:textSize="15dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/tv_gr_benefit_income"
+                            android:layout_centerHorizontal="true"
+                            android:layout_marginTop="15dp"
+                            android:text="提取"
+                            android:textColor="@color/dark_gray"
+                            android:textSize="11dp" />
+                    </RelativeLayout>
+                </RelativeLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="26dp"
+                android:layout_marginRight="26dp"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal" >
+
+                <RelativeLayout
+                    android:id="@+id/rl_gr_benefit_add"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" >
+
+                    <ImageView
+                        android:id="@+id/iv_gr_benefit_ref_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:src="@drawable/rb_progress_1" />
+
+                    <TextView
+                        android:id="@+id/tv_gr_benefit_add"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@id/iv_gr_benefit_ref_1"
+                        android:text="添加"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/rl_gr_benefit_delete"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" >
+
+                    <ImageView
+                        android:id="@+id/iv_gr_benefit_ref_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:src="@drawable/rb_progress_1" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@id/iv_gr_benefit_ref_1"
+                        android:text="删除"
+                        android:textColor="@color/white"
+                        android:textSize="14sp" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" >
+
+                    <ImageView
+                        android:id="@+id/iv_gr_benefit_ref_1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentLeft="true"
+                        android:src="@drawable/rb_progress_1"
+                        android:visibility="invisible" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_toRightOf="@id/iv_gr_benefit_ref_1"
+                        android:text="删除"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_marginLeft="26dp"
+                android:layout_marginRight="26dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rb_under_line" />
+
+            <cn.sx.decentworld.widget.ExpandGridView
+                android:id="@+id/gv_gr_benefit_icon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/rb_bg"
+                android:gravity="center"
+                android:horizontalSpacing="6dp"
+                android:listSelector="@android:color/transparent"
+                android:numColumns="3"
+                android:visibility="gone"
+                android:verticalSpacing="10dp" >
+            </cn.sx.decentworld.widget.ExpandGridView>
+            
+            <LinearLayout 
+                android:id="@+id/ll_gr_benefit_remind"
+                android:layout_width="match_parent"
+                android:gravity="center"
+                android:visibility="visible"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="20dp"
+                android:layout_marginRight="26dp"
+                android:layout_marginLeft="26dp"
+                android:layout_height="wrap_content">
+                <TextView 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="你当前不是别人的贵人!"
+                    android:textColor="@color/white"
+                    android:textSize="24sp"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

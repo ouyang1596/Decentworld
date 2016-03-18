@@ -1,0 +1,84 @@
+package cn.sx.decentworld.activity;
+
+import android.view.View;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.fragment.DoubtFirstStepFragment;
+import cn.sx.decentworld.fragment.DoubtWanThirdStepFragment;
+import cn.sx.decentworld.fragment.DoubtFirstStepFragment.OnDoubtFirstClickListener;
+import cn.sx.decentworld.fragment.DoubtWanSecondStepFragment.OnDoubtWanSecondClickListener;
+import cn.sx.decentworld.fragment.DoubtWanThirdStepFragment.OnDoubtWanThirdClickListener;
+import cn.sx.decentworld.fragment.DoubtWanSecondStepFragment;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+
+@EActivity(R.layout.activity_doubt_wan)
+public class DoubtWanActivity extends BaseFragmentActivity implements
+		OnDoubtFirstClickListener, OnDoubtWanSecondClickListener,
+		OnDoubtWanThirdClickListener {
+	private DoubtFirstStepFragment mDoubtFirstStepFragment;
+	private DoubtWanSecondStepFragment mDoubtWanSecondStepFragment;
+	private DoubtWanThirdStepFragment mDoubtWanThirdStepFragment;
+
+	@AfterViews
+	public void init() {
+		initData();
+	}
+
+	private void initData() {
+		mDoubtFirstStepFragment = new DoubtFirstStepFragment();
+		mDoubtFirstStepFragment.setOnDoubtFirstClickListener(this);
+		mDoubtWanSecondStepFragment = new DoubtWanSecondStepFragment();
+		mDoubtWanSecondStepFragment.setOnDoubtWanSecondClickListener(this);
+		mDoubtWanThirdStepFragment = new DoubtWanThirdStepFragment();
+		mDoubtWanThirdStepFragment.setOnDoubtWanThirdClickListener(this);
+		getSupportFragmentManager().beginTransaction()
+				.add(R.id.fl_doubt_container, mDoubtFirstStepFragment, "dff")
+				.commit();
+	}
+
+	@Override
+	public void OnDoubtFirstClick(View view) {
+		switch (view.getId()) {
+		case R.id.tv_check:
+			getSupportFragmentManager()
+					.beginTransaction()
+					.setCustomAnimations(R.anim.fade_out, R.anim.fade_in,
+							R.anim.fade_out, R.anim.fade_in)
+					.hide(mDoubtFirstStepFragment)
+					.add(R.id.fl_doubt_container, mDoubtWanSecondStepFragment,
+							"dsf").addToBackStack(null).commit();
+			break;
+
+		}
+	}
+
+	@Override
+	public void OnDoubtWanSecondClick(View view) {
+		switch (view.getId()) {
+		case R.id.tv_talent:
+			getSupportFragmentManager()
+					.beginTransaction()
+					.setCustomAnimations(R.anim.fade_out, R.anim.fade_in,
+							R.anim.fade_out, R.anim.fade_in)
+					.hide(mDoubtWanSecondStepFragment)
+					.add(R.id.fl_doubt_container, mDoubtWanThirdStepFragment,
+							"dtf").addToBackStack(null).commit();
+			break;
+		case R.id.tv_money:
+			getSupportFragmentManager()
+					.beginTransaction()
+					.setCustomAnimations(R.anim.fade_out, R.anim.fade_in,
+							R.anim.fade_out, R.anim.fade_in)
+					.hide(mDoubtWanSecondStepFragment)
+					.add(R.id.fl_doubt_container, mDoubtWanThirdStepFragment,
+							"dtf").addToBackStack(null).commit();
+			break;
+		}
+	}
+
+	@Override
+	public void OnDoubtWanThirdClick(View view) {
+
+	}
+}

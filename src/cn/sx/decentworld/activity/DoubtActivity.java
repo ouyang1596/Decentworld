@@ -1,0 +1,298 @@
+package cn.sx.decentworld.activity;
+
+import java.util.HashMap;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.CheckResultBean;
+import cn.sx.decentworld.common.ConstantIntent;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.dialog.CommomPromptDialogFragment;
+import cn.sx.decentworld.dialog.CommomPromptDialogFragment.OnCommomPromptListener;
+import cn.sx.decentworld.dialog.trueOrFalseDialogFragment.OnTrueOrFalseClickListener;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.FileUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_doubt)
+public class DoubtActivity extends BaseFragmentActivity implements OnClickListener, OnTrueOrFalseClickListener,
+		OnCommomPromptListener {
+	@ViewById(R.id.ll_doubt)
+	LinearLayout llDoubt;
+	@ViewById(R.id.ll_wan)
+	LinearLayout llWan;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	private int doubtWan = -1;// 0 去疑假的资料，再试一次
+								// 1去疑不通过，直接买通成为普通用户2升腕真的资料但审核失败，直接买通成为普通用户3升腕不通过，清除资料（不用付钱）
+	private cn.sx.decentworld.dialog.trueOrFalseDialogFragment trueOrFalseDialogFragment;
+	private SendUrl mSendUrl;
+	CommomPromptDialogFragment mCommomPromptDialog;
+	private String shengwan = "升腕是我司的一项收费服务，将扣取10个大洋。\n您需要请手持身份证原件拍照，并在三个条件中至少符合一项，并将其证明提交由公司审核：\n一，才华级别：男性博士，女性硕士（学历证明）；副教授，以及相当于副教授的职称；市级以上比赛1、2、3等奖获奖者（获奖证明）；真实粉丝数量过十万者（用您的方式上传图片证明）；实用新型专利三个以上者，发明专利一个以上者；其他才华证明。\n二，公共服务级别：公务员、国企、事业单位、军队中，科长以上级别工作证明。\n三，财富级别：男性固定资产500万以上，女性固定资产５０万以上（房产、汽车等资产的所有权证明和其价值证明；也可通过比如某种银行卡（会员卡）的持有，侧面证明您的层次）";
+	private String quyi = "不止去掉头像的疑，更是去掉您在别人眼中的疑点，这是一项免费的服务（除非您的头像不真实）。去疑之前请完善您的人物志，如果人物志已经很棒，以下将请您按要求拍照并上传您的其他靓照，系统将把照片和人物志一齐给异性用户投票，决定您的去疑。在头像真实的情况下，就看DW这个真实社区的异性用户们欢不欢迎您进入了。";
+	private Handler mDoubtHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			CheckResultBean bean = JsonUtils.json2Bean(msg.obj.toString(), CheckResultBean.class);
+			Intent intent;
+			switch (bean.status) {
+			case 0:
+				intent = new Intent(DoubtActivity.this, ExamineWelcomeActivity_.class);
+				intent.putExtra(ConstantIntent.ACTIVITY_DOUBT_CHECK_RESULT_BEAN, bean);
+				startActivity(intent);
+				break;
+			case 1:
+				intent = new Intent(DoubtActivity.this, ExamineWelcomeActivity_.class);
+				intent.putExtra(ConstantIntent.ACTIVITY_DOUBT_CHECK_RESULT_BEAN, bean);
+				startActivity(intent);
+				// doubtWan = 0;
+				// ToastUtil.showToast("您的身份为假");
+				// trueOrFalseDialogFragment = new
+				// cn.sx.decentworld.dialog.trueOrFalseDialogFragment();
+				// trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(DoubtActivity.this);
+				// trueOrFalseDialogFragment.setTips("是否再试一次？");
+				// trueOrFalseDialogFragment.show(getSupportFragmentManager(),
+				// "trueOrFalseDialogFragment");
+				break;
+			case 2:
+				ToastUtil.showToast("审核结束，已通过");
+				break;
+			case 3:
+				intent = new Intent(DoubtActivity.this, ExamineWelcomeActivity_.class);
+				intent.putExtra(ConstantIntent.ACTIVITY_DOUBT_CHECK_RESULT_BEAN, bean);
+				startActivity(intent);
+				// doubtWan = 1;
+				// ToastUtil.showToast("审核结束，未通过");
+				// trueOrFalseDialogFragment = new
+				// cn.sx.decentworld.dialog.trueOrFalseDialogFragment();
+				// trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(DoubtActivity.this);
+				// trueOrFalseDialogFragment.setTips("是否直接买通？");
+				// trueOrFalseDialogFragment.show(getSupportFragmentManager(),
+				// "trueOrFalseDialogFragment");
+				break;
+			case 4:
+				intent = new Intent(DoubtActivity.this, DoubtCancelDoubtActivity_.class);
+				intent.putExtra(ConstantIntent.ACTIVITY_DOUBT_CONDITION, bean.condition);
+				startActivity(intent);
+				break;
+			case 5:
+				intent = new Intent(DoubtActivity.this, DoubtCancelDoubtActivity_.class);
+				intent.putExtra(ConstantIntent.ACTIVITY_DOUBT_STATUS, bean.status);
+				intent.putExtra(ConstantIntent.ACTIVITY_DOUBT_CONDITION, bean.condition);
+				startActivity(intent);
+				break;
+			}
+		};
+	};
+
+	private Handler mWanHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case 2222:
+				startActivity(new Intent(DoubtActivity.this, DoubtWanActivity.class));
+				break;
+			case 0:
+				ToastUtil.showToast("用户资料正在审核中");
+				break;
+			case 1:
+				ToastUtil.showToast("用户资料已审核并且审核成功");
+				break;
+			case 2:
+				ToastUtil.showToast("用户资料审核为真，但审核失败");
+				trueOrFalseDialogFragment = new cn.sx.decentworld.dialog.trueOrFalseDialogFragment();
+				trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(DoubtActivity.this);
+				trueOrFalseDialogFragment.setTips("是否直接买通？");
+				trueOrFalseDialogFragment.show(getSupportFragmentManager(), "trueOrFalseDialogFragment");
+				break;
+			case 3:
+				ToastUtil.showToast("用户资料审核为假，且审核失败");
+				trueOrFalseDialogFragment = new cn.sx.decentworld.dialog.trueOrFalseDialogFragment();
+				trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(DoubtActivity.this);
+				trueOrFalseDialogFragment.setTips("是否需要再试一次？");
+				trueOrFalseDialogFragment.show(getSupportFragmentManager(), "trueOrFalseDialogFragment");
+				break;
+			case 3333:
+				showToast(msg.obj.toString());// 可能是没钱，也可能是其他原因
+				break;
+			}
+		};
+	};
+
+	@AfterViews
+	public void init() {
+		initData();
+	}
+
+	private void initData() {
+		mSendUrl = new SendUrl(this);
+		llDoubt.setOnClickListener(this);
+		llWan.setOnClickListener(this);
+		ivBack.setOnClickListener(this);
+	}
+
+	public void getDoubtCheckResult() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + Constants.API_GET_CHECK_STATUS, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						if (2222 == msg.getResultCode()) {
+							LogUtils.i("bm", "getCheckResult--" + msg.getData().toString());
+							Message message = mDoubtHandler.obtainMessage();
+							message.obj = msg.getData().toString();
+							mDoubtHandler.sendMessage(message);
+						} else {
+							if ("您已经是非疑用户了，无法进行去疑操作！".equals(msg.getMsg())) {
+								DecentWorldApp.doubtWan = 1;
+							}
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToast(Constants.NET_WRONG);
+					}
+				});
+	}
+
+	public void getWanCheckStatus() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_WAN_CHECH_STATE, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						Message message = mWanHandler.obtainMessage();
+						message.what = msg.getResultCode();
+						message.obj = msg.getMsg();
+						mWanHandler.sendMessage(message);
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToast(Constants.NET_WRONG);
+					}
+				});
+	}
+
+	private void showToast(final String data) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				ToastUtil.showToast(data);
+			}
+		});
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.ll_doubt:
+			if (FileUtils.getPromptStatus(mContext, Constants.GO_DOUBT) == CommomPromptDialogFragment.GO_DOUBT) {
+				getDoubtCheckResult();
+				return;
+			}
+			showCommomDialog(CommomPromptDialogFragment.GO_DOUBT, quyi);
+			break;
+		case R.id.ll_wan:
+			if (FileUtils.getPromptStatus(mContext, Constants.SHENGWAN) == CommomPromptDialogFragment.SHENGWAN) {
+				getWanCheckStatus();
+				return;
+			}
+			showCommomDialog(CommomPromptDialogFragment.SHENGWAN, shengwan);
+			break;
+		case R.id.iv_back:
+			setResult(0);
+			finish();
+			break;
+		}
+	}
+
+	private void showCommomDialog(int enter, String prompt) {
+		if (null == mCommomPromptDialog) {
+			mCommomPromptDialog = new CommomPromptDialogFragment();
+		}
+		mCommomPromptDialog.setEnter(enter);
+		mCommomPromptDialog.setOnCommomPromptListener(this);
+		mCommomPromptDialog.setTips(prompt);
+		mCommomPromptDialog.show(this.getSupportFragmentManager(), "mCommomPromptDialog");
+	}
+
+	@Override
+	public void onTrueOrFalseClick(View view) {
+		switch (view.getId()) {
+		case R.id.tv_cancel:
+			break;
+		case R.id.tv_ensure:
+			if (3 == doubtWan) {
+				resetStarCheckStatus();
+				return;
+			}
+			Intent intent = new Intent(this, RechargePayMethodActivity_.class);
+			intent.putExtra(ConstantIntent.FRAGMENT_DIALOG_DOUBT_WAN, doubtWan);
+			startActivity(intent);
+			break;
+		}
+	}
+
+	public void resetStarCheckStatus() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_WAN_RESET_CHECH_STATE, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						if (2222 == msg.getResultCode()) {
+							showToast("重置状态成功");
+						} else {
+							showToast("重置状态失败");
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToast(Constants.NET_WRONG);
+					}
+				});
+	}
+
+	@Override
+	public void onCommomPromtClick(View view) {
+		switch (mCommomPromptDialog.getEnter()) {
+		case CommomPromptDialogFragment.GO_DOUBT:
+			getDoubtCheckResult();
+			break;
+		case CommomPromptDialogFragment.SHENGWAN:
+			getWanCheckStatus();
+			break;
+		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		setResult(0);
+		super.onBackPressed();
+	}
+}

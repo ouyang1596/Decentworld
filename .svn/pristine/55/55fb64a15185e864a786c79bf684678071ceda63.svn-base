@@ -1,0 +1,593 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">大腕</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="app_tip">提示</string>
+    <string name="pay_result_callback_msg" formatted="false">微信支付结果：%s</string>
+    <!-- 实名制主界面底部 -->
+    <string name="main_bottom_chat">Chats</string>
+    <string name="main_bottom_contact">Contacts</string>
+    <string name="main_bottom_find">Discover</string>
+    <string name="main_bottom_me">Me</string>
+
+    <!-- 实名制通讯录界面 -->
+
+    <string name="fragment_chat_contact_qinyou">亲友</string>
+    <string name="fragment_chat_contact_friend">朋友</string>
+    <string name="now_refresh_list">正在刷新联系人</string>
+    <string name="get_failed_please_check">获取失败,请检查网络或稍后再试</string>
+    <string name="Has_agreed_to_your_friend_request">已同意你的好友请求</string>
+    <string name="Request_to_add_you_as_a_friend">请求加你为好友</string>
+    <string name="Apply_to_the_group_of">申请加入群：</string>
+    <string name="Has_agreed_to">已同意</string>
+    <string name="Has_refused_to">已拒绝</string>
+    <string name="Are_agree_with">正在同意...</string>
+    <string name="agree">同意</string>
+    <string name="Agree_with_failure">同意失败:</string>
+    <string name="have_you_removed">已把你从他好友列表里移除</string>
+
+    <!-- chatFragment_find -->
+    <string name="string_group_interested">兴趣组</string>
+    <string name="work_circle">作品圈</string>
+
+    <!-- 实名制对话界面上下文菜单 -->
+    <string name="fragment_delete_dialog">删除会话</string>
+    <string name="fragment_delete_dia_and_mess">删除会话及信息</string>
+
+    <!-- 聊天界面 -->
+    <string name="activity_chat_pic">图片</string>
+    <string name="activity_chat_take_pic">拍摄</string>
+    <string name="activity_chat_location">位置</string>
+    <string name="activity_chat_card">名片</string>
+    <string name="activity_chat_video_call">视频聊天</string>
+    <string name="activity_chat_voice_call">语音聊天</string>
+    <string name="activity_chat_move_up_to_cancel">手指上滑，取消发送</string>
+    <string name="button_pushtotalk">按住 说话</string>
+    <string name="button_send">发送</string>
+    <string name="activity_chat_not_connect_to_server"></string>
+    <string name="mute">静音</string>
+    <string name="Hands_free">免提</string>
+    <string name="hang_up">挂断</string>
+    <string name="answer">接听</string>
+    <string name="call_duration">通话时长</string>
+    <string name="Refused">已拒绝</string>
+    <string name="The_other_party_has_refused_to">对方已拒绝</string>
+    <string name="The_other_is_not_online">对方不在线</string>
+    <string name="The_other_is_on_the_phone">对方正在通话中</string>
+    <string name="The_other_party_did_not_answer">对方未接听</string>
+    <string name="did_not_answer">未接听</string>
+    <string name="Has_been_cancelled">已取消</string>
+    <string name="Are_connected_to_each_other">正在连接对方...</string>
+    <string name="Is_not_yet_connected_to_the_server">尚未连接至服务器</string>
+    <string name="have_connected_with">已经和对方建立连接，等待对方接受...</string>
+    <string name="In_the_call">通话中...</string>
+    <string name="The_other_party_refused_to_accept">对方拒绝接受！...</string>
+    <string name="Connection_failure">连接建立失败！...</string>
+    <string name="The_other_party_is_not_online">对方不在线，请稍后再拨...</string>
+    <string name="The_other_is_on_the_phone_please">对方正在通话中，请稍后再拨</string>
+    <string name="The_other_is_hang_up">对方已经挂断</string>
+    <string name="The_other_party_did_not_answer_new">对方未接听</string>
+    <string name="direct_call">Direct</string>
+    <string name="relay_call">Relay</string>
+    <string name="hanging_up">正在挂断..</string>
+
+    <!-- 百度地图界面 -->
+    <string name="Network_error">网络出错</string>
+    <string name="please_check">key 验证出错! 请在 AndroidManifest.xml 文件中检查 key 设置</string>
+    <string name="location_message">位置信息</string>
+    <string name="Making_sure_your_location">正在确定你的位置...</string>
+
+    <!-- 环信 -->
+    <string name="receive_the_passthrough">收到透传：action：</string>
+    <string name="location_recv">[%1$s的位置]</string>
+    <string name="recording_video">录制视频</string>
+    <string name="location_prefix">[我的位置]</string>
+    <string name="picture">[图片]</string>
+    <string name="voice_call">[语音通话]</string>
+    <string name="voice">[声音]</string>
+    <string name="video">[视频]</string>
+    <string name="network_isnot_available">网络不可用</string>
+    <string name="User_name_cannot_be_empty">用户名不能为空！</string>
+    <string name="Password_cannot_be_empty">密码不能为空！</string>
+    <string name="Is_landing">正在登录...</string>
+    <string name="login_failure_failed">登录失败: 获取好友或群聊失败</string>
+    <string name="Login_failed">登录失败:</string>
+    <string name="Application_and_notify">申请与通知</string>
+    <string name="group_chat">群聊</string>
+    <string name="Confirm_password_cannot_be_empty">确认密码不能为空!</string>
+    <string name="Two_input_password">两次输入的密码不一致，请重新输入!</string>
+    <string name="Is_the_registered">正在注册...</string>
+    <string name="Registered_successfully">注册成功</string>
+    <string name="network_anomalies">网络异常，请检查网络！</string>
+    <string name="User_already_exists">用户已存在！</string>
+    <string name="registration_failed_without_permission">注册失败，无权限！</string>
+    <string name="Registration_failed">注册失败:</string>
+    <string name="illegal_user_name">用户名不合法</string>
+    <string name="Cant_chat_with_yourself">不能和自己聊天</string>
+    <string name="can_not_connect_chat_server_connection">连接不到聊天服务器</string>
+    <string name="the_current_network">当前网络不可用，请检查网络设置</string>
+    <string name="Invite_you_to_join_a_group_chat">邀请你加入了群聊</string>
+    <string name="Agreed_to_your_group_chat_application">同意了你的群聊申请</string>
+    <string name="Remove_the_notification">移除通知</string>
+    <string name="connect_conflict">同一帐号已在其他设备登录</string>
+    <string name="em_user_remove">此用户已被移除</string>
+    <string name="ok">确定</string>
+    <string name="cancel">取消</string>
+    <string name="prompt">提示</string>
+    <string name="Logoff_notification">下线通知</string>
+    <string name="Is_download_voice_click_later">正在下载语音，稍后点击</string>
+    <string name="Send_voice_need_sdcard_support">发送语音需要sdcard支持</string>
+    <string name="move_up_to_cancel">手指上滑，取消发送</string>
+    <string name="release_to_cancel">松开手指，取消发送</string>
+    <string name="recoding_fail">录音失败，请重试！</string>
+    <string name="Recording_without_permission">无录音权限</string>
+    <string name="The_recording_time_is_too_short">录音时间太短</string>
+    <string name="send_failure_please">发送失败，请检测服务器是否连接</string>
+    <string name="text_ack_msg">已读</string>
+    <string name="text_delivered_msg">送达</string>
+    <string name="send_fail">发送消息失败,</string>
+    <string name="error_send_invalid_content">你发送了不合法的消息内容</string>
+    <string name="error_send_not_in_the_group">你已经不在此群了</string>
+    <string name="connect_failuer_toast">请检查网络或稍候重试</string>
+    <string name="Into_the_blacklist">移入到黑名单？</string>
+    <string name="Have_downloaded">已下载</string>
+    <string name="resend">重发</string>
+    <string name="confirm_resend">确认重发该信息？</string>
+    <string name="Did_not_download">未下载</string>
+    <string name="Download_the_pictures">下载图片: 0%</string>
+    <string name="Download_the_pictures_new">下载图片:</string>
+    <string name="you_are_group">你被群创建者从此群中移除</string>
+    <string name="the_current_group">当前群聊已被群创建者解散</string>
+    <string name="sd_card_does_not_exist">SD卡不存在，不能拍照</string>
+    <string name="cant_find_pictures">找不到图片</string>
+    <string name="unable_to_get_loaction">无法获取到您的位置信息!</string>
+    <string name="delete">删除</string>
+    <string name="forward">转发</string>
+    <string name="delete_message">删除消息</string>
+    <string name="copy_message">复制消息</string>
+    <string name="delete_voice">删除语音</string>
+
+    <!-- 举报界面 -->
+    <string name="activity_whistleblowing_reason_title1">请选择举报原因</string>
+    <string name="activity_whistleblowing_reason_1">色情低俗</string>
+    <string name="activity_whistleblowing_reason_2">广告敏感</string>
+    <string name="activity_whistleblowing_reason_3">政治敏感</string>
+    <string name="activity_whistleblowing_reason_4">谣言</string>
+    <string name="activity_whistleblowing_reason_5">欺诈骗钱</string>
+    <string name="activity_whistleblowing_reason_6">违法（暴力恐怖、违禁品等）</string>
+    <string name="activity_whistleblowing_reason_7">侵权举报（诽谤、抄袭、冒用...）</string>
+    <string name="activity_whistleblowing_reason_title2">请举证（选填）</string>
+    <string name="activity_whistleblowing_reason_8">补充说明</string>
+    <string name="activity_whistleblowing_nowrite">未填写</string>
+    <string name="hello_html"><![CDATA[Hello <b>World</b>!]]></string>
+
+    <!-- 聊天背景设置界面 -->
+    <string name="activity_chat_background_setting1">选择背景图</string>
+    <string name="activity_chat_background_setting2">从手机相册选择</string>
+    <string name="activity_chat_background_setting3">拍一张</string>
+    <!-- 群聊字段 -->
+    <string name="group_chat_name">群聊名称</string>
+    <string name="group_chat_icon">群头像</string>
+    <string name="group_chat_capacity">群聊大小</string>
+    <string name="set_top">置顶聊天</string>
+    <string name="message_no_interrupt">消息免打扰</string>
+    <string name="my_nickname">我在本群的昵称</string>
+    <string name="set_chat_backgroup">设置本群的聊天背景</string>
+    <string name="clear_chat_history">清空聊天记录</string>
+    <string name="report">举报</string>
+    <string name="delete_exit_group_chat">删除并退出</string>
+    <string name="dismiss_the_group_chat">解散此群</string>
+    <string name="used_group_name">原本的群名称</string>
+    <string name="group_name_info">在此处修改的昵称，只会在此群显示。昵称长度不超过18字</string>
+    <string name="group_my_name_info">在此设置的自己昵称只会在此群内显示</string>
+    <string name="save">保存</string>
+    <string name="fragment_chat_contact_search_hint">DW号、手机号、昵称、实名</string>
+    <string name="address_list">联系人 </string>
+    <string name="refreshing_group_list">正在刷新群列表</string>
+    <string name="not_delete_myself">不能删除自己</string>
+    <string name="Are_removed">正在移除...</string>
+    <string name="confirm_the_members">确认将此成员加入至此群黑名单?</string>
+    <string name="Failed_to_get_group_chat_information">获取群聊信息失败:</string>
+    <string name="Delete_failed">删除失败:</string>
+    <string name="network_unavailable">网络连接不可用，请检查网络</string>
+    <string name="people">人)</string>
+    <string name="being_added">正在添加...</string>
+    <string name="is_quit_the_group_chat">正在退出群聊...</string>
+    <string name="chatting_is_dissolution">正在解散群聊...</string>
+    <string name="are_empty_group_of_news">正在清空群消息...</string>
+    <string name="is_modify_the_group_name">正在修改群名称...</string>
+    <string name="Modify_the_group_name_successful">修改群名称成功</string>
+    <string name="change_the_group_name_failed_please">改变群名称失败，请检查网络或稍后重试</string>
+    <string name="Are_moving_to_blacklist">正在移入至黑名单</string>
+    <string name="failed_to_move_into">移入黑名单失败,请检查网络或稍后重试</string>
+    <string name="sure_to_empty_this">确定清空此群的聊天记录吗？</string>
+    <string name="Add_group_members_fail">添加群成员失败:</string>
+    <string name="Exit_the_group_chat_failure">退出群聊失败:</string>
+
+    <!-- 新的朋友 -->
+    <string name="search_detail">"手机号/DW号/昵称/实名"</string>
+    <string name="recommand">推荐</string>
+    <string name="for_sure">担保</string>
+    <string name="had_added">已添加</string>
+    <string name="had_refused">已拒绝</string>
+    <string name="had_apply">已申请</string>
+    <string name="add_success">添加成功</string>
+    <string name="add_fail">被拒绝</string>
+    <string name="refuse">拒绝</string>
+    <string name="add">添加</string>
+    <string name="add_recommand_info">在此处输入被推荐人手机号码</string>
+    <string name="add_recommand_money">输入推荐金（不低于10元）</string>
+    <string name="add_recommand_long_info">在此处推荐朋友，推荐金最低不少于30元，朋友通过审核进入软件后，每次充值金额的百分之十，会返回到推荐人的“我-设置-现金收益”里。提前一天提取，系统会自动转进绑定的银行卡里。</string>
+    <string name="sure">确定</string>
+    <string name="add_guarantee_money">输入担保金（不低于300元）</string>
+    <string name="add_guarantee_info">在此处输入被担保人手机号码</string>
+    <string name="add_grarantee_long_info">在此处为朋友做担保，担保金300元，朋友在注册环节可选择跳过审核这一环节。</string>
+    <string name="validate">朋友验证</string>
+    <string name="validate_long_info">需要发送验证申请，等待对方通过。(此次添加申请需扣除10个虚拟币)</string>
+
+    <!-- 登陆注册 -->
+    <string name="login">登录</string>
+    <string name="register">注册</string>
+    <string name="password">密码</string>
+    <string name="to_login_info">用户名、手机号、身份证号</string>
+    <string name="mobile_num">手机号码</string>
+    <string name="identify_code">验证码</string>
+    <string name="register_pwd">创建密码</string>
+    <string name="get_identify_code">获取验证码</string>
+    <string name="input_id_card">输入身份证号码</string>
+    <string name="real_name">真实姓名</string>
+    <string name="identify">验证</string>
+    <string name="re_get_identify_num">重新获取验证码</string>
+    <string name="no_phone_num">手机号码不能为空</string>
+    <string name="no_iden_code">验证吗不能为空</string>
+    <string name="no_pwd">密码不能为空</string>
+    <string name="have_money">我特有“财”</string>
+    <string name="have_ability">我特有“才”</string>
+    <string name="have_face">这是个看 “脸” 的世界</string>
+    <string name="take_photo">点击选取头像</string>
+    <string name="set_nickname">设置昵称（不可修改）</string>
+    <string name="nickname_repeat">昵称已被使用，请重新命名</string>
+    <string name="make_sure">确认</string>
+    <string name="forget_pwd">手机号码丢了的点这里</string>
+    <string name="forget_pwd_info">请输入注册时手机号码</string>
+    <string name="input_identify_code">请输入验证码</string>
+    <string name="reget_identify_code">重新获取验证码</string>
+    <string name="forget_idcode_info">请输入注册时的身份证号码</string>
+    <string name="input_new_pwd">请输入新的密码</string>
+    <string name="face_info">这是一个看脸的社会，现拍现验！\n1.拍一张自己的身份证的合照，证明你就是你。\n2.马上自拍一张，这张将随机发送给用户， 让用户决定是否接纳你。</string>
+    <string name="ability_info">你有才，就让你进！\n请拍照上传任何可以证明你“有才”照片证据。</string>
+    <string name="money_info">请您拍照上传线上正规渠道可以核实的(资产证明)。\n今日要求：男性大于10000；\n女性大于1000.</string>
+    <string name="identify_code_wrong">验证码不正确</string>
+    <string name="set_pwd_info">为自己创建一个密码</string>
+    <!-- 图片查看器 -->
+    <string name="viewpager_indicator">%1$d/%2$d</string>
+    <!-- 兴趣组 -->
+
+    <string name="chat_info">聊天详情</string>
+    <string name="distance">距离：</string>
+    <string name="interesting_group">兴趣组</string>
+    <string name="something">点点滴滴</string>
+    <string name="interesting_group_info">兴趣组详情</string>
+    <string name="discover">发现</string>
+    <string name="name_interesting_group">兴趣组名称</string>
+    <string name="icon_interesting_group">兴趣组头像</string>
+    <string name="manager_interesting_group">兴趣组组长</string>
+    <string name="date_interesting_group">兴趣组的创建时间</string>
+    <string name="place_interesting_group">兴趣组地点</string>
+    <string name="detail_interesting_group">兴趣组介绍</string>
+    <string name="some_interesting_group">兴趣组的点点滴滴</string>
+    <string name="members_interesting_group">兴趣组成员</string>
+    <string name="join">加入</string>
+    <string name="input_detail_interesting_group">输入兴趣组关键字搜索</string>
+    <string name="rule_of_build">兴趣组建立的规则</string>
+    <string name="location_group">兴趣组地标</string>
+    <string name="next">下一步</string>
+    <string name="location_info">更具体的位置可自行填写以便查找</string>
+    <string name="build_group_tips">兴趣组创建成功，为了更好地让周围的朋友了解你的兴趣组，请完善兴趣组资料</string>
+    <string name="build_group">建立兴趣组</string>
+    <string name="name_not_null">组名不允许为空</string>
+
+    <!-- 我的设置 -->
+    <string name="magnate_to_other">我是谁的贵人</string>
+    <string name="magnate_to_me">谁是我的贵人</string>
+    <string name="privacy_setting">隐私设置</string>
+    <string name="advance_setting">高级设置</string>
+    <string name="cash_income">现金收益</string>
+    <string name="about_us">关于我们</string>
+    <string name="exit_software">退出</string>
+
+    <!-- 我是谁的贵人 -->
+    <string name="total_revenue">总收益:</string>
+    <string name="draw_cash">提现</string>
+    <string name="check_details">查看明细</string>
+
+    <!-- 谁是我的贵人 -->
+    <string name="click_add_magnate">点击添加贵人</string>
+    <string name="add_magnate_rule">贵人规则填写贵人不需要虚拟币,删除已经填写的贵人 100虚拟币，修改贵人 100虚拟币</string>
+
+    <!-- 隐私设置 -->
+    <string name="bank_card">推荐返利账号</string>
+    <string name="bank_card_info_default">添加银行卡</string>
+    <string name="phone_number">手机号</string>
+    <string name="phone_number_info_default">绑定手机号</string>
+    <string name="password_">密码</string>
+
+    <!-- 设置对话框 -->
+    <string name="textview_hint_password">密码为注册登录时设置的密码</string>
+    <string name="editview_hint_check_password">请输入密码来验证身份</string>
+    <string name="button_hint_password">确定</string>
+    <string name="textview_hint_password_error">密码输入错误，点击空白处可返回重新输入；如果密码忘记，请点击"确定"开始找回密码旅程。</string>
+
+    <!-- ModificationBankCardOne.java -->
+    <string name="activity_modification_bank_card_one_1">请绑定持卡人本人的银行卡</string>
+    <string name="activity_modification_bank_card_one_2">持卡人</string>
+    <string name="activity_modification_bank_card_one_3">卡    号</string>
+
+    <!-- ModificationBankCardTwo.java -->
+    <string name="activity_modification_bank_card_two_1">请选择银行卡类型</string>
+    <string name="activity_modification_bank_card_two_2">卡类型</string>
+    <string name="activity_modification_bank_card_two_type">工商银行</string>
+    <string name="activity_modification_bank_card_two_3">手机号</string>
+    <string name="activity_modification_bank_card_two_number">请输入预留手机号</string>
+
+    <!-- ModificationBankCardThree.java -->
+    <string name="activity_modification_bank_card_three_number">绑定银行卡需要短信确认，验证码已经发送至手机15217345625，请按提示操作</string>
+    <string name="activity_modification_bank_card_three_2">验证码</string>
+    <string name="activity_modification_bank_card_three_code">填写验证码</string>
+
+    <!-- ModificationPhoneNumOne.java -->
+    <string name="activity_modification_phone_num_one_1">国家/地区</string>
+    <string name="activity_modification_phone_num_one_country">中国</string>
+    <string name="activity_modification_phone_num_one_2">手  机  号</string>
+    <string name="activity_modification_phone_num_one_number">13612341234</string>
+
+    <!-- ModificationPhoneNumTwo.java -->
+    <string name="activity_modification_phone_num_two_1">短信验证码已经发送，请填写验证码</string>
+    <string name="activity_modification_phone_num_two_2">手机号</string>
+    <string name="activity_modification_phone_num_two_number">13712341234</string>
+    <string name="activity_modification_phone_num_two_3">验证码</string>
+    <string name="activity_modification_phone_num_two_code">请输入验证码</string>
+
+    <!-- ModificationPasswordOne.java -->
+    <string name="activity_modification_password_one_1">短信验证码已经发送，请填写验证码</string>
+    <string name="activity_modification_password_one_2">手机号</string>
+    <string name="activity_modification_password_one_number">13712341234</string>
+    <string name="activity_modification_password_one_3">验证码</string>
+    <string name="activity_modification_password_one_code">请输入验证码</string>
+
+    <!-- ModificationPasswordTwo.java -->
+    <string name="activity_modification_password_two_1">请按提示操作，重置密码</string>
+    <string name="activity_modification_password_two_2">身份证号</string>
+    <string name="activity_modification_password_two_id">请输入注册时验证的身份证号码</string>
+    <string name="activity_modification_password_two_3">新的密码</string>
+    <string name="activity_modification_password_two_new_password">请设置新的密码</string>
+
+    <!-- AdvanceSettingActivity.java 高级设置 -->
+    <string name="activity_advance_setting_dw">通过DW号搜索到我</string>
+    <string name="activity_advance_setting_phone">通过手机号搜索到我</string>
+    <string name="activity_advance_setting_nickname">通过昵称搜索到我</string>
+    <string name="activity_advance_setting_realname">通过实名搜索到我</string>
+    <string name="activity_advance_setting_unsee_other">不看他(她)的作品圈</string>
+    <string name="activity_advance_setting_unsee_me">不让他(她)看我的作品圈</string>
+    <string name="activity_advance_setting_1">陌生人消息提醒 </string>
+    <string name="activity_advance_setting_push_system">接受系统推送信息 </string>
+    <string name="activity_advance_setting_push_appearance">接受系统推送貌信息 </string>
+    <string name="activity_advance_setting_autoTransfer">自动转账 </string>
+
+    <!-- CashIncomeActivity.java -->
+    <string name="activity_cash_income_total_revenue">总金额:</string>
+    <string name="activity_cash_income_draw_cash">提取到银行卡</string>
+    <string name="activity_cash_income_check_details">查看明细</string>
+
+    <!-- main_user_detail_hearder.xml -->
+    <string name="activity_user_detailed_info_nickname">昵称</string>
+    <string name="activity_user_detailed_info_realname">实名</string>
+    <string name="activity_user_detailed_info_dw">ID号</string>
+    <string name="activity_user_detailed_info_value">身价</string>
+    <string name="activity_user_detailed_info_asset">身家</string>
+    <string name="activity_user_detailed_info_sex_age">性别 年龄</string>
+    <string name="activity_user_detailed_info_address">地区</string>
+    <string name="activity_user_detailed_info_setting">设置</string>
+    <string name="activity_user_detailed_info_work">作品库</string>
+
+    <!-- 陌生人 -->
+    <string name="main_stranger">陌生人信息</string>
+    <string name="main_stranger_near">附近的人</string>
+    <!-- 聊天室 -->
+    <string name="back">返回</string>
+    <string name="content_topic">话题内容</string>
+    <string name="read">阅读</string>
+    <string name="num_onlinechat">在线讨论</string>
+    <string name="join_chat_room">加入聊天室</string>
+    <string name="add_topic">话题添加</string>
+    <string name="title">标题</string>
+    <string name="description">描述</string>
+    <string name="doorsill">门槛</string>
+    <string name="introduce_myself">个人介绍部分</string>
+    <string name="my_icon">我的头像</string>
+    <string name="my_name">我在聊天室中显示的名字</string>
+    <string name="add_content">添加内容</string>
+    <string name="complete">完成</string>
+    <string name="add_content_hint">其中可以直接显示到列表的有70个字在70字内能够有重点吸引人，并且支持长微博形式</string>
+    <string name="set_nickname_tip">戴上面具，做最真实的自己 </string>
+    <string name="click_tojoin">戳我进入</string>
+    <string name="Failed_to_create_groups">创建群组失败:</string>
+    <string name="Failed_to_create_interesting_group">创建兴趣组失败:</string>
+    <!-- 登录注册 -->
+    <string name="forget_psw">忘记密码了吗？</string>
+
+    <!-- 搜索界面 -->
+    <string name="activity_contact_serach_phone">手机号</string>
+    <string name="activity_contact_serach_dw">DW号</string>
+    <string name="activity_contact_serach_nick">昵称</string>
+    <string name="activity_contact_serach_relname">实名</string>
+    <string name="activity_contact_search_occupation">公司</string>
+    <string name="activity_contact_search_school">学校</string>
+    <string name="activity_contact_search_keyword">关键字</string>
+    <string name="activity_contact_serach_seraching">正在搜索中...</string>
+
+    <!-- 联系人详情的资料设置 -->
+    <string name="activity_friend_detail_remark">设置备注</string>
+    <string name="activity_friend_detail_1">设为星标朋友</string>
+    <string name="activity_friend_detail_2">不看他（她）的作品圈</string>
+    <string name="activity_friend_detail_3">不让他（她）看我的作品圈</string>
+    <string name="activity_friend_detail_4">删除联系人</string>
+    <string name="activity_friend_detail_5">举报</string>
+    <string name="Is_to_create_a_group_chat">正在创建群聊...</string>
+    <string name="is_to_create_a_interesting_group_chat">正在创建兴趣组。。。</string>
+    <string name="set">创建</string>
+    <string name="Dissolve_group_chat_tofail">解散群聊失败:</string>
+
+    <!-- ping ++ 支付 -->
+    <string name="missingImage">图片加载失败</string>
+    <string name="amount">支付金额</string>
+    <string name="alipay">支付宝</string>
+    <string name="wechat">微信</string>
+    <string name="upmp">银联</string>
+    <string name="bfb">百度钱包</string>
+    <string name="jdpay">京东支付</string>
+    <string name="confirm">确认</string>
+    <string name="yuan">元</string>
+    <string name="donateFailMessage">\u3000\u3000感谢你的爱心，\n但是系统出现了一些错误</string>
+    <string name="validationErrors">错误</string>
+    <string name="notInstalled">未安装支付软件</string>
+    <string name="confirm_forward_to">确定转发到：%1$s ?</string>
+    <string name="click_to_modify">点击进入编辑</string>
+    <string name="str_recoder_normal">按住说话</string>
+    <string name="str_recoder_recording">松开结束</string>
+    <string name="str_recoder_want_cancel">松开手指，取消发送</string>
+    <string name="too_short">时间过短</string>
+    <string name="title_activity_register_view_pager_show">RegisterViewPagerShowActivity</string>
+    <string name="title_activity_register_what_you_have">RegisterWhatYouHaveActivity</string>
+    <string name="title_activity_register_talent">RegisterTalentActivity</string>
+    <string name="title_activity_money">MoneyActivity</string>
+    <string name="title_activity_register_nick">RegisterNickActivity</string>
+    <string name="title_activity_register_nick_name">RegisterNickNameActivity</string>
+
+    <!-- 用户设信息 -->
+    <string name="user_detail_info_sign">个性签名</string>
+    <string name="user_detail_info_realName">实名</string>
+    <string name="user_detail_info_nickName">昵称</string>
+    <string name="user_detail_info_age">年龄</string>
+    <string name="user_detail_info_sex">性别</string>
+    <string name="user_detail_info_occupation">职业</string>
+    <string name="user_detail_info_corporation">公司</string>
+    <string name="user_detail_info_job">职位</string>
+    <string name="user_detail_info_school">学校</string>
+    <string name="user_detail_info_department">学院</string>
+    <string name="user_detail_info_classes">班级</string>
+    <string name="user_detail_info_type">类别</string>
+    <string name="user_detail_info_hometown">故乡</string>
+    <string name="user_detail_info_nation">民族</string>
+    <string name="user_detail_info_phone">电话</string>
+    <string name="user_detail_info_email">邮箱</string>
+    <string name="user_detail_info_qq">QQ</string>
+    <string name="user_detail_info_wechat">微信</string>
+    <string name="user_detail_info_blog">博客</string>
+    <string name="user_detail_info_vehicle">车子</string>
+    <string name="user_detail_info_bloodType">血型</string>
+    <string name="user_detail_info_constellatory">星座</string>
+    <string name="user_detail_info_cate">美食</string>
+    <string name="user_detail_info_maritalStatus">婚姻状态</string>
+    <string name="user_detail_info_religion">信仰</string>
+    <string name="user_detail_info_position">常出没</string>
+    <string name="user_detail_info_speciality">特长</string>
+    <string name="user_detail_info_likeBooks">喜欢的书</string>
+    <string name="user_detail_info_likeMusic">喜欢的音乐</string>
+    <string name="user_detail_info_likeMovie">喜欢的电影</string>
+    <string name="user_detail_info_likeSport">喜欢的运动</string>
+    <string name="user_detail_info_idol">偶像</string>
+    <string name="user_detail_info_motto">座右铭</string>
+
+    <!-- 对应的模拟数据 -->
+    <string name="user_detail_info_simu_sign">个性签名，是指你在某个论坛（BBS）注册之后， 就可以设置自己的签名了，即在你的每个帖子底部显示的文字， 有些象便签抬头。 由于每个网友所写的文字都不同，有格言、有谚语、有调侃语句等等，也有用图片、动画作为签名，充满个性，也不同。</string>
+    <string name="user_detail_info_simu_realName">陈杰</string>
+    <string name="user_detail_info_simu_nickName">追随我心</string>
+    <string name="user_detail_info_simu_age">25</string>
+    <string name="user_detail_info_simu_sex">男</string>
+    <string name="user_detail_info_simu_occupation">互联网</string>
+    <string name="user_detail_info_simu_corporation">滴滴答答</string>
+    <string name="user_detail_info_simu_job">Android工程师</string>
+    <string name="user_detail_info_simu_school">理工大学</string>
+    <string name="user_detail_info_simu_department">测绘学院</string>
+    <string name="user_detail_info_simu_classes">遥感 10-02</string>
+    <string name="user_detail_info_simu_type">财、才、貌</string>
+    <string name="user_detail_info_simu_hometown">湖南 长沙</string>
+    <string name="user_detail_info_simu_nation">汉</string>
+    <string name="user_detail_info_simu_phone">18824582749</string>
+    <string name="user_detail_info_simu_email">hncschen@163.com</string>
+    <string name="user_detail_info_simu_qq">642373034</string>
+    <string name="user_detail_info_simu_wechat">hncschen</string>
+    <string name="user_detail_info_simu_blog">【博客】</string>
+    <string name="user_detail_info_simu_vehicle">悍马</string>
+    <string name="user_detail_info_simu_bloodType">O型</string>
+    <string name="user_detail_info_simu_constellatory">狮子座</string>
+    <string name="user_detail_info_simu_cate">杂酱面</string>
+    <string name="user_detail_info_simu_maritalStatus">未婚</string>
+    <string name="user_detail_info_simu_religion">【信仰】</string>
+    <string name="user_detail_info_simu_position">【常出没】</string>
+    <string name="user_detail_info_simu_speciality">【特长】</string>
+    <string name="user_detail_info_simu_likeBooks">【喜欢的书】</string>
+    <string name="user_detail_info_simu_likeMusic">【喜欢的音乐】</string>
+    <string name="user_detail_info_simu_likeMovie">【喜欢的电影】</string>
+    <string name="user_detail_info_simu_likeSport">【喜欢的运动】</string>
+    <string name="user_detail_info_simu_idol">钱学森</string>
+    <string name="user_detail_info_simu_motto">雄关漫道真如铁，而今迈步从头越</string>
+    <string name="title_activity_forget_pwd_mobile">ForgetPwdMobileActivity</string>
+    <string name="title_activity_forget_pwd_identifying_code">ForgetPwdIdentifyingCodeActivity</string>
+    <string name="title_activity_forget_pwd_id_card">ForgetPwdIdCardActivity</string>
+    <string name="title_activity_forgert_pwd_reset_pwd">ForgertPwdResetPwdActivity</string>
+    <string name="title_activity_selected">SelectedActivity</string>
+    <string name="title_activity_show_to_me">ShowToMeActivity</string>
+    <string name="operation_fail">操作失败</string>
+    <string name="title_activity_occupation_show_to_me">OccupationShowToMeActivity</string>
+    <string name="title_activity_Religion_show_to_me">ReligionShowToMeActivity</string>
+    <string name="title_activity_flingswip">FlingswipActivity</string>
+    <string name="title_activity_recharge_card">RechargeCardActivity</string>
+    <string name="title_activity_recharge_bank_card_choose_bank_card">RechargeBankCardChooseBankCardActivity</string>
+    <string name="title_activity_recahrge_bank_card_add_bank_card">RecahrgeBankCardAddBankCardActivity</string>
+    <string name="title_activity_recharge_bank_card_add_bank_card_mobile">RechargeBankCardAddBankCardMobileActivity</string>
+    <string name="title_activity_recharge_bank_card_identifying_card">RechargeBankCardIdentifyingCardActivity</string>
+    <string name="title_activity_recharge_ali_pay_wx">RechargeAliPayWXActivity</string>
+    <string name="title_activity_recharge_pay_method">RechargePayMethodActivity</string>
+    <string name="title_activity_show_to_me_lv">ShowToMeLvActivity</string>
+    <string name="title_activity_share">ShareActivity</string>
+    <string name="title_activity_social_status">SocialStatusActivity</string>
+    <string name="title_activity_crop_image_view">CropImageViewActivity</string>
+    <string name="title_activity_default">DefaultActivity</string>
+    <string name="title_activity_me">MeActivity</string>
+    <string name="title_activity_my_info">MyInfoActivity</string>
+    <string name="title_activity_add_theme">AddThemeActivity</string>
+    <string name="title_activity_topic_content">TopicContentActivity</string>
+    <string name="title_activity_edit">EditActivity</string>
+    <string name="title_activity_chat_room_my_subject_list">ChatRoomMySubjectListActivity</string>
+    <string name="title_activity_chat_room_pay">ChatRoomPayActivity</string>
+    <string name="title_activity_anonymous_data">AnonymousDataActivity</string>
+
+    <!-- ouyang -->
+    <string name="register_get_identifying_code">获取验证码</string>
+    <string name="register_next">下一步</string>
+    <string name="title_activity_picture_clip">PictureClipActivity</string>
+    <string name="title_activity_transmit">TransmitActivity</string>
+    <string name="title_activity_chat_pick_contact">ChatPickContactActivity</string>
+    <string name="title_activity_examine">ExamineActivity</string>
+    <string name="title_activity_my_tantan">MyTantanActivity</string>
+    <string name="title_activity_first_eye">FirstEyeActivity</string>
+    <string name="title_activity_examine_welcome">ExamineWelcomeActivity</string>
+    <string name="title_activity_pay_dialog">PayDialogActivity</string>
+    <string name="send_err_msg">错误信息已发送，谢谢</string>
+    <string name="exception_err_title">噢！出了点小问题</string>
+    <string name="exception_err_msg">是否发送出错信息? 这不会耗费您过多的流量，并且能够对我们后续服务的改进提供重要帮助！</string>
+    <string name="btn_ok">确定</string>
+    <string name="btn_cancel">取消</string>
+    <string name="exception_err_upload">正在上传:</string>
+    <string name="title_activity_edit_is_married">EditIsMarriedActivity</string>
+    <string name="software_version_code">软件版本号:</string>
+    <string name="database_version_code">数据库版本号：</string>
+    <string name="software_version_name">软件版本名：</string>
+    <string name="check_new_version">检查新版本</string>
+    <string name="title_activity_recharge_pay_function">RechargePayFunctionActivity</string>
+
+</resources>

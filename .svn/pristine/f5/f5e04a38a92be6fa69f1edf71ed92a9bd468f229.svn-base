@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TextView
+            android:id="@+id/tv_second_step"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="第二步"
+            android:textColor="@color/one_black"
+            android:textSize="@dimen/new_textsize_20sp" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_talent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/bg_ensure"
+        android:focusable="true"
+        android:gravity="center"
+        android:text="才华级别"
+        android:textColor="@color/new_yellow"
+        android:textSize="@dimen/new_textsize_16sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="博士"
+        android:textColor="@color/two_black"
+        android:textSize="@dimen/new_textsize_14sp" />
+
+    <TextView
+        android:id="@+id/tv_money"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/bg_ensure"
+        android:gravity="center"
+        android:text="财富级别"
+        android:textColor="@color/new_yellow"
+        android:textSize="@dimen/new_textsize_16sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="500万"
+        android:textColor="@color/two_black"
+        android:textSize="@dimen/new_textsize_14sp" />
+
+    <TextView
+        android:id="@+id/tv_commom_service"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:background="@drawable/bg_ensure"
+        android:gravity="center"
+        android:text="公共服务级别"
+        android:textColor="@color/new_yellow"
+        android:textSize="@dimen/new_textsize_16sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="科长以上"
+        android:textColor="@color/two_black"
+        android:textSize="@dimen/new_textsize_14sp" />
+
+</LinearLayout>

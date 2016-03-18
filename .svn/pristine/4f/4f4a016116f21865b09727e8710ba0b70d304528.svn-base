@@ -1,0 +1,255 @@
+package cn.sx.decentworld.activity;
+
+import java.util.Calendar;
+
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Presence;
+
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Handler;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.LoginHelper;
+import cn.sx.decentworld.utils.XmppHelper;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_default)
+public class DefaultActivity extends BaseFragmentActivity
+{
+	private static final String TAG = "DefaultActivity";
+//	private static final long DELAY_TIME = 1000;
+	private XMPPConnection con;
+	private static final int SUCCESS = 1;
+	private static final int FAILURE = 0;
+
+	private Calendar mCalendar;
+	@ViewById(R.id.tv_year)
+	TextView tvYear;
+	@ViewById(R.id.tv_month)
+	TextView tvMonth;
+	@ViewById(R.id.tv_week)
+	TextView tvWeek;
+	@ViewById(R.id.tv_day)
+	TextView tvDay;
+	@Bean
+	ToastComponent toast;
+
+	@AfterViews
+	public void init()
+	{
+		initDate();
+
+//		new Handler().postDelayed(new Runnable()
+//		{
+//
+//			@Override
+//			public void run()
+//			{
+//				// 3秒之后执行页面跳转
+//				ifIntentToMainActivity();
+//			}
+//
+//		}, DELAY_TIME);
+		ifIntentToMainActivity();
+	}
+
+	private void initDate()
+	{
+		mCalendar = Calendar.getInstance();
+		int year = mCalendar.get(Calendar.YEAR);
+		tvYear.setText("" + year);
+		int m = mCalendar.get(Calendar.MONTH) + 1;
+		String month = MonthHandle(m);
+		tvMonth.setText(month);
+		int day = mCalendar.get(Calendar.DAY_OF_MONTH);
+		tvDay.setText("" + day);
+		int w = mCalendar.get(Calendar.DAY_OF_WEEK);
+		String week = weekHandle(w);
+		tvWeek.setText(week);
+		LogUtils.e("bm", "year--" + year + "month--" + month + "day--" + day + "week--" + w);
+	}
+
+	private void ifIntentToMainActivity()
+	{
+		if (!("2222".equals(LoginHelper.getResultCode(this))))
+		{
+			// 跳转到登录界面
+			Intent intent = new Intent(DefaultActivity.this , LoginActivity_.class);
+			String username = LoginHelper.getUsername(this);
+			intent.putExtra("username", username);
+			startActivity(intent);
+			finish();
+		}
+		if (LoginHelper.isLogined(this))
+		{
+			if (!XmppHelper.WasAuthenticated())
+			{
+				String dwID = DecentWorldApp.getInstance().getDwID();
+				String username = DecentWorldApp.getInstance().getUserName();
+				String password = DecentWorldApp.getInstance().getPassword();
+				openfireLogin(username, dwID, password);
+			}
+			else
+			{
+				Intent intent = new Intent(DefaultActivity.this , MainActivity_.class);
+				startActivity(intent);
+				finish();
+			}
+		}
+		else
+		{
+			// 确保内存中的数据为空
+			DecentWorldApp.getInstance().setToken("");
+			DecentWorldApp.getInstance().setDwID("");
+			DecentWorldApp.getInstance().setUserName("");
+			DecentWorldApp.getInstance().setPassword("");
+			// 跳转到登录界面
+			Intent intent = new Intent(DefaultActivity.this , LoginActivity_.class);
+			String username = LoginHelper.getUsername(this);
+			intent.putExtra("username", username);
+			startActivity(intent);
+			finish();
+		}
+	}
+
+	private void openfireLogin(String username, String dwID, String password)
+	{
+		LogUtils.i(TAG, "登录过，");
+		new OpenfireLoginAsyn().execute(username, dwID, password);
+	}
+
+	class OpenfireLoginAsyn extends AsyncTask<String, Void, Integer>
+	{
+
+		@Override
+		protected Integer doInBackground(String... params)
+		{
+			try
+			{
+				con = DecentWorldApp.getInstance().getConnectionImpl();
+				if (!con.isAuthenticated() && con.isConnected())
+				{
+					con.login(params[0], params[1], params[2], "Smack");
+					con.sendPacket(new Presence(Presence.Type.available));
+					return SUCCESS;
+				}
+				else if (con.isAuthenticated() && con.isConnected())
+				{
+					return SUCCESS;
+				}
+				else
+				{
+					LogUtils.i(TAG, "7");
+					return FAILURE;
+				}
+			}
+			catch (Exception e)
+			{
+				return FAILURE;
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Integer result)
+		{
+			super.onPostExecute(result);
+			if (result == SUCCESS)
+			{
+				Intent intent = new Intent(DefaultActivity.this , MainActivity_.class);
+				startActivity(intent);
+			}
+			else
+			{
+				Intent intent = new Intent(DefaultActivity.this , LoginActivity_.class);
+				startActivity(intent);
+			}
+			finish();
+		}
+	}
+
+	private String weekHandle(int WeekOfMonth)
+	{
+		String week = null;
+		switch (WeekOfMonth)
+		{
+			case 1:
+				week = "SUNDAY";
+				break;
+
+			case 2:
+				week = "MONDAY";
+				break;
+			case 3:
+				week = "TUESDAY";
+				break;
+			case 4:
+				week = "WEDNESDAY";
+				break;
+			case 5:
+				week = "THURSDAY";
+				break;
+			case 6:
+				week = "FRIDAY";
+				break;
+			case 7:
+				week = "SATURDAY";
+				break;
+		}
+		return week;
+	}
+
+	private String MonthHandle(int month0fYear)
+	{
+		String month = null;
+		switch (month0fYear)
+		{
+			case 1:
+				month = "JAN";
+				break;
+
+			case 2:
+				month = "FEB";
+				break;
+			case 3:
+				month = "MAR";
+				break;
+			case 4:
+				month = "APR";
+				break;
+			case 5:
+				month = "MAY";
+				break;
+			case 6:
+				month = "JUN";
+				break;
+			case 7:
+				month = "JUL";
+				break;
+			case 8:
+				month = "AUG";
+				break;
+			case 9:
+				month = "SEP";
+				break;
+			case 10:
+				month = "OCT";
+				break;
+			case 11:
+				month = "NOV";
+				break;
+			case 12:
+				month = "DEC";
+				break;
+
+		}
+		return month;
+	}
+}

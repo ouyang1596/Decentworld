@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="720px"
+    android:layout_height="593px"
+    android:layout_gravity="center_horizontal"
+    android:background="@drawable/login_dialog_bg"
+    android:id="@+id/activity_login_set_pwd_dialog"
+     >
+
+    <TextView
+        android:id="@+id/tv_if_pwd_ok"
+        android:layout_width="360px"
+        android:layout_height="60px"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="223px"
+        android:gravity="center"
+        android:text="密码长度必须为八位"
+        android:textColor="@color/darkgray"
+        android:textSize="@dimen/text_size_px_30"
+        android:visibility="invisible"
+         >
+    </TextView>
+
+    <LinearLayout
+        android:id="@+id/linearLayout2"
+        android:layout_width="360px"
+        android:layout_height="60px"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/tv_if_pwd_ok"
+        android:background="@drawable/login_et_bg" >
+
+        <EditText
+            android:id="@+id/et_new_pwd"
+            android:layout_width="350px"
+            android:layout_height="60px"
+            android:layout_marginLeft="10px"
+            android:background="@null"
+            android:gravity="center"
+            android:hint="@string/input_new_pwd"
+            android:maxLength="18"
+            android:singleLine="true"
+            android:textSize="@dimen/text_size_px_28" />
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/bt_sure_set_pwd"
+        android:layout_width="215px"
+        android:layout_height="52px"
+        android:layout_below="@+id/linearLayout2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="66px"
+        android:background="@drawable/login_sure_bt"
+        android:clickable="true"
+        android:text="@string/make_sure"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_size_px_28" />
+
+</RelativeLayout>

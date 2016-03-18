@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tv_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="返回"
+            android:textColor="@color/two_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="成就"
+            android:textColor="@color/three_black"
+            android:textSize="@dimen/new_textsize_16sp" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_ensure"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="确定"
+            android:textColor="@color/two_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_introduce_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="大花紫薇大花紫薇大花紫薇大花紫薇大花紫薇大花紫薇大花紫薇大花紫薇" />
+
+</LinearLayout>

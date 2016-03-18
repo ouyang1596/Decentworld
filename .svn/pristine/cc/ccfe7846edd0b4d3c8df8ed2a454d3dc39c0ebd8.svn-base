@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/user_detail_info_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <!-- 基本信息 -->
+
+    <LinearLayout
+        android:id="@+id/ll_user_detail_info_base"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/four_black"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="24dp"
+            android:paddingRight="24dp"
+            android:paddingTop="6dp" >
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="wrap_content"
+                android:src="@drawable/tag_base_info" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/user_detail_title_height"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:text="基本资料"
+                android:textColor="@color/two_black" />
+        </LinearLayout>
+
+        <cn.sx.decentworld.widget.ListViewForScrollView
+            android:id="@+id/lv_per_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@null"
+            android:listSelector="#00000000" >
+        </cn.sx.decentworld.widget.ListViewForScrollView>
+    </LinearLayout>
+
+</LinearLayout>

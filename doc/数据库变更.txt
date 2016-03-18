@@ -1,0 +1,35 @@
+文件更新时间：2016-03-08
+
+一、2016-1-2以前
+1.UserInfo中添加 payAccount（支付账号），ModifyPaycardActivity中加载和修改；
+2.【版本号为2】NewFriend添加userID字段
+3.【版本号为3】删除Stranger表，新建SearchResult表
+4.【版本号为4】NewFriend表添加搜索类型字段searchType，时间字段time
+5.【版本号为5】删除noremindlist表，添加noDisturb表；删除toplist表，添加msgTop表；
+6.【版本号为6】删除表msgTop/noDisturb/chatbg，添加chatSetting表
+7.【版本号为7】添加recommendBenefitList表、recommendBenefitDetail表;
+8.【版本号为8】userInfo表添加autoTransfer字段;
+9.【版本号为9】recommendBenefitList表添加stored字段;
+10.【版本号为10】recommendBenefitDetail表添加statusType字段;
+
+二、2016-1-2以后
+1.【版本号为1】数据库变更为1
+2.【版本号为2】修改userInfo表（从服务器获取的），添加userExtraInfo表（用于存放用户额外信息）；
+
+三、2016-1-29日清除数据库升级文件
+1.【版本号为1】数据库变更为1
+2.【版本号为2】conversationList添加userType字段；
+3.【版本号为3】
+1）userExtraInfo添加 strangerNotice/friendNotice字段；
+2）删除 comment/work表；
+4.【版本号为4】
+1）删除CommentEntity表；
+2）删除MomentEntity表；
+3）删除dWSMessage表；
+4）删除dWMMessage表；
+5）删除praise表；
+6）删除trample表；
+7）删除loginUser表；
+8) 添加momentEntity表；
+9）添加commentEntity表；
+4.【版本号为5】

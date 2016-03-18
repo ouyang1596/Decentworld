@@ -1,0 +1,395 @@
+package cn.sx.decentworld;
+
+import java.util.ArrayList;
+
+import org.jivesoftware.smack.ChatManager;
+
+import android.app.Service;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.os.IBinder;
+import android.support.v4.app.FragmentManager;
+import cn.sx.decentworld.bean.ChatRoomInfo;
+import cn.sx.decentworld.bean.RegisterBean;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.CrashHandler;
+import cn.sx.decentworld.common.FilePath;
+import cn.sx.decentworld.common.SystemHelper;
+import cn.sx.decentworld.service.PacketListenerService;
+import cn.sx.decentworld.service.PacketListenerService.MyBinder;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper;
+
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.app.Application;
+import com.googlecode.androidannotations.annotations.EApplication;
+
+/**
+ * @ClassName: DecentWorldApp.java
+ * @Description: 主要完成的工作 1.实例化全局变量 2.初始化ActiveAndroid数据库 3.保存全局XMPPConnecttion变量
+ * @author: cj
+ * @date: 2015年10月18日 下午4:55:25
+ */
+@EApplication
+public class DecentWorldApp extends Application
+{
+    private static final String TAG = "DecentWorldApp";
+    // 储存多张照片路径
+    public static ArrayList<String> mPicList;
+    // 储存一张照片路径
+    public static String tempPicPath = null;
+    // 全局变量（）
+    private static DecentWorldApp instance;
+    private static Context applicationContext;
+    // 用于与Dw服务器进行通信的dwID号
+    private String dwID = "";
+    // 用户名（目前为手机号码）
+    private String username = "";
+    // 密码
+    private String password = "";
+    // 与dw服务器通信的令牌
+    private String token = "";
+    public static final String MAIN_KEY = "1";
+    public static RegisterBean registerBean;
+    public static String realName;
+    public static String ifGuarantee = "0";
+    public static boolean ifFromAppOwner;
+    // 通过此来判断聊天室退出是否需要调用退出接口
+    public static boolean ifFixed;
+    public static ChatRoomInfo chatRoomInfo;
+    // 聊天管理器
+    private ChatManager chatManager;
+    private Intent messageListenerService;
+    private FragmentManager fm;
+    private String currentUserdwID = "";
+    public static int everLogin = -1;
+    // 标记MainActivity是否初始化完毕，作为在ReconnectionManager中是否发送上线消息的标志
+    private boolean isMainActivityInit = false;
+    // 标记是否登录
+    private boolean isLogin = false;
+    // 计算DecentApplication初始化的次数
+    private int createCount = 0;
+
+    /**
+     * 初始化入口
+     */
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+        createCount++;
+        LogUtils.i(TAG, "Application onCreate，createCount=" + createCount);
+        // 获取进程名字
+        String processName = SystemHelper.getProcessName(this, android.os.Process.myPid());
+        if (processName != null)
+        {
+            LogUtils.i(TAG, "The current process's name is " + processName);
+            boolean defaultProcess = processName.equals(Constants.REAL_PACKAGE_NAME);
+            if (defaultProcess)
+            {
+                LogUtils.i(TAG, "初始化主进程");
+                initAppForMainProcess();
+            }
+            else if (processName.contains(":test"))
+            {
+                LogUtils.i(TAG, "初始化服务进程");
+                initAppForServiceProcess();
+            }
+            else
+            {
+                LogUtils.i(TAG, "初始化其它进程");
+                initAppForOtherProcess();
+            }
+        }
+    }
+
+    /**
+     * 初始化主进程
+     */
+    private void initAppForMainProcess()
+    {
+        instance = this;
+        applicationContext = this;
+        ToastUtil.initToast(this);
+        // 初始化数据库
+        ActiveAndroid.initialize(this);
+        mPicList = new ArrayList<String>();
+        // 初始化文件存储目录
+        FilePath.initialize();
+        // 初始化ImageLoadHepler
+        ImageLoaderHelper.initImageLoader(applicationContext);
+        // 初始化异常报告工具
+        CrashHandler.getInstance().init(this);
+        ImageUtils.saveBitmap(getResources());
+//        onBindService();
+    }
+
+    /**
+     * 初始化服务进程
+     */
+    private void initAppForServiceProcess()
+    {
+        // TODO something
+
+    }
+
+    /**
+     * 初始化其它进程
+     */
+    private void initAppForOtherProcess()
+    {
+        // TODO something
+    }
+
+    /**
+     * 获得DecentWorldApp的唯一实例
+     * 
+     * @return
+     */
+    public static DecentWorldApp getInstance()
+    {
+        return instance;
+    }
+
+    /**
+     * 获取全局的Context
+     *
+     * @return
+     */
+    public static Context getGlobalContext()
+    {
+        return applicationContext;
+    }
+
+    /**
+     * 设置与Dw服务器通信的dwID
+     */
+    public void setDwID(String dwID)
+    {
+        this.dwID = dwID;
+    }
+
+    /**
+     * 获取与Dw服务器进行通信的dwID,如果内存中没有，那么冲sp文件中拿取
+     */
+    public String getDwID()
+    {
+        if (dwID == null || dwID.equals(""))
+        {
+            // 从服务器获取dwID
+            SharedPreferences preferences = getSharedPreferences(UserInfoHelper.SP_FILE_NAME, 0);
+            dwID = preferences.getString(UserInfoHelper.SP_KEY_DW_ID, "");
+        }
+        return dwID;
+    }
+
+    /**
+     * 设置用户名
+     */
+    public void setUserName(String username)
+    {
+        this.username = username;
+    }
+
+    /**
+     * 获取当前登陆用户名
+     */
+    public String getUserName()
+    {
+        return username;
+    }
+
+    /**
+     * 设置密码
+     */
+    public void setPassword(String pwd)
+    {
+        this.password = pwd;
+    }
+
+    /**
+     * 获取密码
+     */
+    public String getPassword()
+    {
+        return password;
+    }
+
+    /**
+     * @return the token
+     */
+    public String getToken()
+    {
+        return token;
+    }
+
+    /**
+     * @param token
+     *            the token to set
+     */
+    public void setToken(String token)
+    {
+        this.token = token;
+    }
+
+    @Override
+    public void onTerminate()
+    {
+        LogUtils.i(TAG, "销毁Application");
+        super.onTerminate();
+        /** 完成数据库的清理工作 **/
+        ActiveAndroid.dispose();
+
+    }
+
+    /**
+     * @return the isMainActivityInit
+     */
+    public boolean isMainActivityInit()
+    {
+        return isMainActivityInit;
+    }
+
+    /**
+     * @param isMainActivityInit
+     *            the isMainActivityInit to set
+     */
+    public void setMainActivityInit(boolean isMainActivityInit)
+    {
+        this.isMainActivityInit = isMainActivityInit;
+    }
+
+    /**
+     * 判断是否已经进行登录操作
+     * 
+     * @return
+     */
+    public boolean isLogin()
+    {
+        return isLogin;
+    }
+
+    // /////////////////////////////////////绑定Service//////////////////////////////////
+//    private PacketListenerService packetListenerService;
+//
+//    /**
+//     * @Description: 消息监听服务
+//     */
+//    private ServiceConnection serviceConnection = new ServiceConnection()
+//    {
+//        @Override
+//        public void onServiceDisconnected(ComponentName name)
+//        {
+//            LogUtils.i(TAG, "服务断开连接");
+//        }
+//
+//        @Override
+//        public void onServiceConnected(ComponentName name, IBinder binder)
+//        {
+//            LogUtils.i(TAG, "服务建立连接");
+//            // 获取监听服务的对象
+//            packetListenerService = ((MyBinder) binder).getService();
+//        }
+//    };
+//    
+//    /**
+//     * 绑定服务
+//     */
+//    private void onBindService()
+//    {
+//        if(packetListenerService == null)
+//        {
+//            Intent intent = new Intent(this , PacketListenerService.class);
+//            bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
+//            startService(intent);
+//        }
+//    }
+//    
+//
+//    /**
+//     * 解绑消息监听服务
+//     */
+//    private void onUnBindService()
+//    {
+//        if(serviceConnection != null)
+//        {
+//            unbindService(serviceConnection);
+//            stopService(new Intent(this , PacketListenerService.class));
+//        }
+//    }
+//
+//    /**
+//     * 获取服务
+//     * @param listener
+//     */
+//    private final Object LOCK = new Object();
+//
+//    public void getService(final GetServiceListener listener)
+//    {
+//        if (packetListenerService == null)
+//        {
+//            LogUtils.i(TAG, "获取服务 1");
+//            synchronized (LOCK)
+//            {
+//                if (packetListenerService == null)
+//                {
+//                    LogUtils.i(TAG, "获取服务 3");
+//                    onBindService();
+//                    new Thread(new Runnable()
+//                    {
+//                        @Override
+//                        public void run()
+//                        {
+//                            while (true)
+//                            {
+//                                try
+//                                {
+//                                    Thread.sleep(100);
+//                                    LogUtils.i(TAG, "正在创建服务...");
+//                                    if (packetListenerService != null)
+//                                    {
+//                                        listener.onCompleted(packetListenerService);
+//                                        return;
+//                                    }
+//                                }
+//                                catch (InterruptedException e)
+//                                {
+//                                    // TODO Auto-generated catch block
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        }
+//                    }).start();
+//                }
+//                else
+//                {
+//                    LogUtils.i(TAG, "获取服务 4");
+//                    listener.onCompleted(packetListenerService);
+//                }
+//            }
+//        }
+//        else
+//        {
+//            LogUtils.i(TAG, "获取服务 2");
+//            listener.onCompleted(packetListenerService);
+//        }
+//
+//    }
+//
+//    public interface GetServiceListener
+//    {
+//        public void onCompleted(PacketListenerService service);
+//    }
+//    
+//    public PacketListenerService getService()
+//    {
+//        return packetListenerService;
+//    }
+
+}

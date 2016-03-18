@@ -1,0 +1,478 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.CharacterParser;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.PinyinComparator;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+import com.alibaba.fastjson.annotation.JSONField;
+
+/**
+ * @ClassName: ContactUsers.java
+ * @Description: 本地数据库存放用户好友的表
+ * @author: dyq
+ * @date: 2015年9月8日 下午4:57:52
+ */
+@Table(name = "contactUser")
+public class ContactUser extends Model
+{
+    private static final String TAG = "ContactUser";
+    /**
+     * 用户类型
+     */
+    /** 存疑用户 **/
+    private static final int USER_TYPE_IMPEACH = 0;
+    /** 普通用户 **/
+    private static final int USER_TYPE_NORMAL = 1;
+    /** 大腕用户 **/
+    private static final int USER_TYPE_VIP = 2;
+
+    public String sortLetters;
+
+    /** 存放用户的朋友的头像 （暂时保留） */
+    @Column(name = "icon")
+    public String icon;
+
+    /** 用户dwID **/
+    @JSONField(serialize = false)
+    @Column(name = "userID")
+    public String userID;
+
+    /** 存放对方的ID */
+    @Column(name = "friendID")
+    public String friendID;
+
+    /** 对方职业 **/
+    @Column(name = "occupation")
+    public String occupation;
+
+    /** 备注 **/
+    @Column(name = "showName")
+    public String showName;
+
+    /** 性别 **/
+    @Column(name = "gender")
+    public String gender;
+
+    /** 用户类型 **/
+    @Column(name = "userType")
+    public int userType;
+
+    /** 对方身价 **/
+    @Column(name = "worth")
+    public float worth;
+
+    /** 保留字段，用于扩展 */
+    @Column(name = "remain")
+    public String remain;
+
+    @Column(name = "nameLetter")
+    public String nameLetter;
+    
+    public boolean checked = false;
+    
+    /**
+     * 
+     */
+    public ContactUser()
+    {
+
+    }
+
+    /**
+     * @return the sortLetters
+     */
+    public String getSortLetters()
+    {
+        return sortLetters;
+    }
+
+    /**
+     * @param sortLetters
+     *            the sortLetters to set
+     */
+    public void setSortLetters(String sortLetters)
+    {
+        this.sortLetters = sortLetters;
+    }
+
+    /**
+     * @return the icon
+     */
+    public String getIcon()
+    {
+        return icon;
+    }
+
+    /**
+     * @param icon
+     *            the icon to set
+     */
+    public void setIcon(String icon)
+    {
+        this.icon = icon;
+    }
+
+    /**
+     * @return the userID
+     */
+    public String getUserID()
+    {
+        return userID;
+    }
+
+    /**
+     * @param userID
+     *            the userID to set
+     */
+    public void setUserID(String userID)
+    {
+        this.userID = userID;
+    }
+
+    /**
+     * @return the friendID
+     */
+    public String getFriendID()
+    {
+        return friendID;
+    }
+
+    /**
+     * @param friendID
+     *            the friendID to set
+     */
+    public void setFriendID(String friendID)
+    {
+        this.friendID = friendID;
+    }
+
+    /**
+     * @return the occupation
+     */
+    public String getOccupation()
+    {
+        return occupation;
+    }
+
+    /**
+     * @param occupation
+     *            the occupation to set
+     */
+    public void setOccupation(String occupation)
+    {
+        this.occupation = occupation;
+    }
+
+    /**
+     * @return the showName
+     */
+    public String getShowName()
+    {
+        return showName;
+    }
+
+    /**
+     * @param showName
+     *            the showName to set
+     */
+    public void setShowName(String showName)
+    {
+        this.showName = showName;
+    }
+
+    /**
+     * @return the gender
+     */
+    public String getGender()
+    {
+        return gender;
+    }
+
+    /**
+     * @param gender
+     *            the gender to set
+     */
+    public void setGender(String gender)
+    {
+        this.gender = gender;
+    }
+
+    /**
+     * @return the userType
+     */
+    public int getUserType()
+    {
+        return userType;
+    }
+
+    /**
+     * @param userType
+     *            the userType to set
+     */
+    public void setUserType(int userType)
+    {
+        this.userType = userType;
+    }
+
+    /**
+     * @return the worth
+     */
+    public float getWorth()
+    {
+        return worth;
+    }
+
+    /**
+     * @param worth
+     *            the worth to set
+     */
+    public void setWorth(float worth)
+    {
+        this.worth = worth;
+    }
+
+    /**
+     * @return the remain
+     */
+    public String getRemain()
+    {
+        return remain;
+    }
+
+    /**
+     * @param remain
+     *            the remain to set
+     */
+    public void setRemain(String remain)
+    {
+        this.remain = remain;
+    }
+
+    /**
+     * @return the nameLetter
+     */
+    public String getNameLetter()
+    {
+        return nameLetter;
+    }
+
+    /**
+     * @param nameLetter
+     *            the nameLetter to set
+     */
+    public void setNameLetter(String nameLetter)
+    {
+        this.nameLetter = nameLetter;
+    }
+    
+
+    /**
+     * @return the checked
+     */
+    public boolean isChecked()
+    {
+        return checked;
+    }
+
+    /**
+     * @param checked the checked to set
+     */
+    public void setChecked(boolean checked)
+    {
+        this.checked = checked;
+    }
+
+    /**
+     * 获取登录用户所有的联系人
+     * 
+     * @return
+     */
+    private static  List<ContactUser> queryAllList()
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=?";
+        return new Select().from(ContactUser.class).where(sql, userID).execute();
+    }
+
+    /**
+     * 删除登录用户的联系人列表
+     */
+    public static void deleteAll()
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=?";
+        new Delete().from(ContactUser.class).where(sql, userID).execute();
+    }
+
+    /**
+     * @param friendID
+     * @return
+     */
+    public static ContactUser queryByDwID(String friendID)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and friendID = ?";
+        return new Select().from(ContactUser.class).where(sql, userID, friendID).executeSingle();
+    }
+
+    public static void deleteByDwID(String friendID)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and friendID = ?";
+        new Delete().from(ContactUser.class).where(sql, userID, friendID).execute();
+    }
+
+    /**
+     * 删除list相同的元素
+     * 
+     * @param list
+     * @return
+     */
+    private static List removeDuplicate(List<ContactUser> list)
+    {
+        for (int i = 0; i < list.size() - 1; i++)
+        {
+            for (int j = list.size() - 1; j > i; j--)
+            {
+                if (list.get(j).getFriendID().equals(list.get(i).getFriendID()))
+                {
+                    list.remove(j);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 验证指定dwID的用户是否为好友
+     * 
+     * @param dwID
+     * @return
+     */
+    public static boolean isContact(String friendID)
+    {
+        if (CommUtil.isBlank(friendID))
+        {
+            return false;
+        }
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and friendID = ?";
+        ContactUser list = new Select().from(ContactUser.class).where(sql, userID, friendID).executeSingle();
+        if (list != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 查询并排序
+     * @return
+     */
+    public static List<ContactUser> queryAll()
+    {
+        List<ContactUser> contactUsers = ContactUser.queryAllList();
+        if (contactUsers.size() > 0)
+        {
+            removeDuplicate(contactUsers);
+            contactUsers = (List<ContactUser>) filledData(contactUsers);
+            Collections.sort(contactUsers, new PinyinComparator());
+        }
+        return contactUsers;
+    }
+
+    /**
+     * 根据DwID查找对应联系人的名字
+     * 
+     * @param friendID
+     * @return
+     */
+    public static String getContactName(String friendID)
+    {
+        String name = "";
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and friendID=?";
+        ContactUser contactUser = new Select().from(ContactUser.class).where(sql, userID, friendID).executeSingle();
+        if (contactUser != null)
+        {
+            return contactUser.getShowName();
+        }
+        return name;
+    }
+
+    /**
+     * 根据list中User的showName填充list中User的SortLetters
+     * 即给User对象的SortLetters字段设置一个[A-Z]中对应的字母或#
+     * 
+     * @param date
+     * @return
+     */
+    public static List<? extends ContactUser> filledData(List<? extends ContactUser> date)
+    {
+        CharacterParser characterParser = CharacterParser.getInstance();
+        for (int i = 0; i < date.size(); i++)
+        {
+            // 汉字转换成拼音
+            String pinyin = characterParser.getSelling(date.get(i).getShowName());
+            String sortString = pinyin.substring(0, 1).toUpperCase();
+            // 正则表达式，判断首字母是否是英文字母
+            if (sortString.matches("[A-Z]"))
+            {
+                date.get(i).setSortLetters(sortString);
+            }
+            else
+            {
+                date.get(i).setSortLetters("#");
+            }
+        }
+        return date;
+    }
+    
+    /**
+     * 为ListView填充数据(暂时没用)
+     * 
+     * @param date
+     * @return
+     */
+    private List<PickContactUser> filledData(String[] date)
+    {
+        CharacterParser characterParser = CharacterParser.getInstance();
+        List<PickContactUser> mSortList = new ArrayList<PickContactUser>();
+        for (int i = 0; i < date.length; i++)
+        {
+            PickContactUser sortModel = new PickContactUser();
+            sortModel.setShowName(date[i]);
+            // 汉字转换成拼音
+            String pinyin = characterParser.getSelling(date[i]);
+            String sortString = pinyin.substring(0, 1).toUpperCase();
+
+            // 正则表达式，判断首字母是否是英文字母
+            if (sortString.matches("[A-Z]"))
+            {
+                sortModel.setSortLetters(sortString.toUpperCase());
+            }
+            else
+            {
+                sortModel.setSortLetters("#");
+            }
+
+            mSortList.add(sortModel);
+        }
+        return mSortList;
+
+    }
+
+}

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ll_item_work_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/gray_e" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+
+        <FrameLayout
+            android:id="@+id/fl_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+
+            <cn.sx.decentworld.widget.CircularImageView
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_gravity="center"
+                android:src="@drawable/btn_bg"
+                android:visibility="gone" />
+
+            <cn.sx.decentworld.widget.CircularImageView
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:layout_gravity="center"
+                android:src="@drawable/login_bg" />
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/fl_image"
+            android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
+            android:text="欧阳" />
+    </LinearLayout>
+
+</RelativeLayout>

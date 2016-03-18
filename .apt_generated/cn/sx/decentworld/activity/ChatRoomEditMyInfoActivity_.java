@@ -37,20 +37,20 @@ public final class ChatRoomEditMyInfoActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        tvNickName = ((TextView) findViewById(id.tv_nickname));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         etSelfIntroduce = ((EditText) findViewById(id.et_self_introduce));
         llChatRoomHead = ((LinearLayout) findViewById(id.ll_chatroom_head));
-        tvNickName = ((TextView) findViewById(id.tv_nickname));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         ivChatRoomHead = ((CircularImageView) findViewById(id.iv_chatroom_head));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
         btnOk = ((Button) findViewById(id.btn_OK));
-        ((ToastComponent_) toast).afterSetContentView_();
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

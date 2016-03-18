@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,40 +38,25 @@ public final class EditUserInfoActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        getUserInfo = GetUserInfo_.getInstance_(this);
-        setUserInfo = SetUserInfo_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
         choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
+        setUserInfo = SetUserInfo_.getInstance_(this);
+        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        iv_edit_user_info_icon_1 = ((ImageView) findViewById(id.iv_edit_user_info_icon_1));
-        iv_edit_user_info_icon_2 = ((ImageView) findViewById(id.iv_edit_user_info_icon_2));
-        tvFinish = ((TextView) findViewById(id.tv_finish));
-        sl_edit_user_info = ((ScrollView) findViewById(id.sl_edit_user_info));
-        ll_edit_user_info_root = ((LinearLayout) findViewById(id.ll_edit_user_info_root));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         iv_edit_user_info_icon_3 = ((ImageView) findViewById(id.iv_edit_user_info_icon_3));
+        iv_edit_user_info_icon_1 = ((ImageView) findViewById(id.iv_edit_user_info_icon_1));
+        tvFinish = ((TextView) findViewById(id.tv_finish));
+        ll_edit_user_info_root = ((LinearLayout) findViewById(id.ll_edit_user_info_root));
         lv_edit_user_info = ((ListViewForScrollView) findViewById(id.lv_edit_user_info));
-        {
-            View view = findViewById(id.tv_finish);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        EditUserInfoActivity_.this.complete();
-                    }
-
-                }
-                );
-            }
-        }
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((SetUserInfo_) setUserInfo).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        sl_edit_user_info = ((ScrollView) findViewById(id.sl_edit_user_info));
+        iv_edit_user_info_icon_2 = ((ImageView) findViewById(id.iv_edit_user_info_icon_2));
         ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
+        ((SetUserInfo_) setUserInfo).afterSetContentView_();
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

@@ -42,11 +42,11 @@ public final class AddThemeActivity_
 
     private void afterSetContentView_() {
         ivCover = ((ImageView) findViewById(id.iv_cover));
-        btnContentSave = ((Button) findViewById(id.btn_content_save));
         lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
-        tvSend = ((TextView) findViewById(id.tv_send));
-        ivBack = ((ImageView) findViewById(id.iv_back));
+        btnContentSave = ((Button) findViewById(id.btn_content_save));
         etSubjectName = ((EditText) findViewById(id.tv_subj_name));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        tvSend = ((TextView) findViewById(id.tv_send));
         ((ChatRoomInfoSettingAndGetting_) chatroomInfoSettingAndGetting).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

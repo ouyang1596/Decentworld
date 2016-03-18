@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_chat_me_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white" >
+
+    <!-- 下拉刷新布局 -->
+
+    <cn.sx.decentworld.widget.CustomScrollView
+        xmlns:ptr="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sv_chat_me"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars="none"
+        ptr:ptrAnimationStyle="flip"
+        ptr:ptrMode="both" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="393dp" >
+
+                <!-- 顶部的头像 的ViewPager -->
+
+                <cn.sx.decentworld.widget.HackyViewPager
+                    android:id="@+id/vp_near_card_detail_pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="360dp"
+                    android:background="#6600ff00" />
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="66dp"
+                    android:layout_alignParentBottom="true"
+                    android:gravity="center_vertical" >
+
+                    <RelativeLayout
+                        android:layout_width="66dp"
+                        android:layout_height="66dp"
+                        android:layout_centerInParent="true"
+                        android:background="@drawable/me_avatar_circle_bg" >
+
+                        <!-- cn.sx.decentworld.widget.CircularImage -->
+
+                        <cn.sx.decentworld.widget.CircularImage
+                            android:id="@+id/iv_chat_me_avatar"
+                            android:layout_width="55dp"
+                            android:layout_height="55dp"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/default_avatar"
+                            android:visibility="visible" />
+                    </RelativeLayout>
+                    <!-- 设置页面 按钮 -->
+
+                    <RelativeLayout
+                        android:id="@+id/rl_chat_me_setting"
+                        android:layout_width="49dp"
+                        android:layout_height="49dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="54dp"
+                        android:background="@drawable/me_setting_circle_bg" >
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/me_setting" />
+                    </RelativeLayout>
+
+                    <!-- 充值 -->
+
+                    <RelativeLayout
+                        android:id="@+id/rl_chat_me_recharge"
+                        android:layout_width="49dp"
+                        android:layout_height="49dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="54dp"
+                        android:background="@drawable/me_setting_circle_bg" >
+
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_centerInParent="true"
+                            android:src="@drawable/me_recharge" />
+                    </RelativeLayout>
+                </RelativeLayout>
+
+                <ImageView
+                    android:id="@+id/iv_doubt"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginBottom="50dp"
+                    android:layout_marginRight="10dp"
+                    android:src="@drawable/doubt"
+                    android:visibility="gone" />
+            </RelativeLayout>
+            <!-- 用户名 -->
+
+            <TextView
+                android:id="@+id/tv_chat_me_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32px"
+                android:gravity="center"
+                android:padding="5dp"
+                android:text="欧阳慕容"
+                android:textSize="18sp" />
+
+            <!-- 聊天室 -->
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp" >
+
+                <LinearLayout
+                    android:id="@+id/ll_chat_me_chat_room"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/iv_chat_me_chat_room"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/me_chat_room" />
+
+                    <TextView
+                        android:id="@+id/tv_chat_me_chat_room"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="聊天室" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="18dp"
+                    android:layout_toLeftOf="@id/ll_chat_me_chat_room"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/iv_chat_me_worth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/me_worth" />
+
+                    <TextView
+                        android:id="@+id/tv_chat_me_worth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10px"
+                        android:text="身价"
+                        android:textColor="@color/red" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="18dp"
+                    android:layout_toRightOf="@id/ll_chat_me_chat_room"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <ImageView
+                        android:id="@+id/iv_chat_me_wealth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/me_wealth" />
+
+                    <TextView
+                        android:id="@+id/tv_chat_me_wealth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="5dp"
+                        android:text="身家"
+                        android:textColor="@color/red" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center" >
+
+                <!-- 立即发信息信息的Fragment -->
+
+                <Button
+                    android:id="@+id/btn_chat_me_send_msg"
+                    android:layout_width="90dp"
+                    android:layout_height="25dp"
+                    android:background="@drawable/me_send_msg" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center" >
+
+                <!-- 我就读的学校 -->
+
+                <TextView
+                    android:id="@+id/tv_chat_me_school"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="我就读的的的静静的 点击" />
+            </LinearLayout>
+
+            <!-- 个性签名 -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center" >
+
+                <TextView
+                    android:id="@+id/tv_chat_me_sign"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="16dp"
+                    android:maxLines="3"
+                    android:text="另外除了系统在概念上具有领先地位之外，Chrome OS实际上还具有一个非常凶残的功能。它的出现让亿万生活在边缘和底层的小应用类网站看到了希望，这对于谷歌来说可以说是无限商机。" />
+            </LinearLayout>
+
+            <!-- 我的的模块 -->
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/tv_refer_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="我的" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="23dp"
+                    android:layout_marginRight="16dp"
+                    android:layout_toRightOf="@id/tv_refer_1"
+                    android:background="#000000" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="16dp"
+                    android:layout_marginRight="23dp"
+                    android:layout_toLeftOf="@id/tv_refer_1"
+                    android:background="#000000" />
+            </RelativeLayout>
+
+            <!-- 底部的信息展示模块  水平的模式的LinearLayout -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:id="@+id/ll_chat_me_user_detail"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true" >
+
+                    <!-- 左侧的编辑模块 -->
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
+
+                        <TextView
+                            android:id="@+id/tv_chat_me_introduce"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="简介"
+                            android:textSize="@dimen/new_textsize_16sp" />
+
+                        <TextView
+                            android:id="@+id/tv_chat_me_edit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:text="编辑"
+                            android:textColor="@color/blue"
+                            android:textSize="@dimen/new_textsize_16sp" />
+                    </RelativeLayout>
+                </LinearLayout>
+                <!-- 右侧的作品圈模块 -->
+
+                <LinearLayout
+                    android:id="@+id/ll_chat_me_work_circle"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:gravity="center" >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="作品圈"
+                        android:textSize="@dimen/new_textsize_16sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 下面是内容的容器 -->
+
+            <LinearLayout
+                android:id="@+id/ll_chat_me_container"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:orientation="vertical" >
+            </LinearLayout>
+        </LinearLayout>
+    </cn.sx.decentworld.widget.CustomScrollView>
+
+    <RelativeLayout
+        android:id="@+id/rel_me_title"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:background="@drawable/gradient_black"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tv_me_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/main_bottom_me"
+            android:textColor="@color/white"
+            android:textSize="@dimen/new_textsize_18sp" />
+    </RelativeLayout>
+
+</RelativeLayout>

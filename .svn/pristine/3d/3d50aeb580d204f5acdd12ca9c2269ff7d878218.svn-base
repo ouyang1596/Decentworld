@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@drawable/rb_title_bg" >
+
+        <LinearLayout
+            android:id="@+id/ll_band_alipay_back"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:gravity="center" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/rb_back" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="绑定支付宝"
+            android:textSize="24sp" />
+    </RelativeLayout>
+
+    <EditText
+        android:id="@+id/et_bind_account_alipay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入支付宝账号" />
+
+    <Button
+        android:id="@+id/btn_bind_account_confirm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="确定" />
+
+</LinearLayout>

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" >
+
+        <TextView
+            android:id="@+id/tv_contact_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="我的名字" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_contact_worth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:drawablePadding="4dp"
+            android:gravity="center_vertical"
+            android:text="66" />
+    </LinearLayout>
+
+    <cn.sx.decentworld.widget.AutoSizeRelativelayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white" >
+
+        <cn.sx.decentworld.widget.AutoSizeImageView
+            android:id="@+id/iv_contact_avatar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="20dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/login_bg" />
+
+        <ImageView
+            android:id="@+id/iv_doubt"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/doubt" />
+
+        <ImageView
+            android:id="@+id/iv_contact_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_margin="10dp"
+            android:src="@drawable/iv_add_selector" />
+    </cn.sx.decentworld.widget.AutoSizeRelativelayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tv_contact_age"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text=""
+            android:textColor="@color/one_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+
+        <ImageView
+            android:id="@+id/iv_contact_sex"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/stranger_boy"
+            android:text="性别"
+            android:textColor="@color/one_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+
+        <TextView
+            android:id="@+id/tv_contact_occupation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="行业"
+            android:textColor="@color/three_black"
+            android:textSize="@dimen/new_textsize_14sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_contact_show"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
+        android:text="简介"
+        android:textColor="@color/one_black"
+        android:textSize="@dimen/new_textsize_14sp" />
+
+</LinearLayout>
