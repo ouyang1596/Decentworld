@@ -21,9 +21,7 @@ import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.KeyboardComponent_;
-import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.component.ui.RegisterComponent_;
-import cn.sx.decentworld.network.request.GetUserInfo_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class RegisterNickActivity_
@@ -39,24 +37,20 @@ public final class RegisterNickActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
-        registerComponent = RegisterComponent_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
-        getUserInfo = GetUserInfo_.getInstance_(this);
+        registerComponent = RegisterComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        llRegisterNick = ((LinearLayout) findViewById(id.root_activity_register_nick));
         etNickName = ((EditText) findViewById(id.et_nickname));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         btnOk = ((Button) findViewById(id.btn_OK));
         rgSex = ((RadioGroup) findViewById(id.rg_sex));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
         tvOccupation = ((TextView) findViewById(id.tv_occupation_shortIntroduce));
-        llRegisterNick = ((LinearLayout) findViewById(id.root_activity_register_nick));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        ((ToastComponent_) toast).afterSetContentView_();
-        ((RegisterComponent_) registerComponent).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
+        ((RegisterComponent_) registerComponent).afterSetContentView_();
         init();
     }
 

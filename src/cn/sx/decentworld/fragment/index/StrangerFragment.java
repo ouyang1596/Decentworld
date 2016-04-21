@@ -12,14 +12,16 @@ import android.os.Message;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.activity.ChatActivity;
 import cn.sx.decentworld.activity.ChatActivity_;
 import cn.sx.decentworld.activity.SelectedActivity_;
 import cn.sx.decentworld.bean.ChoiceInfo;
-import cn.sx.decentworld.bean.ContactUser;
 import cn.sx.decentworld.bean.DWMessage;
 import cn.sx.decentworld.bean.LikeBean;
 import cn.sx.decentworld.bean.NearbyStrangerInfo;
@@ -29,6 +31,8 @@ import cn.sx.decentworld.dialog.CommomPromptDialogFragment;
 import cn.sx.decentworld.dialog.CommomPromptDialogFragment.OnCommomPromptListener;
 import cn.sx.decentworld.dialog.MatchSuccessDialogFragment;
 import cn.sx.decentworld.dialog.MatchSuccessDialogFragment.OnMatchClickListener;
+import cn.sx.decentworld.entity.LaunchChatEntity;
+import cn.sx.decentworld.entity.dao.ContactUserDao;
 import cn.sx.decentworld.fragment.BaseFragment;
 import cn.sx.decentworld.fragment.stranger.StrangerCardFragment;
 import cn.sx.decentworld.fragment.stranger.StrangerCardFragment.OnGetNearStrangerInfoListener;
@@ -37,17 +41,20 @@ import cn.sx.decentworld.fragment.stranger.StrangerListFragment;
 import cn.sx.decentworld.fragment.stranger.StrangerListFragment_;
 import cn.sx.decentworld.fragment.stranger.StrangerMessageFragment;
 import cn.sx.decentworld.fragment.stranger.StrangerMessageFragment_;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.request.GetStrangerInfo;
 import cn.sx.decentworld.network.utils.JsonUtils;
 import cn.sx.decentworld.utils.DWUtils;
 import cn.sx.decentworld.utils.FileUtils;
-import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.SoundPoolUtils;
 import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.utils.VibratorUtil;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EFragment;
 import com.googlecode.androidannotations.annotations.ViewById;
+import com.umeng.analytics.MobclickAgent;
 
 /**
  * @ClassName: StrangerFragment
@@ -57,6 +64,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
  */
 @EFragment(R.layout.main_layout_stranger)
 public class StrangerFragment extends BaseFragment implements OnMatchClickListener, OnClickListener, OnCommomPromptListener {
+	private static final String TAG = "StrangerFragment";
 	@ViewById(R.id.iv_stranger_message)
 	ImageView ivStrangerMessage;
 	@ViewById(R.id.iv_small_pic)
@@ -67,6 +75,8 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 	ImageView ivLike;
 	@ViewById(R.id.iv_select)
 	ImageView ivSelect;
+	public static boolean isRequesting;// 判断是否正在请求当中
+	public static int mRadius;
 	private StrangerCardFragment mStrangerCardFragment;
 	private StrangerMessageFragment mStrangerMessageFragment;
 	private StrangerListFragment mStrangerListFragment;
@@ -78,6 +88,7 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 
 		@SuppressWarnings("unchecked")
 		public void handleMessage(Message msg) {
+			mStrangerCardFragment.tvRefresh.setVisibility(View.VISIBLE);
 			mStrangerListFragment.completeRefresh();
 			switch (msg.what) {
 			case Constants.FAILURE:
@@ -95,21 +106,28 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 						return;
 					}
 					// 判断是否有出现重复的
-					for (int i = 0; i < mStrangerCardFragment.flipDataList.size(); i++) {
-						if (strangerData.get(0).getName().equals(mStrangerCardFragment.flipDataList.get(i).getName())) {
-							return;
-						}
-					}
+					// for (int i = 0; i <
+					// mStrangerCardFragment.flipDataList.size(); i++) {
+					// if
+					// (strangerData.get(0).getName().equals(mStrangerCardFragment.flipDataList.get(i).getName()))
+					// {
+					// return;
+					// }
+					// }
 					mStrangerCardFragment.flipDataList.addAll(strangerData);
 					DWUtils.sortList(mStrangerCardFragment.flipDataList);
 					if (mStrangerListFragment.isPullToRefresh) {
 						mStrangerCardFragment.flipDataList.add(0, new NearbyStrangerInfo());
-						mStrangerCardFragment.getSwipeFlingAdapterView().getTopCardListener().selectRight();
+						try {
+							mStrangerCardFragment.getSwipeFlingAdapterView().getTopCardListener().selectRight();
+						} catch (NullPointerException e) {
+							LogUtils.e(TAG, "error---" + e);
+						}
 						mStrangerListFragment.isPullToRefresh = false;
 					}
 					notifyDataSetChange();
 				} catch (JSONException e) {
-					ToastUtil.showToast("解析异常");
+					LogUtils.e(TAG, "error---" + e);
 				}
 				break;
 			case 3333:
@@ -137,9 +155,24 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 		ivStrangerMessage.setOnClickListener(this);
 		ivSmallPic.setOnClickListener(this);
 		ivLike.setOnClickListener(this);
+		ivLike.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+
+			@Override
+			public void onGlobalLayout() {
+				int height = ivLike.getHeight();
+				mRadius = height / 2;
+				FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+						LinearLayout.LayoutParams.WRAP_CONTENT);
+				lp.setMargins(0, 0, 0, mRadius);
+				mStrangerCardFragment.getSwipeFlingAdapterView().setLayoutParams(lp);
+				ivLike.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+			}
+		});
 		ivBigPic.setOnClickListener(this);
 		ivSelect.setOnClickListener(this);
-		mStrangerCardFragment = new StrangerCardFragment_();
+		if (null == mStrangerCardFragment) {
+			mStrangerCardFragment = new StrangerCardFragment_();
+		}
 		mStrangerCardFragment.setOnGetNearStrangerListener(new OnGetNearStrangerInfoListener() {
 
 			@Override
@@ -162,7 +195,9 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 				}
 			}
 		});
-		mStrangerListFragment = new StrangerListFragment_();
+		if (null == mStrangerListFragment) {
+			mStrangerListFragment = new StrangerListFragment_();
+		}
 		mStrangerListFragment.setOnGetNearStrangerListener(new StrangerListFragment.OnGetNearStrangerInfoListener() {
 
 			@Override
@@ -190,11 +225,13 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 				clearData();
 			}
 		});
-		mStrangerMessageFragment = new StrangerMessageFragment_();
+		if (null == mStrangerMessageFragment) {
+			mStrangerMessageFragment = new StrangerMessageFragment_();
+		}
 		getFragmentManager().beginTransaction().add(R.id.fl_stranger_container, mStrangerMessageFragment, "smf")
 				.add(R.id.fl_stranger_container, mStrangerCardFragment, "scf")
 				.add(R.id.fl_stranger_container, mStrangerListFragment, "slf").hide(mStrangerMessageFragment)
-				.hide(mStrangerListFragment).commit();
+				.show(mStrangerListFragment).show(mStrangerCardFragment).commit();
 		hideStrangerMessage();
 	}
 
@@ -204,8 +241,11 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 			public void handleMessage(android.os.Message msg) {
 				switch (msg.what) {
 				case 6000:
+					SoundPoolUtils.play();// 匹配成功声音
+					VibratorUtil.Vibrate(getActivity(), 300); // 震动300ms
 					MatchSuccessDialogFragment matchSuccessDialogFragment = new MatchSuccessDialogFragment();
 					matchSuccessDialogFragment.setJsonData(msg.obj.toString());
+					matchSuccessDialogFragment.setTips("早就喜欢你，恭喜你得到他的一块大洋！现在去聊聊？");
 					matchSuccessDialogFragment.setOnMatchClickListener(StrangerFragment.this);
 					matchSuccessDialogFragment.show(getActivity().getSupportFragmentManager().beginTransaction(),
 							"matchSuccessDialogFragment");
@@ -233,20 +273,18 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 		case R.id.tv_talk:
 			LikeBean likeBean = (LikeBean) view.getTag();
 			Intent intent = new Intent(getActivity(), ChatActivity_.class);
-			intent.putExtra(ChatActivity.OTHER_ID, likeBean.id);
-			intent.putExtra(ChatActivity.OTHER_NICKNAME, likeBean.showName);
-			intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
-			intent.putExtra(ChatActivity.OTHER_WORTH, Float.valueOf(likeBean.worth));
-			if (ContactUser.isContact(likeBean.id)) {
-				// 朋友关系
-				intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_FRIEND);
-			} else {
-				// 陌生人关系
-				intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_STRANGER);
-			}
+			LaunchChatEntity entity = new LaunchChatEntity(likeBean.id, likeBean.showName, Float.valueOf(likeBean.worth),
+					DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_FRIEND, Integer.valueOf(likeBean.userType));
+			if (!ContactUserDao.isContact(likeBean.id))
+				entity.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+			intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity);
 			startActivity(intent);
 			break;
 		case R.id.tv_cancel:
+			if (null != mStrangerListFragment.nearbyStrangerInfo) {
+				mStrangerListFragment.nearbyStrangerInfo.setLiked("1");
+				mStrangerListFragment.nearStrangerAdapter.notifyDataSetChanged();
+			}
 			break;
 		}
 	}
@@ -261,7 +299,9 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 	}
 
 	private void getNearStrangerInfo() {
+		isRequesting = true;
 		if (null == getStrangerInfo) {
+			isRequesting = false;
 			return;
 		}
 		ChoiceInfo info = ChoiceInfo.queryByDwID(DecentWorldApp.MAIN_KEY);
@@ -287,11 +327,14 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 		map.put("ln", String.valueOf(LocationProvider.longitude));
 		map.put("lt", String.valueOf(LocationProvider.latitude));
 		map.put("page", String.valueOf(mStrangerCardFragment.page));
-		getStrangerInfo.getNearStrangerInfo(map, mGetNearStrangerInfoHandler);
+		getStrangerInfo.getNearStrangerList(map, mGetNearStrangerInfoHandler);
 	}
 
 	@Override
 	protected void lazyLoad() {
+		if (isRequesting) {
+			return;
+		}
 		clearData();
 		getNearStrangerInfo();
 	}
@@ -315,9 +358,9 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 			ivSelect.setVisibility(View.GONE);
 			break;
 		case R.id.iv_small_pic:
-			// getActivity().getSupportFragmentManager().beginTransaction().hide(mStrangerCardFragment)
-			// .hide(mStrangerMessageFragment).show(mStrangerListFragment).commit();
-			fm.beginTransaction().hide(mStrangerCardFragment).hide(mStrangerMessageFragment).show(mStrangerListFragment).commit();
+			mStrangerListFragment.relLv.setVisibility(View.VISIBLE);
+			getActivity().getSupportFragmentManager().beginTransaction().hide(mStrangerCardFragment)
+					.hide(mStrangerMessageFragment).show(mStrangerListFragment).commit();
 			ivBigPic.setVisibility(View.VISIBLE);
 			ivSmallPic.setVisibility(View.GONE);
 			ivStrangerMessage.setVisibility(View.VISIBLE);
@@ -383,5 +426,17 @@ public class StrangerFragment extends BaseFragment implements OnMatchClickListen
 		mStrangerListFragment.isPullToRefresh = true;
 		mStrangerCardFragment.flipDataList.clear();
 		getNearStrangerInfo();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		MobclickAgent.onPageStart(TAG);
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		MobclickAgent.onPageEnd(TAG);
 	}
 }

@@ -7,8 +7,11 @@ import java.util.List;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
@@ -25,11 +28,12 @@ import cn.sx.decentworld.activity.TopicContentActivity_;
 import cn.sx.decentworld.adapter.ChatRoomListAdapter2;
 import cn.sx.decentworld.bean.ChatRoomInfo;
 import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.common.ConstantIntent;
 import cn.sx.decentworld.engine.UserInfoEngine;
 import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.request.GetRoomInfo;
 import cn.sx.decentworld.network.utils.JsonUtils;
-import cn.sx.decentworld.utils.LogUtils;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
@@ -39,6 +43,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 import com.handmark.pulltorefresh.library.PullToRefreshBase;
 import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.umeng.analytics.MobclickAgent;
 
 /**
  * @ClassName: NewsFragment
@@ -47,7 +52,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
  * @date 2015年6月29日12:34:03
  */
 @EFragment(R.layout.main_layout_news)
-public class NewsFragment extends BaseFragment {
+public class NewsFragment extends BaseFragment implements OnTouchListener {
 	private static String TAG = "NewsFragment";
 	public static final int CHAT_ROOM_LIST = 1;
 	private List<ChatRoomInfo> chatRoomInfos;
@@ -81,7 +86,7 @@ public class NewsFragment extends BaseFragment {
 	/**
 	 * 聊天室标题
 	 */
-	@ViewById(R.id.chat_room_title_root)
+	@ViewById(R.id.rel_title_root)
 	RelativeLayout chat_room_title_root;
 
 	/**
@@ -90,6 +95,7 @@ public class NewsFragment extends BaseFragment {
 	@AfterViews
 	public void init() {
 		LogUtils.i(TAG, "init");
+		getDisplayParam();
 		initListView();
 		isPrepared = true;// 标记为已经准备好
 	}
@@ -106,6 +112,7 @@ public class NewsFragment extends BaseFragment {
 				startActivity(intent);
 			}
 		});
+		// ivMe.setOnTouchListener(this);
 		chatRoomInfos = new ArrayList<ChatRoomInfo>();
 		adapter = new ChatRoomListAdapter2(getActivity(), chatRoomInfos);
 		// View v = LayoutInflater.from(getActivity()).inflate(
@@ -124,11 +131,9 @@ public class NewsFragment extends BaseFragment {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
 				UserInfo info = UserInfoEngine.getInstance().getUserInfo();
 				position = position - 1;
-
 				if (position == -1) {
 					return;
 				}
-
 				Intent intent = new Intent(getActivity(), TopicContentActivity_.class);
 				ChatRoomInfo item = adapter.getItem(position);
 				intent.putExtra("roomID", item.getRoomID());
@@ -137,6 +142,7 @@ public class NewsFragment extends BaseFragment {
 				} else {
 					intent.putExtra("nickName", "默认");
 				}
+				intent.putExtra(ConstantIntent.SELF_INTRODUCE, item.getOwnerIntroduction());
 				startActivity(intent);
 			}
 		});
@@ -210,9 +216,9 @@ public class NewsFragment extends BaseFragment {
 	}
 
 	@Override
-	public void onResume() 
-	{
+	public void onResume() {
 		super.onResume();
+		MobclickAgent.onPageStart(TAG);
 	}
 
 	/**
@@ -231,6 +237,84 @@ public class NewsFragment extends BaseFragment {
 		LogUtils.i(TAG, "lazyload");
 		// 从网络获取聊天室列表
 		getRoomInfo.getRoomList(mHandler, CHAT_ROOM_LIST);
+	}
+
+	// ////////////////////////////////////滑动图片图片////////////////////////////////////
+	private int screenWidth = 0;
+	private int screenHeight = 0;
+	private int startX = 0;
+	private int startY = 0;
+	private boolean isClicked = false;
+
+	/**
+	 * 获取屏幕参数
+	 */
+	private void getDisplayParam() {
+		DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+		screenWidth = displayMetrics.widthPixels;
+		screenHeight = displayMetrics.heightPixels - 50;
+	}
+
+	/**
+	 * 图标的触摸事件
+	 */
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		int action = event.getAction();
+		switch (action) {
+		case MotionEvent.ACTION_DOWN:
+			LogUtils.i(TAG, "ACTION_DOWN");
+			isClicked = false;
+			startX = (int) event.getRawX();
+			startY = (int) event.getRawY();
+			break;
+		case MotionEvent.ACTION_MOVE:
+			LogUtils.i(TAG, "ACTION_MOVE");
+			isClicked = true;
+			int dx = (int) event.getRawX() - startX;
+			int dy = (int) event.getRawY() - startY;
+			int left = v.getLeft() + dx;
+			int right = v.getRight() + dx;
+			int top = v.getTop() + dy;
+			int bottom = v.getBottom() + dy;
+
+			if (left < 0) {
+				left = 0;
+				right = left + v.getWidth();
+			}
+
+			if (right > screenWidth) {
+				right = screenWidth;
+				left = right - v.getWidth();
+			}
+
+			if (top < 0) {
+				top = 0;
+				bottom = top + v.getHeight();
+			}
+
+			if (bottom > screenHeight) {
+				bottom = screenHeight;
+				top = bottom - v.getHeight();
+			}
+			v.layout(left, top, right, bottom);
+			startX = (int) event.getRawX();
+			startY = (int) event.getRawY();
+			break;
+		case MotionEvent.ACTION_UP:
+			LogUtils.i(TAG, "ACTION_UP");
+			break;
+		default:
+			break;
+		}
+		LogUtils.i(TAG, "isClicked=" + isClicked);
+		return isClicked;
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		MobclickAgent.onPageEnd(TAG);
 	}
 
 }

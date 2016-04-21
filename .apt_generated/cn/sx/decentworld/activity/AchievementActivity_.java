@@ -34,14 +34,14 @@ public final class AchievementActivity_
     }
 
     private void afterSetContentView_() {
-        tvEnsure = ((TextView) findViewById(id.tv_ensure));
         tvCareerSuccess = ((TextView) findViewById(id.tv_career_success));
         etShortIntroduce = ((EditText) findViewById(id.et_short_introduce));
+        tvBack = ((TextView) findViewById(id.tv_back));
+        tvCareerIsToStart = ((TextView) findViewById(id.tv_career_isto_success));
         tvCareerStart = ((TextView) findViewById(id.tv_career_start));
         tvWan = ((TextView) findViewById(id.tv_wan));
-        tvBack = ((TextView) findViewById(id.tv_back));
         etDetailIntroduce = ((EditText) findViewById(id.et_introduce_detail));
-        tvCareerIsToStart = ((TextView) findViewById(id.tv_career_isto_success));
+        tvEnsure = ((TextView) findViewById(id.tv_ensure));
         init();
     }
 

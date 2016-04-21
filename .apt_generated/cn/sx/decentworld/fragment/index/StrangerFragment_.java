@@ -30,11 +30,11 @@ public final class StrangerFragment_
     }
 
     private void afterSetContentView_() {
-        ivBigPic = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_big_pic));
-        ivLike = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_like));
-        ivSelect = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_select));
         ivStrangerMessage = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_stranger_message));
         ivSmallPic = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_small_pic));
+        ivSelect = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_select));
+        ivBigPic = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_big_pic));
+        ivLike = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_like));
         ((GetStrangerInfo_) getStrangerInfo).afterSetContentView_();
         init();
     }

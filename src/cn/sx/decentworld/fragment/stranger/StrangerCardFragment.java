@@ -12,18 +12,18 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.TextView;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.activity.ChatActivity;
+import cn.sx.decentworld.activity.NearCardDetailActivity;
 import cn.sx.decentworld.activity.NearCardDetailActivity_;
 import cn.sx.decentworld.adapter.CardAdapter;
-import cn.sx.decentworld.bean.ContactUser;
-import cn.sx.decentworld.bean.DWMessage;
 import cn.sx.decentworld.bean.NearbyStrangerInfo;
 import cn.sx.decentworld.bean.StrangerInfo;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.flingswipe.SwipeFlingAdapterView;
 import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.fragment.index.StrangerFragment;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.request.GetStrangerInfo;
-import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
@@ -37,10 +37,9 @@ import com.googlecode.androidannotations.annotations.ViewById;
  */
 @EFragment(R.layout.fragment_near_card)
 public class StrangerCardFragment extends BaseFragment implements OnClickListener {
-	// @ViewById(R.id.lv_stranger_near)
-	// PullToRefreshListView lvNearStranger;
+	private static final String TAG = "StrangerCardFragment";
 	@ViewById(R.id.tv_refresh)
-	TextView tvRefresh;
+	public TextView tvRefresh;
 	// 附近的人
 	@ViewById(R.id.fragment_stranger_near_lv)
 	SwipeFlingAdapterView flingContainer;
@@ -50,14 +49,18 @@ public class StrangerCardFragment extends BaseFragment implements OnClickListene
 	public CardAdapter cardAdapter;
 	@Bean
 	GetStrangerInfo getStrangerInfo;
-	private static String POSITION = "position";
 	public static ArrayList<NearbyStrangerInfo> flipDataList = new ArrayList<NearbyStrangerInfo>();
 	public static final int GET_NEAR_STRANGER = 0;
 	public static final int CLEAR_DATA = 1;
 	public static final int LIKE = 2;
+	private boolean isFirst = true;// 是否是第一次执行
 
 	public void setText(String data) {
 		tvRefresh.setText(data);
+	}
+
+	public TextView getTvRefreshText() {
+		return tvRefresh;
 	}
 
 	public SwipeFlingAdapterView getSwipeFlingAdapterView() {
@@ -66,8 +69,10 @@ public class StrangerCardFragment extends BaseFragment implements OnClickListene
 
 	public void ifTvRefreshShow() {
 		if (flipDataList.size() <= 0) {
+			flingContainer.setVisibility(View.GONE);
 			tvRefresh.setEnabled(true);
 		} else {
+			flingContainer.setVisibility(View.VISIBLE);
 			tvRefresh.setEnabled(false);
 		}
 	}
@@ -79,8 +84,13 @@ public class StrangerCardFragment extends BaseFragment implements OnClickListene
 
 	private void initData() {
 		ifTvRefreshShow();
+		tvRefresh.setVisibility(View.GONE);
 		tvRefresh.setOnClickListener(this);
 		initFlingAdapterView();
+		if (isFirst) {
+			isFirst = false;
+			return;
+		}
 		getNearStrangerInfo();
 	}
 
@@ -96,13 +106,9 @@ public class StrangerCardFragment extends BaseFragment implements OnClickListene
 					NearbyStrangerInfo info = cardAdapter.getItem(itemPosition);
 					Intent intent = new Intent(StrangerCardFragment.this.getActivity(), NearCardDetailActivity_.class);
 					intent.putExtra(Constants.DW_ID, info.getDwID());
-					intent.putExtra(POSITION, itemPosition);
-					intent.putExtra("location", info.getDistance());
-					intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
-					if (ContactUser.isContact(info.getDwID()))
-						intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_FRIEND);
-					else
-						intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_STRANGER);
+					intent.putExtra(NearCardDetailActivity.POSITION, itemPosition);
+					intent.putExtra(NearCardDetailActivity.LOCATION, info.getDistance());
+					intent.putExtra(NearCardDetailActivity.IS_STRANGER_PAGE, true);
 					startActivityForResult(intent, Constants.REQUEST_CODE);
 				}
 			});
@@ -118,37 +124,48 @@ public class StrangerCardFragment extends BaseFragment implements OnClickListene
 
 				@Override
 				public void onLeftCardExit(Object dataObject) {
+
 				}
 
 				@Override
 				public void onRightCardExit(Object dataObject) {
+					View view = flingContainer.getSelectedView();
+					if (null == view) {
+						return;
+					}
+					ImageView ivDisLike = (ImageView) view.findViewById(R.id.iv_card_dislike);
+					if (null == ivDisLike) {
+						return;
+					}
+					ivDisLike.setAlpha(1);
 					return;
 				}
 
 				@Override
 				public void onAdapterAboutToEmpty(int itemsInAdapter) {
-					if (flipDataList.size() >= 1) {
-						return;
-					}
 					ifTvRefreshShow();
-					flingContainer.setVisibility(View.GONE);
-					if (isVisible) {
-						if (isNeedToRequest) {
-							if (ifClearData) {
-								ifClearData = false;
-								return;
-							}
-							page++;
-							getNearStrangerInfo();
-						}
-					}
+					// if (flipDataList.size() >= 1) {
+					// return;
+					// }
+					// ifTvRefreshShow();
+					// flingContainer.setVisibility(View.GONE);
+					// if (isVisible) {
+					// if (isNeedToRequest) {
+					// if (ifClearData) {
+					// ifClearData = false;
+					// return;
+					// }
+					// page++;
+					// getNearStrangerInfo();
+					// }
+					// }
 				}
 
 				// 滚动的时候
 				@SuppressLint("NewApi")
 				@Override
 				public void onScroll(float scrollProgressPercent) {
-					LogUtils.i("bm", "scrollProgressPercent--" + scrollProgressPercent);
+					LogUtils.d(TAG, "onScroll---scrollProgressPercent---" + scrollProgressPercent);
 					scrollProgressPercent = Math.abs(scrollProgressPercent);
 					View view = flingContainer.getSelectedView();
 					if (null == view) {
@@ -181,6 +198,10 @@ public class StrangerCardFragment extends BaseFragment implements OnClickListene
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.tv_refresh:
+			if (StrangerFragment.isRequesting) {
+				ToastUtil.showToast("正在请求当中。。。");
+				return;
+			}
 			page = 0;
 			tvRefresh.setText("刷新中。。。");
 			clearData();
@@ -247,7 +268,7 @@ public class StrangerCardFragment extends BaseFragment implements OnClickListene
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		if (resultCode == Constants.RESULT_CODE_DISLIKE) {
-			int position = data.getIntExtra(POSITION, -1);
+			int position = data.getIntExtra(NearCardDetailActivity.POSITION, -1);
 			if (0 == position) {
 				flingContainer.getTopCardListener().selectLeft();
 			} else {
@@ -255,7 +276,7 @@ public class StrangerCardFragment extends BaseFragment implements OnClickListene
 			}
 			notifyDataSetChange();
 		} else if (resultCode == Constants.RESULT_CODE_LIKE) {
-			int position = data.getIntExtra(POSITION, -1);
+			int position = data.getIntExtra(NearCardDetailActivity.POSITION, -1);
 			NearbyStrangerInfo info = cardAdapter.getItem(position);
 			if ("1".equals(info.getLiked())) {
 				return;

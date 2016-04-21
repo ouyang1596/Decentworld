@@ -6,6 +6,9 @@ package cn.sx.decentworld.fragment;
 import java.io.File;
 import java.util.HashMap;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -25,10 +28,16 @@ import cn.sx.decentworld.R;
 import cn.sx.decentworld.activity.PictureClipActivity_;
 import cn.sx.decentworld.common.ConstantNet;
 import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.dialog.ModifyRealnameDialog;
+import cn.sx.decentworld.dialog.VerifyLoginPwdDialog;
+import cn.sx.decentworld.dialog.ModifyRealnameDialog.ModifyRealnameListener;
+import cn.sx.decentworld.dialog.VerifyLoginPwdDialog.VerifyLoginPwdListener;
 import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.CardUtil;
 import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.ToastUtil;
 
@@ -38,6 +47,7 @@ import cn.sx.decentworld.utils.ToastUtil;
  * @date: 2016年1月12日 下午3:25:20
  */
 public class DoubtWanFirstStepFragment extends Fragment implements OnClickListener {
+	private static final String TAG = "DoubtWanFirstStepFragment";
 	private TextView tvCheck/* , tvDemand */;
 	public String realName, IDCard;
 	private EditText etIDCard;
@@ -75,6 +85,7 @@ public class DoubtWanFirstStepFragment extends Fragment implements OnClickListen
 		etIDCard = (EditText) getActivity().findViewById(R.id.et_id_card);
 		tvRealName = (TextView) getActivity().findViewById(R.id.tv_real_name);
 		tvRealName.setText(UserInfoEngine.getInstance().getUserInfo().getRealName());
+		tvRealName.setOnClickListener(this);
 	}
 
 	public interface OnDoubtWanFirstClickListener {
@@ -90,6 +101,9 @@ public class DoubtWanFirstStepFragment extends Fragment implements OnClickListen
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
+		case R.id.tv_real_name:
+			modifyRealname();
+			break;
 		case R.id.iv_idcard:
 			Intent intent = new Intent(getActivity(), PictureClipActivity_.class);
 			intent.putExtra(Constants.CAMERA_ALBUM, 1);
@@ -109,6 +123,10 @@ public class DoubtWanFirstStepFragment extends Fragment implements OnClickListen
 				ToastUtil.showToast("请先输入身份证号码");
 				return;
 			}
+			if (!CardUtil.validateCard(etIDCard.getText().toString())) {
+				ToastUtil.showToast("身份证号码不正确");
+				return;
+			}
 			IDCard = etIDCard.getText().toString();
 			if (null == picPath) {
 				ToastUtil.showToast("请先拍一张身份证");
@@ -117,6 +135,47 @@ public class DoubtWanFirstStepFragment extends Fragment implements OnClickListen
 			uploadID();
 			break;
 		}
+	}
+
+	/**
+	 * 修改实名
+	 */
+	private void modifyRealname() {
+		VerifyLoginPwdDialog verifyLoginPwdDialog = new VerifyLoginPwdDialog();
+		verifyLoginPwdDialog.setListener(new VerifyLoginPwdListener() {
+			@Override
+			public void onSuccess(String token) {
+				setRealname(token);
+			}
+
+			@Override
+			public void onFailure(String cause) {
+				LogUtils.i(Constants.TAG, "验证密码失败");
+			}
+		});
+		verifyLoginPwdDialog.show(getActivity().getSupportFragmentManager(), "");
+	}
+
+	/**
+	 * 设置实名
+	 */
+	private void setRealname(String token) {
+		ModifyRealnameDialog dialog = new ModifyRealnameDialog();
+		dialog.setTempToken(token);
+		dialog.setListener(new ModifyRealnameListener() {
+			@Override
+			public void onSuccess(String info) {
+				String realName = UserInfoEngine.getInstance().getUserInfo().getRealName();
+				tvRealName.setText(realName);
+				ToastUtil.showToast(info);
+			}
+
+			@Override
+			public void onFailure(String cause) {
+				ToastUtil.showToast(cause);
+			}
+		});
+		dialog.show(getActivity().getSupportFragmentManager(), "");
 	}
 
 	private void uploadID() {
@@ -131,8 +190,18 @@ public class DoubtWanFirstStepFragment extends Fragment implements OnClickListen
 
 			@Override
 			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.d(TAG, "uploadID---" + msg.toString());
 				hideProgressDialog();
 				if (2222 == msg.getResultCode()) {
+					try {
+						String jsonStr = msg.getData().toString();
+						JSONObject jsonObject = JSON.parseObject(jsonStr);
+						Float wealth = jsonObject.getFloat("wealth");
+						UserInfoEngine.getInstance().notifyWealthChanged(wealth);
+					} catch (Exception e) {
+						LogUtils.e(TAG, "uploadID---error---" + e.toString());
+					}
+
 					mUploadHandle.sendEmptyMessage(msg.getResultCode());
 				} else {
 					showToast(msg.getMsg());
@@ -141,6 +210,7 @@ public class DoubtWanFirstStepFragment extends Fragment implements OnClickListen
 
 			@Override
 			public void onFailure(String e) {
+				LogUtils.e(TAG, "error---" + e);
 				hideProgressDialog();
 				showToast(Constants.NET_WRONG);
 			}

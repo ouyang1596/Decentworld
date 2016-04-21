@@ -12,10 +12,10 @@ import android.os.Handler;
 import android.os.Message;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
-import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.utils.ToastUtil;
 
 import com.android.volley.Request.Method;
@@ -40,7 +40,6 @@ public class SearchComponent {
 	@Bean
 	ToastComponent toast;
 	private SendUrl sendUrl;
-	private ProgressDialog mProDialog;
 
 	@AfterViews
 	void init() {
@@ -59,8 +58,7 @@ public class SearchComponent {
 		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/search/searchFriend", Method.GET, new HttpCallBack() {
 			@Override
 			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(TAG, "searchFriendBy...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg()
-						+ ",msg.getData=" + msg.getData());
+				LogUtils.d(TAG, "searchFriendBy---" + msg.toString());
 				hideProgressDialog();
 				if (msg.getResultCode() == 2222) {
 					Message message = handler.obtainMessage();
@@ -78,10 +76,12 @@ public class SearchComponent {
 				hideProgressDialog();
 				handler.sendEmptyMessage(-1);
 				ToastUtil.showToast(Constants.NET_WRONG);
-				LogUtils.i("bm", "searchFriendBy...onFailure,cause by:" + e);
+				LogUtils.e(TAG, "searchFriendBy---error---" + e);
 			}
 		});
 	}
+
+	private ProgressDialog mProDialog;
 
 	private void showProgressDialog() {
 		activity.runOnUiThread(new Runnable() {
@@ -103,6 +103,15 @@ public class SearchComponent {
 				if (null != mProDialog) {
 					mProDialog.hide();
 				}
+			}
+		});
+	}
+
+	private void showToast(final String message) {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				toast.show(message);
 			}
 		});
 	}

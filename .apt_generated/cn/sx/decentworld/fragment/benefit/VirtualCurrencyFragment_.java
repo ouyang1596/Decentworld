@@ -13,7 +13,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.network.request.GetUserInfo_;
 
 public final class VirtualCurrencyFragment_
     extends VirtualCurrencyFragment
@@ -23,7 +22,6 @@ public final class VirtualCurrencyFragment_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(getActivity());
-        getUserInfo = GetUserInfo_.getInstance_(getActivity());
     }
 
     @Override
@@ -33,13 +31,13 @@ public final class VirtualCurrencyFragment_
     }
 
     private void afterSetContentView_() {
-        tv_vc_wealth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_wealth));
+        mDrawWealth = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_vc_draw));
         tvSetBankCard = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_band_card));
-        tv_vc_worth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_worth));
-        rl_vc_draw = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_vc_draw));
-        tvSetPwd = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_set_pwd));
+        mTvBigWealth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_not_draw));
+        mTvWorth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_worth));
+        tvBankCard = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_band_bankCard));
+        mTvWealth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_wealth));
         ((ToastComponent_) toast).afterSetContentView_();
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

@@ -35,12 +35,12 @@ public final class NewsFragment_
     }
 
     private void afterSetContentView_() {
-        chat_room_title_root = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.chat_room_title_root));
         ll_layout_news_root = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_layout_news_root));
         tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
         add_topic_detail = ((ImageView) findViewById(cn.sx.decentworld.R.id.add_topic_detail));
-        main_layout_news_lv = ((PullToRefreshListView) findViewById(cn.sx.decentworld.R.id.main_layout_news_lv));
         ivMe = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me));
+        chat_room_title_root = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rel_title_root));
+        main_layout_news_lv = ((PullToRefreshListView) findViewById(cn.sx.decentworld.R.id.main_layout_news_lv));
         {
             View view = findViewById(cn.sx.decentworld.R.id.add_topic_detail);
             if (view!= null) {

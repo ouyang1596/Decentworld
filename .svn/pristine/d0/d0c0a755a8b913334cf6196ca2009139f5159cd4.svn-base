@@ -1,0 +1,201 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.util.List;
+
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
+import android.text.Spannable;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.TextView.BufferType;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.NearCardDetailActivity;
+import cn.sx.decentworld.activity.NearCardDetailActivity_;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.ConversationList;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.SmileUtils;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.TimeUtils;
+
+/**
+ * @ClassName: ConversationListAdapter.java
+ * @Description: 好友消息列表适配器
+ * @author: cj
+ * @date: 2015年10月5日 下午5:32:38
+ */
+public class ConversationListAdapter extends BaseAdapter
+{
+    private static final String TAG = "ConversationListAdapter";
+    private Context context;
+    private LayoutInflater inflater;
+    private List<ConversationList> messageLists;
+
+    public ConversationListAdapter(Context context, List<ConversationList> messageLists)
+    {
+        this.context = context;
+        this.messageLists = messageLists;
+    }
+
+    @Override
+    public int getCount()
+    {
+        return messageLists.size();
+    }
+
+    @Override
+    public ConversationList getItem(int position)
+    {
+        return messageLists.get(position);
+    }
+
+    @Override
+    public long getItemId(int position)
+    {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
+        ViewHolder holder = null;
+        if (convertView == null)
+        {
+            holder = new ViewHolder();
+            convertView = inflater.from(context).inflate(R.layout.item_friends_message, null);
+            holder.list_item_layout = (LinearLayout) convertView.findViewById(R.id.list_item_layout);
+            holder.iv_avatar = (ImageView) convertView.findViewById(R.id.iv_fragment_chat_chat_avatar);
+            holder.iv_avatar.setOnClickListener(mOnClickListener);
+            holder.tv_title = (TextView) convertView.findViewById(R.id.tv_fragment_chat_chat_title);
+            holder.tv_content = (TextView) convertView.findViewById(R.id.tv_fragment_chat_chat_content);
+            holder.tv_time = (TextView) convertView.findViewById(R.id.tv_fragment_chat_chat_time);
+            holder.unread_msg_number = (TextView) convertView.findViewById(R.id.tv_fragment_chat_chat_unread_msg_number);
+            holder.ivUserType = (ImageView) convertView.findViewById(R.id.tv_fragment_chat_chat_userType);
+            convertView.setTag(holder);
+        }
+        else
+        {
+            holder = (ViewHolder) convertView.getTag();
+        }
+        
+        ConversationList conversation = messageLists.get(position);
+        if(conversation.getChatRelationship() == DWMessage.CHAT_RELATIONSHIP_FRIEND)
+        {
+        }
+        else
+        {
+        }
+        
+        holder.iv_avatar.setTag(Constants.ITEM_POSITION, position);
+        // 填充数据
+
+        if (CommUtil.isNotBlank(conversation.getIcon()))
+        {
+            ImageLoaderHelper.mImageLoader.displayImage(conversation.getIcon(), holder.iv_avatar, ImageLoaderHelper.mOptions);
+        }
+        else
+        {
+            holder.iv_avatar.setImageResource(R.drawable.default_avatar);
+        }
+        holder.tv_title.setText(conversation.getTitle());
+        // 文字、语音、图片、名片
+        if (conversation.getMessageType() == DWMessage.TXT)
+        {
+            Spannable spannable = SmileUtils.getSmiledText(context, conversation.getContent());
+            holder.tv_content.setText(spannable, BufferType.SPANNABLE);
+            holder.tv_content.setTextColor(Color.parseColor("#000000"));
+        }
+        else if (conversation.getMessageType() == DWMessage.VOICE)
+        {
+            holder.tv_content.setText("[语音]");
+            holder.tv_content.setTextColor(Color.parseColor("#C0FF3E"));
+        }
+        else if (conversation.getMessageType() == DWMessage.IMAGE)
+        {
+            holder.tv_content.setText("[图片]");
+            holder.tv_content.setTextColor(Color.parseColor("#EE0000"));
+        }
+        else if (conversation.getMessageType() == DWMessage.CARD)
+        {
+            holder.tv_content.setText("[名片]");
+            holder.tv_content.setTextColor(Color.parseColor("#0000FF"));
+        }
+        holder.tv_time.setText(TimeUtils.toConvFormat(conversation.getTime()));
+        if (conversation.getUnReadCount() != 0)
+        {
+            holder.unread_msg_number.setVisibility(View.VISIBLE);
+            holder.unread_msg_number.setText(conversation.getUnReadCount() + "");
+        }
+        else
+        {
+            holder.unread_msg_number.setVisibility(View.INVISIBLE);
+        }
+        if (conversation.getSetToTop() != 1)
+        {
+            holder.list_item_layout.setBackgroundResource(R.drawable.chat_lv_top_item_selector);
+        }
+        else
+        {
+            holder.list_item_layout.setBackgroundResource(R.drawable.chat_lv_item_selector);
+        }
+
+        // 处理“疑”、“真”、“腕”
+        // LogUtils.i(TAG, "userType=" + conversation.getUserType());
+        if (conversation.getUserType() == ContactUser.USER_TYPE_IMPEACH)
+        {
+            holder.ivUserType.setVisibility(View.VISIBLE);
+            holder.ivUserType.setImageResource(R.drawable.stranger_doubt_shadow);
+        }
+        else if (conversation.getUserType() == ContactUser.USER_TYPE_NORMAL)
+        {
+            holder.ivUserType.setVisibility(View.GONE);
+        }
+        else if (conversation.getUserType() == ContactUser.USER_TYPE_VIP)
+        {
+            holder.ivUserType.setVisibility(View.VISIBLE);
+            holder.ivUserType.setImageResource(R.drawable.stranger_wan);
+        }
+        return convertView;
+    }
+
+    private OnClickListener mOnClickListener = new OnClickListener()
+    {
+
+        @Override
+        public void onClick(View view)
+        {
+            Integer position = (Integer) view.getTag(Constants.ITEM_POSITION);
+            Intent intent = new Intent(context , NearCardDetailActivity_.class);
+            intent.putExtra(Constants.DW_ID, getItem(position).getDwID());
+            intent.putExtra(NearCardDetailActivity.IS_STRANGER_PAGE, false);
+            context.startActivity(intent);
+        }
+    };
+
+    class ViewHolder
+    {
+        LinearLayout list_item_layout;
+        ImageView iv_avatar;// 头像
+        TextView tv_title;// 标题
+        TextView tv_content;// 内容
+        TextView tv_time;// 时间
+        TextView unread_msg_number;// 未读消息
+        // ImageView chat_msg_state;// 消息状态
+        // ImageView chat_unremind;// 免打扰的图标
+        ImageView ivUserType;
+
+    }
+
+}

@@ -23,23 +23,24 @@ import cn.sx.decentworld.R;
 import cn.sx.decentworld.adapter.ContactAdapter;
 import cn.sx.decentworld.adapter.ContactAdapter.OnContactClickListener;
 import cn.sx.decentworld.bean.ContactBean;
-import cn.sx.decentworld.bean.ContactUser;
 import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.SearchResult;
 import cn.sx.decentworld.common.Constants;
-import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.dialog.AddFriendDialog;
 import cn.sx.decentworld.dialog.AddFriendDialog.AddFriendListener;
+import cn.sx.decentworld.engine.ContactEngine;
+import cn.sx.decentworld.engine.ContactEngine.AddCallback;
+import cn.sx.decentworld.entity.LaunchChatEntity;
+import cn.sx.decentworld.entity.dao.ContactUserDao;
+import cn.sx.decentworld.entity.db.ContactUser;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.SendUrl;
-import cn.sx.decentworld.network.SendUrl.HttpCallBack;
-import cn.sx.decentworld.network.entity.ResultBean;
 import cn.sx.decentworld.network.request.GetUserInfo;
 import cn.sx.decentworld.network.utils.JsonUtils;
-import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.widget.CustomScrollView;
 import cn.sx.decentworld.widget.CustomScrollView.ScrollViewListener;
 import cn.sx.decentworld.widget.ListViewForScrollView;
 
-import com.android.volley.Request.Method;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EActivity;
@@ -47,6 +48,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_contact)
 public class ContactActivity extends BaseFragmentActivity implements OnContactClickListener {
+	private static final String TAG = "ContactActivity";
 	@ViewById(R.id.lv_contact)
 	ListViewForScrollView lvContact;
 	@ViewById(R.id.lv_recommend)
@@ -57,8 +59,6 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 	ImageView ivBack;
 	@ViewById(R.id.cScro)
 	CustomScrollView cScro;
-	@Bean
-	ToastComponent toast;
 	@Bean
 	GetUserInfo getUserInfo;
 	private String data;
@@ -71,8 +71,11 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 	private SendUrl mSendUrl;
 	private Handler getContactHandle = new Handler() {
 		public void handleMessage(Message msg) {
+			if (Constants.NET_WRONG_CODE == msg.what) {
+				finish();
+				return;
+			}
 			data = msg.obj.toString();
-			LogUtils.i("bm", "data--" + data);
 			parserJsonData();
 		};
 	};
@@ -87,7 +90,7 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 	private void uploadMobiles() {
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("phoneNums", phoneNums);
-		LogUtils.i("bm", "phoneNums--" + phoneNums);
+		LogUtils.d(TAG, "uploadMobiles---phoneNums---" + phoneNums);
 		getUserInfo.uploadContact(map, getContactHandle);
 	}
 
@@ -108,9 +111,6 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 		tvHeadTitle.setText("您可能认识的人");
 		recommendAdapter = new ContactAdapter(this, recommendbeans);
 		recommendAdapter.setOnContactClickListener(this);
-		// View view = View.inflate(this,
-		// R.layout.item_contact_recommend_footer, null);
-		// lvRecommend.addFooterView(view);
 		lvRecommend.setAdapter(recommendAdapter);
 		lvRecommend.setOnItemClickListener(new OnItemClickListener() {
 
@@ -121,8 +121,6 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 				}
 			}
 		});
-		View vHead = View.inflate(mContext, R.layout.item_friends_contact, null);
-		lvContact.addHeaderView(vHead);
 		contactAdapter = new ContactAdapter(this, contactBeans);
 		contactAdapter.setOnContactClickListener(this);
 		lvContact.setAdapter(contactAdapter);
@@ -146,7 +144,7 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 	private String friendsString;
 
 	private void getFriendsString() {
-		List<ContactUser> temp = ContactUser.queryAll();
+		List<ContactUser> temp = ContactUserDao.queryAll();
 		if (null == temp) {
 			return;
 		}
@@ -161,7 +159,6 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 		try {
 			JSONObject object = new JSONObject(data);
 			JSONArray contactArray = object.getJSONArray("recommend_contact");
-			LogUtils.e("bm", "array--" + contactArray.toString());
 			List<ContactBean> contacts = (List<ContactBean>) JsonUtils.json2BeanArray(contactArray.toString(), ContactBean.class);
 			replaceName(contacts);
 			JSONArray recommendArray = object.getJSONArray("recommend_random");
@@ -202,7 +199,7 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 				finish();
 			}
 		} catch (JSONException e) {
-			toast.show("解析错误");
+			LogUtils.e(TAG, "error---" + e.toString());
 		}
 	}
 
@@ -230,7 +227,6 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 		} else if ("1".equals(rondom)) {
 			handleClickListenerRondom(v, position);
 		}
-
 	}
 
 	private void handleClickListenerContact(View v, int position) {
@@ -239,11 +235,19 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 		switch (v.getId()) {
 		case R.id.tv_contact_name:
 			intent = new Intent(this, ChatActivity_.class);
-			intent.putExtra(ChatActivity.OTHER_ID, contactBean.dwID);
-			intent.putExtra(ChatActivity.OTHER_NICKNAME, contactBean.name);
-			intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
-			judgeRelationship(contactBean, intent);
-			intent.putExtra(ChatActivity.OTHER_WORTH, Float.valueOf(contactBean.worth));
+			// intent.putExtra(ChatActivity.OTHER_ID, contactBean.dwID);
+			// intent.putExtra(ChatActivity.OTHER_NICKNAME, contactBean.name);
+			// intent.putExtra(ChatActivity.CHAT_TYPE,
+			// DWMessage.CHAT_TYPE_SINGLE);
+			// judgeRelationship(contactBean, intent);
+			// intent.putExtra(ChatActivity.OTHER_WORTH,
+			// Float.valueOf(contactBean.worth));
+
+			int userType = Integer.valueOf(contactBean.userType);
+			LaunchChatEntity value = new LaunchChatEntity(contactBean.dwID, contactBean.name, Float.valueOf(contactBean.worth),
+					DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_FRIEND, userType);
+			judgeRelationship(contactBean, value);
+			intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, value);
 			startActivity(intent);
 			break;
 		case R.id.iv_contact_avatar:
@@ -252,18 +256,22 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 			startActivity(intent);
 			break;
 		case R.id.iv_contact_add:
-			AddFriendDialog dialog = AddFriendDialog.newInstance();
+			AddFriendDialog dialog = new AddFriendDialog();
 			dialog.setNeedMoney(false);
 			dialog.setOnListener(new AddFriendListener() {
-
 				@Override
-				public void withReason(String reason) {
-					HashMap<String, String> map = new HashMap<String, String>();
-					map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
-					map.put("friendID", contactBean.dwID);
-					map.put("remark", contactBean.name);
-					map.put("addReason", reason);
-					addFriendRequest(map, Constants.API_ADD_FRIEND_CONTACT);
+				public void withReason(String addReason) {
+					ContactEngine.getInstance().addWithRemark(contactBean.dwID, contactBean.name, addReason, new AddCallback() {
+						@Override
+						public void onSuccess(String info) {
+							Toast.makeText(ContactActivity.this, info, Toast.LENGTH_SHORT).show();
+						}
+
+						@Override
+						public void onFailure(String cause) {
+							Toast.makeText(ContactActivity.this, cause, Toast.LENGTH_SHORT).show();
+						}
+					});
 				}
 			});
 			dialog.show(getSupportFragmentManager(), "dialog");
@@ -277,11 +285,18 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 		switch (v.getId()) {
 		case R.id.tv_contact_name:
 			intent = new Intent(this, ChatActivity_.class);
-			intent.putExtra(ChatActivity.OTHER_ID, contactBean.dwID);
-			intent.putExtra(ChatActivity.OTHER_NICKNAME, contactBean.name);
-			intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
-			judgeRelationship(contactBean, intent);
-			intent.putExtra(ChatActivity.OTHER_WORTH, Float.valueOf(contactBean.worth));
+			// intent.putExtra(ChatActivity.OTHER_ID, contactBean.dwID);
+			// intent.putExtra(ChatActivity.OTHER_NICKNAME, contactBean.name);
+			// intent.putExtra(ChatActivity.CHAT_TYPE,
+			// DWMessage.CHAT_TYPE_SINGLE);
+			// judgeRelationship(contactBean, intent);
+			// intent.putExtra(ChatActivity.OTHER_WORTH,
+			// Float.valueOf(contactBean.worth));
+
+			LaunchChatEntity entity = new LaunchChatEntity(contactBean.dwID, contactBean.name, Float.valueOf(contactBean.worth),
+					DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_FRIEND, Integer.valueOf(contactBean.userType));
+			judgeRelationship(contactBean, entity);
+			intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity);
 			startActivity(intent);
 			break;
 		case R.id.iv_contact_avatar:
@@ -290,18 +305,37 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 			startActivity(intent);
 			break;
 		case R.id.iv_contact_add:
-			AddFriendDialog dialog = AddFriendDialog.newInstance();
+			AddFriendDialog dialog = new AddFriendDialog();
 			dialog.setNeedMoney(true);
 			dialog.setOnListener(new AddFriendListener() {
 
 				@Override
-				public void withReason(String reason) {
-					HashMap<String, String> map = new HashMap<String, String>();
-					map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
-					map.put("friendID", contactBean.dwID);
-					map.put("searchType", "3");
-					map.put("addReason", reason);
-					addFriendRequest(map, Constants.API_ADD_FRIEND_NO_CONTACT);
+				public void withReason(String addReason) {
+					SearchResult searchResult = new SearchResult();
+					searchResult.dwID = contactBean.dwID;
+					searchResult.name = contactBean.name;
+					searchResult.worth = contactBean.worth;
+
+					ContactEngine.getInstance().add(searchResult, addReason, "3", new AddCallback() {
+						@Override
+						public void onSuccess(String info) {
+							Toast.makeText(ContactActivity.this, info, Toast.LENGTH_SHORT).show();
+						}
+
+						@Override
+						public void onFailure(String cause) {
+							Toast.makeText(ContactActivity.this, cause, Toast.LENGTH_SHORT).show();
+						}
+					});
+
+					// HashMap<String, String> map = new HashMap<String,
+					// String>();
+					// map.put(Constants.DW_ID,
+					// DecentWorldApp.getInstance().getDwID());
+					// map.put("friendID", contactBean.dwID);
+					// map.put("searchType", "3");
+					// map.put("addReason", addReason);
+					// addFriendRequest(map, ConstantNet.API_ADD_FRIEND);
 				}
 			});
 			dialog.show(getSupportFragmentManager(), "dialog");
@@ -310,44 +344,10 @@ public class ContactActivity extends BaseFragmentActivity implements OnContactCl
 		}
 	}
 
-	private void judgeRelationship(ContactBean contactBean, Intent intent) {
-		if (ContactUser.isContact(contactBean.dwID)) {
-			intent.putExtra("chatRelationship", DWMessage.CHAT_RELATIONSHIP_FRIEND);
-		} else {
-			intent.putExtra("chatRelationship", DWMessage.CHAT_RELATIONSHIP_STRANGER);
+	private void judgeRelationship(ContactBean contactBean, LaunchChatEntity value) {
+		if (!ContactUserDao.isContact(contactBean.dwID)) {
+			value.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
 		}
-	}
-
-	/**
-	 * 申请添加朋友
-	 * */
-	private void addFriendRequest(HashMap<String, String> map, String api) {
-		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + api, Method.POST, new HttpCallBack() {
-
-			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				if (2222 == msg.getResultCode()) {
-					showToastInfo("申请已发送");
-				} else {
-					showToastInfo(msg.getMsg());
-				}
-			}
-
-			@Override
-			public void onFailure(String e) {
-				showToastInfo(Constants.NET_WRONG);
-			}
-		});
-	}
-
-	private void showToastInfo(final String data) {
-		runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				Toast.makeText(mContext, data, Toast.LENGTH_SHORT).show();
-			}
-		});
 	}
 
 }

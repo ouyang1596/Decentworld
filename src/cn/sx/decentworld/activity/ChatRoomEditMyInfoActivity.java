@@ -21,11 +21,11 @@ import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.common.FilePath;
-import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
-import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
 import cn.sx.decentworld.widget.CircularImageView;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -35,6 +35,7 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_my_info)
 public class ChatRoomEditMyInfoActivity extends BaseFragmentActivity {
+	private static final String TAG = "ChatRoomEditMyInfoActivity";
 	@ViewById(R.id.et_self_introduce)
 	EditText etSelfIntroduce;
 	@ViewById(R.id.iv_chatroom_head)
@@ -53,8 +54,6 @@ public class ChatRoomEditMyInfoActivity extends BaseFragmentActivity {
 	private int chatRoomSize;
 	private String ownerNickName;
 	@Bean
-	ToastComponent toast;
-	@Bean
 	ChatRoomInfoSettingAndGetting chatRoomInfoSettingAndGetting;
 	private String icon, profile;
 	public static final int GET_OWNER_INFO = 0;
@@ -63,22 +62,19 @@ public class ChatRoomEditMyInfoActivity extends BaseFragmentActivity {
 			switch (msg.what) {
 			case 2222:
 				try {
-					LogUtils.i("bm", "msg--" + msg.obj.toString());
 					JSONObject object = new JSONObject(msg.obj.toString());
 					icon = object.getString("icon");
 					profile = object.getString("profile");
-					ImageLoaderHelper.mImageLoader.displayImage(icon,
-							ivChatRoomHead, ImageLoaderHelper.mOptions);
+					ImageLoaderHelper.mImageLoader.displayImage(icon, ivChatRoomHead, ImageLoaderHelper.mOptions);
 					etSelfIntroduce.setText(profile);
 				} catch (JSONException e) {
-					toast.show("解析错误");
+					LogUtils.e(TAG, e.toString());
 					return;
 				}
 				break;
 			case 3333:
-				ImageLoaderHelper.mImageLoader.displayImage(ImageUtils
-						.getIconByDwID(DecentWorldApp.getInstance().getDwID(),
-								ImageUtils.ICON_MAIN), ivChatRoomHead,
+				ImageLoaderHelper.mImageLoader.displayImage(
+						ImageUtils.getIconByDwID(DecentWorldApp.getInstance().getDwID(), ImageUtils.ICON_MAIN), ivChatRoomHead,
 						ImageLoaderHelper.mOptions);
 				break;
 
@@ -88,7 +84,9 @@ public class ChatRoomEditMyInfoActivity extends BaseFragmentActivity {
 	};
 	private Handler mSetUserInfoHandler = new Handler() {
 		public void handleMessage(android.os.Message msg) {
-			toast.show("succ");
+			ImageLoaderHelper.clearCacheByUrl(ImageUtils.getIconByDwID(DecentWorldApp.getInstance().getDwID(),
+					ImageUtils.ICON_MAIN));
+			ImageLoaderHelper.clearCacheByUrl(ImageUtils.getHostIconByDwID(DecentWorldApp.getInstance().getDwID()));
 			finish();
 		};
 	};
@@ -103,8 +101,7 @@ public class ChatRoomEditMyInfoActivity extends BaseFragmentActivity {
 
 			@Override
 			public void onClick(View view) {
-				Intent intent = new Intent(getApplicationContext(),
-						TakePhotosAndpictureSingleActivity.class);
+				Intent intent = new Intent(getApplicationContext(), TakePhotosAndpictureSingleActivity.class);
 				intent.putExtra(Constants.ASPECTX, 1);
 				intent.putExtra(Constants.ASPECTY, 1);
 				intent.putExtra(Constants.OUTPUTX, 450);
@@ -117,22 +114,21 @@ public class ChatRoomEditMyInfoActivity extends BaseFragmentActivity {
 			@Override
 			public void onClick(View view) {
 				if (chatRoomSize == 0) {
-					toast.show("请先创建聊天室");
+					ToastUtil.showToast("请先创建聊天室");
 					return;
 				}
 				if (null == picPath) {
-					toast.show("请重新选择一张图片");
+					ToastUtil.showToast("请重新选择一张图片");
 					return;
 				}
 				if (ImageUtils.fileLength(picPath) > 2 * 1024 * 1024) {
 					Bitmap scalePic = ImageUtils.scalePic(picPath);
-					String filePath = FilePath.HOME + "/temp"
-							+ ImageUtils.generateFileName() + ".png";
+					String filePath = FilePath.HOME + "/temp" + ImageUtils.generateFileName() + ".png";
 					ImageUtils.saveBitmap(filePath, scalePic);
 					picPath = filePath;
 				}
 				if (etSelfIntroduce.length() <= 0) {
-					toast.show("请先输入内容");
+					ToastUtil.showToast("请先输入内容");
 					return;
 				}
 				File[] file = new File[1];
@@ -140,8 +136,7 @@ public class ChatRoomEditMyInfoActivity extends BaseFragmentActivity {
 				HashMap<String, String> map = new HashMap<String, String>();
 				map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
 				map.put("ownerProfile", etSelfIntroduce.getText().toString());
-				chatRoomInfoSettingAndGetting.submitImageWithParams(map, file,
-						Constants.API_SET_OWNER_INFO, mSetUserInfoHandler);
+				chatRoomInfoSettingAndGetting.submitImageWithParams(map, file, Constants.API_SET_OWNER_INFO, mSetUserInfoHandler);
 			}
 		});
 		ivBack.setOnClickListener(new OnClickListener() {
@@ -155,10 +150,8 @@ public class ChatRoomEditMyInfoActivity extends BaseFragmentActivity {
 	}
 
 	private void CGetIntent() {
-		chatRoomSize = getIntent().getIntExtra(
-				ChatRoomMeActivity.CHATROOM_SIZE, 0);
-		ownerNickName = getIntent().getStringExtra(
-				ChatRoomMeActivity.CHATROOM_NICKNAME);
+		chatRoomSize = getIntent().getIntExtra(ChatRoomMeActivity.CHATROOM_SIZE, 0);
+		ownerNickName = getIntent().getStringExtra(ChatRoomMeActivity.CHATROOM_NICKNAME);
 	}
 
 	private void initRequest() {

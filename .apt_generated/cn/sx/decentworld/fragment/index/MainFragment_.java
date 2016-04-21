@@ -31,23 +31,23 @@ public final class MainFragment_
     }
 
     private void afterSetContentView_() {
-        mainFragmentContainer = ((FrameLayout) findViewById(cn.sx.decentworld.R.id.mainFragmentContainer));
-        conversationUnreadLabel = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab1_unread_msg_number));
-        menu_tab_4 = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_4));
-        menu_tab1_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab1_tv));
-        menu_tab_3 = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_3));
         meUnreadLabel = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab4_unread_msg_number));
-        menu_tab4_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab4_iv));
+        menu_tab_4 = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_4));
         menu_tab1_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab1_iv));
-        menu_tab2_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab2_iv));
-        menu_tab_1 = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_1));
-        menu_tab4_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab4_tv));
         findUnreadLabel = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab3_unread_msg_number));
-        contactUnreadLabel = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab2_unread_msg_number));
         menu_tab3_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab3_tv));
-        menu_tab_2 = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_2));
+        menu_tab_3 = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_3));
+        mainFragmentContainer = ((FrameLayout) findViewById(cn.sx.decentworld.R.id.mainFragmentContainer));
         menu_tab2_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab2_tv));
+        conversationUnreadLabel = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab1_unread_msg_number));
+        menu_tab_2 = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_2));
         menu_tab3_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab3_iv));
+        contactUnreadLabel = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab2_unread_msg_number));
+        menu_tab_1 = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.menu_tab_1));
+        menu_tab4_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab4_iv));
+        menu_tab1_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab1_tv));
+        menu_tab2_iv = ((ImageView) findViewById(cn.sx.decentworld.R.id.menu_tab2_iv));
+        menu_tab4_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.menu_tab4_tv));
         init();
     }
 

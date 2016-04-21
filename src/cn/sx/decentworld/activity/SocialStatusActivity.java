@@ -1,28 +1,18 @@
 package cn.sx.decentworld.activity;
 
-import java.util.HashMap;
-
-import org.simple.eventbus.EventBus;
-
 import android.content.Intent;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
-import cn.sx.decentworld.bean.NotifyByEventBus;
-import cn.sx.decentworld.bean.UserInfo;
-import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.abstractclass.AbstractTextWatcher;
 import cn.sx.decentworld.component.ToastComponent;
-import cn.sx.decentworld.network.SendUrl;
-import cn.sx.decentworld.network.SendUrl.HttpCallBack;
-import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.engine.UserDataEngine;
+import cn.sx.decentworld.engine.UserDataEngine.SetWorthListener;
+import cn.sx.decentworld.utils.ToastUtil;
 
-import com.android.volley.Request.Method;
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
 import com.googlecode.androidannotations.annotations.EActivity;
@@ -36,28 +26,14 @@ public class SocialStatusActivity extends BaseFragmentActivity {
 	EditText etSocialStatus;
 	@ViewById(R.id.btn_OK)
 	Button btnOk;
-	@Bean
-	ToastComponent toast;
-	private SendUrl sendUrl;
 
 	@AfterViews
 	public void init() {
-		sendUrl = new SendUrl(this);
 		setBtnState();
-		etSocialStatus.addTextChangedListener(new TextWatcher() {
-			public void onTextChanged(CharSequence data, int arg1, int arg2, int arg3) {
+		etSocialStatus.addTextChangedListener(new AbstractTextWatcher() {
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				setBtnState();
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
-
-			}
-
-			@Override
-			public void afterTextChanged(Editable arg0) {
-
-			}
+			};
 		});
 		ivBack.setOnClickListener(new OnClickListener() {
 			public void onClick(View arg0) {
@@ -71,7 +47,7 @@ public class SocialStatusActivity extends BaseFragmentActivity {
 				String data = etSocialStatus.getText().toString();
 				Integer money = Integer.valueOf(data);
 				if (money < 1) {
-					toast.show("身家至少为1");
+					ToastUtil.showToast("身家至少为1");
 					return;
 				}
 				setSocialStatus();
@@ -79,14 +55,28 @@ public class SocialStatusActivity extends BaseFragmentActivity {
 		});
 	}
 
+	/**
+	 * 设置身价到服务器
+	 */
 	public void setSocialStatus() {
 		String worth = etSocialStatus.getText().toString();
 		if ((!worth.equals("")) && (worth.length() <= 5)) {
-			setWorth(DecentWorldApp.getInstance().getDwID(), worth);
+			UserDataEngine.getInstance().setWorth(worth, new SetWorthListener() {
+				@Override
+				public void onSuccess(String currentWorth) {
+					Intent intent = new Intent(mContext, MainActivity_.class);
+					startActivity(intent);
+				}
+
+				@Override
+				public void onFailure(String cause) {
+					ToastUtil.showToast(cause);
+				}
+			});
 		} else if (worth.length() > 5) {
-			toast.show("身家值不能超过5位");
+			ToastUtil.showToast("身家值不能超过5位");
 		} else if (worth.equals("")) {
-			toast.show("自定义的身家值不能为空");
+			ToastUtil.showToast("自定义的身家值不能为空");
 		}
 	}
 
@@ -103,46 +93,4 @@ public class SocialStatusActivity extends BaseFragmentActivity {
 		}
 	}
 
-	public void setWorth(final String dwID, final String worth) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", dwID);
-		map.put("worth", worth);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/setWorth", Method.GET, new HttpCallBack() {
-			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				if (msg.getResultCode() == 2222) {
-					runOnUiThread(new Runnable() {
-
-						@Override
-						public void run() {
-							UserInfo userInfo = UserInfo.queryByDwID(dwID);
-							userInfo.setWorth(Float.valueOf(worth));
-							userInfo.save();
-							EventBus.getDefault().post("完成支付，更新身价", NotifyByEventBus.NT_REFRESH_WORTH);
-							Intent intent = new Intent(mContext, MainActivity_.class);
-							startActivity(intent);
-						}
-					});
-				}
-				if (msg.getResultCode() == 3333) {
-					showToast(msg.getMsg());
-				}
-			}
-
-			@Override
-			public void onFailure(String e) {
-				showToast(Constants.NET_WRONG);
-			}
-		});
-	}
-
-	private void showToast(final String data) {
-		runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				toast.show(data);
-			}
-		});
-	}
 }

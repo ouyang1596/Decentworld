@@ -1,0 +1,221 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.BenefitDetail;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.component.TitleBar;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.TimeUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.Click;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: MagnateToOtherDetailActivity.java
+ * @Description:
+ * @author: dyq
+ * @date: 2015年7月29日 上午9:50:36
+ */
+@EActivity(R.layout.activity_magnate_to_other_detail)
+public class MagnateToOtherDetailActivity extends BaseFragmentActivity
+{
+    /**
+     * 常量
+     */
+    private static final String TAG = "MagnateToOtherDetailActivity";
+    private static final String BACK = "返回";
+    private static final String CHECK_DETAIL = "收益明细";
+    private static final int GET_DETAIL = 1;
+    /**
+     * 工具类
+     */
+    @Bean
+    TitleBar titleBar;
+    @Bean
+    ToastComponent toast;
+    @Bean
+    GetUserInfo getUserInfo;
+
+    /**
+     * 界面资源
+     */
+    @ViewById(R.id.lv_magnate_to_other_detail)
+    ListView lv_magnate_to_other_detail;
+    @ViewById(R.id.lv_magnate_to_other_remind)
+    LinearLayout lv_magnate_to_other_remind;
+    @ViewById(R.id.tv_magnate_to_other_remind)
+    TextView tv_magnate_to_other_remind;
+
+    /**
+     * 变量
+     */
+    private String dwID;
+    private String otherID;
+    private List<BenefitDetail> lists;
+    private BenefitDetailAdapter adapter;
+
+    @AfterViews
+    void init()
+    {
+        titleBar.setTitleBar(BACK, CHECK_DETAIL);
+        dwID = DecentWorldApp.getInstance().getDwID();
+        otherID = getIntent().getStringExtra("otherID");
+        lists = new ArrayList<BenefitDetail>();
+        adapter = new BenefitDetailAdapter(MagnateToOtherDetailActivity.this);
+        lv_magnate_to_other_detail.setAdapter(adapter);
+        getUserInfo.getGRBenefitHistory(dwID, otherID, handler, GET_DETAIL);
+    }
+
+    Handler handler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            switch (msg.what)
+            {
+                case GET_DETAIL:
+                    processDetail(msg);
+                    break;
+                default:
+                    break;
+            }
+        };
+    };
+
+    /**
+     * 返回
+     */
+    @Click(R.id.main_header_left)
+    void setBackBtn()
+    {
+        finish();
+    }
+
+    /**
+     * @param msg
+     */
+    protected void processDetail(Message msg)
+    {
+        if (msg.arg1 == 1)
+        {
+            lists.clear();
+            String json_result = msg.obj.toString();
+            JSONObject jsonObject = JSON.parseObject(json_result);
+            String result = jsonObject.getString("result");
+            JSONArray array = JSON.parseArray(result);
+            if(array.size()>0)
+            {
+                for (int i = 0; i < array.size(); i++)
+                {
+                    JSONObject object = array.getJSONObject(i);
+                    BenefitDetail detail = new BenefitDetail();
+                    detail.setUserID(object.getString("grID"));
+                    detail.setOtherID(object.getString("dwID"));
+                    detail.setBenefit(object.getFloatValue("benefit"));
+                    detail.setDate(String.valueOf(object.getLongValue("date")));
+                    lists.add(detail);
+                }
+            }
+            lv_magnate_to_other_detail.setVisibility(View.VISIBLE);
+            lv_magnate_to_other_remind.setVisibility(View.GONE);
+            LogUtils.i(TAG, "获取指定人的详情记录为：" + lists.size() + "条");
+            //更新身家
+            Float wealth = jsonObject.getFloat("wealth");
+            UserInfoEngine.getInstance().notifyWealthChanged(wealth);
+        }
+        else
+        {
+            String failResult = msg.obj.toString();
+            lv_magnate_to_other_detail.setVisibility(View.GONE);
+            lv_magnate_to_other_remind.setVisibility(View.VISIBLE);
+            tv_magnate_to_other_remind.setText(failResult);
+        }
+    }
+
+    class BenefitDetailAdapter extends BaseAdapter
+    {
+        private Context context;
+        private LayoutInflater inflater;
+
+        /**
+		 * 
+		 */
+        public BenefitDetailAdapter(Context context)
+        {
+            this.context = context;
+            this.inflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public int getCount()
+        {
+            return lists.size();
+        }
+
+        @Override
+        public Object getItem(int position)
+        {
+            return lists.get(position);
+        }
+
+        @Override
+        public long getItemId(int position)
+        {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent)
+        {
+            ViewHolder holder = null;
+            if (convertView == null)
+            {
+                holder = new ViewHolder();
+                convertView = inflater.inflate(R.layout.item_benefit_detail, null);
+                holder.time = (TextView) convertView.findViewById(R.id.tv_benefit_detail_time);
+                holder.amount = (TextView) convertView.findViewById(R.id.tv_benefit_detail_amount);
+                convertView.setTag(holder);
+            }
+            else
+            {
+                holder = (ViewHolder) convertView.getTag();
+            }
+            BenefitDetail benefitDetail = lists.get(position);
+            holder.time.setText(TimeUtils.toMsgFormat(Long.valueOf(benefitDetail.getDate())));
+            holder.amount.setText(benefitDetail.getBenefit()+"");
+            return convertView;
+        }
+
+        class ViewHolder
+        {
+            TextView time;
+            TextView amount;
+        }
+    }
+
+}

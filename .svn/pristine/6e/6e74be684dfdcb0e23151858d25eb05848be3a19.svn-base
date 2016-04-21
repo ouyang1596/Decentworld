@@ -1,0 +1,224 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.me;
+
+import java.util.HashMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.Fragment;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.AchievementActivity_;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantIntent;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: AchievementFragment.java
+ * @Description:人物志
+ * @author: cj
+ * @date: 2016年1月18日 下午7:51:54
+ */
+@EFragment(R.layout.fragment_achievement)
+public class AchievementFragment extends BaseFragment implements OnClickListener {
+	/**
+	 * 常量
+	 */
+	private static final String TAG = "AchievementFragment";
+	/**
+	 * 工具类
+	 */
+	@Bean
+	ToastComponent toast;
+	private String shortIntroduce, detailIntroduce;
+	/**
+	 * 变量
+	 */
+	private boolean isPrepared = false;
+	@ViewById(R.id.tv_achievement)
+	TextView tvAchievement;
+	@ViewById(R.id.iv_achievement)
+	ImageView ivAchievement;
+	@ViewById(R.id.ll_introduce)
+	LinearLayout llIntroduce;
+	@ViewById(R.id.tv_short_introduce)
+	TextView tvShortIntroduce;
+	@ViewById(R.id.tv_detail_introduce)
+	TextView tvDetailIntroduce;
+	@ViewById(R.id.iv_edit_introduce)
+	ImageView ivEditIntroduce;
+	@ViewById(R.id.fl_achievement)
+	FrameLayout flAchievement;
+	private SendUrl mSendUrl;
+	private Handler mGetIntroduceHandle = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			try {
+				JSONObject object = new JSONObject(msg.obj.toString());
+				if (object.has("short")) {
+					shortIntroduce = object.getString("short");
+					tvShortIntroduce.setVisibility(View.VISIBLE);
+					tvShortIntroduce.setText(shortIntroduce);
+					if (null != mOnShortIntroduceChangeListener) {
+						mOnShortIntroduceChangeListener.onShortIntroduceChange(shortIntroduce);
+					}
+				} else {
+					tvShortIntroduce.setVisibility(View.GONE);
+				}
+				if (object.has("detail")) {
+					detailIntroduce = object.getString("detail");
+					tvDetailIntroduce.setVisibility(View.VISIBLE);
+					tvDetailIntroduce.setText(detailIntroduce);
+				} else {
+					tvDetailIntroduce.setVisibility(View.GONE);
+				}
+				if (CommUtil.isNotBlank(shortIntroduce) || CommUtil.isNotBlank(detailIntroduce)) {
+					llIntroduce.setVisibility(View.VISIBLE);
+					flAchievement.setVisibility(View.GONE);
+				} else {
+					llIntroduce.setVisibility(View.GONE);
+					flAchievement.setVisibility(View.VISIBLE);
+				}
+			} catch (JSONException e) {
+				LogUtils.e("bm", "error---" + msg.obj.toString());
+			}
+		};
+	};
+
+	/**
+	 * 入口
+	 */
+	@AfterViews
+	void init() {
+		mSendUrl = new SendUrl(getActivity());
+		tvAchievement.setOnClickListener(this);
+		ivEditIntroduce.setOnClickListener(this);
+		ivAchievement.setOnClickListener(this);
+		isPrepared = true;
+		lazyLoad();
+		getIntroduce();
+	}
+
+	public void getIntroduce() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_GET_INTRODUCE, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						if (2222 == msg.getResultCode()) {
+							LogUtils.i("bm", msg.getData().toString());
+							Message message = mGetIntroduceHandle.obtainMessage();
+							message.obj = msg.getData().toString();
+							mGetIntroduceHandle.sendMessage(message);
+						} else {
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToast(Constants.NET_WRONG);
+					}
+				});
+	}
+
+	private void showToast(final String data) {
+		getActivity().runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				ToastUtil.showToast(data);
+			}
+		});
+	}
+
+	/**
+	 * 数据延迟加载
+	 */
+	@Override
+	protected void lazyLoad() {
+
+	}
+
+	@Override
+	public void turnToTab(int tab) {
+
+	}
+
+	@Override
+	public void onClick(View v) {
+		Intent intent = null;
+		switch (v.getId()) {
+		case R.id.tv_achievement:
+			intent = new Intent(getActivity(), AchievementActivity_.class);
+			getRootFragment().startActivityForResult(intent, ConstantIntent.REQUEST_CODE);
+			break;
+		case R.id.iv_edit_introduce:
+			intent = new Intent(getActivity(), AchievementActivity_.class);
+			intent.putExtra(ConstantIntent.FRAGMENT_ACHIEVEMENT_SHORT_INTRODUCE, shortIntroduce);
+			intent.putExtra(ConstantIntent.FRAGMENT_ACHIEVEMENT_DETAIL_INTRODUCE, detailIntroduce);
+			getRootFragment().startActivityForResult(intent, ConstantIntent.REQUEST_CODE);
+			break;
+		case R.id.iv_achievement:
+			intent = new Intent(getActivity(), AchievementActivity_.class);
+			getRootFragment().startActivityForResult(intent, ConstantIntent.REQUEST_CODE);
+			break;
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == ConstantIntent.REQUEST_CODE) {
+			getIntroduce();
+		}
+	}
+
+	/**
+	 * 得到根Fragment
+	 */
+	private Fragment getRootFragment() {
+		Fragment fragment = getParentFragment();
+		while (fragment.getParentFragment() != null) {
+			fragment = fragment.getParentFragment();
+		}
+		return fragment;
+	}
+
+	public interface OnShortIntroduceChangeListener {
+		void onShortIntroduceChange(String shortIntroduce);
+	}
+
+	private OnShortIntroduceChangeListener mOnShortIntroduceChangeListener;
+
+	public void setOnShortIntroduceChangeListener(OnShortIntroduceChangeListener onShortIntroduceChangeListener) {
+		mOnShortIntroduceChangeListener = onShortIntroduceChangeListener;
+	}
+}

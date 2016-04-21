@@ -36,15 +36,15 @@ public final class MagnateToOtherDetailActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        getUserInfo = GetUserInfo_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
+        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        lv_magnate_to_other_detail = ((ListView) findViewById(id.lv_magnate_to_other_detail));
         tv_magnate_to_other_remind = ((TextView) findViewById(id.tv_magnate_to_other_remind));
         lv_magnate_to_other_remind = ((LinearLayout) findViewById(id.lv_magnate_to_other_remind));
-        lv_magnate_to_other_detail = ((ListView) findViewById(id.lv_magnate_to_other_detail));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -60,9 +60,9 @@ public final class MagnateToOtherDetailActivity_
                 );
             }
         }
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

@@ -16,7 +16,6 @@ import android.widget.TextView;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.network.request.GetUserInfo_;
-import cn.sx.decentworld.network.request.SetFriendInfo_;
 
 public final class ConversationFragment_
     extends ConversationFragment
@@ -27,7 +26,6 @@ public final class ConversationFragment_
     private void init_(Bundle savedInstanceState) {
         getUserInfo = GetUserInfo_.getInstance_(getActivity());
         toast = ToastComponent_.getInstance_(getActivity());
-        setFriendInfo = SetFriendInfo_.getInstance_(getActivity());
     }
 
     @Override
@@ -38,13 +36,12 @@ public final class ConversationFragment_
 
     private void afterSetContentView_() {
         ivSearch = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_search));
-        rl_fragment_chat_chat_error = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_fragment_chat_chat_error));
         tv_connect_errormsg = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_connect_errormsg));
-        fragment_chat_chat_lv = ((ListView) findViewById(cn.sx.decentworld.R.id.fragment_chat_chat_lv));
+        rl_fragment_chat_chat_error = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_fragment_chat_chat_error));
         tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
+        fragment_chat_chat_lv = ((ListView) findViewById(cn.sx.decentworld.R.id.fragment_chat_chat_lv));
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
-        ((SetFriendInfo_) setFriendInfo).afterSetContentView_();
         init();
     }
 

@@ -38,10 +38,10 @@ public final class EditNicknameActivity_
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        et_edit_nickname = ((EditText) findViewById(id.et_edit_nickname));
-        btn_edit_nickname_complete = ((Button) findViewById(id.btn_edit_nickname_complete));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        et_edit_nickname = ((EditText) findViewById(id.et_edit_nickname));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        btn_edit_nickname_complete = ((Button) findViewById(id.btn_edit_nickname_complete));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.network.request.SetFriendInfo_;
 import cn.sx.decentworld.widget.ContactScrollView;
 import cn.sx.decentworld.widget.ListViewForScrollView;
 
@@ -25,7 +24,6 @@ public final class ContactFragment_
     private View contentView_;
 
     private void init_(Bundle savedInstanceState) {
-        setFriendInfo = SetFriendInfo_.getInstance_(getActivity());
         toast = ToastComponent_.getInstance_(getActivity());
     }
 
@@ -36,17 +34,16 @@ public final class ContactFragment_
     }
 
     private void afterSetContentView_() {
-        fragment_chat_contact_lv = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.fragment_chat_contact_lv));
-        sclView = ((ContactScrollView) findViewById(cn.sx.decentworld.R.id.sclView));
-        llNewFriend = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_new_friend));
-        new_friends_ll_unread_msg_number = ((TextView) findViewById(cn.sx.decentworld.R.id.new_friends_ll_unread_msg_number));
-        tvAddNewFriends = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_add_new_friends));
-        ivSearch = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_search));
-        llContact = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact));
         ivRecommend = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_recommend));
-        llContactList = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact_list));
         ivInvite = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_invite));
-        ((SetFriendInfo_) setFriendInfo).afterSetContentView_();
+        llNewFriend = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_new_friend));
+        fragment_chat_contact_lv = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.fragment_chat_contact_lv));
+        new_friends_ll_unread_msg_number = ((TextView) findViewById(cn.sx.decentworld.R.id.new_friends_ll_unread_msg_number));
+        sclView = ((ContactScrollView) findViewById(cn.sx.decentworld.R.id.sclView));
+        llContactList = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact_list));
+        llContact = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact));
+        ivSearch = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_search));
+        tvAddNewFriends = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_add_new_friends));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

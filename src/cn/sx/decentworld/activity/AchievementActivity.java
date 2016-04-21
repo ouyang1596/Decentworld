@@ -2,6 +2,9 @@ package cn.sx.decentworld.activity;
 
 import java.util.HashMap;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.content.Intent;
 import android.os.Handler;
 import android.text.Editable;
@@ -12,13 +15,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.UserInfo;
 import cn.sx.decentworld.common.ConstantIntent;
 import cn.sx.decentworld.common.ConstantNet;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
-import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.utils.ToastUtil;
 
 import com.android.volley.Request.Method;
@@ -74,8 +77,8 @@ public class AchievementActivity extends BaseFragmentActivity implements OnClick
 
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
-				if (s.length() > 17) {
-					etShortIntroduce.setText(s.subSequence(0, 17));
+				if (s.length() > 100) {
+					etShortIntroduce.setText(s.subSequence(0, 100));
 					return;
 				}
 			}
@@ -120,19 +123,13 @@ public class AchievementActivity extends BaseFragmentActivity implements OnClick
 			break;
 		case R.id.tv_ensure:
 			if (etShortIntroduce.length() <= 0) {
-				ToastUtil.showToast("请先完成一句话简介");
-				return;
-			}
-			if (etShortIntroduce.length() > 50) {
-				ToastUtil.showToast("字数超过50，请缩短字数");
-				return;
+				etShortIntroduce.setText(" ");
 			}
 			if (etDetailIntroduce.length() <= 0) {
-				ToastUtil.showToast("请先完成简介");
-				return;
+				etDetailIntroduce.setText(" ");
 			}
-			if (etDetailIntroduce.length() > 1000) {
-				ToastUtil.showToast("字数超过1000，请缩短字数");
+			if (etDetailIntroduce.length() > 1500) {
+				ToastUtil.showToast("字数超过1500，请缩短字数");
 				return;
 			}
 			updateIntroduce();
@@ -158,7 +155,18 @@ public class AchievementActivity extends BaseFragmentActivity implements OnClick
 					@Override
 					public void onSuccess(String response, ResultBean msg) {
 						if (2222 == msg.getResultCode()) {
-							mUpdataHandle.sendEmptyMessage(msg.getResultCode());
+							try {
+								JSONObject object = new JSONObject(msg.getData().toString());
+								String versionNum = object.getString("versionNum");
+								UserInfo userInfo = UserInfo.queryByDwID(DecentWorldApp.getInstance().getDwID());
+								if (null == userInfo) {
+									userInfo = new UserInfo();
+								}
+								userInfo.versionNum = versionNum;
+								userInfo.save();
+								mUpdataHandle.sendEmptyMessage(msg.getResultCode());
+							} catch (JSONException e) {
+							}
 						} else {
 							showToast("上传失败");
 						}
@@ -192,7 +200,6 @@ public class AchievementActivity extends BaseFragmentActivity implements OnClick
 		case ConstantIntent.ACTIVITY_ACHIEVEMENT_CAREER_START:
 			etDetailIntroduce.setText(tvData);
 			break;
-
 		case ConstantIntent.ACTIVITY_ACHIEVEMENT_CAREER_ISTO_SUCCESS:
 			etDetailIntroduce.setText(tvData);
 			break;

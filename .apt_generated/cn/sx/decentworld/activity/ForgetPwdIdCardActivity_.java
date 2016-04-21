@@ -36,18 +36,18 @@ public final class ForgetPwdIdCardActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        keyboardComponent = KeyboardComponent_.getInstance_(this);
         resetPwdInfo = ResetPwdInfo_.getInstance_(this);
+        keyboardComponent = KeyboardComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        llForgetPwdIdCard = ((LinearLayout) findViewById(id.root_forget_pwd_id_card));
-        etvIdCard = ((EditText) findViewById(id.et_idcard));
         btnOk = ((Button) findViewById(id.btn_OK));
+        etvIdCard = ((EditText) findViewById(id.et_idcard));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        llForgetPwdIdCard = ((LinearLayout) findViewById(id.root_forget_pwd_id_card));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();
+        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         init();
     }
 

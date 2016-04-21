@@ -34,8 +34,8 @@ public final class RechargePayMethodUselessActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         rechargeComponent = RechargeComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
@@ -57,8 +57,8 @@ public final class RechargePayMethodUselessActivity_
                 );
             }
         }
-        ((ToastComponent_) toast).afterSetContentView_();
         ((RechargeComponent_) rechargeComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

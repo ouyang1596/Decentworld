@@ -20,11 +20,12 @@
  */
 package org.apache.qpid.management.common.sasl;
 
+import java.util.Map;
+
 import org.apache.harmony.javax.security.auth.callback.CallbackHandler;
 import org.apache.harmony.javax.security.sasl.SaslClient;
 import org.apache.harmony.javax.security.sasl.SaslClientFactory;
 import org.apache.harmony.javax.security.sasl.SaslException;
-import java.util.Map;
 
 public class ClientSaslFactory implements SaslClientFactory
 {

@@ -17,6 +17,7 @@ import cn.sx.decentworld.fragment.DoubtWanSecondStepFragment;
 import cn.sx.decentworld.fragment.DoubtWanSecondStepFragment.OnDoubtWanSecondClickListener;
 import cn.sx.decentworld.fragment.DoubtWanThirdStepFragment;
 import cn.sx.decentworld.fragment.DoubtWanThirdStepFragment.OnDoubtWanThirdClickListener;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
@@ -24,17 +25,12 @@ import cn.sx.decentworld.utils.ToastUtil;
 
 public class DoubtWanActivity extends BaseFragmentActivity implements OnDoubtWanFirstClickListener,
 		OnDoubtWanSecondClickListener, OnDoubtWanThirdClickListener, OnClickListener {
+	private static final String TAG = "DoubtWanActivity";
 	private ImageView ivBack;
 	private DoubtWanFirstStepFragment mDoubtFirstStepFragment;
 	private DoubtWanSecondStepFragment mDoubtWanSecondStepFragment;
 	private DoubtWanThirdStepFragment mDoubtWanThirdStepFragment;
 	private SendUrl mSendUrl;
-
-	// private Handler mStartCheckHandler = new Handler() {
-	// public void handleMessage(android.os.Message msg) {
-	//
-	// };
-	// };
 
 	@Override
 	protected void onCreate(Bundle arg0) {
@@ -135,6 +131,7 @@ public class DoubtWanActivity extends BaseFragmentActivity implements OnDoubtWan
 
 			@Override
 			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.d(TAG, "uploadMaterial---" + msg.toString());
 				if (2222 == msg.getResultCode()) {
 					showToast("成功");
 					finish();
@@ -145,6 +142,7 @@ public class DoubtWanActivity extends BaseFragmentActivity implements OnDoubtWan
 
 			@Override
 			public void onFailure(String e) {
+				LogUtils.d(TAG, "uploadMaterial---error---" + e);
 				showToast(Constants.NET_WRONG);
 			}
 		});

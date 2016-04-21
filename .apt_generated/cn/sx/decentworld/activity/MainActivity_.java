@@ -15,7 +15,6 @@ import android.view.ViewGroup.LayoutParams;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.common.DWViewPager;
-import cn.sx.decentworld.component.Common_;
 import cn.sx.decentworld.component.ToastComponent_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
@@ -33,13 +32,12 @@ public final class MainActivity_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
-        common = Common_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         main_viewpager = ((DWViewPager) findViewById(id.main_viewpager));
+        viewMask = ((View) findViewById(id.view_mask));
         ((ToastComponent_) toast).afterSetContentView_();
-        ((Common_) common).afterSetContentView_();
         init();
     }
 

@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.component.ui.RegisterComponent_;
 import cn.sx.decentworld.widget.ClearEditText;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -35,18 +34,16 @@ public final class RegisterMobileActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         registerComponent = RegisterComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvNoReceive = ((TextView) findViewById(id.tv_no_receive_code));
         etMobile = ((ClearEditText) findViewById(id.et_mobile));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        etCode = ((ClearEditText) findViewById(id.et_code));
+        tvNoReceive = ((TextView) findViewById(id.tv_no_receive_code));
         btnOk = ((Button) findViewById(id.btn_OK));
-        ((ToastComponent_) toast).afterSetContentView_();
+        etCode = ((ClearEditText) findViewById(id.et_code));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         init();
     }

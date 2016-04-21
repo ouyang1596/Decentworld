@@ -1,0 +1,521 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
+
+import org.simple.eventbus.EventBus;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.UserInfoItemAdapter;
+import cn.sx.decentworld.bean.DisplayAuthority;
+import cn.sx.decentworld.bean.EditUserInfoItem;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.bean.UserExtraInfo;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ChoceAndTakePictureComponent;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.CameraAlbumDialogFragment;
+import cn.sx.decentworld.dialog.CameraAlbumDialogFragment.OnCameraAlbumClickListener;
+import cn.sx.decentworld.engine.UserDataEngine;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.fragment.chatroom.ChatRoomAddThemeContentFragment;
+import cn.sx.decentworld.fragment.me.InnateFragment;
+import cn.sx.decentworld.listener.NetCallback;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.widget.ListViewForScrollView;
+
+import com.alibaba.fastjson.JSON;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: EditUserInfoActivity.java
+ * @Description:编辑自己的详细资料
+ * @author: cj
+ * @date: 2015年10月9日 下午4:01:14
+ */
+@EActivity(R.layout.activity_edit_user_info)
+public class EditUserInfoActivity extends BaseFragmentActivity implements OnClickListener, OnCameraAlbumClickListener {
+	/**
+	 * 常量
+	 */
+	private static final String TAG = "EditUserInfoActivity";
+	// 加载图片时的请求码
+	private static final int REQUESTCODE_GET_ICON_1 = 1;
+	private static final int REQUESTCODE_GET_ICON_2 = 2;
+	private static final int REQUESTCODE_GET_ICON_3 = 3;
+	public static final int REQUESTCODE_EDIT_SIGN = 4;
+	public static final int REQUESTCODE_EDIT_REALNAME = 5;
+	public static final int REQUESTCODE_EDIT_NICKNAME = 6;
+	public static final int REQUESTCODE_EDIT_AGE = 7;
+	public static final int REQUESTCODE_EDIT_SEX = 8;
+	public static final int REQUESTCODE_EDIT_POSITION = 9;
+
+	public static final int REQUESTCODE_EDIT_SCHOOL = 10;
+	public static final int REQUESTCODE_EDIT_DEPARTMENT = 11;
+	public static final int REQUESTCODE_EDIT_CLASSES = 12;
+
+	public static final int REQUESTCODE_EDIT_OCCUPATION = 13;
+	public static final int REQUESTCODE_EDIT_CORPORATION = 14;
+	public static final int REQUESTCODE_EDIT_JOB = 15;
+
+	public static final int REQUESTCODE_EDIT_COMMON1 = 16;// 既可以自定义，也可以选择
+	public static final int REQUESTCODE_EDIT_COMMON2 = 17;// 只可以自定义
+	public static final int REQUESTCODE_EDIT_COMMON3 = 18;// 只可以选择
+
+	/**
+	 * 工具类
+	 */
+	@Bean
+	ToastComponent toast;
+	@Bean
+	ChoceAndTakePictureComponent choceAndTakePictureComponent;
+	private CameraAlbumDialogFragment cameraAlbumDialogFragment;
+
+	/**
+	 * 界面资源
+	 */
+	// 根布局
+	@ViewById(R.id.ll_edit_user_info_root)
+	LinearLayout ll_edit_user_info_root;
+	@ViewById(R.id.sl_edit_user_info)
+	ScrollView sl_edit_user_info;
+
+	// 图片一
+	@ViewById(R.id.iv_edit_user_info_icon_1)
+	ImageView iv_edit_user_info_icon_1;
+	// 图片二
+	@ViewById(R.id.iv_edit_user_info_icon_2)
+	ImageView iv_edit_user_info_icon_2;
+	// 图片三
+	@ViewById(R.id.iv_edit_user_info_icon_3)
+	ImageView iv_edit_user_info_icon_3;
+	@ViewById(R.id.tv_finish)
+	TextView tvFinish;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	@ViewById(R.id.lv_edit_user_info)
+	ListViewForScrollView lv_edit_user_info;
+
+	/**
+	 * 变量
+	 */
+	// 用于保存用户详细信息
+	private String dwID = "";
+	// listView展示的数据
+	private List<EditUserInfoItem> mDatas;
+	// listView适配器
+	private UserInfoItemAdapter userInfoItemAdapter;
+	// 用于保存三张图片
+	private File[] fileIcons = new File[3];
+
+	// 用于将ScrollView滚动到最顶端
+	Handler handler = new Handler();
+	Runnable runnable = new Runnable() {
+		public void run() {
+			sl_edit_user_info.scrollTo(0, 0);
+		}
+	};
+
+	@AfterViews
+	void init() {
+		EventBus.getDefault().register(this);
+		dwID = DecentWorldApp.getInstance().getDwID();
+		iv_edit_user_info_icon_1.setOnClickListener(this);
+		iv_edit_user_info_icon_2.setOnClickListener(this);
+		iv_edit_user_info_icon_3.setOnClickListener(this);
+		tvFinish.setVisibility(View.VISIBLE);
+		tvFinish.setText("完成");
+		ivBack.setVisibility(View.VISIBLE);
+		initListener();
+
+		handler.postDelayed(runnable, 80);
+		// 展示的资料
+		mDatas = InnateFragment.mDatas;
+		/**
+		 * 将图片数据显示到界面上
+		 */
+		UserExtraInfo extraInfo = UserExtraInfo.queryBy(dwID);
+		if (extraInfo != null) {
+			LogUtils.i(TAG, "额外三张照片路径为：extraInfo.getIcon=" + extraInfo.getIcon() + ",extraInfo.getIcon2=" + extraInfo.getIcon2()
+					+ ",extraInfo.getIcon3=" + extraInfo.getIcon3());
+			if (CommUtil.isNotBlank(extraInfo.getIcon())) {
+				ImageLoaderHelper.mImageLoader.displayImage(extraInfo.getIcon(), iv_edit_user_info_icon_1,
+						ImageLoaderHelper.mOptions);
+			}
+			if (CommUtil.isNotBlank(extraInfo.getIcon2())) {
+				ImageLoaderHelper.mImageLoader.displayImage(extraInfo.getIcon2(), iv_edit_user_info_icon_2,
+						ImageLoaderHelper.mOptions);
+			}
+			if (CommUtil.isNotBlank(extraInfo.getIcon3())) {
+				ImageLoaderHelper.mImageLoader.displayImage(extraInfo.getIcon3(), iv_edit_user_info_icon_3,
+						ImageLoaderHelper.mOptions);
+			}
+		} else {
+			LogUtils.i(TAG, "userInfo为空");
+		}
+		/**
+		 * 将详细信息数据显示到界面上
+		 */
+		userInfoItemAdapter = new UserInfoItemAdapter(this, mDatas, true);
+		lv_edit_user_info.setAdapter(userInfoItemAdapter);
+	}
+
+	private void initListener() {
+		ivBack.setOnClickListener(this);
+		tvFinish.setOnClickListener(this);
+
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.iv_edit_user_info_icon_1:
+			// 选择第一张照片
+			requestCode = REQUESTCODE_GET_ICON_1;
+			showCameraAlbumDialog();
+			// selectLocalPic(REQUESTCODE_GET_ICON_1);
+			break;
+		case R.id.iv_edit_user_info_icon_2:
+			// 选择第二张照片
+			// selectLocalPic(REQUESTCODE_GET_ICON_2);
+			requestCode = REQUESTCODE_GET_ICON_2;
+			showCameraAlbumDialog();
+			break;
+		case R.id.iv_edit_user_info_icon_3:
+			// 选择第三张照片
+			// selectLocalPic(REQUESTCODE_GET_ICON_3);
+			requestCode = REQUESTCODE_GET_ICON_3;
+			showCameraAlbumDialog();
+			break;
+		case R.id.iv_back:// 返回不保存数据
+			finish();
+		case R.id.tv_finish:
+			confirm();
+		default:
+			break;
+		}
+	}
+
+	/**
+	 * 选择本地图片
+	 * 
+	 * @param tag
+	 */
+	public void selectLocalPic(int tag) {
+		Intent intent = new Intent(mContext, TakePhotosAndpictureSingleActivity.class);
+		intent.putExtra(Constants.ASPECTX, 1);
+		intent.putExtra(Constants.ASPECTY, 1);
+		intent.putExtra(Constants.OUTPUTX, 400);
+		intent.putExtra(Constants.OUTPUTY, 400);
+		startActivityForResult(intent, tag);
+	};
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		LogUtils.i(TAG, "进入到onActivityResult");
+		super.onActivityResult(requestCode, resultCode, data);
+
+		if ((resultCode == RESULT_OK) && (data != null)) {
+			if ((requestCode == REQUESTCODE_GET_ICON_1) || (requestCode == REQUESTCODE_GET_ICON_2)
+					|| (requestCode == REQUESTCODE_GET_ICON_3)) {
+				UserExtraInfo extraInfo = UserExtraInfo.queryBy(dwID);
+				if (extraInfo == null)
+					extraInfo = new UserExtraInfo();
+				String filePath = data.getStringExtra("filePath");
+				File file = new File(filePath);
+				if (requestCode == REQUESTCODE_GET_ICON_1) {
+					ImageLoaderHelper.clearCacheByUrl(extraInfo.getIcon());
+					ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE + file.getAbsolutePath(),
+							iv_edit_user_info_icon_1, ImageLoaderHelper.mOptions);
+					LogUtils.i("bm", "--filePath--" + Constants.URI_FILE + file.getAbsolutePath());
+					fileIcons[0] = file;
+					UserDataEngine.getInstance().setUserIcon(fileIcons, 1, new SetIconListener());
+				} else if (requestCode == REQUESTCODE_GET_ICON_2) {
+					ImageLoaderHelper.clearCacheByUrl(extraInfo.getIcon2());
+					ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE + file.getAbsolutePath(),
+							iv_edit_user_info_icon_2, ImageLoaderHelper.mOptions);
+					fileIcons[0] = file;
+					UserDataEngine.getInstance().setUserIcon(fileIcons, 2, new SetIconListener());
+				} else if (requestCode == REQUESTCODE_GET_ICON_3) {
+					ImageLoaderHelper.clearCacheByUrl(extraInfo.getIcon3());
+					ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE + file.getAbsolutePath(),
+							iv_edit_user_info_icon_3, ImageLoaderHelper.mOptions);
+					fileIcons[0] = file;
+					UserDataEngine.getInstance().setUserIcon(fileIcons, 3, new SetIconListener());
+				}
+			} else if (requestCode == REQUESTCODE_EDIT_REALNAME) {
+				int position = data.getIntExtra("position", -1);
+				LogUtils.i(TAG, ",position=" + position);
+				if (position != -1) {
+					String newData = data.getStringExtra("newData");
+					refreshData(position, newData);
+				}
+			} else if (requestCode == REQUESTCODE_EDIT_SIGN || requestCode == REQUESTCODE_EDIT_NICKNAME
+					|| requestCode == REQUESTCODE_EDIT_SCHOOL) {
+				int position = data.getIntExtra("position", -1);
+				if (position != -1) {
+					String newData = data.getStringExtra("newData");
+					refreshData(position, newData);
+				}
+			} else if (requestCode == REQUESTCODE_EDIT_AGE || requestCode == REQUESTCODE_EDIT_SEX
+					|| requestCode == REQUESTCODE_EDIT_POSITION) {
+				// 不能修改
+			}
+
+			else if (requestCode == REQUESTCODE_EDIT_DEPARTMENT) {
+				int position = data.getIntExtra("position", -1);
+				if (position != -1) {
+					String newDepartment = data.getStringExtra("newDepartment");
+					refreshData(position, newDepartment);
+				}
+			} else if (requestCode == REQUESTCODE_EDIT_CLASSES) {
+				int position = data.getIntExtra("position", -1);
+				if (position != -1) {
+					String newClasses = data.getStringExtra("newClasses");
+					refreshData(position, newClasses);
+				}
+			} else if (requestCode == REQUESTCODE_EDIT_OCCUPATION) {
+				int position = data.getIntExtra("position", -1);
+				if (position != -1) {
+					String newOccupation = data.getStringExtra("newOccupation");
+					refreshData(position, newOccupation);
+				}
+			} else if (requestCode == REQUESTCODE_EDIT_CORPORATION) {
+				int position = data.getIntExtra("position", -1);
+				if (position != -1) {
+					String newCorporation = data.getStringExtra("newCorporation");
+					refreshData(position, newCorporation);
+
+				}
+			} else if (requestCode == REQUESTCODE_EDIT_JOB) {
+				int position = data.getIntExtra("position", -1);
+				if (position != -1) {
+					String newJob = data.getStringExtra("newJob");
+					refreshData(position, newJob);
+
+				}
+			} else if (requestCode == REQUESTCODE_EDIT_COMMON1 || requestCode == REQUESTCODE_EDIT_COMMON2
+					|| requestCode == REQUESTCODE_EDIT_COMMON3) {
+				int position = data.getIntExtra("position", -1);
+				if (position != -1) {
+					String newData = data.getStringExtra("newData");
+					refreshData(position, newData);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 刷新数据
+	 * 
+	 * @param position
+	 * @param date
+	 */
+	private void refreshData(int position, String date) {
+		LogUtils.i(TAG, "position=" + position + ",newData=" + date);
+		toast.show(date);
+		LogUtils.i(TAG, date);
+		// 保存到变量中
+		mDatas.get(position).setValue(date);
+		userInfoItemAdapter.notifyDataSetChanged();
+	}
+
+	/**
+	 * 完成
+	 */
+	private void confirm() {
+		// 将个人信息提交到服务器
+		HashMap<String, String> mapValue = new HashMap<String, String>();
+		mapValue.put("userId", dwID);
+		updateDBAuth(mapValue);
+		String allUserInfo = JSON.toJSONString(mapValue);
+		LogUtils.i(TAG, allUserInfo);
+		UserDataEngine.getInstance().setUserInfo(allUserInfo, new NetCallback() {
+			@Override
+			public void onSuccess(String msg) {
+				updateDBInfo();
+				setResult(RESULT_OK);
+				finish();
+			}
+
+			@Override
+			public void onFailure(String cause) {
+				LogUtils.i(TAG, "提交失败");
+			}
+		});
+		// 将个人信息的权限提交到服务器
+		String jsonIsShow = JsonUtils.bean2json(UserInfoEngine.getInstance().getDisplayAuthority());
+		UserDataEngine.getInstance().setUserInfoAuthority(jsonIsShow, new NetCallback() {
+
+			@Override
+			public void onSuccess(String msg) {
+				LogUtils.i(TAG, "设置用户权限成功：" + msg);
+			}
+
+			@Override
+			public void onFailure(String cause) {
+				LogUtils.i(TAG, "设置用户权限失败：" + cause);
+			}
+		});
+	}
+
+	/**
+	 * 更新个人权限到数据库，并填充Map
+	 */
+	public void updateDBAuth(HashMap<String, String> mapValue) {
+		// 加载数据库记录
+		DisplayAuthority displayAuthority = UserInfoEngine.getInstance().getDisplayAuthority();
+		// 获取字段
+		Field[] fields = displayAuthority.getClass().getDeclaredFields();
+		// 设置值
+		for (int i = 0; i < mDatas.size(); i++) {
+			boolean isShow = mDatas.get(i).isShow();
+			String index = mDatas.get(i).getIndex();
+			String key = mDatas.get(i).getKey();
+			String value = mDatas.get(i).getValue();
+			// 排除一些不可修改的字段
+			if (!key.equals("性别") && !key.equals("位置") && !key.equals("用户类型") && !key.equals("身家") && !key.equals("DW号")) {
+				// 性别、位置、用户类型 、身家、DW号 值不可修改，所以不用上传
+				LogUtils.i(TAG, "可修改的信息修改为：index = " + index + ",value=" + value + "\n");
+				mapValue.put(index, value);
+			}
+			// 利用映射，将修改的个人信息保存到数据库
+			for (Field field : fields) {
+				if (field.getName().toLowerCase().endsWith(index.toLowerCase()) && !field.getName().equals("userId")) {
+					try {
+						field.setAccessible(true);
+						field.set(displayAuthority, isShow);
+					} catch (Exception e) {
+						LogUtils.e(TAG, "设置" + field.toString() + "权限信息失败：" + e.toString());
+					}
+				}
+			}
+		}
+		displayAuthority.setUserId(dwID);
+		displayAuthority.save();
+	}
+
+	/**
+	 * 更新个人资料到数据库
+	 */
+	public void updateDBInfo() {
+		// 加载数据库记录
+		UserInfo userInfoDB = UserInfoEngine.getInstance().getUserInfo();
+		if (userInfoDB == null) {
+			LogUtils.i(TAG, "加载数据库中的个人信息记录失败");
+			userInfoDB = new UserInfo();
+		} else {
+			LogUtils.i(TAG, "加载数据库中的个人信息记录成功");
+		}
+
+		// 将新修改的数据设置到数据库中
+		for (int i = 0; i < mDatas.size(); i++) {
+			String index = mDatas.get(i).getIndex();
+			Object value = mDatas.get(i).getValue();
+			try {
+				Field fieldDB = userInfoDB.getClass().getDeclaredField(index);
+				fieldDB.setAccessible(true);
+				if (index.equals("age")) {
+					// 如果是年龄，则转化成int
+					int a = Integer.valueOf(value.toString());
+					fieldDB.set(userInfoDB, a);
+				} else if (index.equals("userType") || index.equals("wealth")) {
+					// 不做任何操作
+				} else {
+					fieldDB.set(userInfoDB, value);
+				}
+			} catch (Exception e) {
+				LogUtils.e(TAG, "设置用户信息失败,index=" + index + "，value=" + value + ",cause by:" + e);
+			}
+		}
+		userInfoDB.save();
+		EventBus.getDefault().post("完成资料编辑", NotifyByEventBus.NT_EDIT_INFO_COMPLETE);
+	}
+
+	/**
+	 * 显示拍照相册对话框
+	 * */
+	private void showCameraAlbumDialog() {
+		if (null == cameraAlbumDialogFragment) {
+			cameraAlbumDialogFragment = new CameraAlbumDialogFragment();
+		}
+		cameraAlbumDialogFragment.setOnCameraAlbumClickListener(this);
+		cameraAlbumDialogFragment.show(getSupportFragmentManager(), "cameraAlbumDialogFragment");
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		EventBus.getDefault().unregister(this);
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		LogUtils.i(TAG, "onResume");
+		if (userInfoItemAdapter != null) {
+			userInfoItemAdapter.notifyDataSetChanged();
+		}
+	}
+
+	/** 上传头像回调 **/
+	class SetIconListener implements NetCallback {
+		@Override
+		public void onSuccess(String msg) {
+			toast.show(msg);
+		}
+
+		@Override
+		public void onFailure(String cause) {
+			toast.show(cause);
+		}
+	}
+
+	private int requestCode;
+
+	@Override
+	public void onCameraAlbumClick(View view) {
+		Intent intent;
+		switch (view.getId()) {
+		case R.id.tv_camera:
+			intent = new Intent(this, PictureClipActivity_.class);
+			intent.putExtra(Constants.CAMERA_ALBUM, 1);
+			intent.putExtra(Constants.ASPECTX, 1);
+			intent.putExtra(Constants.ASPECTY, 1);
+			intent.putExtra(Constants.OUTPUTX, 400);
+			intent.putExtra(Constants.OUTPUTY, 400);
+			startActivityForResult(intent, requestCode);
+			break;
+		case R.id.tv_album:
+			intent = new Intent(this, PictureClipActivity_.class);
+			intent.putExtra(Constants.CAMERA_ALBUM, 0);
+			intent.putExtra(Constants.ASPECTX, 1);
+			intent.putExtra(Constants.ASPECTY, 1);
+			intent.putExtra(Constants.OUTPUTX, 400);
+			intent.putExtra(Constants.OUTPUTY, 400);
+			startActivityForResult(intent, requestCode);
+			break;
+		}
+	}
+}

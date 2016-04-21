@@ -36,25 +36,25 @@ public final class ExamineActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        registerComponent = RegisterComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        registerComponent = RegisterComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvName = ((TextView) findViewById(id.tv_name));
         vpExamine = ((HackyViewPager) findViewById(id.vp_examine));
-        tvNoPass = ((TextView) findViewById(id.tv_nopass));
-        tvSex = ((TextView) findViewById(id.tv_sex));
-        tvPass = ((TextView) findViewById(id.tv_pass));
-        tvOccupation = ((TextView) findViewById(id.tv_occupation_shortIntroduce));
-        ivPass = ((ImageView) findViewById(id.iv_pass));
-        tvCondition = ((TextView) findViewById(id.tv_condition));
-        ivNoPass = ((ImageView) findViewById(id.iv_no_pass));
-        llDots = ((LinearLayout) findViewById(id.ll_dots));
-        etIntroduce = ((EditText) findViewById(id.et_introduce));
         tvIfEnter = ((TextView) findViewById(id.tv_ifEnter));
-        ((RegisterComponent_) registerComponent).afterSetContentView_();
+        etIntroduce = ((EditText) findViewById(id.et_introduce));
+        tvName = ((TextView) findViewById(id.tv_name));
+        tvSex = ((TextView) findViewById(id.tv_sex));
+        ivNoPass = ((ImageView) findViewById(id.iv_no_pass));
+        tvPass = ((TextView) findViewById(id.tv_pass));
+        tvNoPass = ((TextView) findViewById(id.tv_nopass));
+        tvOccupation = ((TextView) findViewById(id.tv_occupation_shortIntroduce));
+        llDots = ((LinearLayout) findViewById(id.ll_dots));
+        tvCondition = ((TextView) findViewById(id.tv_condition));
+        ivPass = ((ImageView) findViewById(id.iv_pass));
         ((ToastComponent_) toast).afterSetContentView_();
+        ((RegisterComponent_) registerComponent).afterSetContentView_();
         init();
     }
 

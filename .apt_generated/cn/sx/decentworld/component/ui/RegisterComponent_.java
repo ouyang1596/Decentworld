@@ -8,7 +8,6 @@ package cn.sx.decentworld.component.ui;
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
-import cn.sx.decentworld.component.ToastComponent_;
 
 public final class RegisterComponent_
     extends RegisterComponent
@@ -25,7 +24,6 @@ public final class RegisterComponent_
         if (!(context_ instanceof Activity)) {
             return ;
         }
-        ((ToastComponent_) toastComponent).afterSetContentView_();
         init();
     }
 
@@ -47,7 +45,6 @@ public final class RegisterComponent_
         if (context_ instanceof Activity) {
             activity = ((Activity) context_);
         }
-        toastComponent = ToastComponent_.getInstance_(context_);
     }
 
     public static RegisterComponent_ getInstance_(Context context) {

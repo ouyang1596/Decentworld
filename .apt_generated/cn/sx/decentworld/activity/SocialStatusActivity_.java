@@ -17,7 +17,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.ToastComponent_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class SocialStatusActivity_
@@ -33,14 +32,12 @@ public final class SocialStatusActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        ivBack = ((ImageView) findViewById(id.iv_back));
         btnOk = ((Button) findViewById(id.btn_OK));
         etSocialStatus = ((EditText) findViewById(id.et_social_status));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

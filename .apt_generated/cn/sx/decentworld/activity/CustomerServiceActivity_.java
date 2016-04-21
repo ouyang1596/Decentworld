@@ -36,8 +36,8 @@ public final class CustomerServiceActivity_
 
     private void afterSetContentView_() {
         lvCs = ((ListView) findViewById(id.lv_cs));
-        tvHeadtitle = ((TextView) findViewById(id.tv_header_title));
         ivBack = ((ImageView) findViewById(id.iv_back));
+        tvHeadtitle = ((TextView) findViewById(id.tv_header_title));
         init();
     }
 

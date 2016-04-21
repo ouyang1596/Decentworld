@@ -3,6 +3,7 @@ package cn.sx.decentworld.activity;
 import java.util.HashMap;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
@@ -15,10 +16,14 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.component.ui.RegisterComponent;
 import cn.sx.decentworld.dialog.GetIdentifyingCodeDialogFragment;
 import cn.sx.decentworld.dialog.GetIdentifyingCodeDialogFragment.OnEnsureClickListener;
+import cn.sx.decentworld.observer.SmsObserver;
+import cn.sx.decentworld.utils.ToastUtil;
 import cn.sx.decentworld.widget.ClearEditText;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -27,8 +32,7 @@ import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_register_mobile)
-public class RegisterMobileActivity extends BaseFragmentActivity implements
-		OnClickListener, TextWatcher, OnEnsureClickListener {
+public class RegisterMobileActivity extends BaseFragmentActivity implements OnClickListener, TextWatcher, OnEnsureClickListener {
 	@ViewById(R.id.iv_back)
 	ImageView ivBack;
 	@ViewById(R.id.tv_header_title)
@@ -41,49 +45,34 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 	Button btnOk;
 	@ViewById(R.id.tv_no_receive_code)
 	TextView tvNoReceive;
-	@Bean
-	ToastComponent toast;
 	private FragmentManager fragmentManager;
 	private TimeCount timeCount = new TimeCount(60000, 1000);
 	private String mMobile = "";
 	@Bean
 	RegisterComponent registerComponent;
-	// private Handler mGetIdentifyingCodeHandler = new Handler() {
-	// public void handleMessage(android.os.Message msg) {
-	// switch (msg.what) {
-	// case 2001:
-	// toast.show(msg.obj.toString());
-	// break;
-	// case 1001:
-	// toast.show(msg.obj.toString());
-	// break;
-	// case 0:
-	// toast.show(msg.obj.toString());
-	// break;
-	// case 1:
-	// startIntent(RegisterNickActivity_.class);
-	// break;
-	// }
-	// toast.show(msg.obj.toString());
-	// }
-	// // private void saveToregisterBean(android.os.Message msg) {
-	// // DecentWorldApp.registerBean = new RegisterBean();
-	// // String jsonData = msg.getData().toString();
-	// // try {
-	// // JSONObject joData = new JSONObject(jsonData);
-	// // String jsonString = joData.getString("record");
-	// // DecentWorldApp.registerBean = JsonUtils.json2Bean(jsonString,
-	// // RegisterBean.class);
-	// // } catch (JSONException e) {
-	// // LogUtils.v("bm", e.getLocalizedMessage());
-	// // }
-	// // }
-	// };
 	private Handler mCheckCodeHandle = new Handler() {
 		public void handleMessage(Message msg) {
 			startActivity(new Intent(mContext, RegisterNickActivity_.class));
 			finish();
 		};
+	};
+	private Handler mRequestCodeHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			timeCount.cancel();
+			btnOk.setText("获取验证码");
+			setBtnOk(true);
+		};
+	};
+	private SmsObserver mObserver;
+	private Handler mHandler = new Handler() {
+
+		@Override
+		public void handleMessage(Message msg) {
+			if (msg.what == Constants.MSG_RECEIVED_CODE) {
+				String code = (String) msg.obj;
+				etCode.setText(code);
+			}
+		}
 	};
 
 	@AfterViews
@@ -97,6 +86,13 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 		btnOk.setText(getResources().getString(R.string.get_identify_code));
 		etCode.addTextChangedListener(this);
 		etMobileAddTextChangedListener();
+		initObserver();
+	}
+
+	private void initObserver() {
+		mObserver = new SmsObserver(this, mHandler);
+		Uri uri = Uri.parse("content://sms");
+		getContentResolver().registerContentObserver(uri, true, mObserver);
 	}
 
 	@Override
@@ -115,29 +111,26 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 	}
 
 	private void showGetIdentifyingCodeDialog() {
-		GetIdentifyingCodeDialogFragment gif = GetIdentifyingCodeDialogFragment
-				.newInstance(registerComponent.tel);
+		GetIdentifyingCodeDialogFragment gif = GetIdentifyingCodeDialogFragment.newInstance(registerComponent.tel);
 		gif.setOnEnsureClickListener(RegisterMobileActivity.this);
 		gif.show(fragmentManager, "getIdentifyingcodes");
 	}
 
 	private void handlerBtnOk() {
-		if (getResources().getString(R.string.register_get_identifying_code)
-				.equals(btnOk.getText().toString())) {
+		if (getResources().getString(R.string.register_get_identifying_code).equals(btnOk.getText().toString())) {
 			getIdentifyingCode();
-		} else if (getResources().getString(R.string.register_next).equals(
-				btnOk.getText().toString())) {
+		} else if (getResources().getString(R.string.register_next).equals(btnOk.getText().toString())) {
 			sendIdentifyingCode();
 		}
 	}
 
 	private void sendIdentifyingCode() {
 		if (etCode.length() <= 0) {
-			toast.show("请输入验证码");
+			ToastUtil.showToast("请输入验证码");
 			return;
 		}
 		if (etMobile.length() <= 0) {
-			toast.show("请输入手机号码");
+			ToastUtil.showToast("请输入手机号码");
 			return;
 		}
 		String iCode = etCode.getText().toString();
@@ -147,43 +140,17 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 		registerComponent.identifyCode(map, mCheckCodeHandle);
 	}
 
-	// public void ifJump(Message msg) {
-	// RegisterInfo info = RegisterInfo.queryByDwID(registerComponent.tel);
-	// if (null == info) {
-	// info = new RegisterInfo(registerComponent.tel);
-	// info.save();
-	// }
-	// switch (msg.what) {
-	// case 0:
-	// case 1:
-	// toast.show("验证码已发送到手机");
-	// break;
-	// case 2:
-	// startIntent(RegisterPersonalMsgActivity_.class);
-	// break;
-	// case 3:
-	// startIntent(RegisterIsStudentActivity_.class);
-	// break;
-	// case 4:
-	// startIntent(RegisterWhatYouHaveActivity_.class);
-	// break;
-	// case 5:
-	// startIntent(RegisterNickActivity_.class);
-	// break;
-	// }
-	// }
-
 	private void getIdentifyingCode() {
 		if (etMobile.length() <= 0) {
-			toast.show("请输入手机号码");
+			ToastUtil.showToast("请输入手机号码");
 			return;
 		}
 		if (etMobile.length() != 11) {
-			toast.show("手机号码输入不正确");
+			ToastUtil.showToast("手机号码输入不正确");
 			return;
 		}
 		String mobile = etMobile.getText().toString();
-		registerComponent.requestCode(mobile);
+		registerComponent.requestCode(mobile, mRequestCodeHandler);
 		timeCount.start();
 		setBtnOk(false);
 	}
@@ -194,8 +161,7 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 	}
 
 	@Override
-	public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
-			int arg3) {
+	public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
 	}
 
 	@Override
@@ -205,22 +171,16 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 		if (data.length() > 0) {
 			btnOk.setText(getResources().getString(R.string.register_next));
 		} else {
-			btnOk.setText(getResources().getString(
-					R.string.register_get_identifying_code));
+			btnOk.setText(getResources().getString(R.string.register_get_identifying_code));
 		}
 	}
 
 	private void etMobileAddTextChangedListener() {
 		etMobile.addTextChangedListener(new TextWatcher() {
-			public void onTextChanged(CharSequence data, int arg1, int arg2,
-					int arg3) {
-				if (!(mMobile.equals(data.toString()))) {
-					etCode.setText("");
-				}
+			public void onTextChanged(CharSequence data, int arg1, int arg2, int arg3) {
 			}
 
-			public void beforeTextChanged(CharSequence data, int arg1,
-					int arg2, int arg3) {
+			public void beforeTextChanged(CharSequence data, int arg1, int arg2, int arg3) {
 			}
 
 			public void afterTextChanged(Editable arg0) {
@@ -262,157 +222,22 @@ public class RegisterMobileActivity extends BaseFragmentActivity implements
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		if (CommUtil.isNotBlank(RegisterComponent.tel)) {
+			etMobile.setText(RegisterComponent.tel);
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		getContentResolver().unregisterContentObserver(mObserver);
+	}
+
+	@Override
 	protected void onStop() {
 		super.onStop();
 		timeCount.cancel();
 	}
-	// @ViewById(R.id.et_mobile)
-	// EditText etvMobile;
-	// @ViewById(R.id.btn_OK)
-	// Button btnOk;
-	// @ViewById(R.id.iv_back)
-	// ImageView ivBack;
-	// @ViewById(R.id.tv_age_count)
-	// TextView tvAgreement;
-	// @Bean
-	// ToastComponent toast;
-	// @ViewById(R.id.root_activity_register_mobile)
-	// LinearLayout llRegisterMobile;
-	// @Bean
-	// RegisterComponent registerComponent;
-	// // 对键盘的操作
-	// @Bean
-	// KeyboardComponent keyboardComponent;
-	//
-	// @AfterViews
-	// public void init() {
-	// ViewUtil.scaleContentView(llRegisterMobile);
-	// setBtnState();
-	// openKeyboard();
-	// keyboardComponent.openKeybord(etvMobile);
-	// llRegisterMobile.setOnClickListener(new OnClickListener() {
-	//
-	// @Override
-	// public void onClick(View arg0) {
-	// closeKeyBoard();
-	// }
-	// });
-	// etvMobile.addTextChangedListener(new TextWatcher() {
-	//
-	// @Override
-	// public void onTextChanged(CharSequence arg0, int arg1, int arg2,
-	// int arg3) {
-	// setBtnState();
-	// }
-	//
-	// @Override
-	// public void beforeTextChanged(CharSequence arg0, int arg1,
-	// int arg2, int arg3) {
-	//
-	// }
-	//
-	// @Override
-	// public void afterTextChanged(Editable arg0) {
-	//
-	// }
-	// });
-	// btnOk.setOnClickListener(new OnClickListener() {
-	//
-	// @Override
-	// public void onClick(View arg0) {
-	// /**
-	// * 获取验证码操作
-	// */
-	// String tel = etvMobile.getText().toString();
-	// if (tel.length() != 11) {
-	// toast.show("手机号码格式不正确");
-	// return;
-	// }
-	// Handler handler = new Handler() {
-	// public void handleMessage(android.os.Message msg) {
-	// RegisterInfo info = RegisterInfo
-	// .queryByDwID(registerComponent.tel);
-	// if (null == info) {
-	// info = new RegisterInfo(registerComponent.tel);
-	// info.save();
-	// }
-	// switch (msg.what) {
-	// case 0:
-	// beginIntent();
-	// break;
-	// case 1:
-	// beginIntent();
-	// break;
-	// case 2:
-	// startActivity(new Intent(mContext,
-	// RegisterPersonalMsgActivity_.class));
-	// break;
-	// case 3:
-	// startActivity(new Intent(mContext,
-	// RegisterIsStudentActivity_.class));
-	// break;
-	// case 4:
-	// startActivity(new Intent(mContext,
-	// RegisterWhatYouHaveActivity_.class));
-	// break;
-	// case 5:
-	// startActivity(new Intent(mContext,
-	// RegisterNickActivity_.class));
-	// break;
-	// }
-	// finish();
-	// }
-	// };
-	// registerComponent.requestCode(tel, handler);
-	// }
-	// });
-	// ivBack.setOnClickListener(new OnClickListener() {
-	//
-	// @Override
-	// public void onClick(View arg0) {
-	// closeKeyBoard();
-	// finish();
-	// }
-	// });
-	// }
-	//
-	// /**
-	// * 打开软键盘
-	// */
-	// private void openKeyboard() {
-	// Timer timer = new Timer();
-	// timer.schedule(new TimerTask() {
-	// public void run() {
-	// keyboardComponent.openKeybord(etvMobile);
-	// }
-	// }, 500);
-	// }
-	//
-	// /**
-	// * 关闭软键盘
-	// */
-	// private void closeKeyBoard() {
-	// keyboardComponent.closeKeyboard(etvMobile);
-	// }
-	//
-	// private void beginIntent() {
-	// Intent intent = new Intent(mContext,
-	// RegisterIdentifyingCodeActivity_.class);
-	// startActivity(intent);
-	// }
-	//
-	// private void setBtnState() {
-	// int length = etvMobile.length();
-	// if (length <= 0) {
-	// btnOk.setEnabled(false);
-	// btnOk.setTextColor(getResources()
-	// .getColor(R.color.rg_tv_blue_press));
-	// btnOk.setBackgroundResource(R.drawable.rg_btn_blue_pressed_shape);
-	// } else {
-	// btnOk.setEnabled(true);
-	// btnOk.setTextColor(getResources().getColor(
-	// R.drawable.rg_tv_color_selector));
-	// btnOk.setBackgroundResource(R.drawable.rg_btn_bg_selector);
-	// }
-	// }
 }

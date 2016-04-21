@@ -7,22 +7,31 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.MyChatRoom;
 import cn.sx.decentworld.bean.SubjectBean;
 import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantIntent;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.dialog.TrueOrFalseDialogFragment;
+import cn.sx.decentworld.dialog.TrueOrFalseDialogFragment.OnTrueOrFalseClickListener;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting;
 import cn.sx.decentworld.network.utils.JsonUtils;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ViewUtil;
+import cn.sx.decentworld.widget.CircularImageView;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.Bean;
@@ -36,10 +45,10 @@ public class ChatRoomMySubjectListActivity extends BaseFragmentActivity {
 	List<SubjectBean> subjects;
 	@ViewById(R.id.iv_back)
 	ImageView ivBack;
-	@ViewById(R.id.root_activity_chat_room_my_subject_list)
-	LinearLayout llMySubjectList;
+	private MyChatRoom mMyChatroom;
+	private int mPosition;
 	@Bean
-	ChatRoomInfoSettingAndGetting ChatRoomInfoSettingAndGetting;
+	ChatRoomInfoSettingAndGetting chatRoomInfoSettingAndGetting;
 	private Handler mHandler = new Handler() {
 		public void handleMessage(android.os.Message msg) {
 			try {
@@ -55,10 +64,14 @@ public class ChatRoomMySubjectListActivity extends BaseFragmentActivity {
 
 	@AfterViews
 	public void init() {
-		ViewUtil.scaleContentView(llMySubjectList);
 		CGetIntent();
 		initView();
 		initAdapter();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
 		initRequest();
 	}
 
@@ -72,7 +85,7 @@ public class ChatRoomMySubjectListActivity extends BaseFragmentActivity {
 		});
 	}
 
-	SubjectAdapter adapter;
+	private SubjectAdapter adapter;
 
 	private void initAdapter() {
 		adapter = new SubjectAdapter();
@@ -81,14 +94,12 @@ public class ChatRoomMySubjectListActivity extends BaseFragmentActivity {
 
 	private void initRequest() {
 		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("roomID", roomID);
-		ChatRoomInfoSettingAndGetting.getSubjectList(map, mHandler);
+		map.put("roomID", mMyChatroom.roomID);
+		chatRoomInfoSettingAndGetting.getSubjectList(map, mHandler);
 	}
 
-	private String roomID;
-
 	private void CGetIntent() {
-		roomID = getIntent().getStringExtra("roomID");
+		mMyChatroom = (MyChatRoom) getIntent().getSerializableExtra(Constants.MY_CHATROOM);
 	}
 
 	class SubjectAdapter extends BaseAdapter {
@@ -110,103 +121,116 @@ public class ChatRoomMySubjectListActivity extends BaseFragmentActivity {
 
 		@Override
 		public View getView(int position, View con, ViewGroup arg2) {
-			ViewHolder vh = null;
+			ViewHolder vh;
 			if (null == con) {
-				vh = new ViewHolder();
 				con = View.inflate(mContext, R.layout.item_subject, null);
-				vh.llContent = (LinearLayout) con.findViewById(R.id.ll_content);
-				vh.llContent1 = (LinearLayout) con.findViewById(R.id.ll_content1);
-				vh.llContent2 = (LinearLayout) con.findViewById(R.id.ll_content2);
-				vh.tvSubjectContent = (TextView) con.findViewById(R.id.et_content);
-				vh.tvSubjectContent1 = (TextView) con.findViewById(R.id.et_content1);
-				vh.tvSubjectContent2 = (TextView) con.findViewById(R.id.et_content2);
-				vh.ivSubjectBackground = (ImageView) con.findViewById(R.id.iv_cover);
-				vh.ivImgUrl = (ImageView) con.findViewById(R.id.iv_add_pic);
-				vh.ivImgUrl1 = (ImageView) con.findViewById(R.id.iv_add_pic1);
-				vh.ivImgUrl2 = (ImageView) con.findViewById(R.id.iv_add_pic2);
-				vh.tvSubjectName = (TextView) con.findViewById(R.id.tv_subj_name);
+				ViewUtil.scaleView(con);
+				vh = new ViewHolder();
+				vh.ivBg = (ImageView) con.findViewById(R.id.iv_bg);
+				vh.ivDetail = (CircularImageView) con.findViewById(R.id.iv_detail);
+				vh.ivChatRoomEnter = (ImageView) con.findViewById(R.id.iv_chatroom_enter);
+				vh.tvChatRoomName = (TextView) con.findViewById(R.id.tv_subject_name);
+				vh.tvSelfIntroduce = (TextView) con.findViewById(R.id.tv_self_introduce);
+				vh.tvOnLineCount = (TextView) con.findViewById(R.id.tv_online_count);
+				vh.tvChargeAmount = (TextView) con.findViewById(R.id.tv_chargerAmount);
+				vh.tvSelfNickName = (TextView) con.findViewById(R.id.tv_self_nickname);
+				vh.tvDeleteSubject = (TextView) con.findViewById(R.id.tv_delete_subject);
+				vh.tvDeleteSubject.setOnClickListener(mOnClickListener);
+				vh.tvEditSubject = (TextView) con.findViewById(R.id.tv_edit_subject);
+				vh.tvEditSubject.setOnClickListener(mOnClickListener);
 				con.setTag(vh);
 			} else {
 				vh = (ViewHolder) con.getTag();
 			}
-			SubjectBean info = subjects.get(position);
-			String subjectBackground = info.subjectBackground;
-			if (CommUtil.isNotBlank(subjectBackground)) {
-				// Picasso.with(mContext).load(subjectBackground)
-				// .error(R.drawable.solid_heart)
-				// .into(vh.ivSubjectBackground);
-				ImageLoaderHelper.mImageLoader
-						.displayImage(subjectBackground, vh.ivSubjectBackground, ImageLoaderHelper.mOptions);
+			SubjectBean subjectBean = subjects.get(position);
+			String roomBg = subjectBean.subjectBackground;
+			if (CommUtil.isNotBlank(roomBg)) {
+				ImageLoaderHelper.mImageLoader.displayImage(roomBg, vh.ivBg, ImageLoaderHelper.mOptions);
+			} else {
+				vh.ivBg.setImageResource(R.drawable.ic_launcher);
 			}
-			vh.tvSubjectName.setText(info.subjectName);
-			setContent(vh, info);
-			setContent1(vh, info);
-			setContent2(vh, info);
+			String ownerIcon = mMyChatroom.ownerIcon;
+			if (CommUtil.isNotBlank(ownerIcon)) {
+				ImageLoaderHelper.mImageLoader.displayImage(ownerIcon, vh.ivDetail, ImageLoaderHelper.mOptions);
+			} else {
+				vh.ivDetail.setImageResource(R.drawable.ic_launcher);
+			}
+			vh.tvSelfNickName.setText(mMyChatroom.ownerNickName);
+			vh.tvChatRoomName.setText(subjectBean.subjectName);
+			vh.tvSelfIntroduce.setText(mMyChatroom.ownerIntroduction);
+			vh.tvOnLineCount.setText(mMyChatroom.onLineNum + " 在线");
+			vh.tvChargeAmount.setText(mMyChatroom.chargeAmount + " 价格");
+			vh.tvDeleteSubject.setTag(Constants.ITEM_POSITION, position);
+			vh.tvDeleteSubject.setTag(Constants.ITEM_TAG, subjectBean);
+			vh.tvEditSubject.setTag(Constants.ITEM_POSITION, position);
+			vh.tvEditSubject.setTag(Constants.ITEM_TAG, subjectBean);
+			if (position == 0) {
+				vh.tvOnLineCount.setVisibility(View.VISIBLE);
+				vh.tvChargeAmount.setVisibility(View.VISIBLE);
+			} else {
+				vh.tvOnLineCount.setVisibility(View.GONE);
+				vh.tvChargeAmount.setVisibility(View.GONE);
+			}
 			return con;
 		}
 
-		private void setContent(ViewHolder vh, SubjectBean info) {
-			String imgUrl = info.imgUrl;
-			String subjectContent = info.subjectContent;
-			if (null != imgUrl || null != subjectContent) {
-				vh.llContent.setVisibility(View.VISIBLE);
-				vh.tvSubjectContent.setText(subjectContent);
-				if (CommUtil.isNotBlank(imgUrl)) {
-					// Picasso.with(mContext).load(imgUrl)
-					// .error(R.drawable.solid_heart).into(vh.ivImgUrl);
-					ImageLoaderHelper.mImageLoader.displayImage(imgUrl, vh.ivImgUrl, ImageLoaderHelper.mOptions);
+		private Handler mDeletHandler = new Handler() {
+			public void handleMessage(android.os.Message msg) {
+				subjects.remove(mPosition);
+				notifyDataSetChanged();
+			};
+		};
+
+		private OnClickListener mOnClickListener = new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				mPosition = (Integer) v.getTag(Constants.ITEM_POSITION);
+				SubjectBean subjectBean = (SubjectBean) v.getTag(Constants.ITEM_TAG);
+				switch (v.getId()) {
+				case R.id.tv_delete_subject:
+					TrueOrFalseDialogFragment trueOrFalseDialogFragment = new cn.sx.decentworld.dialog.TrueOrFalseDialogFragment();
+					trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(mOnTrueOrFalseClickListener);
+					trueOrFalseDialogFragment.setTips("是否删除此话题");
+					trueOrFalseDialogFragment.setObj(subjectBean);
+					trueOrFalseDialogFragment.show(getSupportFragmentManager(), "trueOrFalseDialogFragment");
+					break;
+				case R.id.tv_edit_subject:
+					Intent intent = new Intent(ChatRoomMySubjectListActivity.this, ChatRoomEditMySubjectActivity_.class);
+					intent.putExtra(ConstantIntent.SUBJECTBEAN, subjectBean);
+					startActivity(intent);
+					break;
 				}
-			} else {
-				vh.llContent.setVisibility(View.GONE);
 			}
+		};
+		private OnTrueOrFalseClickListener mOnTrueOrFalseClickListener = new OnTrueOrFalseClickListener() {
+
+			@Override
+			public void onTrueOrFalseClick(TrueOrFalseDialogFragment dialog, View view) {
+				switch (view.getId()) {
+				case R.id.tv_cancel:
+					break;
+				case R.id.tv_ensure:
+					SubjectBean subjectBean = (SubjectBean) dialog.getObj();
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+					map.put("roomID", subjectBean.roomID);
+					map.put("subjectID", "" + subjectBean.id);
+					chatRoomInfoSettingAndGetting.deleteSubject(map, ConstantNet.API_DELETE_SUBJECT, mDeletHandler);
+					break;
+				}
+			}
+		};
+
+		public void setMyChatRoom(MyChatRoom myChatRoom) {
+			mMyChatroom = myChatRoom;
 		}
 
-		private void setContent1(ViewHolder vh, SubjectBean info) {
-			String imgUrl1 = info.imgUrl1;
-			String subjectContent1 = info.subjectContent1;
-			if (null != imgUrl1 || null != subjectContent1) {
-				vh.llContent1.setVisibility(View.VISIBLE);
-				vh.tvSubjectContent1.setText(subjectContent1);
-				if (CommUtil.isNotBlank(imgUrl1)) {
-					// Picasso.with(mContext).load(imgUrl1)
-					// .error(R.drawable.solid_heart).into(vh.ivImgUrl1);
-					ImageLoaderHelper.mImageLoader.displayImage(imgUrl1, vh.ivImgUrl1, ImageLoaderHelper.mOptions);
-				}
-			} else {
-				vh.llContent1.setVisibility(View.GONE);
-			}
-		}
-
-		private void setContent2(ViewHolder vh, SubjectBean info) {
-			String imgUrl2 = info.imgUrl2;
-			String subjectContent2 = info.subjectContent2;
-			if (null != imgUrl2 || null != subjectContent2) {
-				vh.llContent.setVisibility(View.VISIBLE);
-				vh.tvSubjectContent.setText(subjectContent2);
-				if (CommUtil.isNotBlank(imgUrl2)) {
-					// Picasso.with(mContext).load(imgUrl2)
-					// .error(R.drawable.solid_heart).into(vh.ivImgUrl2);
-					ImageLoaderHelper.mImageLoader.displayImage(imgUrl2, vh.ivImgUrl2, ImageLoaderHelper.mOptions);
-				}
-			} else {
-				vh.llContent2.setVisibility(View.GONE);
-			}
-		}
-
-		// public String beginDate;
-		// public String endDate;
-		// public String imgUrl;
-		// public String imgUrl1;
-		// public String imgUrl2;
-		// public String subjectBackground;
-		// public String subjectName;
-		// public String subjectContent;
-		// public String subjectContent1;
-		// public String subjectContent2;
 		class ViewHolder {
-			LinearLayout llContent, llContent1, llContent2;
-			TextView tvSubjectName, tvSubjectContent, tvSubjectContent1, tvSubjectContent2;
-			ImageView ivSubjectBackground, ivImgUrl, ivImgUrl1, ivImgUrl2;
+			ImageView ivBg, ivChatRoomEnter;
+			CircularImageView ivDetail;
+			TextView tvSelfIntroduce, tvChatRoomName, tvOnLineCount, tvChargeAmount, tvSelfNickName;
+			TextView tvDeleteSubject, tvEditSubject;
 		}
 	}
 }

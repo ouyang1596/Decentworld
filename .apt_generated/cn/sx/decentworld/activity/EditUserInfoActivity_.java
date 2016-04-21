@@ -20,8 +20,6 @@ import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ChoceAndTakePictureComponent_;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.network.request.GetUserInfo_;
-import cn.sx.decentworld.network.request.SetUserInfo_;
 import cn.sx.decentworld.widget.ListViewForScrollView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
@@ -40,23 +38,19 @@ public final class EditUserInfoActivity_
     private void init_(Bundle savedInstanceState) {
         choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
-        setUserInfo = SetUserInfo_.getInstance_(this);
-        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        tvFinish = ((TextView) findViewById(id.tv_finish));
         iv_edit_user_info_icon_3 = ((ImageView) findViewById(id.iv_edit_user_info_icon_3));
         iv_edit_user_info_icon_1 = ((ImageView) findViewById(id.iv_edit_user_info_icon_1));
-        tvFinish = ((TextView) findViewById(id.tv_finish));
         ll_edit_user_info_root = ((LinearLayout) findViewById(id.ll_edit_user_info_root));
-        lv_edit_user_info = ((ListViewForScrollView) findViewById(id.lv_edit_user_info));
         ivBack = ((ImageView) findViewById(id.iv_back));
         sl_edit_user_info = ((ScrollView) findViewById(id.sl_edit_user_info));
         iv_edit_user_info_icon_2 = ((ImageView) findViewById(id.iv_edit_user_info_icon_2));
+        lv_edit_user_info = ((ListViewForScrollView) findViewById(id.lv_edit_user_info));
         ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
-        ((SetUserInfo_) setUserInfo).afterSetContentView_();
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

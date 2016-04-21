@@ -37,10 +37,10 @@ public final class RechargeBenefitActivity_
     }
 
     private void afterSetContentView_() {
+        tv_rb_title_benefit = ((TextView) findViewById(id.tv_rb_title_benefit));
         ll_rb_title_bg = ((LinearLayout) findViewById(id.ll_rb_title_bg));
         ll_rb_back = ((LinearLayout) findViewById(id.ll_rb_back));
         tv_rb_title_recharge = ((TextView) findViewById(id.tv_rb_title_recharge));
-        tv_rb_title_benefit = ((TextView) findViewById(id.tv_rb_title_benefit));
         iv_rb_icon = ((CircularImage) findViewById(id.iv_rb_icon));
         ((ToastComponent_) toast).afterSetContentView_();
         init();

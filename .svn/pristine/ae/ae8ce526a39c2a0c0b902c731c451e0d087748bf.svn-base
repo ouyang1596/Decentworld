@@ -1,0 +1,219 @@
+package cn.sx.decentworld.activity;
+
+import java.io.File;
+import java.util.HashMap;
+
+import android.app.ProgressDialog;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.dialog.TrueOrFalseDialogFragment;
+import cn.sx.decentworld.dialog.TrueOrFalseDialogFragment.OnTrueOrFalseClickListener;
+import cn.sx.decentworld.fragment.chatroom.ChatRoomAddThemeContentFragment;
+import cn.sx.decentworld.fragment.chatroom.ChatRoomAddThemeFeeScaleFragment;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_chatroom_add)
+public class ChatRoomAddThemeActivity extends BaseFragmentActivity implements OnClickListener, OnCheckedChangeListener {
+	private static final String TAG = "ChatRoomAddThemeActivity";
+	@ViewById(R.id.rg_content)
+	RadioGroup rgContentFee;
+	@ViewById(R.id.rb_content)
+	RadioButton rbContent;
+	@ViewById(R.id.rb_fee_scale)
+	RadioButton rbFeeScale;
+	@ViewById(R.id.tv_send)
+	TextView tvSend;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	private ChatRoomAddThemeContentFragment mChatRoomContentFragment;
+	private ChatRoomAddThemeFeeScaleFragment mChatRoomFeeScaleFragment;
+	private SendUrl mSendUrl;
+	private Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			finish();
+		};
+	};
+
+	@AfterViews
+	public void init() {
+		CGetIntent();
+		mSendUrl = new SendUrl(this);
+		mChatRoomContentFragment = new ChatRoomAddThemeContentFragment();
+		mChatRoomContentFragment.isNewOrEdit = 0;
+		mChatRoomFeeScaleFragment = new ChatRoomAddThemeFeeScaleFragment();
+		mChatRoomFeeScaleFragment.isNewOrEdit = 0;
+		getSupportFragmentManager().beginTransaction().add(R.id.fl_container_content_fee, mChatRoomContentFragment, "")
+				.add(R.id.fl_container_content_fee, mChatRoomFeeScaleFragment, "").hide(mChatRoomFeeScaleFragment).commit();
+		rgContentFee.setOnCheckedChangeListener(this);
+		tvSend.setOnClickListener(this);
+		ivBack.setOnClickListener(this);
+	}
+
+	@Override
+	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		switch (group.getCheckedRadioButtonId()) {
+		case R.id.rb_content:
+			getSupportFragmentManager().beginTransaction().hide(mChatRoomFeeScaleFragment).show(mChatRoomContentFragment)
+					.commit();
+			tvSend.setVisibility(View.VISIBLE);
+			break;
+		case R.id.rb_fee_scale:
+			getSupportFragmentManager().beginTransaction().hide(mChatRoomContentFragment).show(mChatRoomFeeScaleFragment)
+					.commit();
+			tvSend.setVisibility(View.GONE);
+			break;
+		}
+	}
+
+	@Bean
+	ChatRoomInfoSettingAndGetting chatRoomInfoSettingAndGetting;
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.tv_send:
+			if (CommUtil.isBlank(mChatRoomContentFragment.getCover())) {
+				ToastUtil.showToast("请先上传一张图片");
+				return;
+			}
+			if (CommUtil.isBlank(mChatRoomContentFragment.getSubjectName())) {
+				ToastUtil.showToast("请先输入主题名");
+				return;
+			}
+			if (CommUtil.isBlank(mChatRoomContentFragment.getSubjectContent())) {
+				ToastUtil.showToast("请先输入主题内容");
+				return;
+			}
+			if (CommUtil.isBlank(mChatRoomFeeScaleFragment.getFee())) {
+				ToastUtil.showToast("请先输入收费标准");
+				return;
+			}
+			TrueOrFalseDialogFragment trueOrFalseDialogFragment = new cn.sx.decentworld.dialog.TrueOrFalseDialogFragment();
+			trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(mOnTrueOrFalseClickListener);
+			trueOrFalseDialogFragment.setTips("确认创建新的话题");
+			trueOrFalseDialogFragment.show(getSupportFragmentManager(), "trueOrFalseDialogFragment");
+			break;
+		case R.id.iv_back:
+			finish();
+			break;
+		}
+	}
+
+	private OnTrueOrFalseClickListener mOnTrueOrFalseClickListener = new OnTrueOrFalseClickListener() {
+
+		@Override
+		public void onTrueOrFalseClick(TrueOrFalseDialogFragment dialog, View view) {
+			switch (view.getId()) {
+			case R.id.tv_cancel:
+				break;
+			case R.id.tv_ensure:
+				if (!mChatRoomFeeScaleFragment.isSetChargeAmount) {
+					ToastUtil.showToast("请先设置收费标准");
+					return;
+				}
+				addNewTheme();
+				break;
+			}
+		}
+	};
+
+	private void addNewTheme() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("subjectName", mChatRoomContentFragment.getSubjectName());
+		map.put("roomID", roomID);
+		map.put("ownerID", DecentWorldApp.getInstance().getDwID());
+		map.put("subjectContent", mChatRoomContentFragment.getSubjectContent());
+		File[] file = new File[1];
+		file[0] = new File(mChatRoomContentFragment.getCover());
+		addNewThemeRequest(map, file);
+	}
+
+	private void addNewThemeRequest(HashMap<String, String> map, File[] file) {
+		showProgressDialog();
+		mSendUrl.httpRequestWithImage(map, file, Constants.CONTEXTPATH_OPENFIRE + Constants.API_CREATE_SUBJECT,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String resultJSON, ResultBean resultBean) {
+						LogUtils.i(TAG, "addNewThemeRequest===>" + "ResultCode-->" + resultBean.getResultCode() + "--Data-->"
+								+ resultBean.getData().toString() + "--Msg-->" + resultBean.getMsg());
+						hideProgressDialog();
+						if (resultBean.getResultCode() == 2222) {
+							showToast("succ");
+							mHandler.sendEmptyMessage(2222);
+						} else {
+							showToast(resultBean.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						hideProgressDialog();
+						showToast(Constants.NET_WRONG);
+						LogUtils.e(TAG, "addNewThemeRequest===>" + "e-->" + e);
+					}
+				});
+	}
+
+	private ProgressDialog mProDialog;
+
+	private void showProgressDialog() {
+		if (null == mProDialog) {
+			mProDialog = ProgressDialog.show(this, null, "loading");
+		} else {
+			mProDialog.show();
+		}
+	}
+
+	private void hideProgressDialog() {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (null != mProDialog) {
+					mProDialog.hide();
+				}
+			}
+		});
+	}
+
+	private void showToast(final String data) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				ToastUtil.showToast(data);
+			}
+		});
+	}
+
+	private String roomID;
+
+	private void CGetIntent() {
+		roomID = getIntent().getStringExtra(ChatRoomMeActivity.ROOMID);
+	}
+
+	public String getRoomID() {
+		return roomID;
+	}
+}

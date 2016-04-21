@@ -36,12 +36,12 @@ public final class EditIsMarriedActivity_
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_back));
         rbMarried = ((RadioButton) findViewById(id.rb_married));
-        rbNoMarried = ((RadioButton) findViewById(id.rb_no_married));
         rgIsMarried = ((RadioGroup) findViewById(id.rg_is_married));
-        tvFinish = ((TextView) findViewById(id.tv_finish));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        tvFinish = ((TextView) findViewById(id.tv_finish));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        rbNoMarried = ((RadioButton) findViewById(id.rb_no_married));
         init();
     }
 

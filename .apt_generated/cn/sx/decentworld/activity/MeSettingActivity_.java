@@ -13,7 +13,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.Common_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class MeSettingActivity_
@@ -29,11 +28,9 @@ public final class MeSettingActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        common = Common_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ((Common_) common).afterSetContentView_();
         init();
     }
 

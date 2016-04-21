@@ -1,5 +1,6 @@
 package cn.sx.decentworld.activity;
 
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,12 +25,11 @@ import android.widget.TextView;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.bean.RegisterInfo;
 import cn.sx.decentworld.bean.RegisterInfoUseless;
+import cn.sx.decentworld.common.ConstantNet;
 import cn.sx.decentworld.component.KeyboardComponent;
-import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.component.ui.RegisterComponent;
 import cn.sx.decentworld.dialog.BackDialogFragment.OnBackClickListener;
 import cn.sx.decentworld.fragment.ViewPagerFragment;
-import cn.sx.decentworld.network.request.GetUserInfo;
 import cn.sx.decentworld.utils.ToastUtil;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -54,20 +54,23 @@ public class RegisterNickActivity extends BaseFragmentActivity implements OnBack
 	@ViewById(R.id.root_activity_register_nick)
 	LinearLayout llRegisterNick;
 	private FragmentManager fragmentManager;
-	// @ViewById(R.id.iv_nickname)
-	// ImageView ivNickName;
 	private ViewPagerFragment mVpFragment;
 	@Bean
 	RegisterComponent registerComponent;
 	private static final int IMAGE_REQUEST_CODE = 100;
 	private static final int OCCUPATION_REQUEST_CODE = 200;
 	public static RegisterInfo registerInfo;
-	@Bean
-	GetUserInfo getUserInfo;
-	@Bean
-	ToastComponent toast;
-	// private String filePath;
 	private XMPPConnection con;
+	private Handler mCheckNickNameHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			registerInfo.nickName = etNickName.getText().toString();
+			registerInfo.occupation = tvOccupation.getText().toString();
+			registerInfo.picPaths = mVpFragment.mPicPaths;
+			registerInfo.sex = ((RadioButton) findViewById(rgSex.getCheckedRadioButtonId())).getText().toString();
+			Intent intent = new Intent(RegisterNickActivity.this, RegisterSetPasswordActivity_.class);
+			startActivity(intent);
+		};
+	};
 
 	@AfterViews
 	public void init() {
@@ -86,16 +89,6 @@ public class RegisterNickActivity extends BaseFragmentActivity implements OnBack
 			}
 		});
 
-		// ivNickName.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View v) {
-		// Intent intent = new Intent(getApplicationContext(),
-		// TakePhotosAndpictureActivity.class);
-		// intent.putExtra("max_count", 1);
-		// startActivityForResult(intent, IMAGE_REQUEST_CODE);
-		// }
-		// });
 		initData();
 		setBtnState();
 		fragmentManager = getSupportFragmentManager();
@@ -131,52 +124,25 @@ public class RegisterNickActivity extends BaseFragmentActivity implements OnBack
 			@Override
 			public void onClick(View arg0) {
 				if (etNickName.length() <= 0) {
-					toast.show("昵称不能为空");
+					ToastUtil.showToast("昵称不能为空");
 					return;
 				}
 				if (etNickName.length() > 8) {
-					toast.show("字数不能超过8个字符");
+					ToastUtil.showToast("字数不能超过8个字符");
 					return;
 				}
 				if (tvOccupation.length() <= 0) {
-					toast.show("行业不能为空");
+					ToastUtil.showToast("行业不能为空");
 					return;
 				}
 				if (mVpFragment.mPicPaths.size() <= 0) {
 					ToastUtil.showToast("请先选择至少一张图片");
 					return;
 				}
-				String nickName = etNickName.getText().toString();
-				Handler handler = new Handler() {
-					public void handleMessage(android.os.Message msg) {
-						ToastUtil.showToast("注册成功");
-						startIntent(LoginActivity_.class);
-						finish();
-						// login();
-					}
-				};
-				// if (null == filePath) {
-				// toast.show("请先选择一张图片");
-				// return;
-				// }
-				registerInfo.nickName = nickName;
-				registerInfo.occupation = tvOccupation.getText().toString();
-				registerInfo.picPaths = mVpFragment.mPicPaths;
-				registerInfo.sex = ((RadioButton) findViewById(rgSex.getCheckedRadioButtonId())).getText().toString();
-				Intent intent = new Intent(RegisterNickActivity.this, RegisterSetPasswordActivity_.class);
-				startActivity(intent);
-				// File[] images = new File[1];
-				// File file = new File(filePath);
-				// images[0] = file;
-				// HashMap<String, String> map = new HashMap<String, String>();
-				// map.put("nickName", nickName);
-				// map.put("phoneNum", RegisterComponent.tel);
-				// map.put("occupation", tvOccupation.getText().toString());
-				// map.put("sex", ((RadioButton) findViewById(rgSex
-				// .getCheckedRadioButtonId())).getText().toString());
-				// // registerComponent.submitNickName(nickName, handler);
-				// registerComponent.submitNickName(map, images,
-				// Constants.API_REGISTER_NICK_IMAGES, handler);
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put("nickName", etNickName.getText().toString());
+				registerComponent.checkNickName(map, ConstantNet.API_CHECK_NICKNAME, mCheckNickNameHandler);
+
 			}
 		});
 		tvOccupation.setOnClickListener(new OnClickListener() {
@@ -223,20 +189,6 @@ public class RegisterNickActivity extends BaseFragmentActivity implements OnBack
 
 	@Override
 	public void backClick(int state) {
-		// if (state == Constants.SAVE) {
-		// RegisterInfo info = RegisterInfo.queryByDwID(registerComponent.tel);
-		// if (info == null) {
-		// info = new RegisterInfo(registerComponent.tel);
-		// }
-		// if (etNickName.length() > 0) {
-		// String strIdentifyCard = etNickName.getText().toString();
-		// info.identifyCard = strIdentifyCard;
-		// }
-		// info.save();
-		// startIntent(RegisterWhatYouHaveActivity_.class);
-		// } else {
-		// startIntent(RegisterWhatYouHaveActivity_.class);
-		// }
 		finish();
 	}
 
@@ -247,106 +199,6 @@ public class RegisterNickActivity extends BaseFragmentActivity implements OnBack
 	}
 
 	private String beginTime, support, unsupport, standard;
-
-	// private void backAction() {
-	// if (etNickName.length() > 0) {
-	// BackDialogFragment bf = BackDialogFragment
-	// .newInstance("您是否需要保存已经写好的信息？");
-	// bf.setOnBackClickListener(RegisterNickActivity.this);
-	// bf.show(fragmentManager, "backDialogs");
-	// } else {
-	// finish();
-	// }
-	// }
-	// private void login() {
-	// final RegisterInfo info = RegisterInfo
-	// .queryByDwID(registerComponent.tel);
-	// if (null == info) {
-	// startIntent(LoginActivity_.class);
-	// return;
-	// }
-	// Handler handler = new Handler() {
-	// public void handleMessage(android.os.Message msg) {
-	// switch (msg.what) {
-	// case 2222:
-	// try {
-	// JSONObject jsonObject = new JSONObject(
-	// msg.obj.toString());
-	// String dwID = jsonObject.getString("dwID");
-	// String token = jsonObject.getString("token");
-	// showProgressDialog();
-	// new LoginXMPPAsyncTask().execute(registerComponent.tel,
-	// dwID, info.password, token);
-	// } catch (JSONException e) {
-	// }
-	// break;
-	// case 2010:
-	// try {
-	// JSONObject jsonObject = new JSONObject(
-	// msg.obj.toString());
-	// beginTime = jsonObject.getString("beginTime");
-	// support = jsonObject.getString("support");
-	// unsupport = jsonObject.getString("unsupport");
-	// standard = jsonObject.getString("standard");
-	// } catch (JSONException e) {
-	// }
-	// break;
-	// }
-	//
-	// }
-	// };
-	// getUserInfo.getUserdwID(registerComponent.tel, handler);
-	// }
-
-	// class LoginXMPPAsyncTask extends AsyncTask<String, Void, Integer> {
-	//
-	// @Override
-	// protected Integer doInBackground(String... params) {
-	// try {
-	// con = XmppHelper.getConnection(null);
-	// con.login(params[0], params[1], params[2], "Smack");
-	// con.sendPacket(new Presence(Presence.Type.available));
-	// // 登录成功后保存相应的数据到Application和SQLite中
-	// DecentWorldApp.getInstance().setDwID(params[1]);
-	// DecentWorldApp.getInstance().setToken(params[3]);
-	// DecentWorldApp.getInstance().setUserName(params[0]);
-	// DecentWorldApp.getInstance().setPassword(params[2]);
-	// SharedPreferences preferences = getSharedPreferences("setting",
-	// 0);
-	// SharedPreferences.Editor editor = preferences.edit();
-	// editor.putString("token", params[3]);
-	// editor.commit();
-	// UserLogin user = UserLogin.queryByDwID(params[1]);
-	// if (user == null) {
-	// UserLogin userLogin = new UserLogin(params[1], params[0],
-	// params[2], 1);
-	// userLogin.save();
-	// } else {
-	// UserLogin userLogin = UserLogin.queryByDwID(params[1]);
-	// userLogin.setUsername(params[0]);
-	// userLogin.setPassword(params[2]);
-	// userLogin.setPriority(1);
-	// userLogin.save();
-	// }
-	// } catch (Exception e) {
-	// LogUtils.e("bm", "register---" + e.getLocalizedMessage());
-	// return Constants.FAILURE;
-	// }
-	// return Constants.SUCC;
-	// }
-	//
-	// @Override
-	// protected void onPostExecute(Integer result) {
-	// super.onPostExecute(result);
-	// hideProgressDialog();
-	// if (result == Constants.SUCC) {
-	// startIntent(MainActivity_.class);
-	// } else {
-	// startIntent(LoginActivity_.class);
-	// }
-	// finish();
-	// }
-	// }
 
 	// 对键盘的操作
 	@Bean

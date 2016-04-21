@@ -1,0 +1,260 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.abstractclass.AbstractTextWatcher;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.ReminderDialog;
+import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
+import cn.sx.decentworld.engine.BenefitEngine;
+import cn.sx.decentworld.engine.BenefitEngine.ValidateRecommendListener;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.utils.DataConvertUtils;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: RecommendActivity.java
+ * @Description: 
+ * @author: cj
+ * @date: 2016年1月13日 下午6:17:38
+ */
+public class RecommendActivity extends BaseFragmentActivity implements OnClickListener
+{
+    private static final String TAG = "RecommendActivity";
+    private static final int VALIDATERECOMMEND = 1;
+    private static final int NEND_BAND_ACCOUNT = 2;
+
+    
+    /**
+     * 界面资源
+     */
+    private ImageView mBack;
+    private ImageView mOpenRecommendUnavailableList;
+
+    //电话号码 
+    private EditText mPhoneNum;
+    //推荐金额
+    private EditText mAmount;
+    //提交
+    private Button mSubmit;
+    
+    /**
+     * 变量
+     */
+    private String dwID = "";
+    private String phoneNum = "";
+    private String money = "";
+    
+
+    @Override
+    protected void onCreate(Bundle arg0)
+    {
+        super.onCreate(arg0);
+        setContentView(R.layout.activity_recommend);
+        initVars();
+        initViews();
+        initEvents();
+        loadData();
+    }
+
+    /**
+     * 初始化变量
+     */
+    private void initVars()
+    {
+        dwID = DecentWorldApp.getInstance().getDwID();
+    }
+    
+
+    /**
+     * 初始化界面
+     */
+    private void initViews()
+    {
+        mBack = (ImageView) findViewById(R.id.iv_back);
+        mOpenRecommendUnavailableList = (ImageView) findViewById(R.id.iv_recommend_unavaliable);
+        mPhoneNum = (EditText) findViewById(R.id.et_recommend_phoneNum);
+        mAmount = (EditText) findViewById(R.id.et_recommend_money);
+        mSubmit = (Button) findViewById(R.id.btn_recommend_confirm);
+    }
+
+
+    /**
+     * 
+     */
+    private void initEvents()
+    {
+        mBack.setOnClickListener(this);
+        mOpenRecommendUnavailableList.setOnClickListener(this);
+        mSubmit.setOnClickListener(this);
+//        mPhoneNum.addTextChangedListener(new TextWatcher()
+//        {
+//            @Override
+//            public void onTextChanged(CharSequence str, int start, int before, int count)
+//            {
+//                
+//            }
+//            
+//            @Override
+//            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+//            {
+//                // TODO Auto-generated method stub
+//                
+//            }
+//            
+//            @Override
+//            public void afterTextChanged(Editable s)
+//            {
+//                // TODO Auto-generated method stub
+//                
+//            }
+//        });
+        
+        mPhoneNum.addTextChangedListener(new AbstractTextWatcher(){
+            @Override
+            public void onTextChanged(CharSequence str, int start, int before, int count)
+            {
+                DataConvertUtils.formatPhone(str.toString(), mPhoneNum);
+            }
+        });
+    }
+    
+    
+    /**
+     * 
+     */
+    private void loadData()
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+
+
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.iv_back:
+                finish();
+                break;
+            case R.id.iv_recommend_unavaliable:
+                startActivity(new Intent(this, RecommendUnavaliableActivity.class));
+                break;
+            case R.id.btn_recommend_confirm:
+                confirm();
+                break;
+            default:
+                break;
+        }
+    }
+
+
+    /**
+     * 确定
+     */
+    private void confirm()
+    {
+        phoneNum = mPhoneNum.getText().toString().replaceAll(" ", "");
+        money = mAmount.getText().toString().trim();
+        //判断电话号码
+        if(CommUtil.isBlank(phoneNum))
+        {
+            LogUtils.i(TAG, "请输入电话号码");
+            Toast.makeText(RecommendActivity.this, "请输入电话号码", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        else
+        {
+            if(phoneNum.length()!=11)
+            {
+                LogUtils.i(TAG, "请输入有效的电话号码");
+                toast("请输入有效的电话号码");
+                return;
+            }
+        }
+        //判断担保金额
+        if(CommUtil.isBlank(money))
+        {
+            LogUtils.i(TAG, "请输入推荐金额");
+            toast("请输入推荐金额");
+            return;
+        }
+        else
+        {
+            if(Integer.valueOf(money)<10)
+            {
+                LogUtils.i(TAG, "推荐金额必须大于10");
+                toast("推荐金额必须大于10");
+                return;
+            }
+        }
+        //验证被推荐人
+        new BenefitEngine().validateRecommend(phoneNum, new ValidateRecommendListener()
+        {
+            
+            @Override
+            public void onSuccess(String info)
+            {
+                Intent intent = new Intent(RecommendActivity.this , RechargePayMethodActivity_.class);
+                intent.putExtra("isRecommend", true);
+                intent.putExtra("phoneNum", phoneNum);
+                intent.putExtra("amount", money);
+                startActivity(intent);
+            }
+            
+            @Override
+            public void onRegister(String info)
+            {
+                toast(info);
+            }
+            
+            @Override
+            public void onHasRecommend(String info)
+            {
+                toast(info);
+            }
+            
+            @Override
+            public void onFailure(String cause)
+            {
+                toast(cause);
+            }
+        });
+    }
+    
+    /**
+     * 弹出提示信息
+     * @param info
+     */
+    private void toast(String info)
+    {
+        Toast.makeText(RecommendActivity.this, info, Toast.LENGTH_SHORT).show();
+    }
+}

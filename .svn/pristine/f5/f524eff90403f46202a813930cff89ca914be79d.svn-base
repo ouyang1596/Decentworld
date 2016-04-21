@@ -1,0 +1,418 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity.discover;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.BaseFragmentActivity;
+import cn.sx.decentworld.adapter.FriendsCircleAdapter;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.InputNumberDialog;
+import cn.sx.decentworld.dialog.InputNumberDialog.InputNumberListener;
+import cn.sx.decentworld.dialog.ReminderDialog;
+import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
+import cn.sx.decentworld.engine.MomentEngine;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.entity.db.MomentEntity;
+import cn.sx.decentworld.fragment.PublishFragment;
+import cn.sx.decentworld.fragment.PublishFragment.OnPublishChangeListener;
+import cn.sx.decentworld.network.request.MomentNetRequest;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.nui.multiphotopicker.model.ImageItem;
+
+/**
+ * @ClassName: WorksCircleActivity.java
+ * @Description: 朋友圈界面
+ * @author: cj
+ * @date: 2016年2月22日 下午3:42:08
+ */
+@EActivity(R.layout.activity_moment)
+public class MomentActivity extends BaseFragmentActivity implements OnRefreshListener2, OnPublishChangeListener, OnClickListener
+{
+    /**
+     * 常量
+     */
+    private static final String TAG = "MomentActivity";
+    private static final int REQUEST_CODE_DOWN_REFRESH = 1;
+    private static final int REQUEST_CODE_UP_REFRESH = 2;
+    private static final int REQUEST_CODE_PUBLISH = 3;
+    /**
+     * 控件对应的级别
+     */
+    private static final int PUBLISH_LEVEL_FAMILY = 3;
+    private static final int PUBLISH_LEVEL_FRIEND = 2;
+    private static final int PUBLISH_LEVEL_SPECIAL = 1;
+    private static final int PUBLISH_LEVEL_ALL = 0;
+    
+    
+
+    /**
+     * 工具类
+     */
+
+    @Bean
+    ToastComponent toast;
+    @Bean
+    MomentNetRequest momentNetRequest;
+
+    /**
+     * 界面资源
+     */
+    // 返回
+    @ViewById(R.id.iv_moment_back)
+    ImageView ivBack;
+    // 朋友圈列表
+    @ViewById(R.id.plv_moment)
+    PullToRefreshListView plvMoment;
+    // 发布容器
+    @ViewById(R.id.fl_moment_public_container)
+    FrameLayout flPublic;
+
+    @ViewById(R.id.tv_moment_publish)
+    TextView tvIsPublish;
+
+    /**
+     * 变量
+     */
+    private String userID;
+    private List<MomentEntity> mMomentList;
+    private FriendsCircleAdapter mMomentAdapter;
+
+    private PublishFragment mPublishFragment;
+    private MomentEngine mMomentEngine;
+    private int height;
+    private long remoteID = 0;
+    
+    // 屏蔽列表
+    private ArrayList<String> blocklist = new ArrayList<String>();
+    // 只给谁看
+    private ArrayList<String> onlyshowtolist = new ArrayList<String>();
+    
+    
+    private MomentEntity entity;
+
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        initVariables();
+        initViews();
+        initDatas();
+    }
+
+    /**
+     * 初始化变量
+     */
+    private void initVariables()
+    {
+        measureHeight();
+        tvIsPublish.setOnClickListener(this);
+        userID = DecentWorldApp.getInstance().getDwID();
+        mMomentList = new ArrayList<MomentEntity>();
+        mMomentAdapter = new FriendsCircleAdapter(this , mMomentList);
+    }
+
+    /**
+     * 初始化界面
+     */
+    private void initViews()
+    {
+        View headerView = View.inflate(this, R.layout.header_moment, null);
+        plvMoment.getRefreshableView().addHeaderView(headerView);
+        plvMoment.setAdapter(mMomentAdapter);
+        plvMoment.setMode(Mode.BOTH);
+        plvMoment.setOnRefreshListener(this);
+
+        mPublishFragment = new PublishFragment();
+        mPublishFragment.setOnPublishChangeListener(this);
+        getSupportFragmentManager().beginTransaction().add(R.id.fl_moment_public_container, mPublishFragment).commit();
+    }
+
+    /**
+     * 初始化数据
+     */
+    private void initDatas()
+    {
+        mMomentEngine = new MomentEngine(this);
+        List<MomentEntity> initData = mMomentEngine.initData();
+        if (initData != null && initData.size() > 0)
+        {
+            mMomentList.addAll(initData);
+            remoteID = mMomentList.get(0).getRemoteID();
+            mMomentAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+        // 显示或隐藏发布界面
+            case R.id.tv_moment_publish:
+                if (tvIsPublish.getText().equals("发布"))
+                {
+                    getSupportFragmentManager().beginTransaction().show(mPublishFragment).commit();
+                    tvIsPublish.setText("隐藏");
+                }
+                else
+                {
+                    getSupportFragmentManager().beginTransaction().hide(mPublishFragment).commit();
+                    tvIsPublish.setText("发布");
+                }
+                break;
+            default:
+                break;
+        }
+
+    }
+
+    // ////////////////////////////////////数据操作/////////////////////////////////
+
+    /**
+     * 下拉刷新
+     */
+    @Override
+    public void onPullDownToRefresh(PullToRefreshBase refreshView)
+    {
+        LogUtils.i(TAG, "下拉刷新开始");
+        mMomentEngine.downRefresh(remoteID, 0, refreshHandler, REQUEST_CODE_DOWN_REFRESH);
+    }
+
+    /**
+     * 上拉刷新
+     */
+    @Override
+    public void onPullUpToRefresh(PullToRefreshBase refreshView)
+    {
+        LogUtils.i(TAG, "上拉刷新开始");
+        mMomentEngine.upRefresh(remoteID, "", refreshHandler, REQUEST_CODE_DOWN_REFRESH);
+    }
+
+    /**
+     * 发布
+     */
+    @Override
+    public void onPublishChange(final int choose)
+    {
+        LogUtils.i(TAG, "发布到：" + choose);
+        if (choose == PUBLISH_LEVEL_ALL)
+        {
+            // 需要缴费
+            InputNumberDialog dialog = new InputNumberDialog();
+            dialog.setTitle("发布作品圈，需要缴费");
+            dialog.setHint("请输入金额(不小于5大洋)");
+            dialog.setMinNum(5);
+            dialog.setListener(new InputNumberListener()
+            {
+                @Override
+                public void confirm(float info)
+                {
+                    publish(choose, info);
+                }
+            });
+            dialog.show(getSupportFragmentManager(), "publish");
+            //
+
+        }
+        else if (choose == PUBLISH_LEVEL_SPECIAL)
+        {
+            // 选取联系人
+            ReminderDialog dialog = new ReminderDialog();
+            dialog.setInfo("选择联系人");
+            dialog.setListener(new ReminderListener()
+            {
+                @Override
+                public void confirm()
+                {
+                    publish(choose, 0);
+                }
+            });
+            dialog.show(getSupportFragmentManager(), "selectContact");
+
+        }
+        else
+        {
+            publish(choose, 0);
+        }
+
+    }
+
+    public void publish(int choose, float money)
+    {
+        entity = new MomentEntity();
+        entity.setPublisherID(DecentWorldApp.getInstance().getDwID());
+        //发送时间
+        long time = System.currentTimeMillis();
+        entity.setPublishTime(time);
+        //判断发送级别
+        if (choose == PUBLISH_LEVEL_ALL)
+            entity.setLevel(MomentEntity.LEVEL_ALL);
+        else if (choose == PUBLISH_LEVEL_SPECIAL)
+            entity.setLevel(MomentEntity.LEVEL_FRIEND);
+        else if (choose == PUBLISH_LEVEL_FRIEND)
+            entity.setLevel(MomentEntity.LEVEL_FRIEND);
+        else
+            entity.setLevel(MomentEntity.LEVEL_FAMILY);
+        //判断消息类型
+        //语音
+        
+        String voiceFilePath = mPublishFragment.getVoiceFilePath();
+        if(CommUtil.isNotBlank(voiceFilePath))
+        {
+            entity.setContentType(DWMessage.VOICE);
+        }
+        
+        //图片
+        File[] files = new File[9];
+        List<ImageItem> imageItems = mPublishFragment.getImageItems();
+        if(imageItems != null && imageItems.size()>0)
+        {
+            entity.setContentType(DWMessage.IMAGE);
+            for (int i = 0; i < imageItems.size(); i++)
+            {
+                if (!imageItems.get(i).equals("0"))
+                    files[i] = new File(imageItems.get(i).sourcePath);
+            }
+        }
+        
+        //文字
+        String txtContent = mPublishFragment.getText();
+        if(CommUtil.isNotBlank(txtContent))
+        {
+            entity.setContent(txtContent);
+        }
+       
+        entity.setPublisherName("Jack");
+        entity.setMoney(money);
+        entity.setMomentState(MomentEntity.STATE_UNFINISHED);
+        
+        //获取发布者的名字
+        // 根据权限获取要显示的名字
+        String publisherName = UserInfoEngine.getInstance().getShowName();
+        entity.setPublisherName(publisherName);
+        
+        mMomentEngine.publish(entity, files, blocklist, onlyshowtolist, refreshHandler,REQUEST_CODE_PUBLISH);
+        //将数据添加到内存并刷新
+        mMomentList.add(entity);
+        mMomentAdapter.notifyDataSetChanged();
+    }
+
+    // ////////////////////////////////////默认/////////////////////////////////
+
+    /**
+     * 高度变化
+     */
+    @Override
+    public void onHeightChnage(int height)
+    {
+        LogUtils.i("bm", "height--" + height);
+        LayoutParams layoutParams = plvMoment.getLayoutParams();
+        layoutParams.height = this.height - height - 50;
+        plvMoment.setLayoutParams(layoutParams);
+    }
+
+    /**
+     * 获取屏幕高度
+     * */
+    public int getHeight()
+    {
+        return height;
+    }
+
+    /**
+     * 获取屏幕的宽高
+     */
+    private void measureHeight()
+    {
+        WindowManager wm = this.getWindowManager();
+        height = wm.getDefaultDisplay().getHeight();
+    }
+
+    // ////////////////////////////////////逻辑/////////////////////////////////
+
+    Handler refreshHandler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            switch (msg.what)
+            {
+                case REQUEST_CODE_DOWN_REFRESH:
+                    String result = msg.obj.toString();
+                    if (msg.arg1 == ConstantNet.NET_REQUEST_SUCCESS)
+                    {
+                        LogUtils.i(TAG, "下拉刷新从网络获取的结果为：" + result);
+                        ArrayList<MomentEntity> temp = mMomentEngine.processDownRefreshResult(result);
+                        if (temp.size() > 0)
+                        {
+                            // 将解析得到的数据添加到内存中
+                            mMomentList.addAll(0, temp);
+                            // 排序
+                            Collections.sort(mMomentList);
+                            // 刷新界面
+                            mMomentAdapter.notifyDataSetChanged();
+                        }
+                        toast.show("下拉刷新成功");
+                    }
+                    else
+                    {
+                        toast.show(result);
+                    }
+                    // 下拉刷新完成
+                    plvMoment.onRefreshComplete();
+                    break;
+                case REQUEST_CODE_UP_REFRESH:
+                    
+                    
+
+                    break;
+                case REQUEST_CODE_PUBLISH:
+                    if(msg.arg1 == ConstantNet.NET_REQUEST_SUCCESS)
+                    {
+                        entity.setMomentState(MomentEntity.STATE_SUCCESSED);
+                        mMomentAdapter.notifyDataSetChanged();
+                    }else
+                    {
+                        entity.setMomentState(MomentEntity.STATE_FAILURED);
+                        mMomentAdapter.notifyDataSetChanged();
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        };
+    };
+
+}

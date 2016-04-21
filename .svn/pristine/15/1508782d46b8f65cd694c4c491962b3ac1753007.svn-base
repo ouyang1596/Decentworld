@@ -1,0 +1,49 @@
+1.新建TestConnEntity和TestConnEngine类；
+2.集成Bmob,用于存储测试打印的Log新；
+3.埋点：
+1）发送消息之前；
+2）获取的ChatManager为空；
+3）发送消息抛出异常；
+4）发送完过了6秒之后没有收到回执；（查看此时获得的connnection中的isSocketClosed属性）
+
+
+测试结果：
+1.出现情况：发送出去后，一直在转圈，6s之后圈去掉，查看DWMessage和XMPPTCPConnection如下：
+发送之前
+DWMessage [ifFromNet=0, chatType=0, chatRelationship=0, direct=1, messageType=0, fromDwId=990357, toDwId=107691, body=gggh, time=1460435641412, wealth=, isRead=0, voiceTime=0.0, sendSuccess=2, txtMsgID=Fn5Kz-16, mid=330823, uri=, localUrl=, remoteUrl=, forwardDwId=, forwardName=, userID=990357, token=, fromName=, fromWorth=0.0]
+
+XMPPTCPConnection [socket=Socket[address=/112.74.13.117,port=5222,localPort=51061], connectionID=4f297415, user=990357@decentworld/Smack, connected=true, socketClosed=false, anonymous=false, usingTLS=false, parsingExceptionCallback=org.jivesoftware.smack.parsing.ExceptionThrowingCallback@434fad30, packetWriter=org.jivesoftware.smack.tcp.PacketWriter@4358d5e8, packetReader=org.jivesoftware.smack.tcp.PacketReader@4358e580, compressionMethods=[zlib], serverAckdCompression=false, compressionLock=java.lang.Object@4355cc00]
+
+发送6s之后
+DWMessage [ifFromNet=0, chatType=0, chatRelationship=0, direct=1, messageType=0, fromDwId=990357, toDwId=107691, body=gggh, time=1460435641451, wealth=, isRead=1, voiceTime=0.0, sendSuccess=2, txtMsgID=Fn5Kz-16, mid=330823, uri=, localUrl=, remoteUrl=, forwardDwId=, forwardName=, userID=990357, token=, fromName=, fromWorth=0.0]
+
+XMPPTCPConnection [socket=Socket[address=/112.74.13.117,port=5222,localPort=51061], connectionID=4f297415, user=990357@decentworld/Smack, connected=true, socketClosed=false, anonymous=false, usingTLS=false, parsingExceptionCallback=org.jivesoftware.smack.parsing.ExceptionThrowingCallback@434fad30, packetWriter=org.jivesoftware.smack.tcp.PacketWriter@4358d5e8, packetReader=org.jivesoftware.smack.tcp.PacketReader@4358e580, compressionMethods=[zlib], serverAckdCompression=false, compressionLock=java.lang.Object@4355cc00]
+
+三、用ChatManager与XMPPConnection发送文字消息的对比
+
+04-12 16:06:56.846: D/dw PacketWriter(4744): writePackets...message=<message id='Ru7XQ-4' to='107691@decentworld' type='chat'><subject>chat</subject><body>{&quot;body&quot;:&quot;看看&quot;,&quot;chatRelationship&quot;:0,&quot;chatType&quot;:0,&quot;direct&quot;:1,&quot;forwardDwId&quot;:&quot;&quot;,&quot;forwardName&quot;:&quot;&quot;,&quot;from&quot;:&quot;990357&quot;,&quot;fromDwId&quot;:&quot;990357&quot;,&quot;ifFromNet&quot;:0,&quot;isRead&quot;:0,&quot;localUrl&quot;:&quot;&quot;,&quot;messageType&quot;:0,&quot;mid&quot;:330828,&quot;remoteUrl&quot;:&quot;&quot;,&quot;sendSuccess&quot;:2,&quot;time&quot;:&quot;1460448416825&quot;,&quot;to&quot;:&quot;107691&quot;,&quot;toDwId&quot;:&quot;107691&quot;,&quot;token&quot;:&quot;C31B767C488E354C6DC1CABC266C5E59342CB4A98889CE2C783289B9131B9AD8&quot;,&quot;txtMsgID&quot;:&quot;Ru7XQ-4&quot;,&quot;uri&quot;:&quot;&quot;,&quot;voiceTime&quot;:0,&quot;wealth&quot;:&quot;&quot;}</body><thread>6cc46615-a51a-4b3b-b2cf-de33b36fad3d</thread></message>
+
+
+04-12 16:06:57.074: D/dw PacketWriter(4744): writePackets...message=<message id='Ru7XQ-4' to='107691@decentworld' type='chat'><subject>chat</subject><body>{&quot;body&quot;:&quot;看看&quot;,&quot;chatRelationship&quot;:0,&quot;chatType&quot;:0,&quot;direct&quot;:1,&quot;forwardDwId&quot;:&quot;&quot;,&quot;forwardName&quot;:&quot;&quot;,&quot;from&quot;:&quot;990357&quot;,&quot;fromDwId&quot;:&quot;990357&quot;,&quot;ifFromNet&quot;:0,&quot;isRead&quot;:0,&quot;localUrl&quot;:&quot;&quot;,&quot;messageType&quot;:0,&quot;mid&quot;:330828,&quot;remoteUrl&quot;:&quot;&quot;,&quot;sendSuccess&quot;:2,&quot;time&quot;:&quot;1460448416825&quot;,&quot;to&quot;:&quot;107691&quot;,&quot;toDwId&quot;:&quot;107691&quot;,&quot;token&quot;:&quot;C31B767C488E354C6DC1CABC266C5E59342CB4A98889CE2C783289B9131B9AD8&quot;,&quot;txtMsgID&quot;:&quot;Ru7XQ-4&quot;,&quot;uri&quot;:&quot;&quot;,&quot;voiceTime&quot;:0,&quot;wealth&quot;:&quot;&quot;}</body><thread>6cc46615-a51a-4b3b-b2cf-de33b36fad3d</thread></message>
+
+
+04-12 16:24:10.414: D/dw PacketWriter(6144): writePackets...message=<message id='6jGph-6' to='107691' type='chat'><subject>chat</subject><body>{&quot;body&quot;:&quot;等等&quot;,&quot;chatRelationship&quot;:0,&quot;chatType&quot;:0,&quot;direct&quot;:1,&quot;forwardDwId&quot;:&quot;&quot;,&quot;forwardName&quot;:&quot;&quot;,&quot;from&quot;:&quot;990357&quot;,&quot;fromDwId&quot;:&quot;990357&quot;,&quot;ifFromNet&quot;:0,&quot;isRead&quot;:0,&quot;localUrl&quot;:&quot;&quot;,&quot;messageType&quot;:0,&quot;mid&quot;:330917,&quot;remoteUrl&quot;:&quot;&quot;,&quot;sendSuccess&quot;:2,&quot;time&quot;:&quot;1460449450414&quot;,&quot;to&quot;:&quot;107691&quot;,&quot;toDwId&quot;:&quot;107691&quot;,&quot;token&quot;:&quot;F20CAE38E406A9AB7F17B45CF71D2F9977140EF50A0B7ECBDD6798BD634E700D&quot;,&quot;txtMsgID&quot;:&quot;6jGph-6&quot;,&quot;uri&quot;:&quot;&quot;,&quot;voiceTime&quot;:0,&quot;wealth&quot;:&quot;&quot;}</body></message>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

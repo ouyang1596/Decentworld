@@ -1,0 +1,190 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.manager;
+
+import java.util.HashMap;
+
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.listener.HttpCallback;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+
+/**
+ * @ClassName: VersionInfoManager.java
+ * @Description: 版本信息管理，包括获取当前版本，最新版本，更新版本等操作
+ * @author: cj
+ * @date: 2015年12月14日 下午12:31:11
+ */
+public class VersionInfoManager
+{
+    private static final String TAG = "";
+    private Context context;
+
+    /**
+	 * 
+	 */
+    public VersionInfoManager(Context context)
+    {
+        this.context = context;
+    }
+
+    /**
+     * 返回当前软件版本号
+     */
+    public int getAppVersionCode()
+    {
+        int versionCode = 0;
+        try
+        {
+            // ---get the package info---
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            versionCode = pi.versionCode;
+        }
+        catch (Exception e)
+        {
+            LogUtils.i(TAG, "获取软件版本号出现异常：" + e);
+        }
+        return versionCode;
+    }
+
+    /**
+     * 返回当软件版本名
+     */
+    public String getAppVersionName()
+    {
+        String versionName = "";
+        try
+        {
+            // ---get the package info---
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
+            versionName = pi.versionName;
+            if (CommUtil.isBlank(versionName))
+            {
+                return "";
+            }
+        }
+        catch (Exception e)
+        {
+            LogUtils.i(TAG, "获取软件版本名出现异常：" + e);
+        }
+        return versionName;
+    }
+
+    /**
+     * 获取String MetaData数据
+     */
+    public String getApplicationStringMetaData(String name)
+    {
+        if (CommUtil.isBlank(name))
+        {
+            LogUtils.i(TAG, "getApplicationStringMetaData...参数不能为空");
+            return "";
+        }
+        String value = "";
+        ApplicationInfo info;
+        try
+        {
+            PackageManager pm = context.getPackageManager();
+            info = pm.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            value = info.metaData.getString(name);
+            if (CommUtil.isBlank(value))
+            {
+                LogUtils.i(TAG, "getApplicationStringMetaData...获取的值为空");
+                return "";
+            }
+        }
+        catch (Exception e)
+        {
+            LogUtils.i(TAG, "getApplicationStringMetaData...获取metaData,name=" + name + ",出现异常：" + e);
+        }
+        return value;
+    }
+
+    /**
+     * 获取Integer MetaData数据
+     */
+    public int getApplicationIntMetaData(String name)
+    {
+        if (CommUtil.isBlank(name))
+        {
+            LogUtils.i(TAG, "getApplicationIntMetaData...参数不能为空");
+            return 0;
+        }
+        int value = 0;
+        ApplicationInfo info;
+        try
+        {
+            PackageManager pm = context.getPackageManager();
+            info = pm.getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
+            value = info.metaData.getInt(name);
+            if (CommUtil.isBlank(value))
+            {
+                LogUtils.i(TAG, "getApplicationIntMetaData...获取的值为空");
+                return 0;
+            }
+        }
+        catch (Exception e)
+        {
+            LogUtils.i(TAG, "getApplicationIntMetaData...获取metaData,name=" + name + ",出现异常：" + e);
+        }
+        return value;
+    }
+
+    /**
+     * 获得当前软件版本号
+     * 
+     * @param handler
+     * @param requestCode
+     */
+    public void getCurrentAppVersionCode(final HttpCallback callback)
+    {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("appType", "ANDROID");
+        LogUtils.i(TAG, "getCurrentAppVersionCode...begin");
+        SendUrl sendUrl = new SendUrl(context);
+        sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/version/getVersionNum", Method.GET, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String response, ResultBean msg)
+            {
+                LogUtils.i(TAG, "getCurrentAppVersionCode...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg() + ",msg.getData=" + msg.getData());
+                if (msg.getResultCode() == 2222)
+                {
+                    JSONObject jsonObject = JSON.parseObject(msg.getData().toString());
+                    String version = jsonObject.getString("currentVersion");
+                    callback.onSuccess(version);
+                }
+                else if (msg.getResultCode() == 3333)
+                {
+                    LogUtils.i(TAG, "getCurrentAppVersionCode...failure,cause by:" + msg.getMsg());
+                    callback.onFailure(msg.getMsg());
+                    ToastUtil.showToast(msg.getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.i(TAG, "getCurrentAppVersionCode...failure,cause by:" + e);
+                callback.onFailure(e);
+                ToastUtil.showToast(Constants.NET_WRONG);
+            }
+        });
+    }
+
+}

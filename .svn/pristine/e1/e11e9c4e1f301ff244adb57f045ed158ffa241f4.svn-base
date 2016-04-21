@@ -1,0 +1,155 @@
+package cn.sx.decentworld.utils;
+
+import org.jivesoftware.smack.XMPPConnection;
+
+import cn.bmob.v3.listener.GetTableSchemaListener;
+import cn.bmob.v3.listener.SaveListener;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.XmppHelper;
+import cn.sx.decentworld.entity.TestConnEntity;
+import android.util.Log;
+
+/**
+ * 
+ * @author Jansin Miao 2013年4月8日 开发阶段将下面LOG_LEVEL 设置为6这样所有的log都能显示，
+ *         在发布的时候我们将LOG_LEVEL 设置为0.这样log就非常方便管理了
+ */
+public class LogUtils
+{
+    public static int LOG_LEVEL = 6;
+    public static int ERROR = 1;
+    public static int WARN = 2;
+    public static int INFO = 3;
+    public static int DEBUG = 4;
+    public static int VERBOS = 5;
+    public static final String TAG = "dw ";
+    // 是否显示测试代码
+    public static final boolean IS_SHOW_TEST_CODE = false;
+    //是否打印时间
+    private static boolean isShowTime = false;
+
+    /**
+     * 
+     * @param tag
+     *            类名
+     * @param msg
+     *            要输出的错误信息（软件存在的错误、异常等信息）
+     */
+    public static void e(String tag, String msg)
+    {
+        if (LOG_LEVEL > ERROR)
+        {
+            Log.e(TAG + tag, getTime()+ msg);
+        }
+    }
+
+    /**
+     * 
+     * @param tag
+     *            类名
+     * @param msg
+     *            要输出的警告信息
+     */
+    public static void w(String tag, String msg)
+    {
+        if (LOG_LEVEL > WARN)
+        {
+            Log.w(TAG + tag,  getTime()+msg);
+        }
+    }
+
+    /**
+     * 
+     * @param tag
+     *            类名
+     * @param msg
+     *            要输出的提示信息
+     */
+
+    public static void i(String tag, String msg)
+    {
+        if (LOG_LEVEL > INFO)
+            Log.i(TAG + tag, getTime()+msg);
+    }
+
+    /**
+     * 
+     * @param tag
+     *            类名
+     * @param msg
+     *            要输出的调试信息
+     */
+    public static void d(String tag, String msg)
+    {
+        if (LOG_LEVEL > DEBUG)
+            Log.d(TAG + tag, getTime()+msg);
+    }
+
+    /**
+     * 
+     * @param tag
+     *            类名
+     * @param msg
+     *            要输出的一般
+     */
+    public static void v(String tag, String msg)
+    {
+        if (LOG_LEVEL > VERBOS)
+            Log.v(TAG + tag, getTime()+msg);
+    }
+    
+    /**
+     * 上传日志文件到服务器
+     */
+    public static void uploadLogFile()
+    {
+        
+    }
+    
+    /**
+     * 上传warm信息到服务器
+     * @param tag
+     * @param msg
+     */
+    public static void wUpload(String tag,String msg)
+    {
+      w(tag, msg);
+    }
+    
+    /**
+     * 上传error信息到服务器
+     * @param tag
+     * @param msg
+     */
+    public static void eUpload(String tag,String msg)
+    {
+        e(tag, msg);
+    }
+    
+    ////////////////////////////////////////私有方法///////////////////////////////////////
+    /**
+     * 获取系统当前时间
+     * @return 返回yyyy_MM_dd0HH11mm11ss格式的时间
+     */
+    private static String getTime()
+    {
+        String time = "";
+        if(isShowTime)
+        {
+            time = TimeUtils.getFormatTime(System.currentTimeMillis(), TimeUtils.yyyy_MM_dd0HH11mm11ss)+":";
+        }
+        return time;
+    }
+    
+    private static TestConnEntity getTestConnEntity()
+    {
+        TestConnEntity connEntity = new TestConnEntity();
+        connEntity.setUserID(DecentWorldApp.getInstance().getDwID());
+        connEntity.setPhoneNum(DecentWorldApp.getInstance().getUserName());
+        connEntity.setShowName("Jack");
+        connEntity.setTime(TimeUtils.getDateAllMessage());
+        return connEntity;
+    }
+    
+    
+}

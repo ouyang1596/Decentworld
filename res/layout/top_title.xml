@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/chat_room_title_root"
+    android:id="@+id/rel_top_title_root"
     android:layout_width="match_parent"
     android:layout_height="49dp"
     android:background="@color/black_80_percent"
@@ -12,7 +12,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:padding="10dp"
+        android:paddingBottom="15dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="15dp"
         android:src="@drawable/back"
         android:visibility="gone" />
 
@@ -43,7 +46,10 @@
             android:id="@+id/tv_finish"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:paddingBottom="15dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:paddingTop="15dp"
             android:text="完成"
             android:textColor="@color/white"
             android:textSize="@dimen/new_textsize_14sp"

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="cn.sx.decentworld"
-    android:versionCode="8"
-    android:versionName="1.0.8" >
+    android:versionCode="11"
+    android:versionName="1.2.0" >
 
     <uses-sdk
         android:minSdkVersion="9"
         android:targetSdkVersion="22" />
 
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -79,7 +80,15 @@
             android:value="dw.db" />
         <meta-data
             android:name="AA_DB_VERSION"
-            android:value="5" />
+            android:value="7" />
+        <!-- umeng友盟 -->
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="56f9e2a167e58ea2180008cd" >
+        </meta-data>
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="android" />
 
         <!--  -->
         <meta-data
@@ -95,6 +104,9 @@
         </service>
         <!-- 下载 -->
         <service android:name="cn.sx.decentworld.service.DownloadListenService" >
+        </service>
+        <!-- 测试服务 -->
+        <service android:name="cn.sx.decentworld.service.TestService" >
         </service>
         <!-- 接收系统广播 -->
         <receiver android:name="cn.sx.decentworld.broadcast.ReceiveSysBC" >
@@ -166,7 +178,7 @@
             android:theme="@style/horizontal_slide" >
         </activity>
         <activity
-            android:name="cn.sx.decentworld.activity.ModificationPasswordOne_"
+            android:name="cn.sx.decentworld.activity.ModifyPasswordActivity_"
             android:theme="@style/horizontal_slide" >
         </activity>
         <activity
@@ -330,7 +342,10 @@
             android:name="cn.sx.decentworld.activity.SocialStatusActivity_"
             android:label="@string/title_activity_social_status" >
         </activity>
-        <activity android:name="cn.sx.decentworld.activity.DefaultActivity_" >
+        <!-- 默认启动界面 -->
+        <activity
+            android:name="cn.sx.decentworld.activity.DefaultActivity_"
+            android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -417,8 +432,6 @@
         </activity>
         <activity android:name="cn.sx.decentworld.activity.EditIsMarriedActivity_" >
         </activity>
-        <activity android:name="cn.sx.decentworld.activity.NearCardDetailForMessageActivity_" >
-        </activity>
         <activity
             android:name="com.alipay.sdk.app.H5PayActivity"
             android:configChanges="orientation|keyboardHidden|navigation"
@@ -442,8 +455,6 @@
             android:exported="true"
             android:launchMode="singleTask" >
         </activity>
-        <activity android:name="cn.sx.decentworld.activity.BindAccountAlipayActivity_" >
-        </activity>
         <activity
             android:name="cn.sx.decentworld.activity.ContactActivity_"
             android:label="@string/title_activity_contact" >
@@ -463,7 +474,7 @@
             android:label="@string/title_activity_doubt_verify" >
         </activity>
         <activity
-            android:name="cn.sx.decentworld.activity.RecommendActivity_"
+            android:name="cn.sx.decentworld.activity.RecommendActivity"
             android:launchMode="singleTask" >
         </activity>
         <activity android:name="cn.sx.decentworld.activity.RechargeBenefitActivity_" >
@@ -480,13 +491,16 @@
             android:name="cn.sx.decentworld.activity.TempletActivity_"
             android:label="@string/title_activity_templet" >
         </activity>
-        <activity android:name="cn.sx.decentworld.activity.RecommendUnavaliableActivity_" >
+        <activity android:name="cn.sx.decentworld.activity.RecommendUnavaliableActivity" >
         </activity>
         <activity
             android:name="cn.sx.decentworld.activity.CustomerServiceActivity_"
             android:label="@string/title_activity_customer_service" >
         </activity>
-        <activity android:name="cn.sx.decentworld.activity.LoadNetdataActivity_" >
+        <!-- 启动加载数据页面 -->
+        <activity
+            android:name="cn.sx.decentworld.activity.LoadNetdataActivity_"
+            android:launchMode="singleTask" >
         </activity>
         <!-- 作品圈 -->
         <activity android:name="cn.sx.decentworld.activity.discover.WorksCircleActivity_" >
@@ -499,11 +513,8 @@
         <activity android:name="cn.sx.decentworld.activity.discover.PublishWorksCircleActivity_" >
         </activity>
         <!-- 发布朋友圈 -->
-        <activity android:name="cn.sx.decentworld.activity.discover.PublishMomentActivity_" >
-        </activity>
-        <!-- 虚拟币提现的设置界面 -->
-        <activity android:name="cn.sx.decentworld.activity.DrawCashSettingActivity_" >
-        </activity>
+        <!-- <activity android:name="cn.sx.decentworld.activity.discover.PublishMomentActivity_" > -->
+        <!-- </activity> -->
         <!-- 测试LogRecord的Activity -->
         <activity android:name="cn.sx.decentworld.test.TestLogRecordActivity_" >
         </activity>
@@ -522,12 +533,25 @@
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize" >
         </activity>
         <activity
-            android:name="cn.sx.decentworld.activity.CeshiActivity"
+            android:name="cn.sx.decentworld.activity.CeshiActivity_"
             android:label="@string/title_activity_ceshi" >
         </activity>
         <!-- 设置虚拟币提现的银行卡卡号 -->
-        <activity android:name="cn.sx.decentworld.SetBankCardActivity_" >
+        <activity android:name="cn.sx.decentworld.activity.SetBankCardActivity_" >
         </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.DawanZhongchouActivity"
+            android:label="@string/title_activity_dawan_zhongchou" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.PickContactForCallingCardActivity_" >
+        </activity>
+        <activity
+            android:name="cn.sx.decentworld.activity.HistoryWorthActivity"
+            android:label="@string/title_activity_history_worth" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.activity.ChatRoomEditMySubjectActivity_" >
+        </activity>
+        <activity android:name="cn.sx.decentworld.test.cj.JackTestActivity"></activity>
     </application>
 
 </manifest>

@@ -22,12 +22,13 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.pm.PackageManager;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-import android.media.SoundPool;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -38,16 +39,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
+import cn.sx.decentworld.abstractclass.AbstractTextWatcher;
 import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.XmppHelper;
 import cn.sx.decentworld.component.KeyboardComponent;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.component.ui.RegisterComponent;
+import cn.sx.decentworld.engine.UserDataEngine;
+import cn.sx.decentworld.engine.UserDataEngine.GetUserIDListener;
 import cn.sx.decentworld.listener.LoginListener;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.request.GetUserInfo;
 import cn.sx.decentworld.utils.AES;
-import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.DataConvertUtils;
 import cn.sx.decentworld.utils.TimeUtils;
+import cn.sx.decentworld.utils.ToastUtil;
 import cn.sx.decentworld.utils.sputils.UserInfoHelper;
 
 import com.alibaba.fastjson.JSON;
@@ -58,6 +64,7 @@ import com.googlecode.androidannotations.annotations.EActivity;
 import com.googlecode.androidannotations.annotations.ViewById;
 import com.nui.multiphotopicker.model.ImageItem;
 import com.nui.multiphotopicker.util.IntentConstants;
+import com.umeng.analytics.MobclickAgent;
 
 /**
  * 登陆页面
@@ -72,7 +79,6 @@ public class LoginActivity extends BaseFragmentActivity implements OnClickListen
 	private static final String ACCOUNT_ERROR = "账号或密码错误";
 	public static final int toNextDialog = 1;
 	public static final int REQUEST_CODE_SETNICK = 1;
-
 	/**
 	 * 界面资源
 	 */
@@ -97,9 +103,6 @@ public class LoginActivity extends BaseFragmentActivity implements OnClickListen
 	@Bean
 	ToastComponent toast;
 	@Bean
-	GetUserInfo getUserInfo;
-
-	@Bean
 	KeyboardComponent keyboardComponent;
 
 	/**
@@ -109,18 +112,29 @@ public class LoginActivity extends BaseFragmentActivity implements OnClickListen
 	private String mobile, password;
 	private static Float retryTimes;
 	private boolean progressShow;
+	private ProgressDialog mProgressDialog;
 
 	/**
 	 * 入口
 	 */
 	@AfterViews
 	public void init() {
-		setEditTextDraw();
+		// setEditTextDraw();
 		setListener();
 		tvCeshi.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(mContext, CeshiActivity.class));
+				Intent intent = new Intent(mContext, CeshiActivity_.class);
+				intent.putExtra(
+						"json_data",
+						"{\"chargeAmount\":1.0,\"curNum\":\"1\",\"occupantList\":[],\"owner\":{\"dwID\":\"905583\",\"userNickName\":\"味精\",\"worth\":1.0},\"ownerID\":\"905583\",\"ownerIcon\":\"http://112.74.13.117/data/905583/icon/sicon.jpg\",\"role\":\"moderator\",\"roomBackground\":\"http://112.74.13.117/data/chatroom/938914/subject/subjectBackground.jpg\",\"roomID\":\"938914\",\"roomNotice\":\"\",\"roomOwnerNickName\":\"味精\",\"roomWealth\":\"0.0\",\"subjectName\":\"滴滴答答\"}");
+				startActivity(intent);
+			}
+		});
+		etMobile.addTextChangedListener(new AbstractTextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence str, int start, int before, int count) {
+				DataConvertUtils.formatPhone(str.toString(), etMobile);
 			}
 		});
 	}
@@ -133,14 +147,14 @@ public class LoginActivity extends BaseFragmentActivity implements OnClickListen
 		}
 	}
 
-	private void setEditTextDraw() {
-		Drawable drawMobile = getResources().getDrawable(R.drawable.et_mobile);
-		drawMobile.setBounds(0, 0, 30, 30);// 第一0是距左边距离，第二0是距上边距离，40分别是长宽
-		etMobile.setCompoundDrawables(drawMobile, null, null, null);// 只放左边
-		Drawable drawPwd = getResources().getDrawable(R.drawable.et_password);
-		drawPwd.setBounds(0, 0, 30, 30);// 第一0是距左边距离，第二0是距上边距离，40分别是长宽
-		etPassword.setCompoundDrawables(drawPwd, null, null, null);// 只放左边
-	}
+	// private void setEditTextDraw() {
+	// Drawable drawMobile = getResources().getDrawable(R.drawable.et_mobile);
+	// drawMobile.setBounds(0, 0, 30, 30);// 第一0是距左边距离，第二0是距上边距离，40分别是长宽
+	// etMobile.setCompoundDrawables(drawMobile, null, null, null);// 只放左边
+	// Drawable drawPwd = getResources().getDrawable(R.drawable.et_password);
+	// drawPwd.setBounds(0, 0, 30, 30);// 第一0是距左边距离，第二0是距上边距离，40分别是长宽
+	// etPassword.setCompoundDrawables(drawPwd, null, null, null);// 只放左边
+	// }
 
 	/**
 	 * 设置界面控件监听事件
@@ -156,25 +170,28 @@ public class LoginActivity extends BaseFragmentActivity implements OnClickListen
 	public void onClick(View view) {
 		switch (view.getId()) {
 		case R.id.btn_login:
-			if (etMobile.length() <= 0) {
+			String phoneNum = etMobile.getText().toString().replaceAll(" ", "");
+			if (phoneNum.length() <= 0) {
 				toast.show("请先输入手机号");
 				return;
 			}
-			if (etMobile.length() != 11) {
+			if (phoneNum.length() != 11) {
 				toast.show("输入的手机号格式不正确");
 				return;
 			}
-			mobile = etMobile.getText().toString();
+			mobile = phoneNum;
 			if (etPassword.length() <= 0) {
 				toast.show("请输入密码");
 				return;
 			}
 			// 对明文密码进行AES加密
 			password = AES.encode(etPassword.getText().toString());
-			getUserInfo.getUserdwID(mobile, mHandler);
+			getUserdwID(mobile);
 			break;
 		case R.id.iv_register:
 			startActivity(new Intent(LoginActivity.this, RegisterMobileActivity_.class));
+			// startActivity(new Intent(LoginActivity.this,
+			// RegisterNickActivity_.class));
 			break;
 		case R.id.iv_forget_password:
 			startActivity(new Intent(mContext, ForgetPwdMobileActivity_.class));
@@ -186,21 +203,31 @@ public class LoginActivity extends BaseFragmentActivity implements OnClickListen
 	}
 
 	/**
-	 * 获取dwID的回调
+	 * 获取用户ID
 	 */
-	private Handler mHandler = new Handler() {
-		public void handleMessage(android.os.Message msg) {
-			switch (msg.what) {
-			case 2222:
-				LogUtils.i(TAG, "根据电话号码获取的dwID和token=" + msg.obj.toString());
-				JSONObject object = JSON.parseObject(msg.obj.toString());
-				String dwID = object.getString("dwID");
-				String token = object.getString("token");
-				login(dwID, password, token, mobile);
-				break;
+	private void getUserdwID(String phoneNum) {
+		// 显示进度
+		if (mProgressDialog == null)
+			mProgressDialog = ProgressDialog.show(LoginActivity.this, null, "Loading");
+		else
+			mProgressDialog.show();
+		// 调用接口获取ID
+		UserDataEngine.getInstance().getUserID(phoneNum, new GetUserIDListener() {
+			@Override
+			public void onSuccess(String userID, String token) {
+				if (mProgressDialog != null)
+					mProgressDialog.dismiss();
+				login(userID, password, token, mobile);
 			}
-		};
-	};
+
+			@Override
+			public void onFailure(String cause) {
+				if (mProgressDialog != null)
+					mProgressDialog.dismiss();
+				toast.show(cause);
+			}
+		});
+	}
 
 	/**
 	 * 登录openfire
@@ -218,33 +245,36 @@ public class LoginActivity extends BaseFragmentActivity implements OnClickListen
 		});
 		pd.setMessage(getString(R.string.Is_landing));
 		pd.show();
+		// 登录
 		XmppHelper.firstLogin(dwID, password, new LoginListener() {
 			@Override
 			public void onLoginSuccess() {
 				LogUtils.i(TAG, "登录成功");
 				// 保存用户信息
 				UserInfoHelper.saveLoginInfo(LoginActivity.this, dwID, password, token, phoneNum);
+				dismissDlg();
 				// 进入数据加载页面
 				Intent intent = new Intent(LoginActivity.this, LoadNetdataActivity_.class);
 				startActivity(intent);
 				finish();
-				// 销毁进度条对话框
-				if (pd != null && pd.isShowing()) {
-					pd.dismiss();
-				}
+				// 友盟账号统计
+				MobclickAgent.onProfileSignIn(dwID);
 			}
 
 			@Override
 			public void onLoginFailure(Exception exception) {
 				LogUtils.i(TAG, "登录失败");
 				// 将连接置为空
-				XmppHelper.closeConnection();
+				XmppHelper.setConnNull();
 				processLoginException(exception);
-				// 销毁进度条对话框
+				dismissDlg();
+			}
+
+			// 销毁进度条对话框
+			private void dismissDlg() {
 				if (pd != null && pd.isShowing()) {
 					pd.dismiss();
 				}
-
 			}
 		});
 	}
@@ -254,7 +284,6 @@ public class LoginActivity extends BaseFragmentActivity implements OnClickListen
 	 */
 	protected void processLoginException(Exception e) {
 		/** 异常判断 **/
-		LogUtils.e(TAG, "登录异常，caused by:" + e);
 		if (e instanceof IllegalStateException) {
 			if (e.toString().contains("Already logged")) {
 				LogUtils.e(TAG, "已经登录过服务器，不需要重复登录");
@@ -300,7 +329,7 @@ public class LoginActivity extends BaseFragmentActivity implements OnClickListen
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		List<ImageItem> incomingDataList = (List<ImageItem>) data.getSerializableExtra(IntentConstants.EXTRA_IMAGE_LIST);
 		File file = new File(incomingDataList.get(0).sourcePath);
-		LogUtils.i("bm", "time--" + TimeUtils.getFormatTime(file.lastModified(), "yyyy-MM-dd-HH-mm:ss:ms"));
-	};
+		LogUtils.i(TAG, "onActivityResult---time---" + TimeUtils.getFormatTime(file.lastModified(), "yyyy-MM-dd-HH-mm:ss:ms"));
+	}
 
 }

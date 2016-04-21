@@ -17,7 +17,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting_;
 import cn.sx.decentworld.widget.CircularImageView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -35,18 +34,16 @@ public final class ChatRoomMeActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         tvEditSelfInfo = ((TextView) findViewById(id.tv_edit_self_info));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        tvCreateChatRoom = ((TextView) findViewById(id.tv_create_chatroom));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         lvChatRooms = ((ListView) findViewById(id.lv_chatrooms));
         ivHead = ((CircularImageView) findViewById(id.iv_head));
-        tvCreateChatRoom = ((TextView) findViewById(id.tv_create_chatroom));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        ((ToastComponent_) toast).afterSetContentView_();
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         init();
     }

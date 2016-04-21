@@ -1,0 +1,128 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.utils;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.widget.Toast;
+import cn.sx.decentworld.engine.SettingEngine;
+
+/**
+ * @ClassName: PromptUtils.java
+ * @Description: 提示信息工具箱
+ * @author: cj
+ * @date: 2016年4月6日 下午3:27:01
+ */
+public class PromptUtils
+{
+    private static final String TAG = "PromptUtils";
+    private ProgressDialog mProDialog;
+    private Activity activity;
+    private Context context;
+    
+    /**
+     * 构造函数
+     */
+    public PromptUtils(Context context)
+    {
+        this.activity = (Activity) context;
+        this.context = context;
+    }
+    
+
+    /**
+     * 显示进度条
+     */
+    public void showProgressDialog()
+    {
+        activity.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (null == mProDialog)
+                {
+                    mProDialog = ProgressDialog.show(context, null, "loading");
+                }
+                else
+                {
+                    mProDialog.show();
+                }
+            }
+        });
+    }
+
+    /**
+     * 隐藏进度条
+     */
+    public void hideProgressDialog()
+    {
+        activity.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (null != mProDialog)
+                {
+                    mProDialog.hide();
+                }
+            }
+        });
+    }
+
+    /**
+     * 
+     * @param netWrong
+     */
+    public void showToast(final String netWrong)
+    {
+        activity.runOnUiThread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Toast.makeText(context,netWrong, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    
+    /**
+     * 显示被挤下线通知
+     * @param title
+     * @param content
+     */
+    public void showOffLine(String title, String content)
+    {
+        android.app.AlertDialog.Builder conflictBuilder = null;
+        try
+        {
+            if (conflictBuilder == null)
+                conflictBuilder = new android.app.AlertDialog.Builder(context);
+            conflictBuilder.setTitle(title);
+            conflictBuilder.setMessage(content);
+            conflictBuilder.setPositiveButton("确定", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    dialog.dismiss();
+                    SettingEngine.getInstance().loginOut(context);
+                }
+            });
+            conflictBuilder.setCancelable(false);
+            conflictBuilder.create().show();
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "");
+        }
+        finally
+        {
+            conflictBuilder = null;
+        }
+    }
+
+}

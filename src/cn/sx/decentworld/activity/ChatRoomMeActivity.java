@@ -19,8 +19,12 @@ import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.bean.MyChatRoom;
 import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantIntent;
+import cn.sx.decentworld.common.ConstantNet;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.TrueOrFalseDialogFragment;
+import cn.sx.decentworld.dialog.TrueOrFalseDialogFragment.OnTrueOrFalseClickListener;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
@@ -28,6 +32,7 @@ import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting;
 import cn.sx.decentworld.network.utils.JsonUtils;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.ToastUtil;
 import cn.sx.decentworld.widget.CircularImageView;
 
 import com.android.volley.Request.Method;
@@ -51,8 +56,6 @@ public class ChatRoomMeActivity extends BaseFragmentActivity implements OnClickL
 	@ViewById(R.id.tv_header_title)
 	TextView tvTitle;
 	ChatRoomsAdapter adapter;
-	@Bean
-	ToastComponent toast;
 	List<MyChatRoom> mChatRooms;
 	public static final int GET_CHATROOMS = 1;
 	public static final int CHATROOM_ENTER = 2;
@@ -68,7 +71,6 @@ public class ChatRoomMeActivity extends BaseFragmentActivity implements OnClickL
 				List<MyChatRoom> chatrooms = (List<MyChatRoom>) JsonUtils.json2BeanArray(msg.obj.toString(), MyChatRoom.class);
 				mChatRooms.clear();
 				mChatRooms.addAll(chatrooms);
-				ImageLoaderHelper.clearCache();
 				adapter.notifyDataSetChanged();
 				setHead();
 				break;
@@ -163,6 +165,7 @@ public class ChatRoomMeActivity extends BaseFragmentActivity implements OnClickL
 	}
 
 	class ChatRoomsAdapter extends BaseAdapter implements OnClickListener {
+		private Integer mPosition;
 
 		@Override
 		public int getCount() {
@@ -190,12 +193,19 @@ public class ChatRoomMeActivity extends BaseFragmentActivity implements OnClickL
 				vh.tvSubjectName = (TextView) con.findViewById(R.id.tv_subject_name);
 				vh.ivOwnerIcon = (CircularImageView) con.findViewById(R.id.iv_detail);
 				vh.tvSelfNickName = (TextView) con.findViewById(R.id.tv_self_nickname);
-				vh.tvChatRoomEnter = (TextView) con.findViewById(R.id.tv_chatroom_enter);
-				vh.tvSubjectList = (ImageView) con.findViewById(R.id.iv_mysubject_list);
+				vh.ivChatRoomEnter = (ImageView) con.findViewById(R.id.iv_chatroom_enter);
+				vh.tvSubjectList = (TextView) con.findViewById(R.id.tv_mysubject_list);
 				vh.tvChargeAmount = (TextView) con.findViewById(R.id.rb_fee_scale);
 				vh.ivRoomBackground = (ImageView) con.findViewById(R.id.iv_bg);
-				vh.ivNewTheme = (CircularImageView) con.findViewById(R.id.iv_new_theme);
-				vh.ivEdit = (CircularImageView) con.findViewById(R.id.iv_edit);
+				vh.ivRoomBackground.setOnClickListener(this);
+				vh.tvNewTheme = (TextView) con.findViewById(R.id.tv_new_theme);
+				vh.tvSubjectContent = (TextView) con.findViewById(R.id.tv_subject_content);
+				vh.tvEdit = (TextView) con.findViewById(R.id.tv_edit);
+				vh.viewMySubjectList = con.findViewById(R.id.view_mysubject_list);
+				vh.viewEdit = con.findViewById(R.id.view_edit);
+				vh.viewDeleteSubject = con.findViewById(R.id.view_delete_subject);
+				vh.tvDeleteCurrentSubject = (TextView) con.findViewById(R.id.tv_delete_subject);
+				vh.tvDeleteCurrentSubject.setOnClickListener(this);
 				con.setTag(vh);
 			} else {
 				vh = (ViewHolder) con.getTag();
@@ -204,9 +214,11 @@ public class ChatRoomMeActivity extends BaseFragmentActivity implements OnClickL
 			vh.tvOnLineNum.setText(chatroom.onLineNum);
 			vh.tvSelfIntroduce.setText(chatroom.ownerIntroduction);
 			if (null == chatroom.subjectName || "".equals(chatroom.subjectName)) {
-				vh.ivEdit.setVisibility(View.GONE);
+				vh.tvEdit.setVisibility(View.GONE);
+				vh.viewEdit.setVisibility(View.GONE);
 			} else {
-				vh.ivEdit.setVisibility(View.VISIBLE);
+				vh.tvEdit.setVisibility(View.VISIBLE);
+				vh.viewEdit.setVisibility(View.VISIBLE);
 			}
 			vh.tvSubjectName.setText(chatroom.subjectName);
 			vh.tvSelfNickName.setText(chatroom.ownerNickName);
@@ -222,55 +234,107 @@ public class ChatRoomMeActivity extends BaseFragmentActivity implements OnClickL
 			} else {
 				vh.ivRoomBackground.setImageResource(R.drawable.ic_launcher);
 			}
-			vh.ivNewTheme.setTag(Constants.ITEM_POSITION, position);
-			vh.ivEdit.setTag(Constants.ITEM_POSITION, position);
-			vh.tvChatRoomEnter.setTag(Constants.ITEM_POSITION, position);
+			vh.ivRoomBackground.setTag(Constants.ITEM_POSITION, position);
+			vh.tvDeleteCurrentSubject.setTag(Constants.ITEM_POSITION, position);
+			vh.tvNewTheme.setTag(Constants.ITEM_POSITION, position);
+			vh.tvEdit.setTag(Constants.ITEM_POSITION, position);
+			vh.ivChatRoomEnter.setTag(Constants.ITEM_POSITION, position);
 			vh.tvSubjectList.setTag(Constants.ITEM_POSITION, position);
-			vh.ivNewTheme.setOnClickListener(this);
-			vh.ivEdit.setOnClickListener(this);
-			vh.tvChatRoomEnter.setOnClickListener(this);
-			if (null == chatroom.subjectAmount || Float.valueOf(chatroom.subjectAmount) <= 1) {
+			vh.tvNewTheme.setOnClickListener(this);
+			vh.tvEdit.setOnClickListener(this);
+			vh.ivChatRoomEnter.setOnClickListener(this);
+			if (null == chatroom.subjectAmount || Float.valueOf(chatroom.subjectAmount) <= 0) {
 				vh.tvSubjectList.setVisibility(View.GONE);
+				vh.viewMySubjectList.setVisibility(View.GONE);
 			} else {
 				vh.tvSubjectList.setVisibility(View.VISIBLE);
 				vh.tvSubjectList.setOnClickListener(this);
+				vh.viewMySubjectList.setVisibility(View.VISIBLE);
+			}
+			if (CommUtil.isBlank(chatroom.subjectID)) {
+				vh.viewDeleteSubject.setVisibility(View.GONE);
+				vh.tvDeleteCurrentSubject.setVisibility(View.GONE);
+			} else {
+				vh.viewDeleteSubject.setVisibility(View.VISIBLE);
+				vh.tvDeleteCurrentSubject.setVisibility(View.VISIBLE);
 			}
 			return con;
 		}
 
 		class ViewHolder {
-			TextView tvSubjectName, tvSelfIntroduce, tvOnLineNum, tvSelfNickName, tvChatRoomEnter, tvChargeAmount;
-			CircularImageView ivOwnerIcon, ivNewTheme, ivEdit;
-			ImageView ivRoomBackground, tvSubjectList;
+			TextView tvSubjectName, tvSelfIntroduce, tvOnLineNum, tvSelfNickName, tvChargeAmount, tvSubjectList, tvNewTheme,
+					tvEdit, tvSubjectContent, tvDeleteCurrentSubject;
+			CircularImageView ivOwnerIcon;
+			ImageView ivRoomBackground, ivChatRoomEnter;
+			View viewMySubjectList, viewEdit, viewDeleteSubject;
 		}
 
 		@Override
 		public void onClick(View view) {
-			Integer position = (Integer) view.getTag(Constants.ITEM_POSITION);
-			MyChatRoom item = adapter.getItem(position);
+			mPosition = (Integer) view.getTag(Constants.ITEM_POSITION);
+			MyChatRoom item = adapter.getItem(mPosition);
 			Intent intent;
 			switch (view.getId()) {
-			case R.id.iv_new_theme:
+			case R.id.tv_new_theme:
 				intent = new Intent(mContext, ChatRoomAddThemeActivity_.class);
 				intent.putExtra(ChatRoomMeActivity.ROOMID, item.roomID);
 				startActivity(intent);
 				break;
-
-			case R.id.iv_edit:
+			case R.id.tv_edit:
 				intent = new Intent(mContext, ChatRoomEditActivity_.class);
 				intent.putExtra(ROOMID, item.roomID);
 				startActivity(intent);
 				break;
-			case R.id.tv_chatroom_enter:
+			case R.id.iv_chatroom_enter:
 				requestEnterChatRoom(item);
 				break;
-			case R.id.iv_mysubject_list:
+			case R.id.tv_mysubject_list:
 				intent = new Intent(mContext, ChatRoomMySubjectListActivity_.class);
-				intent.putExtra(ROOMID, item.roomID);
+				intent.putExtra(Constants.MY_CHATROOM, item);
+				startActivity(intent);
+				break;
+			case R.id.tv_delete_subject:
+				TrueOrFalseDialogFragment trueOrFalseDialogFragment = new cn.sx.decentworld.dialog.TrueOrFalseDialogFragment();
+				trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(mOnTrueOrFalseClickListener);
+				trueOrFalseDialogFragment.setTips("是否删除此话题");
+				trueOrFalseDialogFragment.setObj(item);
+				trueOrFalseDialogFragment.show(getSupportFragmentManager(), "trueOrFalseDialogFragment");
+				break;
+			case R.id.iv_bg:
+				intent = new Intent(mContext, TopicContentActivity_.class);
+				intent.putExtra("roomID", item.roomID);
+				intent.putExtra("nickName", item.ownerNickName);
+				intent.putExtra(ConstantIntent.SELF_INTRODUCE, item.ownerIntroduction);
 				startActivity(intent);
 				break;
 			}
 		}
+
+		private Handler mDeletHandler = new Handler() {
+			public void handleMessage(android.os.Message msg) {
+				mChatRooms.remove(mPosition);
+				notifyDataSetChanged();
+				getRooms();
+			};
+		};
+		private OnTrueOrFalseClickListener mOnTrueOrFalseClickListener = new OnTrueOrFalseClickListener() {
+
+			@Override
+			public void onTrueOrFalseClick(TrueOrFalseDialogFragment dialog, View view) {
+				switch (view.getId()) {
+				case R.id.tv_cancel:
+					break;
+				case R.id.tv_ensure:
+					MyChatRoom myChatRoom = (MyChatRoom) dialog.getObj();
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+					map.put("roomID", myChatRoom.roomID);
+					map.put("subjectID", "" + myChatRoom.subjectID);
+					chatRoomInfoSettingAndGetting.deleteSubject(map, ConstantNet.API_DELETE_SUBJECT, mDeletHandler);
+					break;
+				}
+			}
+		};
 	}
 
 	private SendUrl sendUrl;
@@ -308,7 +372,7 @@ public class ChatRoomMeActivity extends BaseFragmentActivity implements OnClickL
 
 					@Override
 					public void run() {
-						toast.show(data);
+						ToastUtil.showToast(data);
 					}
 				});
 			}

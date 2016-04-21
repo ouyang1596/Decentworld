@@ -7,16 +7,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -35,8 +28,8 @@ import cn.sx.decentworld.activity.PictureClipActivity_;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.dialog.CameraAlbumDialogFragment;
 import cn.sx.decentworld.dialog.CameraAlbumDialogFragment.OnCameraAlbumClickListener;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.utils.ImageUtils;
-import cn.sx.decentworld.utils.LogUtils;
 
 /**
  * @ClassName: ViewPagerFragment.java
@@ -45,6 +38,7 @@ import cn.sx.decentworld.utils.LogUtils;
  * @date: 2016年1月12日 下午3:44:55
  */
 public class ViewPagerFragment extends Fragment implements OnClickListener, OnCameraAlbumClickListener {
+	private static final String TAG = "ViewPagerFragment";
 	private LinearLayout llDots;
 	private ViewPager vpShowPic;
 	public HashMap<Integer, String> mPicPaths;
@@ -221,7 +215,7 @@ public class ViewPagerFragment extends Fragment implements OnClickListener, OnCa
 			int fileLength = ImageUtils.fileLength(picPath);
 			Bitmap bitmap = getBitmap(picPath, fileLength);
 			if (0 == mPosition) {
-				LogUtils.i("bm", "condition--" + condition);
+				LogUtils.i(TAG, "onActivityResult---指示---" + condition);
 				bitmap = ImageUtils.drawTextToBitmap(condition, bitmap);
 			}
 			ImageUtils.saveBitmap(picPath, bitmap);
@@ -282,8 +276,8 @@ public class ViewPagerFragment extends Fragment implements OnClickListener, OnCa
 			intent.putExtra(Constants.CAMERA_ALBUM, 1);
 			intent.putExtra(Constants.ASPECTX, 1);
 			intent.putExtra(Constants.ASPECTY, 1);
-			intent.putExtra(Constants.OUTPUTX, 400);
-			intent.putExtra(Constants.OUTPUTY, 400);
+			intent.putExtra(Constants.OUTPUTX, 500);
+			intent.putExtra(Constants.OUTPUTY, 500);
 			startActivityForResult(intent, Constants.REQUEST_CODE);
 			break;
 		case R.id.tv_album:
@@ -291,8 +285,8 @@ public class ViewPagerFragment extends Fragment implements OnClickListener, OnCa
 			intent.putExtra(Constants.CAMERA_ALBUM, 0);
 			intent.putExtra(Constants.ASPECTX, 1);
 			intent.putExtra(Constants.ASPECTY, 1);
-			intent.putExtra(Constants.OUTPUTX, 400);
-			intent.putExtra(Constants.OUTPUTY, 400);
+			intent.putExtra(Constants.OUTPUTX, 500);
+			intent.putExtra(Constants.OUTPUTY, 500);
 			startActivityForResult(intent, Constants.REQUEST_CODE);
 			break;
 		case R.id.tv_cancel:

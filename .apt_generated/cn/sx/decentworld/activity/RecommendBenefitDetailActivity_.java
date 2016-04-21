@@ -13,7 +13,9 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.TitleBar_;
@@ -40,6 +42,8 @@ public final class RecommendBenefitDetailActivity_
     }
 
     private void afterSetContentView_() {
+        mTvPromptContainer = ((TextView) findViewById(id.tv_prompt_container));
+        mLlListContainer = ((LinearLayout) findViewById(id.ll_list_container));
         lv_recommend_benefit_detail = ((ListView) findViewById(id.lv_recommend_benefit_detail));
         {
             View view = findViewById(id.main_header_left);

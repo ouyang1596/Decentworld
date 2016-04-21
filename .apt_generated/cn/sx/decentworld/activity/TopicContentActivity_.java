@@ -13,13 +13,10 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
@@ -37,20 +34,16 @@ public final class TopicContentActivity_
 
     private void init_(Bundle savedInstanceState) {
         chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvIntroduce = ((TextView) findViewById(id.tv_introduce));
-        btnOK = ((Button) findViewById(id.btn_OK));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
-        etSubjectName = ((EditText) findViewById(id.tv_subj_name));
-        lvAddNewTheme = ((ListView) findViewById(id.lv_add_new_theme));
-        ivHead = ((ImageView) findViewById(id.iv_head));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        ivCover = ((ImageView) findViewById(id.iv_cover));
+        tvOwnerName = ((TextView) findViewById(id.tv_owner_name));
+        ivOwnerIcon = ((ImageView) findViewById(id.iv_owner_icon));
+        tvContent = ((TextView) findViewById(id.tv_content));
+        tvSelfIntroduce = ((TextView) findViewById(id.tv_self_introduce));
+        btnChatRoomEnter = ((Button) findViewById(id.btn_chatroom_enter));
+        tvTitle = ((TextView) findViewById(id.tv_title));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

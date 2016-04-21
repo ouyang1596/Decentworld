@@ -1,0 +1,266 @@
+package cn.sx.decentworld;
+
+import java.util.ArrayList;
+
+import org.jivesoftware.smack.ChatManager;
+
+import android.content.Context;
+import android.content.Intent;
+import cn.bmob.v3.Bmob;
+import cn.sx.decentworld.bean.ChatRoomInfo;
+import cn.sx.decentworld.bean.PromptBean;
+import cn.sx.decentworld.bean.RegisterBean;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.CrashHandler;
+import cn.sx.decentworld.common.FilePath;
+import cn.sx.decentworld.common.SystemHelper;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.SoundPoolUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper;
+
+import com.activeandroid.ActiveAndroid;
+import com.activeandroid.app.Application;
+import com.chen.twoprocess.Watcher;
+import com.googlecode.androidannotations.annotations.EApplication;
+import com.umeng.analytics.MobclickAgent;
+
+/**
+ * @ClassName: DecentWorldApp.java
+ * @Description: 主要完成的工作 1.保存全局变量 ; 2.初始化ActiveAndroid数据库 ; 3.初始化变量；
+ * 
+ * @author: cj
+ * @date: 2015年10月18日 下午4:55:25
+ */
+@EApplication
+public class DecentWorldApp extends Application {
+	private static final String TAG = "DecentWorldApp";
+	// 储存多张照片路径
+	public static ArrayList<String> mPicList;
+	// 储存一张照片路径
+	public static String tempPicPath = null;
+	// 全局变量
+	private static DecentWorldApp instance;
+	private static Context applicationContext;
+	// 用于与Dw服务器进行通信的dwID号
+	private String dwID = "";
+	// 用户名（目前为手机号码）
+	private String username = "";
+	// 密码
+	private String password = "";
+	// 与dw服务器通信的令牌
+	private String token = "";
+	public static final String MAIN_KEY = "1";
+	public static RegisterBean registerBean;
+	public static String realName;
+	public static String ifGuarantee = "0";
+	public static boolean ifFromAppOwner;
+	// 通过此来判断聊天室退出是否需要调用退出接口
+	public static boolean ifFixed;
+	public static ChatRoomInfo chatRoomInfo;
+	// 聊天管理器
+	private ChatManager chatManager;
+	private Intent messageListenerService;
+	// 判断是否有网络
+	public static boolean hasNet = true;
+	// 标记MainActivity是否初始化完毕，作为在ReconnectionManager中是否发送上线消息的标志
+	private boolean isMainActivityInit = false;
+	// 标记是否登录
+	private boolean isLogin = false;
+	// 计算DecentApplication初始化的次数
+	private int createCount = 0;
+	public static int doubtWan = -1;// 0表示疑1表示真2表示腕
+	// 网络连接超时时间
+	public static long netConnectTimeout = 3500;
+	public static int isFirst=-1;
+	//初始化Bmob服务，用于提交测试数据
+	private static final String BmobAppKey = "1f90a4de6def9c5ce28bfafafdf19c39";
+	//最大的消息ID，用于与服务器同步.
+	private long maxMsgID = -1;
+
+	/**
+	 * 初始化入口
+	 */
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		createCount++;
+		LogUtils.i(TAG, "Application onCreate，createCount=" + createCount);
+		// 获取进程名字
+		String processName = SystemHelper.getProcessName(this, android.os.Process.myPid());
+		if (processName != null) {
+			LogUtils.i(TAG, "The current process's name is " + processName);
+			boolean defaultProcess = processName.equals(Constants.REAL_PACKAGE_NAME);
+			if (defaultProcess) {
+				LogUtils.i(TAG, "初始化主进程");
+				initAppForMainProcess();
+			} else if (processName.contains(":test")) {
+				LogUtils.i(TAG, "初始化服务进程");
+				initAppForServiceProcess();
+			} else {
+				LogUtils.i(TAG, "初始化其它进程");
+				initAppForOtherProcess();
+			}
+		}
+	}
+
+	/**
+	 * 初始化主进程
+	 */
+	private void initAppForMainProcess() {
+		instance = this;
+		applicationContext = this;
+		// 友盟统计设置为调试模式
+		MobclickAgent.setDebugMode(false);
+		// 初始化声音池
+		SoundPoolUtils.init(this);
+		// 初始化提示信息工具
+		ToastUtil.initToast(this);
+		// 初始化数据库
+		ActiveAndroid.initialize(this);
+		mPicList = new ArrayList<String>();
+		// 初始化文件存储目录
+		FilePath.initialize();
+		// 初始化ImageLoadHepler
+		ImageLoaderHelper.initImageLoader(this);
+		// 初始化异常报告工具
+		CrashHandler.getInstance().init(this);
+		ImageUtils.saveBitmap(getResources());
+
+		// 初始化双进程守护
+//		Watcher watcher = new Watcher(this);
+//		watcher.createAppMonitor("0");
+		
+		//初始化Bmob
+		Bmob.initialize(this, BmobAppKey);
+	}
+
+	/**
+	 * 初始化服务进程
+	 */
+	private void initAppForServiceProcess() {
+		// TODO something
+
+	}
+
+	/**
+	 * 初始化其它进程
+	 */
+	private void initAppForOtherProcess() {
+		// TODO something
+	}
+
+	/**
+	 * 获得DecentWorldApp的唯一实例
+	 * 
+	 * @return
+	 */
+	public static DecentWorldApp getInstance() {
+		return instance;
+	}
+
+	/**
+	 * 获取全局的Context
+	 *
+	 * @return
+	 */
+	public static Context getGlobalContext() {
+		return applicationContext;
+	}
+
+	/**
+	 * 设置与Dw服务器通信的dwID
+	 */
+	public void setDwID(String dwID) {
+		this.dwID = dwID;
+	}
+
+	/**
+	 * 获取与Dw服务器进行通信的dwID,如果内存中没有，那么冲sp文件中拿取
+	 */
+	public String getDwID() {
+		if (CommUtil.isBlank(dwID)) {
+			dwID = UserInfoHelper.getDwID();
+		}
+		return dwID;
+	}
+
+	/**
+	 * 设置用户名
+	 */
+	public void setUserName(String username) {
+		this.username = username;
+	}
+
+	/**
+	 * 获取当前登陆用户名
+	 */
+	public String getUserName() {
+		return username;
+	}
+
+	/**
+	 * 设置密码
+	 */
+	public void setPassword(String pwd) {
+		this.password = pwd;
+	}
+
+	/**
+	 * 获取密码
+	 */
+	public String getPassword() {
+		return password;
+	}
+
+	/**
+	 * @return the token
+	 */
+	public String getToken() {
+		return token;
+	}
+
+	/**
+	 * @param token
+	 *            the token to set
+	 */
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	@Override
+	public void onTerminate() {
+		LogUtils.i(TAG, "销毁Application");
+		super.onTerminate();
+		/** 完成数据库的清理工作 **/
+		ActiveAndroid.dispose();
+	}
+
+	/**
+	 * @return the isMainActivityInit
+	 */
+	public boolean isMainActivityInit() {
+		return isMainActivityInit;
+	}
+
+	/**
+	 * @param isMainActivityInit
+	 *            the isMainActivityInit to set
+	 */
+	public void setMainActivityInit(boolean isMainActivityInit) {
+		this.isMainActivityInit = isMainActivityInit;
+	}
+
+	/**
+	 * 判断是否已经进行登录操作
+	 * 
+	 * @return
+	 */
+	public boolean isLogin() {
+		return isLogin;
+	}
+
+}

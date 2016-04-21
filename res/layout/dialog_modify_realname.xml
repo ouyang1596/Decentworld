@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="@dimen/dig_width"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/text_size_20"
+            android:text="修改实名" />
+        
+        <EditText 
+            android:id="@+id/et_modify_realname"
+            android:layout_width="240dp"
+            android:layout_marginTop="20dp"
+            android:layout_height="40dp"
+            android:padding="3dp"
+            android:hint="请填写实名"
+            android:textSize="@dimen/text_size_20"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/edittext_selector"/>
+        
+        <include 
+            layout="@layout/btn_belong_dialog_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="20dp"/>
+    </LinearLayout>
+
+</LinearLayout>

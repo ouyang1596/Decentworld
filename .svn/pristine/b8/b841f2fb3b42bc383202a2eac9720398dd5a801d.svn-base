@@ -1,0 +1,32 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+import java.util.Map;
+
+/**
+ * 作品圈刷新请求所需的对象
+ */
+public class WorkRefreshRequest {
+	private int page;
+	// 以work的ID和它的分数作为键值对产生的客户端版本
+	private Map<String, String> clientVersion;
+
+	public int getPage() {
+		return page;
+	}
+
+	public void setPage(int page) {
+		this.page = page;
+	}
+
+	public Map<String, String> getClientVersion() {
+		return clientVersion;
+	}
+
+	public void setClientVersion(Map<String, String> clientVersion) {
+		this.clientVersion = clientVersion;
+	}
+
+}

@@ -1,0 +1,126 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.service;
+
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.packet.Presence;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.activity.DefaultActivity;
+import cn.sx.decentworld.activity.LoadNetdataActivity_;
+import cn.sx.decentworld.activity.LoginActivity_;
+import cn.sx.decentworld.common.XmppHelper;
+import cn.sx.decentworld.listener.ConnectOpenFireListener;
+import cn.sx.decentworld.task.ConnectOpenFireTask;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper;
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.IBinder;
+
+/**
+ * @ClassName: TestService.java
+ * @Description:
+ * @author: cj
+ * @date: 2016年1月21日 下午4:28:40
+ */
+public class TestService extends Service
+{
+    private static final String TAG = "TestService";
+    private boolean isRun = true;
+
+    @Override
+    public IBinder onBind(Intent intent)
+    {
+        LogUtils.i(TAG, "onBind");
+        return null;
+    }
+
+    class MyBinder extends Binder
+    {
+        /**
+         * 构造函数
+         */
+        public MyBinder()
+        {
+            LogUtils.i(TAG, "onBind");
+        }
+    }
+
+    @Override
+    public void onCreate()
+    {
+        super.onCreate();
+        LogUtils.i(TAG, "onCreate");
+        
+        if(UserInfoHelper.isLogined(this))
+        {
+            LogUtils.i(TAG, "以前登录过，配置文件中有登录信息");
+            if (NetworkUtils.isNetWorkConnected(this))
+            {
+                LogUtils.i(TAG, "有网络，加载网络数据");
+                String dwID = DecentWorldApp.getInstance().getDwID();
+                String password = DecentWorldApp.getInstance().getPassword();
+                ConnectOpenFireTask task = new ConnectOpenFireTask();
+                task.setOnConnectOpenFireListener(new ConnectOpenFireListener()
+                {
+                    @Override
+                    public void onSuccess()
+                    {
+                        LogUtils.i(TAG, "登录openfire成功");
+                        try
+                        {
+                            LogUtils.i(TAG, "发送上线消息");
+                            XmppHelper.getConnection().sendPacket(new Presence(Presence.Type.available));
+                        }
+                        catch (NotConnectedException e)
+                        {
+                            LogUtils.i(TAG, "发送上线消息，出现异常，cause："+e.toString());
+                            e.printStackTrace();
+                        }
+                    }
+                    
+                    @Override
+                    public void onFailure()
+                    {
+                        LogUtils.i(TAG, "登录openfire失败");
+        
+                    }
+                });
+                task.execute(dwID, password);
+            }
+            else
+            {
+                LogUtils.i(TAG, "没有网络，加载历史数据");
+            }
+        }
+        
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId)
+    {
+        LogUtils.i(TAG, "onStartCommand");
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    public void onDestroy()
+    {
+    	isRun = false;
+        LogUtils.i(TAG, "onDestroy");
+        super.onDestroy();
+    }
+    
+    public void test()
+    {
+        
+    }
+    
+
+
+}

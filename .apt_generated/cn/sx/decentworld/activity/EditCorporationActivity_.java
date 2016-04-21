@@ -38,10 +38,10 @@ public final class EditCorporationActivity_
     }
 
     private void afterSetContentView_() {
+        et_edit_corporation = ((EditText) findViewById(id.et_edit_corporation));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         btn_edit_corporation_complete = ((Button) findViewById(id.btn_edit_corporation_complete));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        et_edit_corporation = ((EditText) findViewById(id.et_edit_corporation));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

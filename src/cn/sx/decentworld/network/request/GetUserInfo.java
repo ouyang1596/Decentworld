@@ -13,11 +13,11 @@ import android.os.Message;
 import cn.sx.decentworld.common.ConstantNet;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.fragment.main.ConversationFragment;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
-import cn.sx.decentworld.utils.AES;
-import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.utils.ToastUtil;
 
 import com.alibaba.fastjson.JSON;
@@ -37,7 +37,7 @@ import com.googlecode.androidannotations.annotations.RootContext;
  */
 @EBean
 public class GetUserInfo {
-	private static String TAG = "GetUserInfo";
+	private static final String TAG = "GetUserInfo";
 	@RootContext
 	Context context;
 	@RootContext
@@ -45,250 +45,10 @@ public class GetUserInfo {
 	@Bean
 	ToastComponent toast;
 	private SendUrl sendUrl;
-	private ProgressDialog mProDialog;
 
 	@AfterViews
 	void init() {
 		sendUrl = new SendUrl(context);
-	}
-
-	/**
-	 * 根据电话号码获取dwID
-	 * 
-	 * @param phoneNum
-	 */
-	public void getUserdwID(final String phoneNum, final Handler handler) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("phoneNum", phoneNum);
-		LogUtils.i(TAG, "getUserdwID...begin,phoneNum=" + phoneNum);
-		showProgressDialog();
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_LOGIN_GET_DWID, Method.POST,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, final ResultBean bean) {
-						hideProgressDialog();
-						LogUtils.i(TAG, "getUserdwID...getResultCode=" + bean.getResultCode() + ",getData=" + bean.getData()
-								+ ",getMsg=" + bean.getMsg());
-						if (bean.getResultCode() == 2222) {
-							// 获取成功，返回 dwID,token
-							Message message = handler.obtainMessage();
-							message.what = bean.getResultCode();
-							message.obj = bean.getData().toString();
-							handler.sendMessage(message);
-						} else if (bean.getResultCode() == 3333) {
-							showToastInfo(bean.getMsg());
-						}
-					}
-
-					@Override
-					public void onFailure(String e) {
-						hideProgressDialog();
-						showToastInfo(Constants.NET_WRONG);
-					}
-				});
-	}
-
-	/**
-	 * 获取用户身家
-	 * 
-	 * @param dwID
-	 *            用户id
-	 * @param handler
-	 *            回调handler
-	 * @param resultCode
-	 *            回调中msg.what 的值
-	 */
-	public void getWealth(String dwID, final Handler handler, final int resultCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", dwID);
-		LogUtils.i(TAG, "getWealth...begin，dwID=" + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_GET_WEALTH, Method.GET, new HttpCallBack() {
-			@Override
-			public void onSuccess(String response, ResultBean bean) {
-				LogUtils.i(TAG, "getWealth...getResultCode=" + bean.getResultCode() + ",getData=" + bean.getData() + ",getMsg="
-						+ bean.getMsg());
-				if (bean.getResultCode() == 2222) {
-					JSONObject json = JSON.parseObject(bean.getData().toString());
-					Message message = Message.obtain();
-					message.obj = json.getString("wealth");
-					message.what = resultCode;
-					handler.sendMessage(message);
-					LogUtils.i(TAG, "getWealth...success");
-				}
-				if (bean.getResultCode() == 3333) {
-					LogUtils.i(TAG, "getWealth...failure,cause by:" + bean.getMsg());
-				}
-			}
-
-			@Override
-			public void onFailure(String error) {
-				LogUtils.i(TAG, "getWealth...onFailure,cause by:" + error);
-			}
-		});
-	}
-
-	/**
-	 * 获取用户身价
-	 * 
-	 * @param dwID
-	 *            用户id
-	 * @param handler
-	 *            回调handler
-	 * @param resultCode
-	 *            回调中msg.what 的值
-	 */
-	public void getWorth(String dwID, final Handler handler, final int resultCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", dwID);
-		LogUtils.i(TAG, "getWorth...begin,dwID" + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_GET_WORTH, Method.GET, new HttpCallBack() {
-			@Override
-			public void onSuccess(String response, ResultBean bean) {
-				LogUtils.i(TAG, "getWorth...getResultCode=" + bean.getResultCode() + ",getData=" + bean.getData() + ",getMsg="
-						+ bean.getMsg());
-				if (bean.getResultCode() == 2222) {
-					JSONObject json = JSON.parseObject(bean.getData().toString());
-					Message message = Message.obtain();
-					message.obj = json.getString("worth");
-					message.what = resultCode;
-					handler.sendMessage(message);
-					LogUtils.i(TAG, "getWorth...success");
-				}
-
-				if (bean.getResultCode() == 3333) {
-					LogUtils.i(TAG, "getWorth...failure,cause by:" + bean.getMsg());
-				}
-			}
-
-			@Override
-			public void onFailure(String error) {
-				LogUtils.i(TAG, "getWorth...onFailure,cause by:" + error);
-			}
-		});
-	}
-
-	/**
-	 * 根据dwID获取用户信息
-	 * 
-	 * @param dwID
-	 */
-	public void getUserInfo(final String dwID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", dwID);
-		LogUtils.i(TAG, "getUserInfo...begin，dwID= " + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_RETRIEVE_INFO, Method.GET, new HttpCallBack() {
-			@Override
-			public void onSuccess(String response, ResultBean bean) {
-				LogUtils.i(TAG, "getUserInfo...msg.getResultCode=" + bean.getResultCode() + ",getData=" + bean.getData()
-						+ ",msg.getMsg=" + bean.getMsg());
-				if (bean.getResultCode() == 2222)// 获取成功
-				{
-					Message message = Message.obtain();
-					message.what = requestCode;
-					message.arg1 = 1;
-					message.obj = bean.getData().toString();
-					handler.sendMessage(message);
-				}
-				if (bean.getResultCode() == 3333) {
-					LogUtils.i(TAG, "getUserInfo...failure,cause by:" + bean.getMsg());
-					Message message = Message.obtain();
-					message.what = requestCode;
-					message.arg1 = 0;
-					handler.sendMessage(message);
-				}
-			}
-
-			@Override
-			public void onFailure(String error) {
-				showToastInfo(Constants.NET_WRONG);
-				LogUtils.i(TAG, "getUserInfo...onFailure,cause by:" + error);
-				Message message = Message.obtain();
-				message.what = requestCode;
-				message.arg1 = 0;
-				handler.sendMessage(message);
-			}
-		});
-	}
-
-	/**
-	 * 获取用户信息的对外显示权限【完成】
-	 * 
-	 * @param dwID
-	 * @param handler
-	 * @param requestCode
-	 */
-	public void getUserInfoAuth(final String dwID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", dwID);
-		LogUtils.i(TAG, "getUserInfoAuth...begin，dwID= " + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_USER_AUTH, Method.GET, new HttpCallBack() {
-			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(TAG, "getUserInfoAuth...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg());
-				if (msg.getResultCode() == 2222)// 获取成功
-				{
-					Message message = Message.obtain();
-					message.what = requestCode;
-					message.arg1 = 1;
-					message.obj = msg.getData().toString();
-					handler.sendMessage(message);
-				}
-				if (msg.getResultCode() == 3333) {
-					LogUtils.i(TAG, "getUserInfoAuth...failure,cause by:" + msg.getMsg());
-					Message message = Message.obtain();
-					message.what = requestCode;
-					message.arg1 = 0;
-					handler.sendMessage(message);
-				}
-			}
-
-			@Override
-			public void onFailure(String error) {
-				LogUtils.i(TAG, "getUserInfoAuth...failure,cause by:" + error);
-				Message message = Message.obtain();
-				message.what = requestCode;
-				message.arg1 = 0;
-				handler.sendMessage(message);
-			}
-		});
-	}
-
-	/**
-	 * 获取我是谁的贵人的列表【完成】
-	 * 
-	 * @param dwID
-	 * @param handler
-	 * @param requestCode
-	 */
-	public void getMyProteges(final String userID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", userID);
-		LogUtils.i(TAG, "getMyProteges...begin，userID= " + userID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_GET_GR_LIST_TO_OTHER, Method.GET,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(TAG,
-								"getMyProteges...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg()
-										+ ",msg.getData=" + msg.getData().toString());
-						if (msg.getResultCode() == 2222)// 获取成功
-						{
-							LogUtils.i(TAG, "getMyProteges...我是 " + msg.getMsg() + " 个人的贵人。");
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.obj = msg.getData().toString();
-							handler.sendMessage(message);
-						}
-						if (msg.getResultCode() == 3333) {
-							LogUtils.i(TAG, "getMyProteges...failure,cause by:" + msg.getMsg());
-						}
-					}
-
-					@Override
-					public void onFailure(String error) {
-						LogUtils.i(TAG, "getMyProteges...onFailure,cause by:" + error);
-					}
-				});
 	}
 
 	/**
@@ -345,102 +105,7 @@ public class GetUserInfo {
 				});
 	}
 
-	/**
-	 * 验证即将被推荐的人是否有效【完成】
-	 * 
-	 * @param phoneNum
-	 * @param handler
-	 * @param requestCode
-	 */
-	public void validateRecommend(String dwID, String phoneNum, final Handler handler) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", dwID);
-		map.put("phoneNum", phoneNum);
-		LogUtils.i(TAG, "validateRecommend...begin");
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_VALIDATE_RECOMMEND, Method.GET,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(TAG, "validateRecommend...msg.getResultCode=" + msg.getResultCode());
-						if (msg.getResultCode() == 2001)// 被推荐人已经注册
-						{
-							LogUtils.i(TAG, "validateRecommend...msg.getMsg=" + msg.getMsg());
-							showToastInfo("被推荐人已经注册");
-						} else if (msg.getResultCode() == 2009)// 已被他人推荐
-						{
-							LogUtils.i(TAG, "validateRecommend...msg.getMsg=" + msg.getMsg());
-							showToastInfo("已被他人推荐");
-						} else if (msg.getResultCode() == 2222) {
-							LogUtils.i(TAG, "validateRecommend...success,推荐的人有效");
-							handler.sendEmptyMessage(2222);
-						} else if (msg.getResultCode() == 3333) {
-							LogUtils.i(TAG, "validateRecommend...msg.getMsg=" + msg.getMsg());
-							handler.sendEmptyMessage(3333);
-						}
-					}
-
-					@Override
-					public void onFailure(String e) {
-						LogUtils.i(TAG, "validateRecommend...onFailure,caused by:" + e);
-						showToastInfo(Constants.NET_WRONG);
-					}
-				});
-	}
-
-	/**
-	 * 获取单聊聊天记录
-	 * 
-	 * @param dwID
-	 *            自己的ID
-	 * @param toID
-	 *            对方的ID
-	 * @param page
-	 *            消息开始的位置
-	 * @param handler
-	 *            回调Handler
-	 * @param requestCode
-	 *            请求码
-	 */
-	public void getUserHistoryMsg(String dwID, String toID, long firstIndex, int chatType, final Handler handler) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", dwID);
-		map.put("toID", toID);
-		map.put("firstIndex", String.valueOf(firstIndex));
-		map.put("chatType", String.valueOf(chatType));
-		LogUtils.i(TAG, "getUserHistoryMsg...begin,dwID=" + dwID + ",toID=" + toID + ",firstIndex=" + firstIndex + ",chatType="
-				+ chatType);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_SINGLE_HISTORY_MSG, Method.POST,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(TAG,
-								"getUserHistoryMsg...msg.getResultCode=" + msg.getResultCode() + "\nmsg.getMsg=" + msg.getMsg()
-										+ "\nmsg.getData=" + msg.getData());
-						if (msg.getResultCode() == 2222) {
-							Message message = Message.obtain();
-							message.what = 1;
-							message.obj = msg.getData().toString();
-							handler.sendMessage(message);
-						}
-						if (msg.getResultCode() == 3333) {
-							LogUtils.i(TAG, "getUserHistoryMsg...onfailure,cause by:" + msg.getMsg());
-							Message message = Message.obtain();
-							message.obj = msg.getMsg();
-							message.what = 2;
-							handler.sendMessage(message);
-						}
-					}
-
-					@Override
-					public void onFailure(String e) {
-						LogUtils.i(TAG, "getUserHistoryMsg...onFailure,cause by:" + e);
-						Message message = Message.obtain();
-						message.obj = "网络错误";
-						message.what = 3;
-						handler.sendMessage(message);
-					}
-				});
-	}
+	private ProgressDialog mProDialog;
 
 	private void showToastInfo(final String data) {
 		activity.runOnUiThread(new Runnable() {
@@ -574,154 +239,35 @@ public class GetUserInfo {
 	}
 
 	/**
-	 * 推荐别人获得的收益列表详情
-	 * 
-	 * @param userID
-	 *            自己的ID
-	 * @param otherID
-	 *            被推荐人ID
-	 * @param handler
-	 * @param requestCode
-	 */
-	public void getRecommendBenefitDetail(String userID, String otherID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", userID);
-		map.put("recommenderedID", otherID);
-		LogUtils.i(TAG, "getRecommendBenefitDetail...begin,dwID=" + userID + ",otherID=" + otherID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_RECOMMEND_BENEFIT_DETAIL, Method.GET,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(TAG, "getRecommendBenefitDetail...success,msg.getResultCode=" + msg.getResultCode()
-								+ ",msg.getMsg=" + msg.getMsg() + ",msg.getData=" + msg.getData());
-						if (msg.getResultCode() == 2222) {
-							// list 包含key为 amount,time,status
-							LogUtils.i(TAG, "getRecommendBenefitDetail...success");
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.obj = msg.getData().toString();
-							handler.sendMessage(message);
-						}
-
-						if (msg.getResultCode() == 3333) {
-							LogUtils.i(TAG, "getRecommendBenefitDetail...failure");
-							showToastInfo(msg.getMsg());
-						}
-					}
-
-					@Override
-					public void onFailure(String e) {
-						LogUtils.i(TAG, "getRecommendBenefitDetail...onFailure");
-						showToastInfo(Constants.NET_WRONG);
-					}
-				});
-	}
-
-	/**
-	 * 获取用户的账号
-	 * 
-	 * @param dwID
-	 * @param handler
-	 * @param requestCod
-	 */
-	public void getUserAccount(String dwID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", dwID);
-		LogUtils.i(TAG, "getUserAccount...begin,dwID" + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_ACCOUNT_DETAIL, Method.GET,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(TAG,
-								"getUserAccount...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg()
-										+ ",msg.getData=" + msg.getData());
-						if (msg.getResultCode() == 2222) {
-							LogUtils.i(TAG, "getUserAccount...success");
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.obj = msg.getData().toString();
-							handler.sendMessage(message);
-						} else if (msg.getResultCode() == 3333) {
-							LogUtils.i(TAG, "getUserAccount...failure,cause by:" + msg.getMsg());
-							Message message = Message.obtain();
-							message.what = requestCode + 1;
-							handler.sendMessage(message);
-						}
-					}
-
-					@Override
-					public void onFailure(String e) {
-						LogUtils.i(TAG, "getUserAccount...onFailure,cause by:" + e);
-						showToastInfo(Constants.NET_WRONG);
-					}
-				});
-
-	}
-
-	/**
 	 * 上传联系人列表到服务器
 	 * 
-	 * @param dwID
+	 * @param strangerID
 	 * @param handler
 	 * @param requestCod
 	 */
 	public void uploadContact(HashMap<String, String> map, final Handler handle) {
+		showProgressDialog();
 		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + Constants.UPLOAD_CONTACT, Method.GET, new HttpCallBack() {
 			@Override
 			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.d(TAG, "uploadContact---" + msg.toString());
+				hideProgressDialog();
 				if (msg.getResultCode() == 2222) {
 					LogUtils.i("bm", msg.getData().toString());
 					Message message = handle.obtainMessage();
 					message.obj = msg.getData().toString();
-					LogUtils.i("bm", "data--" + msg.getData().toString());
 					handle.sendMessage(message);
 				} else {
+					showToastInfo(msg.getMsg());
 				}
 			}
 
 			@Override
 			public void onFailure(String e) {
-				LogUtils.i(TAG, "getUserAccount...onFailure,cause by:" + e);
+				LogUtils.e(TAG, "uploadContact---error---" + e);
+				hideProgressDialog();
 				showToastInfo(Constants.NET_WRONG);
-			}
-		});
-	}
-
-	/**
-	 * 获取高级设置的开关权限(三个)
-	 */
-	public void getAdvanceAuth(String dwID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", dwID);
-		LogUtils.i(TAG, "getAdvanceAuth...begin,dwID=" + dwID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + Constants.AUTH_GET, Method.GET, new HttpCallBack() {
-			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(TAG, "getAdvanceAuth...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg()
-						+ ",msg.getData=" + msg.getData());
-				if (msg.getResultCode() == 2222) {
-					Message message = Message.obtain();
-					message.what = requestCode;
-					message.arg1 = 1;
-					message.obj = msg.getData().toString();
-					handler.sendMessage(message);
-				}
-				if (msg.getResultCode() == 3333) {
-					LogUtils.i(TAG, "getAdvanceAuth...failure,cause by:" + msg.getMsg());
-					Message message = Message.obtain();
-					message.what = requestCode;
-					message.arg1 = 0;
-					handler.sendMessage(message);
-				}
-			}
-
-			@Override
-			public void onFailure(String e) {
-				LogUtils.i(TAG, "getAuthFromServer...onFailure,cause by:" + e);
-				Message message = Message.obtain();
-				message.what = requestCode;
-				message.arg1 = 0;
-				handler.sendMessage(message);
+				handle.sendEmptyMessage(Constants.NET_WRONG_CODE);
 			}
 		});
 	}
@@ -770,284 +316,28 @@ public class GetUserInfo {
 				});
 	}
 
-	/**
-	 * 获取谁是我的贵人
-	 * 
-	 * @param userID
-	 * @param handler
-	 * @param requestCode
-	 */
-	public void getMyGr(String userID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", userID);
-		LogUtils.i(TAG, "getMyGr...begin,userID=" + userID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_MY_GR, Method.GET, new HttpCallBack() {
-			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(TAG, "getMyGr...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg()
-						+ ",msg.getData=" + msg.getData());
-				if (msg.getResultCode() == 2222) {
-					LogUtils.i(TAG, "getMyGr...success");
-					Message message = Message.obtain();
-					message.what = requestCode;
-					message.arg1 = 1;
-					message.obj = msg.getData().toString();
-					handler.sendMessage(message);
-				} else if (msg.getResultCode() == 3333) {
-					/** 没有贵人 **/
-					LogUtils.i(TAG, "getMyGr...failure,cause by:" + msg.getMsg());
-					Message message = Message.obtain();
-					message.what = requestCode;
-					message.arg1 = 0;
-					handler.sendMessage(message);
-
-				} else {
-					LogUtils.i(TAG, "getMyGr...failure,cause by:不知名的结果码");
-				}
-			}
+	public void getShareprice(HashMap<String, String> map, String api, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + api, Method.POST, new HttpCallBack() {
 
 			@Override
-			public void onFailure(String e) {
-				LogUtils.i(TAG, "getMyGr...onFailure,cause by:" + e.toString());
-				showToastInfo(Constants.NET_WRONG);
-			}
-		});
-	}
-
-	/**
-	 * 提取推荐的收益
-	 * 
-	 * @param userID
-	 * @param pwd
-	 */
-	public void extraRecomBenefit(String userID, String pwd, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", userID);
-		map.put("password", AES.encodeWithRandomStr(pwd));
-		LogUtils.i(TAG, "extraRecomBenefit...begin,userID=" + userID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_DRAW_RECOMMEND_BENEFIT, Method.GET,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(TAG, "extraRecomBenefit...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg="
-								+ msg.getMsg() + ",msg.getData=" + msg.getData());
-						if (msg.getResultCode() == 2222) {
-							LogUtils.i(TAG, "extraRecomBenefit...success");
-							showToastInfo("提取成功");
-							handler.sendEmptyMessage(requestCode);
-						} else if (msg.getResultCode() == 3333) {
-							/** 没有贵人 **/
-							LogUtils.i(TAG, "extraRecomBenefit...failure,cause by:" + msg.getMsg());
-							showToastInfo(msg.getMsg());
-						} else {
-							/** 有推荐人，提现金额不足 **/
-							LogUtils.i(TAG, "extraRecomBenefit...failure,cause by:不知名的结果码");
-						}
-					}
-
-					@Override
-					public void onFailure(String e) {
-						LogUtils.i(TAG, "extraRecomBenefit...onFailure,cause by:" + e.toString());
-						showToastInfo(Constants.NET_WRONG);
-					}
-				});
-	}
-
-	/**
-	 * 获取朋友相关会话列表
-	 * 
-	 * @param userID
-	 * @param handler
-	 * @param requestCode
-	 */
-	public void getFriendConvList(String userID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", userID);
-		LogUtils.i(TAG, "getFriendConvList...begin,userID=" + userID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_FRIEND_CONVERSATION, Method.GET,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(TAG, "getFriendConvList...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg="
-								+ msg.getMsg() + ",msg.getData=" + msg.getData());
-						if (msg.getResultCode() == 2222) {
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.arg1 = 1;
-							message.obj = msg.getData().toString();
-							handler.sendMessage(message);
-						} else if (msg.getResultCode() == 3333) {
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.arg1 = 0;
-							handler.sendMessage(message);
-
-						} else {
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.arg1 = 0;
-							handler.sendMessage(message);
-						}
-					}
-
-					@Override
-					public void onFailure(String e) {
-						LogUtils.i(TAG, "getFriendConvList...onFailure,cause by:" + e.toString());
-						showToastInfo(Constants.NET_WRONG);
-						Message message = Message.obtain();
-						message.what = requestCode;
-						message.arg1 = 0;
-						handler.sendMessage(message);
-					}
-				});
-	}
-
-	/**
-	 * 从网络获取已经推荐的列表
-	 * 
-	 * @param userID
-	 *            用户ID
-	 * @param handler
-	 *            回调
-	 * @param requestCode
-	 *            请求码
-	 */
-	public void getRecommendUnavaliable(String userID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", userID);
-		LogUtils.i(TAG, "getRecommendUnavaliable...begin,userID=" + userID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_RECOMMEND_UNAVALIABLE, Method.GET,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(TAG, "getRecommendUnavaliable...begin,msg.getResultCode=" + msg.getResultCode()
-								+ ",msg.getMsg=" + msg.getMsg() + ",msg.getData=" + msg.getData());
-						if (msg.getResultCode() == 2222) {
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.arg1 = 1;
-							message.obj = msg.getData().toString();
-							handler.sendMessage(message);
-						} else if (msg.getResultCode() == 3333) {
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.arg1 = 0;
-							handler.sendMessage(message);
-
-						} else {
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.arg1 = 0;
-							handler.sendMessage(message);
-						}
-					}
-
-					@Override
-					public void onFailure(String e) {
-						LogUtils.i(TAG, "getRecommendUnavaliable...onFailure,cause by:" + e.toString());
-						showToastInfo(Constants.NET_WRONG);
-						Message message = Message.obtain();
-						message.what = requestCode;
-						message.arg1 = 0;
-						handler.sendMessage(message);
-					}
-				});
-
-	}
-
-	/**
-	 * 获取陌生人相关会话列表
-	 * 
-	 * @param userID
-	 * @param handler
-	 * @param requestCode
-	 */
-	public void getStrangerConvList(String userID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", userID);
-		LogUtils.i(TAG, "getStrangerConvList...begin,userID=" + userID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_STRANGER_CONVERSATION, Method.GET,
-				new HttpCallBack() {
-					@Override
-					public void onSuccess(String response, ResultBean msg) {
-						LogUtils.i(TAG, "getStrangerConvList...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg="
-								+ msg.getMsg() + ",msg.getData=" + msg.getData());
-						if (msg.getResultCode() == 2222) {
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.arg1 = 1;
-							message.obj = msg.getData().toString();
-							handler.sendMessage(message);
-						} else if (msg.getResultCode() == 3333) {
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.arg1 = 0;
-							handler.sendMessage(message);
-
-						} else {
-							Message message = Message.obtain();
-							message.what = requestCode;
-							message.arg1 = 0;
-							handler.sendMessage(message);
-						}
-					}
-
-					@Override
-					public void onFailure(String e) {
-						LogUtils.i(TAG, "getStrangerConvList...onFailure,cause by:" + e.toString());
-						showToastInfo(Constants.NET_WRONG);
-						Message message = Message.obtain();
-						message.what = requestCode;
-						message.arg1 = 0;
-						handler.sendMessage(message);
-					}
-				});
-
-	}
-
-	/**
-	 * 登录时获取该用户所用的所有信息
-	 * 
-	 * @param userID
-	 * @param handler
-	 * @param requestCode
-	 */
-	public void loadAllData(String userID, final Handler handler, final int requestCode) {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("dwID", userID);
-		LogUtils.i(TAG, "loadAllData...begin,userID=" + userID);
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_LOAD_ALL_DATA, Method.GET, new HttpCallBack() {
-			@Override
-			public void onSuccess(String response, ResultBean msg) {
-				LogUtils.i(TAG, "loadAllData...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg()
-						+ ",msg.getData=" + msg.getData());
-				if (msg.getResultCode() == 2222) {
-					LogUtils.i(TAG, "loadAllData...success");
-					Message message = Message.obtain();
-					message.what = requestCode;
-					message.arg1 = 1;
-					message.obj = msg.getData().toString();
-					handler.sendMessage(message);
-				}
-				if (msg.getResultCode() == 3333) {
-					LogUtils.i(TAG, "loadAllData...failure,cause by:" + msg.getMsg());
-					Message message = Message.obtain();
-					message.what = requestCode;
-					message.arg1 = 0;
+			public void onSuccess(String resultJSON, ResultBean resultBean) {
+				ConversationFragment.isLoading = false;
+				hideProgressDialog();
+				if (resultBean.getResultCode() == 2222) {
+					LogUtils.i("bm", "getShareprice--" + resultBean.getData().toString());
+					Message message = handler.obtainMessage();
+					message.obj = resultBean.getData().toString();
 					handler.sendMessage(message);
 				}
 			}
 
 			@Override
 			public void onFailure(String e) {
-				LogUtils.i(TAG, "loadAllData...onFailure,cause by:" + e);
+				ConversationFragment.isLoading = false;
+				hideProgressDialog();
 				showToastInfo(Constants.NET_WRONG);
-				Message message = Message.obtain();
-				message.what = requestCode;
-				message.arg1 = 0;
-				handler.sendMessage(message);
 			}
 		});
 	}
-
 }

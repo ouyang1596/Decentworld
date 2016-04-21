@@ -35,26 +35,26 @@ public final class NearCardDetail2Activity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         getStrangerInfo = GetStrangerInfo_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        btnOK = ((Button) findViewById(id.btn_OK));
         tvAddr = ((TextView) findViewById(id.tv_addr));
+        lvAnonymousInfo = ((ListView) findViewById(id.lv_anonymous_info));
         tvUserSign = ((TextView) findViewById(id.tv_user_detail_info_sign));
         tvAge = ((TextView) findViewById(id.tv_age));
-        ivSex = ((ImageView) findViewById(id.iv_boy));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         imgv1 = ((ImageView) findViewById(id.imgv1));
-        imgv3 = ((ImageView) findViewById(id.imgv3));
+        imgv2 = ((ImageView) findViewById(id.imgv2));
         tvRealNameNickname = ((TextView) findViewById(id.tv_realname_nickname));
         ivShowIcon = ((ImageView) findViewById(id.iv_show_icon));
-        imgv2 = ((ImageView) findViewById(id.imgv2));
-        lvAnonymousInfo = ((ListView) findViewById(id.lv_anonymous_info));
-        ((ToastComponent_) toast).afterSetContentView_();
+        imgv3 = ((ImageView) findViewById(id.imgv3));
+        btnOK = ((Button) findViewById(id.btn_OK));
+        ivSex = ((ImageView) findViewById(id.iv_boy));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((GetStrangerInfo_) getStrangerInfo).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

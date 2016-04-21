@@ -1,0 +1,67 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.util.List;
+
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.WorkComment;
+
+/**
+ * @ClassName: WorkCircleAdapter.java
+ * @author: yj
+ * @date: 2016年3月7日 下午3:05:29
+ */
+public class CommentAdapter extends BaseAdapter {
+	private Context mContext;
+	private List<WorkComment> mWorkComments;
+
+	public CommentAdapter(Context context) {
+		mContext = context;
+	}
+
+	@Override
+	public int getCount() {
+		return null == mWorkComments ? 0 : mWorkComments.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return mWorkComments.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View con, ViewGroup parent) {
+		ViewHolder vh;
+		if (null == con) {
+			con = View.inflate(mContext, R.layout.item_comment, null);
+			vh = new ViewHolder();
+			vh.tvComment = (TextView) con.findViewById(R.id.tv_comment);
+			con.setTag(vh);
+		} else {
+			vh = (ViewHolder) con.getTag();
+		}
+		WorkComment workComment = mWorkComments.get(position);
+		vh.tvComment.setText(workComment.publisherName + "：" + workComment.content);
+		return con;
+	}
+
+	public void setWorkComment(List<WorkComment> workComments) {
+		mWorkComments = workComments;
+	}
+
+	class ViewHolder {
+		TextView tvComment;
+	}
+}

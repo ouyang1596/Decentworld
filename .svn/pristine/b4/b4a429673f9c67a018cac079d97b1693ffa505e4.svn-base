@@ -1,0 +1,285 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.stranger;
+
+import java.util.ArrayList;
+
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.NearCardDetailActivity;
+import cn.sx.decentworld.activity.NearCardDetailActivity_;
+import cn.sx.decentworld.adapter.CardAdapter;
+import cn.sx.decentworld.bean.NearbyStrangerInfo;
+import cn.sx.decentworld.bean.StrangerInfo;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.flingswipe.SwipeFlingAdapterView;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.fragment.index.StrangerFragment;
+import cn.sx.decentworld.network.request.GetStrangerInfo;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: AchievementFragment.java
+ * @author: yj
+ * @date: 2016年1月6日 下午3:28:18
+ */
+@EFragment(R.layout.fragment_near_card)
+public class StrangerCardFragment extends BaseFragment implements OnClickListener {
+	@ViewById(R.id.tv_refresh)
+	TextView tvRefresh;
+	// 附近的人
+	@ViewById(R.id.fragment_stranger_near_lv)
+	SwipeFlingAdapterView flingContainer;
+	public boolean isNeedToRequest = true;
+	public static int page = 0;
+	public boolean ifClearData;
+	public CardAdapter cardAdapter;
+	@Bean
+	GetStrangerInfo getStrangerInfo;
+	public static ArrayList<NearbyStrangerInfo> flipDataList = new ArrayList<NearbyStrangerInfo>();
+	public static final int GET_NEAR_STRANGER = 0;
+	public static final int CLEAR_DATA = 1;
+	public static final int LIKE = 2;
+	private boolean isFirst = true;// 是否是第一次执行
+
+	public void setText(String data) {
+		tvRefresh.setText(data);
+	}
+
+	public TextView getTvRefreshText() {
+		return tvRefresh;
+	}
+
+	public SwipeFlingAdapterView getSwipeFlingAdapterView() {
+		return flingContainer;
+	}
+
+	public void ifTvRefreshShow() {
+		if (flipDataList.size() <= 0) {
+			flingContainer.setVisibility(View.GONE);
+			tvRefresh.setEnabled(true);
+		} else {
+			flingContainer.setVisibility(View.VISIBLE);
+			tvRefresh.setEnabled(false);
+		}
+	}
+
+	@AfterViews
+	public void init() {
+		initData();
+	}
+
+	private void initData() {
+		ifTvRefreshShow();
+		tvRefresh.setOnClickListener(this);
+		initFlingAdapterView();
+		if (isFirst) {
+			isFirst = false;
+			return;
+		}
+		getNearStrangerInfo();
+	}
+
+	private void initFlingAdapterView() {
+		if (null == cardAdapter) {
+			cardAdapter = new CardAdapter(getActivity(), flipDataList);
+			flingContainer.setAdapter(cardAdapter);
+			// 设置卡片的可见张数,经过试验，不能将其设置成一张notifydataSetChange会失效
+			flingContainer.setMaxVisible(4);
+			flingContainer.setOnItemClickListener(new SwipeFlingAdapterView.OnItemClickListener() {
+				@Override
+				public void onItemClicked(int itemPosition, Object dataObject) {
+					NearbyStrangerInfo info = cardAdapter.getItem(itemPosition);
+					Intent intent = new Intent(StrangerCardFragment.this.getActivity(), NearCardDetailActivity_.class);
+					intent.putExtra(Constants.DW_ID, info.getDwID());
+					intent.putExtra(NearCardDetailActivity.POSITION, itemPosition);
+					intent.putExtra(NearCardDetailActivity.LOCATION, info.getDistance());
+					intent.putExtra(NearCardDetailActivity.IS_STRANGER_PAGE, true);
+					startActivityForResult(intent, Constants.REQUEST_CODE);
+				}
+			});
+			// 滑动监听
+			flingContainer.setFlingListener(new SwipeFlingAdapterView.onFlingListener() {
+				@Override
+				public void removeFirstObjectInAdapter() {
+					if (flipDataList.size() > 0) {
+						flipDataList.remove(0);
+						notifyDataSetChange();
+					}
+				}
+
+				@Override
+				public void onLeftCardExit(Object dataObject) {
+
+				}
+
+				@Override
+				public void onRightCardExit(Object dataObject) {
+					View view = flingContainer.getSelectedView();
+					if (null == view) {
+						return;
+					}
+					ImageView ivDisLike = (ImageView) view.findViewById(R.id.iv_card_dislike);
+					if (null == ivDisLike) {
+						return;
+					}
+					ivDisLike.setAlpha(1);
+					return;
+				}
+
+				@Override
+				public void onAdapterAboutToEmpty(int itemsInAdapter) {
+					ifTvRefreshShow();
+					// if (flipDataList.size() >= 1) {
+					// return;
+					// }
+					// ifTvRefreshShow();
+					// flingContainer.setVisibility(View.GONE);
+					// if (isVisible) {
+					// if (isNeedToRequest) {
+					// if (ifClearData) {
+					// ifClearData = false;
+					// return;
+					// }
+					// page++;
+					// getNearStrangerInfo();
+					// }
+					// }
+				}
+
+				// 滚动的时候
+				@SuppressLint("NewApi")
+				@Override
+				public void onScroll(float scrollProgressPercent) {
+					LogUtils.i("bm", "scrollProgressPercent--" + scrollProgressPercent);
+					scrollProgressPercent = Math.abs(scrollProgressPercent);
+					View view = flingContainer.getSelectedView();
+					if (null == view) {
+						return;
+					}
+					ImageView ivDisLike = (ImageView) view.findViewById(R.id.iv_card_dislike);
+					if (null == ivDisLike) {
+						return;
+					}
+					ivDisLike.setAlpha(scrollProgressPercent > 0 ? scrollProgressPercent : 0);
+				}
+			});
+		}
+	}
+
+	private void saveStrangerInfo(NearbyStrangerInfo item) {
+		String dwID = item.getDwID();
+		StrangerInfo info = StrangerInfo.queryByDwID(dwID);
+		if (null == info) {
+			info = new StrangerInfo();
+		}
+		info.strangerDwID = dwID;
+		info.age = item.getAge();
+		info.nickname = item.getName();
+		info.location = "深圳南山";
+		info.save();
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.tv_refresh:
+			if (StrangerFragment.isRequesting) {
+				ToastUtil.showToast("正在请求当中。。。");
+				return;
+			}
+			page = 0;
+			tvRefresh.setText("刷新中。。。");
+			clearData();
+			getNearStrangerInfo();
+			break;
+		default:
+			break;
+		}
+	}
+
+	public void refreshAdapter() {
+
+	}
+
+	private void clearData() {
+		if (null != mOnGetNearStrangerInfo) {
+			mOnGetNearStrangerInfo.onGetNearStrangerInfo(CLEAR_DATA);
+		}
+	}
+
+	private void notifyDataSetChange() {
+		if (null != mOnGetNearStrangerInfo) {
+			mOnGetNearStrangerInfo.onNotifyDataSetChange();
+		}
+	}
+
+	private void getNearStrangerInfo() {
+		if (null != mOnGetNearStrangerInfo) {
+			mOnGetNearStrangerInfo.onGetNearStrangerInfo(GET_NEAR_STRANGER);
+		}
+	}
+
+	public interface OnGetNearStrangerInfoListener {
+		void onGetNearStrangerInfo(int position);
+
+		void onNotifyDataSetChange();
+
+		void onLike(NearbyStrangerInfo nearbyStrangerInfo);
+	}
+
+	private OnGetNearStrangerInfoListener mOnGetNearStrangerInfo;
+
+	public void setOnGetNearStrangerListener(OnGetNearStrangerInfoListener onDoubtWanSecondClickListener) {
+		mOnGetNearStrangerInfo = onDoubtWanSecondClickListener;
+	}
+
+	@Override
+	protected void lazyLoad() {
+
+	}
+
+	@Override
+	public void turnToTab(int tab) {
+
+	}
+
+	public void like(NearbyStrangerInfo nearbyStrangerInfo) {
+		if (null != mOnGetNearStrangerInfo) {
+			mOnGetNearStrangerInfo.onLike(nearbyStrangerInfo);
+		}
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (resultCode == Constants.RESULT_CODE_DISLIKE) {
+			int position = data.getIntExtra(NearCardDetailActivity.POSITION, -1);
+			if (0 == position) {
+				flingContainer.getTopCardListener().selectLeft();
+			} else {
+				flipDataList.remove(position);
+			}
+			notifyDataSetChange();
+		} else if (resultCode == Constants.RESULT_CODE_LIKE) {
+			int position = data.getIntExtra(NearCardDetailActivity.POSITION, -1);
+			NearbyStrangerInfo info = cardAdapter.getItem(position);
+			if ("1".equals(info.getLiked())) {
+				return;
+			}
+			like(info);
+		}
+	}
+}

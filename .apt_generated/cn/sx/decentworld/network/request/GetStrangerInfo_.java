@@ -8,7 +8,6 @@ package cn.sx.decentworld.network.request;
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
-import cn.sx.decentworld.component.ToastComponent_;
 
 public final class GetStrangerInfo_
     extends GetStrangerInfo
@@ -25,7 +24,6 @@ public final class GetStrangerInfo_
         if (!(context_ instanceof Activity)) {
             return ;
         }
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 
@@ -47,7 +45,6 @@ public final class GetStrangerInfo_
             activity = ((Activity) context_);
         }
         context = context_;
-        toast = ToastComponent_.getInstance_(context_);
     }
 
     public static GetStrangerInfo_ getInstance_(Context context) {

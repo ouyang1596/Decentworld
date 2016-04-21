@@ -1,0 +1,212 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.dao;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.PickContactUser;
+import cn.sx.decentworld.common.CharacterParser;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.PinyinComparator;
+import cn.sx.decentworld.entity.db.ContactUser;
+
+/**
+ * @ClassName: ContactUserDao.java
+ * @Description: 联系人数据访问
+ * @author: cj
+ * @date: 2016年4月21日 上午9:22:02
+ */
+public class ContactUserDao
+{
+    /**
+     * 查询所有记录，并进行排序
+     * 
+     * @return 返回排序后的结果
+     */
+    public static List<ContactUser> queryAll()
+    {
+        List<ContactUser> contactUsers = queryAllList();
+        if (contactUsers.size() > 0)
+        {
+            removeDuplicate(contactUsers);
+            contactUsers = (List<ContactUser>) filledData(contactUsers);
+            Collections.sort(contactUsers, new PinyinComparator());
+        }
+        return contactUsers;
+    }
+
+    /**
+     * 通过ID查询联系人
+     * 
+     * @param friendID
+     * @return
+     */
+    public static ContactUser query(String friendID)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and friendID = ?";
+        return new Select().from(ContactUser.class).where(sql, userID, friendID).executeSingle();
+    }
+
+    /**
+     * 删除当前用户的联系人列表
+     */
+    public static void deleteAll()
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=?";
+        new Delete().from(ContactUser.class).where(sql, userID).execute();
+    }
+
+    public static void delete(String friendID)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and friendID = ?";
+        new Delete().from(ContactUser.class).where(sql, userID, friendID).execute();
+    }
+
+    /**
+     * 验证指定dwID的用户是否为好友
+     * 
+     * @param dwID
+     * @return
+     */
+    public static boolean isContact(String friendID)
+    {
+        if (CommUtil.isBlank(friendID))
+        {
+            return false;
+        }
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and friendID = ?";
+        ContactUser list = new Select().from(ContactUser.class).where(sql, userID, friendID).executeSingle();
+        if (list != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 根据DwID查找对应联系人的名字
+     * 
+     * @param friendID
+     * @return
+     */
+    public static String getName(String friendID)
+    {
+        String name = "";
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and friendID=?";
+        ContactUser contactUser = new Select().from(ContactUser.class).where(sql, userID, friendID).executeSingle();
+        if (contactUser != null)
+        {
+            return contactUser.getShowName();
+        }
+        return name;
+    }
+
+    // ////////////////////////////////私有方法////////////////////////////////
+
+    /**
+     * 获取当前用户的所有联系人
+     * 
+     * @return
+     */
+    private static List<ContactUser> queryAllList()
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=?";
+        return new Select().from(ContactUser.class).where(sql, userID).execute();
+    }
+
+    /**
+     * 删除list相同的元素
+     * 
+     * @param list
+     * @return
+     */
+    private static List removeDuplicate(List<ContactUser> list)
+    {
+        for (int i = 0; i < list.size() - 1; i++)
+        {
+            for (int j = list.size() - 1; j > i; j--)
+            {
+                if (list.get(j).getFriendID().equals(list.get(i).getFriendID()))
+                {
+                    list.remove(j);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
+     * 根据list中User的showName填充list中User的SortLetters
+     * 即给User对象的SortLetters字段设置一个[A-Z]中对应的字母或#
+     * 
+     * @param date
+     * @return
+     */
+    private static List<? extends ContactUser> filledData(List<? extends ContactUser> date)
+    {
+        CharacterParser characterParser = CharacterParser.getInstance();
+        for (int i = 0; i < date.size(); i++)
+        {
+            // 汉字转换成拼音
+            String pinyin = characterParser.getSelling(date.get(i).getShowName());
+            String sortString = pinyin.substring(0, 1).toUpperCase();
+            // 正则表达式，判断首字母是否是英文字母
+            if (sortString.matches("[A-Z]"))
+            {
+                date.get(i).setSortLetters(sortString);
+            }
+            else
+            {
+                date.get(i).setSortLetters("#");
+            }
+        }
+        return date;
+    }
+
+    /**
+     * 为ListView填充数据(暂时没用)
+     * 
+     * @param date
+     * @return
+     */
+    private List<PickContactUser> filledData(String[] date)
+    {
+        CharacterParser characterParser = CharacterParser.getInstance();
+        List<PickContactUser> mSortList = new ArrayList<PickContactUser>();
+        for (int i = 0; i < date.length; i++)
+        {
+            PickContactUser sortModel = new PickContactUser();
+            sortModel.setShowName(date[i]);
+            // 汉字转换成拼音
+            String pinyin = characterParser.getSelling(date[i]);
+            String sortString = pinyin.substring(0, 1).toUpperCase();
+
+            // 正则表达式，判断首字母是否是英文字母
+            if (sortString.matches("[A-Z]"))
+            {
+                sortModel.setSortLetters(sortString.toUpperCase());
+            }
+            else
+            {
+                sortModel.setSortLetters("#");
+            }
+
+            mSortList.add(sortModel);
+        }
+        return mSortList;
+    }
+
+}

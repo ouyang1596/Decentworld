@@ -25,11 +25,11 @@ import cn.sx.decentworld.bean.ChatRoomInfo;
 import cn.sx.decentworld.bean.UserInfo;
 import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
-import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.utils.ViewUtil;
 import cn.sx.decentworld.widget.CircularImageView;
 
@@ -77,18 +77,12 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 			vh = new ViewHolder();
 			vh.ivBg = (ImageView) con.findViewById(R.id.iv_bg);
 			vh.ivDetail = (CircularImageView) con.findViewById(R.id.iv_detail);
-			vh.ivChatRoomEnter = (ImageView) con
-					.findViewById(R.id.iv_chatroom_enter);
-			vh.tvChatRoomName = (TextView) con
-					.findViewById(R.id.tv_subject_name);
-			vh.tvSelfIntroduce = (TextView) con
-					.findViewById(R.id.tv_self_introduce);
-			vh.tvOnLineCount = (TextView) con
-					.findViewById(R.id.tv_online_count);
-			vh.tvChargeAmount = (TextView) con
-					.findViewById(R.id.tv_chargerAmount);
-			vh.tvSelfNickName = (TextView) con
-					.findViewById(R.id.tv_self_nickname);
+			vh.ivChatRoomEnter = (ImageView) con.findViewById(R.id.iv_chatroom_enter);
+			vh.tvChatRoomName = (TextView) con.findViewById(R.id.tv_subject_name);
+			vh.tvSelfIntroduce = (TextView) con.findViewById(R.id.tv_self_introduce);
+			vh.tvOnLineCount = (TextView) con.findViewById(R.id.tv_online_count);
+			vh.tvChargeAmount = (TextView) con.findViewById(R.id.tv_chargerAmount);
+			vh.tvSelfNickName = (TextView) con.findViewById(R.id.tv_self_nickname);
 			con.setTag(vh);
 		} else {
 			vh = (ViewHolder) con.getTag();
@@ -97,22 +91,17 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 		String roomBg = info.getRoomBackground();
 		if (CommUtil.isNotBlank(roomBg)) {
 			// Picasso.with(context).load(roomBg).into(vh.ivBg);
-			ImageLoaderHelper.mImageLoader.displayImage(roomBg, vh.ivBg,
-					ImageLoaderHelper.mOptions);
+			ImageLoaderHelper.mImageLoader.displayImage(roomBg, vh.ivBg, ImageLoaderHelper.mOptions);
 		} else {
 			vh.ivBg.setImageResource(R.drawable.ic_launcher);
 		}
 		String ownerIcon = info.getOwnerIcon();
 		if (CommUtil.isNotBlank(ownerIcon)) {
-			// Picasso.with(context).load(ownerIcon).config(Config.RGB_565)
-			// .into(vh.ivDetail);
-			ImageLoaderHelper.mImageLoader.displayImage(ownerIcon, vh.ivDetail,
-					ImageLoaderHelper.mOptions);
+			ImageLoaderHelper.mImageLoader.displayImage(ownerIcon, vh.ivDetail, ImageLoaderHelper.mOptions);
 		} else {
 			vh.ivDetail.setImageResource(R.drawable.ic_launcher);
 		}
 		vh.tvSelfNickName.setText(info.getOwnerName());
-		LogUtils.i(TAG, info.getSubjectName());
 		vh.tvChatRoomName.setText(info.getSubjectName());
 		vh.tvSelfIntroduce.setText(info.getOwnerIntroduction());
 		vh.tvOnLineCount.setText(info.getOnLineNum() + " 在线");
@@ -128,7 +117,6 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 		public void handleMessage(Message msg) {
 			Intent intent = new Intent(context, ChatRoomChatActivity_.class);
 			intent.putExtra("json_data", msg.obj.toString());
-			LogUtils.i(TAG, "调用加入聊天室接口返回的数据：" + msg.obj.toString());
 			context.startActivity(intent);
 		};
 	};
@@ -148,13 +136,11 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 				if (null == info.getOwnerID()) {
 					return;
 				}
-				if (DecentWorldApp.getInstance().getDwID()
-						.equals(info.getOwnerID())) {
+				if (DecentWorldApp.getInstance().getDwID().equals(info.getOwnerID())) {
 					DecentWorldApp.ifFromAppOwner = true;
 					MainActivity_.main_viewpager.setCurrentItem(1);
 				} else {
-					Intent intent = new Intent(context,
-							NearCardDetailActivity_.class);
+					Intent intent = new Intent(context, NearCardDetailActivity_.class);
 					intent.putExtra(Constants.DW_ID, info.getOwnerID());
 					// intent.putExtra(POSITION, 100);
 					context.startActivity(intent);
@@ -171,11 +157,8 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 		map.put("dwID", dwID);
 		map.put("roomID", info.getRoomID());
 		map.put("nickName", UserInfo.queryByDwID(dwID).getNickName());
-		LogUtils.i(TAG, "requestEnterChatRoom...dwID=" + dwID + ",roomID="
-				+ info.getRoomID());
 		showProgressDialog();
-		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE
-				+ "/joinChatRoom", Method.GET, new HttpCallBack() {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + "/joinChatRoom", Method.GET, new HttpCallBack() {
 			@Override
 			public void onSuccess(String response, ResultBean msg) {
 				hideProgressDialog();
@@ -184,18 +167,15 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 					message.obj = msg.getData().toString();
 					mHandler.sendMessage(message);
 				} else {
-					LogUtils.i(TAG, "requestEnterChatRoom...failure,cause by:"
-							+ msg.getMsg());
+					LogUtils.d(TAG, "requestEnterChatRoom---error---" + msg.getMsg());
 				}
 			}
 
 			@Override
 			public void onFailure(String e) {
 				hideProgressDialog();
-				Toast.makeText(context, Constants.NET_WRONG, Toast.LENGTH_LONG)
-						.show();
-				LogUtils.i(TAG, "requestEnterChatRoom...onFailure,cause by:"
-						+ e);
+				Toast.makeText(context, Constants.NET_WRONG, Toast.LENGTH_LONG).show();
+				LogUtils.e(TAG, "requestEnterChatRoom---error---" + e);
 			}
 		});
 	}
@@ -223,7 +203,6 @@ public class ChatRoomListAdapter2 extends BaseAdapter {
 	class ViewHolder {
 		ImageView ivBg, ivChatRoomEnter;
 		CircularImageView ivDetail;
-		TextView tvSelfIntroduce, tvChatRoomName, tvOnLineCount,
-				tvChargeAmount, tvSelfNickName;
+		TextView tvSelfIntroduce, tvChatRoomName, tvOnLineCount, tvChargeAmount, tvSelfNickName;
 	}
 }

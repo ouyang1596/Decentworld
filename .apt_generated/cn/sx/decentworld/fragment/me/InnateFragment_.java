@@ -22,8 +22,8 @@ public final class InnateFragment_
     private View contentView_;
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(getActivity());
         getUserInfo = GetUserInfo_.getInstance_(getActivity());
+        toast = ToastComponent_.getInstance_(getActivity());
     }
 
     @Override
@@ -33,10 +33,10 @@ public final class InnateFragment_
     }
 
     private void afterSetContentView_() {
-        lv_me_innate = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.lv_me_innate));
         iv_me_innate_edit = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me_innate_edit));
-        ((ToastComponent_) toast).afterSetContentView_();
+        lv_me_innate = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.lv_me_innate));
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

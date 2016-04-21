@@ -1,0 +1,76 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="6dp" >
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="看好大腕前景，可购买原始股"
+        android:textColor="@color/one_black"
+        android:textSize="@dimen/new_textsize_18sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="每次购买后，单价上涨一万元"
+        android:textColor="@color/one_black"
+        android:textSize="@dimen/new_textsize_18sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:id="@+id/tv_price_today"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="今日价格：1万元"
+        android:textColor="@color/one_black"
+        android:textSize="@dimen/new_textsize_18sp" />
+
+    <TextView
+        android:id="@+id/tv_buy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/stroke_bg_et"
+        android:padding="5dp"
+        android:text="购买0.05%"
+        android:textColor="@color/one_black"
+        android:textSize="@dimen/new_textsize_18sp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="付款成功后，大腕会邀请您与创始人签署一致行动人协议，股权便可生效"
+        android:textColor="@color/one_black"
+        android:textSize="@dimen/new_textsize_18sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:text="支持大腕，我们未来同舟共济"
+        android:textColor="@color/one_black"
+        android:textSize="@dimen/new_textsize_18sp" />
+
+</LinearLayout>

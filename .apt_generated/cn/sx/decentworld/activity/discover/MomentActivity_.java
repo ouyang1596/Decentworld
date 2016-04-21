@@ -18,7 +18,6 @@ import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.network.request.MomentNetRequest_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
@@ -36,16 +35,15 @@ public final class MomentActivity_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
-        momentNetRequest = MomentNetRequest_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        flPublic = ((FrameLayout) findViewById(id.fl_moment_public_container));
-        tvIsPublish = ((TextView) findViewById(id.tv_moment_publish));
-        plvMoment = ((PullToRefreshListView) findViewById(id.plv_moment));
-        ivBack = ((ImageView) findViewById(id.iv_moment_back));
+        mFlPublicContainer = ((FrameLayout) findViewById(id.fl_moment_public_container));
+        mTvIsPublish = ((TextView) findViewById(id.tv_moment_publish));
+        mTvTitle = ((TextView) findViewById(id.tv_moment_title));
+        mIvBack = ((ImageView) findViewById(id.iv_moment_back));
+        mPlvMomentList = ((PullToRefreshListView) findViewById(id.plv_moment));
         ((ToastComponent_) toast).afterSetContentView_();
-        ((MomentNetRequest_) momentNetRequest).afterSetContentView_();
         init();
     }
 

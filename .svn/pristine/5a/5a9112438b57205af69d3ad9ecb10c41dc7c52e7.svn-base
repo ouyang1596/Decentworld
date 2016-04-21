@@ -1,0 +1,315 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.setting;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import android.app.Fragment;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.UserExtraInfo;
+import cn.sx.decentworld.engine.SettingEngine;
+import cn.sx.decentworld.listener.NetCallback;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.utils.ViewUtil;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: AdvanceSettingActivity.java
+ * @author: yj
+ * @date: 2015年12月27日 上午9:27:04
+ * 高级设置
+ */
+@EFragment(R.layout.activity_advance_setting)
+public class AdvanceSettingFragment extends Fragment implements OnClickListener
+{
+    /**
+     * 常量
+     */
+    private static final String TAG = "AdvanceSettingActivity";
+
+    /**
+     * 界面资源
+     */
+    @ViewById(R.id.ll_advance_setting_root)
+    LinearLayout ll_advance_setting_root;
+
+    
+    //接收系统推送的消息
+    @ViewById(R.id.iv_advance_setting_push_system)
+    ImageView iv_advance_setting_push_system;
+    //接收审核信息（包括图像和审核信息）
+    @ViewById(R.id.iv_advance_setting_acceptCheckPush)
+    ImageView iv_advance_setting_acceptCheckPush;
+    //是否关闭陌生人消息提醒
+    @ViewById(R.id.iv_advance_ifClose_voice_stranger)
+    ImageView iv_advance_ifClose_voice_stranger;
+    //是否关闭好友消息提醒
+    @ViewById(R.id.iv_advance_ifClose_voice_friend)
+    ImageView iv_advance_ifClose_voice_friend;
+
+
+    /**
+     * 变量
+     */
+    private String dwID;
+    private int items = 4;
+    public Boolean[] checkBoxIsChecked = new Boolean[items];
+    private List<ImageView> imageViewList;
+    public List<String> indexs;
+
+    @AfterViews
+    public void init()
+    {
+        ViewUtil.scaleContentView(ll_advance_setting_root);
+        dwID = DecentWorldApp.getInstance().getDwID();
+        iv_advance_setting_push_system.setOnClickListener(this);
+        iv_advance_setting_acceptCheckPush.setOnClickListener(this);
+        iv_advance_ifClose_voice_stranger.setOnClickListener(this);
+        iv_advance_ifClose_voice_friend.setOnClickListener(this);
+
+        imageViewList = new ArrayList<ImageView>();
+        imageViewList.add(iv_advance_setting_push_system);
+        imageViewList.add(iv_advance_setting_acceptCheckPush);
+        imageViewList.add(iv_advance_ifClose_voice_stranger);
+        imageViewList.add(iv_advance_ifClose_voice_friend);
+
+        indexs = new ArrayList<String>();
+        indexs.add("acceptPush");
+        indexs.add("acceptCheckPush");
+        indexs.add("strangerNotice");
+        indexs.add("friendNotice");
+        initData();
+    }
+
+    /**
+     * 初始化数据
+     */
+    private void initData()
+    {
+        UserExtraInfo info = UserExtraInfo.queryBy(dwID);
+        if (info == null || info.getAcceptPush() == null || info.getAcceptCheckPush() == null || info.getStrangerNotice() == null
+                || info.getFriendNotice() == null)
+        {
+            //获取高级权限
+            SettingEngine.getInstance().getAdvanceAuth(new NetCallback()
+            {
+                @Override
+                public void onSuccess(String msg)
+                {
+                    getAdvanceAuthSuccess(msg);
+                }
+                
+                @Override
+                public void onFailure(String cause)
+                {
+                    getAdvanceAuthFailure();
+                }
+            });
+        }
+        else
+        {
+            checkBoxIsChecked[0] = info.getAcceptPush();
+            checkBoxIsChecked[1] = info.getAcceptCheckPush();
+            checkBoxIsChecked[2] = info.getStrangerNotice();
+            checkBoxIsChecked[3] = info.getFriendNotice();
+            initSwitch(checkBoxIsChecked);
+        }
+    }
+
+    /**
+     * 搜索开关控制
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.iv_advance_setting_push_system:
+                clickSwitch(0);
+                break;
+            case R.id.iv_advance_setting_acceptCheckPush:
+                clickSwitch(1);
+                break;
+            case R.id.iv_advance_ifClose_voice_stranger:
+                clickSwitch(2);
+                break;
+            case R.id.iv_advance_ifClose_voice_friend:
+                clickSwitch(3);
+                break;
+        }
+    }
+
+    /**
+     * 点击开关时
+     */
+    private void clickSwitch(int i)
+    {
+        if (checkBoxIsChecked[i])
+        {
+            imageViewList.get(i).setImageResource(R.drawable.switch_rectangle_close);
+            checkBoxIsChecked[i] = false;
+        }
+        else
+        {
+            imageViewList.get(i).setImageResource(R.drawable.switch_rectangle_open);
+            checkBoxIsChecked[i] = true;
+        }
+    }
+
+    /**
+     * 用网络请求的数据初始化开关
+     */
+    private void initSwitch(Boolean[] SW)
+    {
+        for (int i = 0; i < SW.length; i++)
+        {
+            if (!SW[i])
+                imageViewList.get(i).setImageResource(R.drawable.switch_rectangle_close);
+            else
+                imageViewList.get(i).setImageResource(R.drawable.switch_rectangle_open);
+        }
+    };
+
+ 
+    /**
+     * 从服务器获取高级设置开关权限成功
+     */
+    protected void getAdvanceAuthSuccess(String msg)
+    {
+        JSONObject jObject = JSON.parseObject(msg);
+        UserExtraInfo info = UserExtraInfo.queryBy(dwID);
+        if (info == null)
+        {
+            info = new UserExtraInfo();
+        }
+
+        Boolean acceptPush = jObject.getBooleanValue("acceptPush");
+        if (acceptPush != null)
+        {
+            checkBoxIsChecked[0] = acceptPush;
+            info.setAcceptPush(acceptPush);
+        }
+        Boolean acceptCheckPush = jObject.getBooleanValue("acceptCheckPush");
+        if (acceptCheckPush != null)
+        {
+            checkBoxIsChecked[1] = acceptCheckPush;
+            info.setAcceptCheckPush(acceptCheckPush);
+        }
+        Boolean strangerNotice = jObject.getBooleanValue("strangerNotice");
+        if (strangerNotice != null)
+        {
+            checkBoxIsChecked[2] = strangerNotice;
+            info.setStrangerNotice(strangerNotice);
+        }
+        Boolean friendNotice = jObject.getBooleanValue("friendNotice");
+        if (friendNotice != null)
+        {
+            checkBoxIsChecked[3] = friendNotice;
+            info.setFriendNotice(friendNotice);
+        }
+        info.save();
+        initSwitch(checkBoxIsChecked);
+    }
+
+    /**
+     * 从服务器获取高级设置开关权限失败
+     */
+    protected void getAdvanceAuthFailure()
+    {
+        for (int i = 0; i < items; i++)
+        {
+            checkBoxIsChecked[i] = false;
+        }
+    }
+
+    /**
+     * 上传高级设置开关权限到服务器成功
+     */
+    protected void uploadAdvanceAuthSuccess()
+    {
+        UserExtraInfo userInfo = UserExtraInfo.queryBy(dwID);
+        if (userInfo != null)
+        {
+            if (checkBoxIsChecked[0])
+                userInfo.setAcceptPush(true);
+            else
+                userInfo.setAcceptPush(false);
+            if (checkBoxIsChecked[1])
+                userInfo.setAcceptCheckPush(true);
+            else
+                userInfo.setAcceptCheckPush(false);
+            
+            if (checkBoxIsChecked[2])
+                userInfo.setStrangerNotice(true);
+            else
+                userInfo.setStrangerNotice(false);
+            if (checkBoxIsChecked[3])
+                userInfo.setFriendNotice(true);
+            else
+                userInfo.setFriendNotice(false);
+            userInfo.save();
+        }
+        else
+        {
+            LogUtils.i(TAG, "保存修改的数据时，检测到UserInfo为空");
+        }
+    }
+
+    /**
+     * 上传高级设置开关权限到服务器失败
+     */
+    protected void uploadAdvanceAuthFailure()
+    {
+        if(getActivity() != null && !getActivity().isDestroyed())
+        {
+            ToastUtil.showToast("设置失败");
+            getActivity().finish();
+        }
+    }
+
+    
+    /**
+     * 上传开关的状态信息
+     */
+    public void uploadStatusInfo()
+    {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("user_id", DecentWorldApp.getInstance().getDwID());
+        for (int i = 0; i < checkBoxIsChecked.length; i++) {
+            if (checkBoxIsChecked[i])
+                map.put(indexs.get(i), "true");
+            else
+                map.put(indexs.get(i), "false");
+        }
+        map.put("strangerMessageNotice", "false");
+        String auth = JSON.toJSONString(map);
+        SettingEngine.getInstance().setAdvanceAuth(auth, new NetCallback()
+        {
+            @Override
+            public void onSuccess(String msg)
+            {
+                uploadAdvanceAuthSuccess();
+            }
+            
+            @Override
+            public void onFailure(String cause)
+            {
+                uploadAdvanceAuthFailure();
+            }
+        });
+    }
+}

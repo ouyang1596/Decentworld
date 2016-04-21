@@ -13,6 +13,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,7 +21,6 @@ import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.KeyboardComponent_;
-import cn.sx.decentworld.component.ToastComponent_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class RechargeAliPayWXActivity_
@@ -37,14 +37,14 @@ public final class RechargeAliPayWXActivity_
 
     private void init_(Bundle savedInstanceState) {
         keyboardComponent = KeyboardComponent_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         llpayMethod = ((LinearLayout) findViewById(id.ll_pay_method));
+        btnEunsre = ((Button) findViewById(id.btn_ensure));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         etMoney = ((EditText) findViewById(id.et_money));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         {
             View view = findViewById(id.iv_back);
             if (view!= null) {
@@ -61,7 +61,6 @@ public final class RechargeAliPayWXActivity_
             }
         }
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

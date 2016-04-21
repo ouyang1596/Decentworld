@@ -15,7 +15,6 @@ import android.widget.TextView;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.network.request.GetUserInfo_;
-import cn.sx.decentworld.network.request.SetUserInfo_;
 import cn.sx.decentworld.widget.ListViewForScrollView;
 
 public final class CashBenefitFragment_
@@ -27,7 +26,6 @@ public final class CashBenefitFragment_
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(getActivity());
         getUserInfo = GetUserInfo_.getInstance_(getActivity());
-        serUserInfo = SetUserInfo_.getInstance_(getActivity());
     }
 
     @Override
@@ -37,22 +35,21 @@ public final class CashBenefitFragment_
     }
 
     private void afterSetContentView_() {
-        tv_cash_benefit_total_big = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_total_big));
-        tv_cash_benefit_autoTransfer = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_autoTransfer));
         tv_cash_benefit_not_small = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_not_small));
-        tv_cash_benefit_total_small = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_total_small));
-        tv_cash_benefit_back_big = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_back_big));
-        listView = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.lv_cash_benefit));
         tv_cash_benefit_not_draw = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_not_draw));
-        rl_cash_benefit_draw = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_cash_benefit_draw));
-        tv_cash_benefit_back_small = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_back_small));
-        tv_cash_benefit_wx = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_wx));
-        tv_cash_benefit_alipay = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_alipay));
-        tv_cash_benefit_not_big = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_not_big));
+        tv_cash_benefit_total_small = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_total_small));
         ll_cash_benefit_remind = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_cash_benefit_remind));
+        mDrawCash = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_cash_benefit_draw));
+        tv_cash_benefit_not_big = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_not_big));
+        tv_cash_benefit_back_big = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_back_big));
+        tv_cash_benefit_back_small = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_back_small));
+        listView = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.lv_cash_benefit));
+        tv_cash_benefit_autoTransfer = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_autoTransfer));
+        tv_cash_benefit_alipay = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_alipay));
+        tv_cash_benefit_total_big = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_total_big));
+        tv_cash_benefit_wx = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_wx));
         ((ToastComponent_) toast).afterSetContentView_();
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((SetUserInfo_) serUserInfo).afterSetContentView_();
         init();
     }
 

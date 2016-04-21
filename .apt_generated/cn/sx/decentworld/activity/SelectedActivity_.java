@@ -37,19 +37,19 @@ public final class SelectedActivity_
     }
 
     private void afterSetContentView_() {
-        llContainerAge = ((LinearLayout) findViewById(id.ll_container_age));
-        tvAgeScope = ((TextView) findViewById(id.tv_age_scope));
-        llGirl = ((LinearLayout) findViewById(id.ll_girl));
-        btnOk = ((Button) findViewById(id.btn_OK));
-        tvWorthScope = ((TextView) findViewById(id.tv_worth_scope));
-        ivGirl = ((ImageView) findViewById(id.iv_girl));
-        llContainerDistance = ((LinearLayout) findViewById(id.ll_container_distance));
-        ivBoy = ((ImageView) findViewById(id.iv_boy));
-        lvSelect = ((ListViewForScrollView) findViewById(id.lv_select));
-        tvMoney = ((TextView) findViewById(id.tv_money));
-        llBoy = ((LinearLayout) findViewById(id.ll_boy));
         tvDistanceScope = ((TextView) findViewById(id.tv_distance_scope));
+        tvMoney = ((TextView) findViewById(id.tv_money));
+        btnOk = ((Button) findViewById(id.btn_OK));
+        llGirl = ((LinearLayout) findViewById(id.ll_girl));
+        lvSelect = ((ListViewForScrollView) findViewById(id.lv_select));
+        llContainerAge = ((LinearLayout) findViewById(id.ll_container_age));
+        ivBoy = ((ImageView) findViewById(id.iv_boy));
         llContainerWorth = ((LinearLayout) findViewById(id.ll_container_worth));
+        ivGirl = ((ImageView) findViewById(id.iv_girl));
+        tvWorthScope = ((TextView) findViewById(id.tv_worth_scope));
+        tvAgeScope = ((TextView) findViewById(id.tv_age_scope));
+        llBoy = ((LinearLayout) findViewById(id.ll_boy));
+        llContainerDistance = ((LinearLayout) findViewById(id.ll_container_distance));
         init();
     }
 

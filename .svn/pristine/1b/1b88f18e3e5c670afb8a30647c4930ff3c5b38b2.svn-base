@@ -1,0 +1,789 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.engine;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.json.JSONException;
+import org.simple.eventbus.EventBus;
+
+import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.ConversationList;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.NewFriend;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.bean.SearchResult;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.manager.MsgNotifyManager;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.ImageUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+
+/**
+ * @ClassName: AddContactEngine.java
+ * @Description: 添加联系人业务类
+ * @author: cj
+ * @date: 2016年3月22日 上午10:48:16
+ */
+public class ContactEngine {
+	public static final String TAG = "ContactEngine";
+	public static ContactEngine instance = null;
+
+	/**
+	 * 构造函数
+	 */
+	private ContactEngine() {
+		// TODO Auto-generated constructor stub
+	}
+
+	// ////////////////////////////////////////获取实例///////////////////////////////////////////////////
+	/**
+	 * 获取实例
+	 * 
+	 * @return
+	 */
+	public static ContactEngine getInstance() {
+		if (instance == null) {
+			synchronized (ContactEngine.class) {
+				if (instance == null) {
+					instance = new ContactEngine();
+				}
+			}
+		}
+		return instance;
+	}
+
+	// ////////////////////////////////////////公有方法///////////////////////////////////////////////////
+
+	/**
+	 * 添加好友
+	 * 
+	 * @param searchResult
+	 *            搜索结果
+	 * @param addReason
+	 *            添加理由
+	 * @param searchType
+	 *            搜索类型
+	 * @param addCallback
+	 *            回调
+	 */
+	public void add(SearchResult searchResult, String addReason, String searchType, AddCallback addCallback) {
+		LogUtils.i(TAG, "add");
+		if (ContactUser.queryByDwID(searchResult.dwID) == null) {
+			addFriend(searchResult, addReason, searchType, addCallback);
+		} else {
+			addCallback.onFailure("已经互为好友");
+		}
+	}
+
+	/**
+	 * 接收到好友申请消息
+	 */
+	public void addByOther(org.jivesoftware.smack.packet.Message message) {
+		/**
+		 * {"addReason":"链接","dwID":"107691","nickName":"陈伟","searchType":"0",
+		 * "worth":"1.0"}
+		 */
+		LogUtils.i(TAG, "addByOther");
+		// 解析数据
+		JSONObject jsonObject = JSON.parseObject(message.getBody());
+		String addReason = jsonObject.getString("addReason");
+		String dwID = jsonObject.getString("dwID");
+		String nickName = jsonObject.getString("nickName");
+		String searchType = jsonObject.getString("searchType");
+		float worth = Float.valueOf(jsonObject.getString("worth"));
+		String icon = ImageUtils.getIconByDwID(dwID, ImageUtils.ICON_SMALL);
+		// 判断数据库中是否有数据
+		NewFriend newFriend = NewFriend.queryByDwID(dwID);
+		if (newFriend != null) {
+			newFriend.setMessageType(NewFriend.message_be_add);
+			newFriend.setAddReason(addReason);
+			newFriend.setIsShown(0);
+		} else {
+			newFriend = new NewFriend();
+			newFriend.setUsername(nickName);
+			newFriend.setOtherID(dwID);
+			newFriend.setIcon(icon);
+			newFriend.setWorth(worth);
+			newFriend.setAddReason(addReason);
+			newFriend.setMessageType(NewFriend.message_be_add);// 被添加
+		}
+		newFriend.save();
+		showRedPoint();
+
+		MsgNotifyManager.getInstance().addFriend(MsgNotifyManager.NOTIFY_ADD_FRIEND_APPLY, nickName);
+	}
+
+	/**
+	 * 删除
+	 */
+	public void delete(String otherID, DeleteCallback deleteCallback) {
+		deleteFriend(otherID, deleteCallback);
+	}
+
+	/**
+	 * 被人删除
+	 */
+	public void deleteByOther(String otherID) {
+		// 将对方从联系人列表中删除，并通知刷新
+		ContactUser contactUser = ContactUser.queryByDwID(otherID);
+		if (contactUser != null) {
+			contactUser.delete();
+			EventBus.getDefault().post(otherID, NotifyByEventBus.NT_REFRESH_CONTACT);
+		}
+
+		// 将将该人的会话列表移动到陌生人处
+		List<ConversationList> conversationList = ConversationList.queryByDwID(otherID, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+		if (conversationList.size() > 0) {
+			for (ConversationList temp : conversationList) {
+				temp.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+				temp.save();
+			}
+			ConversationEngine.getInstance().reloadConv("【被人删除，更新陌生人会话列表】");
+		}
+	}
+
+	/**
+	 * 同意好友请求
+	 * 
+	 * @param otherID
+	 * @param acceptCallback
+	 */
+	public void accept(String otherID, AcceptCallback acceptCallback) {
+		acceptFriend(otherID, acceptCallback);
+	}
+
+	/**
+	 * 对方同意好友申请
+	 */
+	public void acceptByOther(String fromDwId) {
+		/** 从数据库中加载记录 **/
+		NewFriend newFriend = NewFriend.queryByDwID(fromDwId);
+		if (newFriend != null) {
+			newFriend.setIsShown(1);
+			newFriend.setMessageType(NewFriend.message_add_success);
+			newFriend.save();
+			/** 生成一个联系人记录 **/
+			ContactUser cc = new ContactUser();
+			cc.setUserID(DecentWorldApp.getInstance().getDwID());
+			cc.setFriendID(newFriend.getOtherID());
+			cc.setWorth(Float.valueOf(newFriend.getWorth()));
+			cc.setShowName(newFriend.getUsername());
+			cc.save();
+			/** 将陌生人处的会话列表移动到好友处（可能有陌生人单聊、陌生人匿名消息） **/
+			List<ConversationList> conversationList = ConversationList
+					.queryByDwID(fromDwId, DWMessage.CHAT_RELATIONSHIP_STRANGER);
+			if (conversationList.size() > 0) {
+				for (ConversationList temp : conversationList) {
+					temp.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_FRIEND);
+					temp.save();
+				}
+				ConversationEngine.getInstance().reloadConv("【同意加为好友回执，更新陌生人会话列表】");
+			}
+			/** 路由到ChatFragment(更新新的朋友Item) **/
+			EventBus.getDefault().post("", NotifyByEventBus.NT_SHOW_FRIENDS_ADDED);
+			/** 路由到ChatFragment（好友列表） **/
+			EventBus.getDefault().post(fromDwId, NotifyByEventBus.NT_REFRESH_CONTACT);
+			/** 已经添加对方为好友，生成一条通知消息记录（DWMessage）保存到数据库 **/
+			DWMessage dwMessage = new DWMessage(DWMessage.NOTIFY, DWMessage.Direct.RECEIVE);
+			dwMessage.setFrom(newFriend.getOtherID());
+			dwMessage.setBody("已经添加对方为好友，,扣费方式改变，以自己的身价为标准");
+			dwMessage.save();
+			MsgNotifyManager.getInstance().addFriend(MsgNotifyManager.NOTIFY_ADD_FRIEND_AGREE, newFriend.getUsername());
+		}
+	}
+
+	/**
+	 * 拒绝好友申请
+	 * 
+	 * @param otherID
+	 * @param refuseCallback
+	 */
+	public void refuse(String otherID, RefuseCallback refuseCallback) {
+		refuseFriend(otherID, refuseCallback);
+	}
+
+	/**
+	 * 对方拒绝好友申请
+	 */
+	public void refuseByOther(org.jivesoftware.smack.packet.Message message, String fromDwId) {
+		JSONObject json = (JSONObject) JSON.parse(message.getBody().toString());
+		NewFriend newFriend = NewFriend.queryByDwID(fromDwId);
+		if (newFriend != null) {
+			newFriend.setIsShown(1);
+			newFriend.setMessageType(NewFriend.message_add_fail);
+			newFriend.save();
+			// 路由到ChatFragment(更新新的朋友Item)
+			EventBus.getDefault().post("", NotifyByEventBus.NT_SHOW_FRIENDS_ADDED);
+			MsgNotifyManager.getInstance().addFriend(MsgNotifyManager.NOTIFY_ADD_FRIEND_REFUSE, newFriend.getUsername());
+		}
+	}
+
+	/**
+	 * 修改备注
+	 * 
+	 * @param contactID
+	 * @param remark
+	 */
+	public void setRemark(String otherID, String remark, SetRemarkCallback setRemarkCallback) {
+		setContactRemark(otherID, remark, setRemarkCallback);
+	}
+
+	/**
+	 * 显示小红点
+	 */
+	public void showRedPoint() {
+		int newfriend_count = NewFriend.selectAllIsNotShown();
+		// 将消息路由到ChatFragment,显示小红点
+		EventBus.getDefault().post(newfriend_count, NotifyByEventBus.NT_SHOW_FRIENDS_ADDED);
+		/** Tab处小红点 **/
+		EventBus.getDefault().post(newfriend_count, NotifyByEventBus.NT_UNREAD_CONTACT_COUNT);
+	}
+
+	/**
+	 * 添加系统推荐且不在联系人列表中的人为好友
+	 * 
+	 * @param otherID
+	 *            对方ID
+	 * @param remark
+	 *            对方的名字
+	 * @param addReason
+	 *            添加理由
+	 * @param addCallback
+	 *            回调
+	 */
+
+	public void addWithRemark(String otherID, String remark, String addReason, final AddCallback addCallback) {
+		addContactWithRemark(otherID, remark, addReason, addCallback);
+
+	}
+
+	/**
+	 * 添加好友回调
+	 */
+	public interface AddCallback {
+		public void onSuccess(String info);
+
+		public void onFailure(String cause);
+	}
+
+	/**
+	 * 删除好友回调
+	 */
+	public interface DeleteCallback {
+		public void onSuccess(String info);
+
+		public void onFailure(String cause);
+	}
+
+	/**
+	 * 同意好友回调
+	 */
+	public interface AcceptCallback {
+		public void onSuccess(String info);
+
+		public void onFailure(String cause);
+	}
+
+	/**
+	 * 同意好友回调
+	 */
+	public interface RefuseCallback {
+		public void onSuccess(String info);
+
+		public void onFailure(String cause);
+	}
+
+	/**
+	 * 同意好友回调
+	 */
+	public interface SetRemarkCallback {
+		public void onSuccess(String info);
+
+		public void onFailure(String cause);
+	}
+
+	// ////////////////////////////////////////私有方法///////////////////////////////////////////////////
+
+	/**
+	 * 申请加为好友接口
+	 */
+	private void addFriend(final SearchResult searchResult, final String addReason, String searchType,
+			final AddCallback addCallback) {
+		final String friendID = searchResult.dwID;
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				String info = msg.obj.toString();
+				switch (msg.what) {
+				case 0:
+					addCallback.onFailure(info);
+					break;
+				case 1:
+					// 构造一个对象并保存
+					NewFriend newFriend = NewFriend.queryByDwID(friendID);
+					if (newFriend != null) {
+						newFriend.setMessageType(NewFriend.message_had_apply);
+						newFriend.setAddReason(addReason);
+						newFriend.setIsShown(1);
+					} else {
+						newFriend = new NewFriend();
+						newFriend.setUsername(searchResult.name);
+						newFriend.setOtherID(searchResult.dwID);
+						newFriend.setWorth(Float.valueOf(searchResult.worth));
+						newFriend.setAddReason(addReason);
+						newFriend.setMessageType(NewFriend.message_had_apply);
+						newFriend.setIsShown(1);
+					}
+					newFriend.save();
+					addCallback.onSuccess(info);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("friendID", friendID);
+		map.put("searchType", searchType);
+		map.put("addReason", addReason);
+		LogUtils.i(TAG, "addFriend...dwID=" + dwID + ",friendID=" + friendID + ",searchType=" + searchType + ",addReason="
+				+ addReason);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_ADD_FRIEND, Method.GET, new HttpCallBack() {
+			@Override
+			public void onFailure(String e) {
+				LogUtils.i(TAG, "addFriend...onFailure" + e);
+				Message message = new Message();
+				message.what = 0;
+				message.obj = Constants.NET_WRONG;
+				handler.sendMessage(message);
+			}
+
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.i(TAG, "addFriend...getResultCode=" + msg.getResultCode() + ",getData=" + msg.getData().toString()
+						+ ",getMsg" + msg.getMsg());
+				if (msg.getResultCode() == 2222) {
+					LogUtils.i(TAG, "addFriend...success");
+					//更新身家
+					String jsonStr = msg.getData().toString();
+					JSONObject jsonObject = JSON.parseObject(jsonStr);
+					Float wealth = jsonObject.getFloat("wealth");
+					UserInfoEngine.getInstance().notifyWealthChanged(wealth);
+					//回调
+					Message message = new Message();
+					message.what = 1;
+					message.obj = "申请已发送";
+					handler.sendMessage(message);
+				}
+
+				if (msg.getResultCode() == 3333) {
+					LogUtils.i(TAG, "addFriend...failure，cause by:" + msg.getMsg());
+					/** 你不能添加自己为好友 **/
+					Message message = new Message();
+					message.what = 0;
+					message.obj = msg.getMsg();
+					handler.sendMessage(message);
+				}
+			}
+		});
+	}
+
+	/**
+	 * 删除好友
+	 * 
+	 * @param strangerID
+	 * @param friendID
+	 * @param handler
+	 * @param requestCode
+	 */
+	private void deleteFriend(final String friendID, final DeleteCallback deleteCallback) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				String info = msg.obj.toString();
+				switch (msg.what) {
+				case 0:
+					deleteCallback.onFailure(info);
+					break;
+				case 1:
+					afterDeleteContact(friendID, info, deleteCallback);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("friendID", friendID);
+		LogUtils.i(TAG, "deleteFriend...begin,dwID=" + dwID + ",friendID=" + friendID);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_DELETE_FRIEND, Method.GET, new HttpCallBack() {
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.i(TAG, "deleteFriend...msg.getResultCode=" + msg.getResultCode());
+				if (msg.getResultCode() == 2222) {
+					LogUtils.i(TAG, "deleteFriend...msg.getMsg=" + msg.getMsg());
+					Message message = Message.obtain();
+					message.obj = "删除成功";
+					message.what = 1;
+					handler.sendMessage(message);
+				}
+				if (msg.getResultCode() == 3333) {
+					LogUtils.i(TAG, "deleteFriend...failure,cause by:" + msg.getMsg());
+					Message message = Message.obtain();
+					message.obj = "删除好友失败";
+					message.what = 0;
+					handler.sendMessage(message);
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				LogUtils.i(TAG, "deleteFriend...onFailure,cause by:" + e);
+				Message message = Message.obtain();
+				message.obj = Constants.NET_WRONG;
+				message.what = 0;
+				handler.sendMessage(message);
+			}
+		});
+	}
+
+	/**
+	 * 删除联系人后的处理
+	 */
+	private void afterDeleteContact(String friendID, String info, DeleteCallback deleteCallback) {
+		/** 将指定ID好友从数据库中删除，并刷新列表 **/
+		ContactUser user = ContactUser.queryByDwID(friendID);
+		if (user != null) {
+			user.delete();
+		}
+
+		/** 将好友的会话列表移到陌生人处 **/
+		List<ConversationList> conversationList = ConversationList.queryByDwID(friendID, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+		if (conversationList.size() > 0) {
+			for (ConversationList t : conversationList) {
+				t.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+				t.save();
+			}
+			ConversationEngine.getInstance().reloadConv("【删除好友，通知陌生人页面更新会话列表】");
+		}
+		deleteCallback.onSuccess(info);
+	}
+
+	/**
+	 * 同意添加为好友
+	 * 
+	 * @param strangerID
+	 * @param friendID
+	 */
+	private void acceptFriend(final String friendID, final AcceptCallback acceptCallback) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				String info = msg.obj.toString();
+				switch (msg.what) {
+				case 0:
+					acceptCallback.onFailure(info);
+					break;
+				case 1:
+					NewFriend friend = NewFriend.queryByDwID(friendID);
+					friend.setMessageType(NewFriend.message_had_add);
+					friend.setIsShown(1);
+					friend.save();
+					EventBus.getDefault().post(friend, NotifyByEventBus.NT_UPDATE_NEW_FRIEND_LIST);
+					acceptCallback.onSuccess(info);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("friendID", friendID);
+		LogUtils.i(TAG, "acceptFriend...begin");
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_ACCEPT_FRIEND, Method.GET, new HttpCallBack() {
+			@Override
+			public void onFailure(String e) {
+				LogUtils.i(TAG, "acceptFriend...onFailure,cause by:" + e);
+				Message message = Message.obtain();
+				message.obj = Constants.NET_WRONG;
+				message.what = 0;
+				handler.sendMessage(message);
+			}
+
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.i(TAG, "acceptFriend...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg());
+				if (msg.getResultCode() == 2222) {
+					try {
+						org.json.JSONObject object = new org.json.JSONObject(msg.getData().toString());
+						String versionNum = object.getString("versionNum");
+						UserInfo userInfo = UserInfo.queryByDwID(DecentWorldApp.getInstance().getDwID());
+						if (null == userInfo) {
+							userInfo = new UserInfo();
+						}
+						userInfo.versionNum = versionNum;
+						userInfo.save();
+					} catch (JSONException e) {
+
+					}
+					LogUtils.i(TAG, "acceptFriend...success");
+					Message message = Message.obtain();
+					message.obj = "同意成功";
+					message.what = 1;
+					handler.sendMessage(message);
+				}
+
+				if (msg.getResultCode() == 3333) {
+					LogUtils.i(TAG, "acceptFriend...failure,cause by:" + msg.getMsg());
+					Message message = Message.obtain();
+					message.obj = "同意失败";
+					message.what = 0;
+					handler.sendMessage(message);
+				}
+			}
+		});
+	}
+
+	/**
+	 * 拒绝加为好友
+	 * 
+	 * @param strangerID
+	 * @param friendID
+	 */
+	private void refuseFriend(final String friendID, final RefuseCallback refuseCallback) {
+
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				String info = msg.obj.toString();
+				switch (msg.what) {
+				case 0:
+					refuseCallback.onFailure(info);
+					break;
+				case 1:
+					NewFriend friend = NewFriend.queryByDwID(friendID);
+					friend.setMessageType(NewFriend.message_had_refused);
+					friend.save();
+					EventBus.getDefault().post(friend, NotifyByEventBus.NT_UPDATE_NEW_FRIEND_LIST);
+					refuseCallback.onSuccess(info);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("friendID", friendID);
+		LogUtils.i(TAG, "refuseFriend...begin");
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_REFUSE_FRIEND, Method.GET, new HttpCallBack() {
+			@Override
+			public void onFailure(String e) {
+				LogUtils.i(TAG, "refuseFriend...onFailure,cause by:" + e);
+				Message message = Message.obtain();
+				message.obj = Constants.NET_WRONG;
+				message.what = 0;
+				handler.sendMessage(message);
+			}
+
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.i(TAG, "refuseFriend...msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg());
+				if (msg.getResultCode() == 2222) {
+					LogUtils.i(TAG, "refuseFriend...success");
+					Message message = Message.obtain();
+					message.obj = "拒绝成功";
+					message.what = 1;
+					handler.sendMessage(message);
+				}
+
+				if (msg.getResultCode() == 3333) {
+					LogUtils.i(TAG, "refuseFriend...failure,cause by:" + msg.getMsg());
+					Message message = Message.obtain();
+					message.obj = "拒绝失败";
+					message.what = 0;
+					handler.sendMessage(message);
+				}
+			}
+
+		});
+	}
+
+	/**
+	 * 设置备注
+	 * 
+	 * @param strangerID
+	 * @param friendID
+	 * @param remark
+	 * @param handler
+	 * @param requestCode
+	 */
+	private void setContactRemark(final String friendID, final String remark, final SetRemarkCallback setRemarkCallback) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				String info = msg.obj.toString();
+				switch (msg.what) {
+				case 0:
+					setRemarkCallback.onFailure(info);
+					break;
+				case 1:
+					afterSetRemark(friendID, remark);
+					setRemarkCallback.onSuccess(info);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("friendID", friendID);
+		map.put("remark", remark);
+		LogUtils.i(TAG, "setRemark...begin,dwID=" + dwID + ",friendID=" + friendID + ",remark=" + remark);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_SET_REMARK, Method.GET, new HttpCallBack() {
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+
+				LogUtils.i(TAG, "setRemark...msg.getResultCode=" + msg.getResultCode());
+				if (msg.getResultCode() == 2222) {
+					LogUtils.i(TAG, "setRemark...msg.getMsg=" + msg.getMsg());
+					Message message = Message.obtain();
+					message.obj = "设置备注成功";
+					message.what = 1;
+					handler.sendMessage(message);
+				}
+				if (msg.getResultCode() == 3333) {
+					LogUtils.i(TAG, "setRemark...msg.getMsg=" + msg.getMsg());
+					Message message = Message.obtain();
+					message.obj = "设置备注失败";
+					message.what = 0;
+					handler.sendMessage(message);
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				LogUtils.i(TAG, "setRemark...failure,caused by:" + e);
+				Message message = Message.obtain();
+				message.obj = Constants.NET_WRONG;
+				message.what = 0;
+				handler.sendMessage(message);
+			}
+		});
+	}
+
+	/**
+	 * 设置备注后的处理
+	 */
+	private void afterSetRemark(String friendID, String remark) {
+		LogUtils.i(TAG, "设置备注成功，修改为:" + remark);
+		/** 修改会话列表 **/
+		ConversationList temp = ConversationList.queryByDwID(friendID, DWMessage.CHAT_TYPE_SINGLE,
+				DWMessage.CHAT_RELATIONSHIP_FRIEND);
+		if (temp != null) {
+			temp.setTitle(remark);
+			temp.save();
+			ConversationEngine.getInstance().reloadConv("【修改完备注】");
+		}
+		/** 修改指定ID好友数据库 ，并刷新列表 **/
+		ContactUser contactUser = ContactUser.queryByDwID(friendID);
+		if (contactUser != null) {
+			contactUser.setShowName(remark);
+			contactUser.save();
+		}
+	}
+
+	/**
+	 * 添加系统推荐且不在联系人列表中的人为好友
+	 */
+	private void addContactWithRemark(String otherID, String remark, String addReason, final AddCallback addCallback) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				String info = msg.obj.toString();
+				switch (msg.what) {
+				case 0:
+					addCallback.onFailure(info);
+					break;
+				case 1:
+					addCallback.onSuccess(info);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("friendID", otherID);
+		map.put("remark", remark);
+		map.put("addReason", addReason);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_ADD_FRIEND_CONTACT, Method.POST,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						if (2222 == msg.getResultCode()) {
+							Message message = new Message();
+							message.what = 1;
+							message.obj = "申请已发送";
+							handler.sendMessage(message);
+						} else {
+							Message message = new Message();
+							message.what = 0;
+							message.obj = "添加好友失败";
+							handler.sendMessage(message);
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						Message message = new Message();
+						message.what = 0;
+						message.obj = Constants.NET_WRONG;
+						handler.sendMessage(message);
+					}
+				});
+
+	}
+
+}

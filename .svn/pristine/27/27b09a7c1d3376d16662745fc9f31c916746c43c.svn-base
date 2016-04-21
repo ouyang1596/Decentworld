@@ -1,0 +1,540 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity.discover;
+
+import java.io.File;
+import java.util.ArrayList;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.BaseFragmentActivity;
+import cn.sx.decentworld.activity.MultipleTakePhotosAndpictureActivity;
+import cn.sx.decentworld.activity.PickContactActivity;
+import cn.sx.decentworld.activity.PickContactActivity_;
+import cn.sx.decentworld.adapter.GridImageAdapter;
+import cn.sx.decentworld.bean.ContactUser;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.component.TitleBar;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.ReminderDialog;
+import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
+import cn.sx.decentworld.entity.db.MomentEntity;
+import cn.sx.decentworld.network.request.MomentNetRequest;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.widget.ExpandGridView;
+import cn.sx.decentworld.widget.RecorderButton;
+import cn.sx.decentworld.widget.RecorderButton.AudioFinishedRecordeListener;
+import cn.sx.decentworld.widget.SlipButton;
+import cn.sx.decentworld.widget.SlipButton.SlipButtonChangeListener;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: PublishFriendsCircleActivity.java
+ * @Description: 发布朋友圈
+ * @author: cj
+ * @date: 2016年2月23日 上午11:27:31
+ */
+@EActivity(R.layout.activity_publish_moment)
+public class PublishMomentActivity extends BaseFragmentActivity implements OnClickListener, AudioFinishedRecordeListener, SlipButtonChangeListener
+{
+    /**
+     * 常量
+     */
+    public static final String TAG = "PublishFriendsCircleActivity";
+    // 发布朋友圈时最多选取张数（目前为9张）
+    public static final int PIC_MAX_COUNT = 9;
+    // 选择图片的请求码
+    public static final int REQUEST_CODE_OPEN_GALLERY = 1;
+    // 选择联系人的请求码
+    public static final int REQUEST_CODE_PICK_CONTACT = 2;
+//    public static final int REQUEST_CODE_PICK_CONTACT = 2;
+//    public static final int REQUEST_CODE_PICK_CONTACT = 2;
+//    public static final int REQUEST_CODE_PICK_CONTACT = 2;
+
+    /**
+     * 工具类
+     */
+    @Bean
+    ToastComponent toast;
+    @Bean
+    TitleBar titleBar;
+    @Bean
+    MomentNetRequest momentNetRequest;
+
+    /**
+     * 界面资源
+     */
+    @ViewById(R.id.main_header_left)
+    LinearLayout main_header_left;
+
+    // 文字信息
+    @ViewById(R.id.et_publish_friends_circle_txt)
+    EditText et_publish_friends_circle_txt;
+    // 图片信息
+    @ViewById(R.id.gv_publish_friends_circle_image)
+    ExpandGridView gv_publish_friends_circle_image;
+    // 发布朋友圈
+    @ViewById(R.id.sb_publish_friends_circle_send)
+    SlipButton sb_publish_friends_circle_send;
+    // 谁可以看
+    @ViewById(R.id.btn_publish_friends_circle_see)
+    Button btn_publish_friends_circle_see;
+    // 谁可以看的显示列表
+    @ViewById(R.id.ll_publish_friends_circle_see)
+    LinearLayout ll_publish_friends_circle_see;
+
+    // 按住说话
+    @ViewById(R.id.btn_publish_friends_circle_record_voice)
+    RecorderButton btn_publish_friends_circle_record_voice;
+    @ViewById(R.id.tv_publish_friends_circle_voice_path)
+    TextView tv_publish_friends_circle_voice_path;
+    // 显示发送状态
+    @ViewById(R.id.ll_publish_friends_circle_state)
+    RelativeLayout ll_publish_friends_circle_state;
+    // 亲、朋、全
+    @ViewById(R.id.tv_publish_friends_circle_state)
+    TextView tv_publish_friends_circle_state;
+    // “向右滑动发送”、“松开手指发送”
+    @ViewById(R.id.tv_publish_friends_circle_info)
+    TextView tv_publish_friends_circle_info;
+
+    // 语音容器
+    @ViewById(R.id.ll_publish_friends_circle_voice)
+    LinearLayout ll_publish_friends_circle_voice;
+
+    /**
+     * 变量
+     */
+    private int publishType = 0;
+    private String userID = "";
+    // 文字内容
+    private String txtContent = "";
+    // 图片
+    private ArrayList<String> imageList = new ArrayList<String>();
+    // 语音
+    // private ArrayList<String> voiceList = new ArrayList<String>();
+    // 屏蔽列表
+    private ArrayList<String> blocklist = new ArrayList<String>();
+    // 只给谁看
+    private ArrayList<String> onlyshowtolist = new ArrayList<String>();
+    // 发布级别
+    private int level = -1;
+    // 朋友圈类型
+    private int type = -1;
+    // 选择的图片
+    private GridImageAdapter gridImageAdapter;
+    private String voicePath = "";
+    private float money = 0;
+
+    @AfterViews
+    void init()
+    {
+        initVariables();
+        initViews();
+        initListener();
+        loadData();
+    }
+
+    /**
+     * 初始化变量
+     */
+    private void initVariables()
+    {
+        //初始化即将要发布的朋友圈
+//        MomentActivity.publishMoment = new MomentEntity();
+        //初始化用户ID
+        userID = DecentWorldApp.getInstance().getDwID();
+        publishType = getIntent().getIntExtra("type", 0);
+
+        if (publishType == DWMessage.TXT)
+        {
+            // 隐藏展示图片的控件
+            gv_publish_friends_circle_image.setVisibility(View.GONE);
+            // 隐藏展示语音的控件
+            ll_publish_friends_circle_voice.setVisibility(View.GONE);
+        }
+        else if (publishType == DWMessage.IMAGE)
+        {
+            // 发表“文字”+“图片”
+            // 初始化展示图片的控件
+            imageList.add("0");
+            gridImageAdapter = new GridImageAdapter(this , imageList);
+            gv_publish_friends_circle_image.setAdapter(gridImageAdapter);
+            gv_publish_friends_circle_image.setOnItemClickListener(new OnItemClickListener()
+            {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                {
+                    if (imageList.get(position).equals("0"))
+                    {
+                        Intent intent = new Intent(PublishMomentActivity.this , MultipleTakePhotosAndpictureActivity.class);
+                        intent.putExtra(MultipleTakePhotosAndpictureActivity.MAX_COUNT, PIC_MAX_COUNT - imageList.size() + 1);
+                        startActivityForResult(intent, REQUEST_CODE_OPEN_GALLERY);
+                    }
+                    else
+                    {
+                        ArrayList<String> temp = new ArrayList<String>();
+                        for (String path : imageList)
+                        {
+                            if (!path.equals("0"))
+                                temp.add(path);
+                        }
+                        // 查看对应图片的大图
+                        ImageUtils.browerBigImage(PublishMomentActivity.this, temp, ImageUtils.IMAGE_FROM_LOCAL, position);
+                    }
+                }
+            });
+            // 隐藏展示语音的控件
+            ll_publish_friends_circle_voice.setVisibility(View.GONE);
+        }
+        else
+        {
+            // 发表“文字”+"语音"
+            // 隐藏展示图片的控件
+            gv_publish_friends_circle_image.setVisibility(View.GONE);
+
+            // 初始化展示语音的控件
+        }
+        sb_publish_friends_circle_send.SetOnChangedListener(this);
+    }
+
+    /**
+     * 初始化界面
+     */
+    private void initViews()
+    {
+        titleBar.setTitleBar("返回", "发布朋友圈");
+    }
+
+    /**
+     * 初始化监听
+     */
+    private void initListener()
+    {
+        main_header_left.setOnClickListener(this);
+        btn_publish_friends_circle_see.setOnClickListener(this);
+        btn_publish_friends_circle_record_voice.setAudioFishedRecorde(this);
+    }
+
+    /**
+     * 加载数据
+     */
+    private void loadData()
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.main_header_left:
+                back();
+                
+                break;
+            case R.id.btn_publish_friends_circle_see:
+                // 打开联系人列表，选择联系人
+                Intent intent = new Intent(this , PickContactActivity_.class);
+                intent.putExtra(PickContactActivity.PICK_TYPE, PickContactActivity.PICK_TYPE_MULTI);
+                startActivityForResult(intent, REQUEST_CODE_PICK_CONTACT);
+                break;
+
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 返回时判断
+     */
+    private void back()
+    {
+        if(publishType == DWMessage.TXT)
+        {
+            String temp = et_publish_friends_circle_txt.getText().toString();
+            if(CommUtil.isNotBlank(temp))
+            {
+                reminderDialog("你要\n放弃发布文字朋友圈吗？");
+            }else
+            {
+                finish();
+            }
+        }
+        else if(publishType == DWMessage.VOICE)
+        {
+            if(CommUtil.isNotBlank(voicePath))
+            {
+                reminderDialog("你要\n放弃发布语音朋友圈吗？");
+            }else
+            {
+                finish();
+            }
+        }else
+        {
+            if(imageList.size()>1)
+            {
+                reminderDialog("你要\n放弃发布图片朋友圈吗？");
+            }else
+            {
+                finish();
+            }
+        }
+    }
+    
+    /**
+     * 退出时弹出提示框,点击确认后关闭当前页面
+     */
+    private void reminderDialog(String info)
+    {
+        ReminderDialog dialog = new ReminderDialog();
+        dialog.setInfo(info);
+        dialog.setListener(new ReminderListener()
+        {
+            @Override
+            public void confirm()
+            {
+                finish();
+            }
+        });
+        dialog.show(getSupportFragmentManager(), "reminder");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
+    {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (resultCode == RESULT_OK)
+        {
+            if (requestCode == REQUEST_CODE_OPEN_GALLERY)
+            {
+                if (null != intent.getExtras())
+                {
+                    ArrayList<String> filePaths = intent.getExtras().getStringArrayList(MultipleTakePhotosAndpictureActivity.PATH_RESULT);
+                    imageList.addAll(imageList.size() - 1, filePaths);
+                    if (imageList.size() >= PIC_MAX_COUNT + 1)
+                        imageList.remove(PIC_MAX_COUNT);
+                    gridImageAdapter.notifyDataSetChanged();
+                    for (int i = 0; i < imageList.size() - 1; i++)
+                    {
+                        LogUtils.i(TAG, "照片路径为：" + imageList.get(i));
+                    }
+                }
+
+            }
+            else if (requestCode == REQUEST_CODE_PICK_CONTACT)
+            {
+                // 转发名片,被转发人的dwID如下
+//                ArrayList<String> result = intent.getStringArrayListExtra(PickContactActivity.CONTACT_DWID);
+//                blocklist.addAll(result);
+//                for (String str : blocklist)
+//                {
+//                    TextView v = new TextView(this);
+//                    v.setText(str);
+//                    ll_publish_friends_circle_see.addView(v);
+//                }
+                
+                ArrayList<ContactUser> arrayList = (ArrayList<ContactUser>) intent.getSerializableExtra(PickContactActivity.CONTACT_DWID);
+                for(ContactUser user:arrayList)
+                {
+                    blocklist.add(user.getFriendID());
+                }
+                for (String str : blocklist)
+                {
+                    TextView v = new TextView(this);
+                    v.setText(str);
+                    ll_publish_friends_circle_see.addView(v);
+                }
+               
+            }
+        }
+    }
+
+    /**
+     * 按住说话回调
+     */
+    @Override
+    public void FinishedRecordeListener(Float mTime, String FilePath)
+    {
+        voicePath = FilePath;
+        tv_publish_friends_circle_voice_path.setText("录音时间为：" + mTime + "\n" + FilePath);
+    }
+
+    @Override
+    public void OnChanged(boolean isPress, int checkState, boolean isFinish)
+    {
+        LogUtils.e(TAG, "checkState=" + checkState + ",isFinish=" + isFinish);
+
+        if (isPress)
+        {
+            ll_publish_friends_circle_state.setVisibility(View.VISIBLE);
+            if (checkState == SlipButton.SWITCH_NO)
+            {
+                tv_publish_friends_circle_state.setText("");
+                tv_publish_friends_circle_info.setText("向右滑动发送");
+            }
+            else if (checkState == SlipButton.SWITCH_FAMILY)
+            {
+                tv_publish_friends_circle_state.setText("亲");
+                tv_publish_friends_circle_info.setText("松开手指发送");
+            }
+            else if (checkState == SlipButton.SWITCH_FRIEND)
+            {
+                tv_publish_friends_circle_state.setText("朋");
+                tv_publish_friends_circle_info.setText("松开手指发送");
+            }
+            else if (checkState == SlipButton.SWITCH_ALL)
+            {
+                tv_publish_friends_circle_state.setText("全");
+                tv_publish_friends_circle_info.setText("松开手指发送");
+            }
+        }
+        else
+        {
+            ll_publish_friends_circle_state.setVisibility(View.GONE);
+        }
+
+        // 确定发布朋友圈
+        if (isFinish && checkState != SlipButton.SWITCH_NO)
+        {
+            send(checkState);
+        }
+    }
+
+    /**
+     * 发送
+     */
+    private void send(int level)
+    {
+        //判断是否发送全部人可见，如果是则金额必须大于0
+        if(level == MomentEntity.LEVEL_ALL)
+        {
+            if(money == 0)
+            {
+                toast.show("请填写金额");
+                return ;
+            }
+        }
+        // 发送内容
+        txtContent = et_publish_friends_circle_txt.getText().toString();
+        if (publishType == DWMessage.TXT)
+        {
+            if (CommUtil.isBlank(txtContent))
+            {
+                toast.show("请输入要发布的内容");
+                return;
+            }
+            type = 0;
+//            momentNetRequest.publish(userID, txtContent, type, level, null,0, blocklist, onlyshowtolist, handler);
+//            MomentActivity.publishMoment = new MomentEntity();
+//            MomentEntity entity = MomentActivity.publishMoment;
+//            entity.setPublisherID(DecentWorldApp.getInstance().getDwID());
+//            entity.setContent(txtContent);
+//            entity.setPublishTime(System.currentTimeMillis());
+//            entity.setContentType(type);
+//            entity.setPublisherName("Jack");
+//            entity.setLevel(level);
+            
+            
+            
+            //数据已经保存在了entity中，只需要调用接口接口，所传参数重entity中获取；
+            
+            //将数据保存在数据库，其中entity中的发送状态字段设置为发送中；
+            
+            //当调用接口返回成功后更新发送状态字段为发送成功，若放回失败，则更新对应的发送状态为失败；
+            
+            //下次进入该界面后，遍历所有作品圈记录，当发现发送状态为失败的则重新发送；
+        }
+        else if (publishType == DWMessage.VOICE)
+        {
+            // 发送语音
+
+            // 判断路径是否为空，不为空则构造File,否则弹出提示；
+            if (CommUtil.isBlank(voicePath))
+            {
+                toast.show("请录制语音");
+                return;
+            }
+            type = 1;
+            File[] file = new File[1];
+            file[0] = new File(voicePath);
+//            momentNetRequest.publish(userID, txtContent, type, level, file,money, blocklist, onlyshowtolist, handler);
+        }
+        else
+        {
+            // 发送图片
+            if (imageList.size() <= 1)
+            {
+                toast.show("请选择图片");
+                return;
+            }
+            type = 2;
+            // 判断路径是否为空，不为空则构造File,否则弹出提示；
+            File[] file = new File[9];
+            for (int i = 0; i < imageList.size(); i++)
+            {
+                if (!imageList.get(i).equals("0"))
+                    file[i] = new File(imageList.get(i));
+            }
+//            momentNetRequest.publish(userID, txtContent, type, level, file, money,blocklist, onlyshowtolist, handler);
+        }
+    }
+
+    /**
+     * 发布朋友圈回调
+     */
+    Handler handler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            switch (msg.what)
+            {
+                case ConstantNet.NET_REQUEST_SUCCESS:
+                    // 网络请求成功
+                    String successInfo = msg.obj.toString();
+                    toast.show(successInfo);
+                    // 保存数据
+//                    MomentEntity entity = MomentActivity.publishMoment;
+//                    entity.setMomentState(MomentEntity.STATE_SUCCESSED);
+//                    //填充服务器返回的值...
+//                    entity.setRemoteID(0);
+//                    entity.save();
+                    setResult(RESULT_OK);
+                    // 关闭当前界面
+                    finish();
+                    break;
+                case ConstantNet.NET_REQUEST_FAILURE:
+                    // 网络请求失败
+                    String failureInfo = msg.obj.toString();
+                    toast.show(failureInfo);
+                    break;
+                default:
+                    break;
+            }
+        };
+    };
+
+}

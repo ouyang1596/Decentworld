@@ -4,37 +4,51 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Paint.FontMetrics;
+import android.support.v4.app.FragmentActivity;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.activity.ChatActivity;
 import cn.sx.decentworld.activity.ChatActivity_;
-import cn.sx.decentworld.bean.ContactUser;
 import cn.sx.decentworld.bean.DWMessage;
 import cn.sx.decentworld.bean.NearbyStrangerInfo;
 import cn.sx.decentworld.bean.StrangerInfo;
 import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.dialog.CommomPromptDialogFragment;
+import cn.sx.decentworld.dialog.CommomPromptDialogFragment.OnCommomPromptListener;
+import cn.sx.decentworld.entity.LaunchChatEntity;
+import cn.sx.decentworld.entity.dao.ContactUserDao;
+import cn.sx.decentworld.fragment.index.StrangerFragment;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.utils.FileUtils;
 import cn.sx.decentworld.utils.ImageLoaderHelper;
 import cn.sx.decentworld.utils.ImageUtils;
 import cn.sx.decentworld.utils.ViewUtil;
-import cn.sx.decentworld.widget.RoundImageView;
+import cn.sx.decentworld.widget.AutoSizeImageView;
 
-public class CardAdapter extends BaseAdapter {
+public class CardAdapter extends BaseAdapter implements OnCommomPromptListener {
 	private static final String TAG = "CardAdapter";
 	private Context mContext;
 	private List<NearbyStrangerInfo> mCardList;
 	private LayoutInflater inflater;
+	FragmentActivity mActivity;
 
 	public CardAdapter(Context mContext, List<NearbyStrangerInfo> mCardList) {
 		this.mContext = mContext;
 		this.mCardList = mCardList;
 		inflater = LayoutInflater.from(mContext);
+		mActivity = (FragmentActivity) mContext;
 	}
 
 	@Override
@@ -59,7 +73,7 @@ public class CardAdapter extends BaseAdapter {
 			con = inflater.inflate(R.layout.item_card_stranger, parent, false);
 			ViewUtil.scaleView(con);
 			vh = new ViewHolder();
-			vh.mCardIcon = (RoundImageView) con.findViewById(R.id.item_nearby_stranger_icon);
+			vh.mCardIcon = (AutoSizeImageView) con.findViewById(R.id.item_nearby_stranger_icon);
 			// vh.mCardHeadPic = (ImageView) con.findViewById(R.id.iv_head_pic);
 			// vh.mCardHeadPic.setOnClickListener(mOnClickListener);
 			vh.mCardSex = (ImageView) con.findViewById(R.id.item_nearby_stranger_sex);
@@ -68,6 +82,8 @@ public class CardAdapter extends BaseAdapter {
 			vh.mCardAge = (TextView) con.findViewById(R.id.item_nearby_stranger_age);
 			vh.llTalkToStranger = (LinearLayout) con.findViewById(R.id.ll_talk_stranger);
 			vh.llTalkToStranger.setOnClickListener(mOnClickListener);
+			// vh.relMbc = (MainIvBCIvRelativeLayout)
+			// con.findViewById(R.id.rel_mbc);
 			vh.ivRealNameOrNickName = (ImageView) con.findViewById(R.id.iv_realname_nickname);
 			vh.mCardWorth = (TextView) con.findViewById(R.id.item_nearby_stranger_worth);
 			vh.mCardJob = (TextView) con.findViewById(R.id.item_nearby_stranger_work);
@@ -76,6 +92,7 @@ public class CardAdapter extends BaseAdapter {
 			// vh.mCardSex = (ImageView) con.findViewById(R.id.iv_sex_girl_boy);
 			vh.mCardDistance = (TextView) con.findViewById(R.id.item_nearby_stranger_location);
 			vh.mCardSign = (TextView) con.findViewById(R.id.item_nearby_stranger_sign);
+			vh.llSexAgeLocation = (LinearLayout) con.findViewById(R.id.ll_sex_age_location);
 			// vh.mCardLike = (ImageView) con
 			// .findViewById(R.id.item_nearby_stranger_like);
 			// vh.mCardLike.setOnClickListener(mOnClickListener);
@@ -87,16 +104,10 @@ public class CardAdapter extends BaseAdapter {
 			vh = (ViewHolder) con.getTag();
 		}
 		vh.llTalkToStranger.setTag(position);
-		// vh.mCardHeadPic.setTag(position);
-		// vh.mCardLike.setTag(position);
-		// vh.mCardSayHi.setTag(position);
 		NearbyStrangerInfo info = mCardList.get(position);
 		ImageLoaderHelper.mImageLoader.displayImage(ImageUtils.getIconByDwID(info.getDwID(), ImageUtils.ICON_MAIN), vh.mCardIcon,
 				ImageLoaderHelper.mOptions);
 		vh.mCardName.setText(info.getName());
-		// vh.mCardSex
-		// .setImageResource("0".equals(info.getSex()) ? R.drawable.me_sex_women
-		// : R.drawable.me_sex_man);
 		if ("秘密".equals(info.getAge())) {
 			vh.mCardAge.setText("最好的年龄");
 		} else {
@@ -122,7 +133,11 @@ public class CardAdapter extends BaseAdapter {
 		}
 		Double distance = Double.valueOf(info.getDistance());
 		distance = ((int) (distance * 100)) / 100.0;
-		vh.mCardDistance.setText(distance + "km");
+		if (distance > 10000) {
+			vh.mCardDistance.setText("对方已隐藏距离");
+		} else {
+			vh.mCardDistance.setText(distance + "km");
+		}
 		if ("男".equals(info.getSex())) {
 			vh.mCardSex.setImageResource(R.drawable.stranger_boy);
 		} else {
@@ -132,12 +147,98 @@ public class CardAdapter extends BaseAdapter {
 		if (CommUtil.isNotBlank(info.getWealth())) {
 			vh.tvWealth.setText(info.getWealth());
 		} else {
-			vh.tvWealth.setVisibility(View.GONE);
+			vh.tvWealth.setText("此地无银");
 		}
-		if (CommUtil.isNotBlank(info.getShortIntroduce())) {
-			vh.mCardSign.setText(info.getShortIntroduce());
+		// vh.mCardSign.setText(info.getSign());
+		vh.mCardJob.setVisibility(View.INVISIBLE);
+		vh.mCardSign.setVisibility(View.INVISIBLE);
+		vh.llSexAgeLocation.setVisibility(View.INVISIBLE);
+		if (position == 0) {
+			mTvOnGlobalLayoutListener.setparams(vh.mCardJob, vh.mCardSign, vh.llSexAgeLocation, info);
+			vh.mCardSign.getViewTreeObserver().addOnGlobalLayoutListener(mTvOnGlobalLayoutListener);
+			// mAutoImgOnGlobalLayoutListener.setParams(vh.mCardIcon,
+			// vh.mCardUserType);
+			// vh.mCardUserType.getViewTreeObserver().addOnGlobalLayoutListener(mAutoImgOnGlobalLayoutListener);
 		}
+		// if (CommUtil.isNotBlank(info.getShortIntroduce())) {
+		// vh.mCardSign.setText(info.getShortIntroduce());
+		// }
 		return con;
+	}
+
+	private AutoImgOnGlobalLayoutListener mAutoImgOnGlobalLayoutListener = new AutoImgOnGlobalLayoutListener();
+
+	class AutoImgOnGlobalLayoutListener implements OnGlobalLayoutListener {
+		private AutoSizeImageView mAutoImg;
+		private ImageView mIvUserType;
+
+		public void setParams(AutoSizeImageView autoImg, ImageView ivUserType) {
+			mAutoImg = autoImg;
+			mIvUserType = ivUserType;
+		}
+
+		@Override
+		public void onGlobalLayout() {
+			RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+					LinearLayout.LayoutParams.WRAP_CONTENT);
+			lp.setMargins(10, 10, 10, 10);
+			mIvUserType.setLayoutParams(lp);
+			mAutoImg.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+		}
+	}
+
+	private TvOnGlobalLayoutListener mTvOnGlobalLayoutListener = new TvOnGlobalLayoutListener();
+
+	class TvOnGlobalLayoutListener implements OnGlobalLayoutListener {
+		private TextView mTv, mTvJob;
+		private NearbyStrangerInfo mInfo;
+		private LinearLayout mLlSexAgeLocation;
+
+		public void setparams(TextView tvJob, TextView tv, LinearLayout llSexAgeLocation, NearbyStrangerInfo info) {
+			mTv = tv;
+			mInfo = info;
+			mTvJob = tvJob;
+			mLlSexAgeLocation = llSexAgeLocation;
+		}
+
+		@Override
+		public void onGlobalLayout() {
+			int height = mTv.getHeight() - StrangerFragment.mRadius;
+			LogUtils.d(TAG, "onGlobalLayout--- mTv.getHeight()---" + mTv.getHeight());
+			int height2 = mTv.getHeight();
+			if (height <= 0 || height > 100000) {
+				mTvJob.setVisibility(View.GONE);
+				mTv.setVisibility(View.GONE);
+				mLlSexAgeLocation.setVisibility(View.GONE);
+				mTv.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				return;
+			}
+			mTvJob.setVisibility(View.VISIBLE);
+			mTv.setVisibility(View.VISIBLE);
+			mLlSexAgeLocation.setVisibility(View.VISIBLE);
+			FontMetrics fontMetrics = mTv.getPaint().getFontMetrics();
+			int tvHeight = (int) (fontMetrics.descent - fontMetrics.ascent);
+			if (height - tvHeight <= 0) {
+				mTv.setVisibility(View.GONE);
+				mTv.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				return;
+			}
+			int value = (height - tvHeight) / tvHeight;
+			if (value == 0) {
+				mTv.setSingleLine(true);
+				mTv.setEllipsize(TextUtils.TruncateAt.END);
+			} else if (value > 0) {
+				mTv.setLines(value + 1);
+				mTv.setEllipsize(TextUtils.TruncateAt.END);
+			}
+			mTv.setText(mInfo.getSign());
+			if (CommUtil.isNotBlank(mInfo.getShortIntroduce())) {
+				mTv.setText(mInfo.getShortIntroduce());
+			}
+			LogUtils.d(TAG, "onGlobalLayout---ascent---" + fontMetrics.ascent + "descent--" + fontMetrics.descent);
+			LogUtils.d(TAG, "onGlobalLayout---height---" + height);
+			mTv.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+		}
 	}
 
 	private static String POSITION = "position";
@@ -157,28 +258,49 @@ public class CardAdapter extends BaseAdapter {
 				break;
 			case R.id.ll_talk_stranger:
 				NearbyStrangerInfo item = CardAdapter.this.getItem(position);
-				Intent intent = new Intent(mContext, ChatActivity_.class);
-				intent.putExtra(ChatActivity.OTHER_ID, item.getDwID());
-				intent.putExtra(ChatActivity.OTHER_NICKNAME, item.getName());
-				intent.putExtra(ChatActivity.OTHER_WORTH, Float.valueOf(item.getWorth()));
-				intent.putExtra(ChatActivity.CHAT_TYPE, DWMessage.CHAT_TYPE_SINGLE);
-				if (ContactUser.isContact(item.getDwID())) {
-					// 朋友关系
-					intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+				if (ContactUserDao.isContact(item.getDwID())) {
+					if (FileUtils.getPromptStatus(mActivity, Constants.FRIEND) == CommomPromptDialogFragment.FRIEND) {
+						Intent intent = new Intent(mActivity, ChatActivity_.class);
+						LaunchChatEntity entity = new LaunchChatEntity(item.getDwID(), item.getName(), Float.valueOf(item
+								.getWorth()), DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_FRIEND,
+								Integer.valueOf(item.getUserType()));
+						intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity);
+						mContext.startActivity(intent);
+					} else {
+						showCommomDialog(item, CommomPromptDialogFragment.FRIEND, "你与他是朋友关系，他与你每说一句话，将按照他的身价向你付费。同理，注意你的身价哦！");
+					}
 				} else {
-					// 陌生人关系
-					intent.putExtra(ChatActivity.CHAT_RELATIONSHIP, DWMessage.CHAT_RELATIONSHIP_STRANGER);
+					if (FileUtils.getPromptStatus(mActivity, Constants.STRANGER) == CommomPromptDialogFragment.STRANGER) {
+						Intent intent = new Intent(mActivity, ChatActivity_.class);
+						LaunchChatEntity entity = new LaunchChatEntity(item.getDwID(), item.getName(), Float.valueOf(item
+								.getWorth()), DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_STRANGER,
+								Integer.valueOf(item.getUserType()));
+						intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity);
+						mContext.startActivity(intent);
+					} else {
+						showCommomDialog(item, CommomPromptDialogFragment.STRANGER,
+								"你与他是陌生人关系，每人前三句是不会得到费用的。之后他与你每说一句话，将按照你的身价向你付费。同理，注意他的身价哦！");
+					}
 				}
-				mContext.startActivity(intent);
-				saveStrangerInfo(position);
 				break;
 			case R.id.iv_head_pic:
-				// strangerFragment.flingContainer.getTopCardListener()
-				// .selectLeft();
 				break;
 			}
 		}
 	};
+	private CommomPromptDialogFragment mCommomPromptDialog;
+
+	private void showCommomDialog(NearbyStrangerInfo item, int enter, String prompt) {
+		if (null == mCommomPromptDialog) {
+			mCommomPromptDialog = new CommomPromptDialogFragment();
+		}
+		mCommomPromptDialog.setObject(item);
+		mCommomPromptDialog.setEnter(enter);
+		mCommomPromptDialog.setOnCommomPromptListener(this);
+		mCommomPromptDialog.setTips(prompt);
+		FragmentActivity activity = (FragmentActivity) mContext;
+		mCommomPromptDialog.show(activity.getSupportFragmentManager(), "mCommomPromptDialog");
+	}
 
 	private void saveStrangerInfo(int position) {
 		NearbyStrangerInfo nearStrangerInfo = this.getItem(position);
@@ -194,9 +316,8 @@ public class CardAdapter extends BaseAdapter {
 	}
 
 	class ViewHolder {
-		RoundImageView mCardIcon;
-		// ImageView mCardSayHi, mCardLike, mCardSex;
-		// ImageView mCardHeadPic;
+		AutoSizeImageView mCardIcon;
+		LinearLayout llSexAgeLocation;
 		ImageView mCardUserType;
 		ImageView ivRealNameOrNickName;
 		TextView mCardName;
@@ -209,5 +330,29 @@ public class CardAdapter extends BaseAdapter {
 		TextView tvLikeCount;
 		TextView tvWealth;
 		LinearLayout llTalkToStranger;
+		// MainIvBCIvRelativeLayout relMbc;// 用来显示主图片以及底部居中图片
+	}
+
+	@Override
+	public void onCommomPromtClick(View view) {
+		NearbyStrangerInfo strangerInfo = (NearbyStrangerInfo) mCommomPromptDialog.getObject();
+		switch (mCommomPromptDialog.getEnter()) {
+		case CommomPromptDialogFragment.STRANGER:
+			Intent intent = new Intent(mActivity, ChatActivity_.class);
+			LaunchChatEntity entity = new LaunchChatEntity(strangerInfo.getDwID(), strangerInfo.getName(),
+					Float.valueOf(strangerInfo.getWorth()), DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_STRANGER,
+					Integer.valueOf(strangerInfo.getUserType()));
+			intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity);
+			mContext.startActivity(intent);
+			break;
+		case CommomPromptDialogFragment.FRIEND:
+			intent = new Intent(mActivity, ChatActivity_.class);
+			LaunchChatEntity entity1 = new LaunchChatEntity(strangerInfo.getDwID(), strangerInfo.getName(),
+					Float.valueOf(strangerInfo.getWorth()), DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_FRIEND,
+					Integer.valueOf(strangerInfo.getUserType()));
+			intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity1);
+			mContext.startActivity(intent);
+			break;
+		}
 	}
 }

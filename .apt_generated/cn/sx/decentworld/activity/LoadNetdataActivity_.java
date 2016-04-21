@@ -15,7 +15,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.network.request.GetUserInfo_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class LoadNetdataActivity_
@@ -31,12 +30,10 @@ public final class LoadNetdataActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         tvLoadNetData = ((TextView) findViewById(id.tv_load_net_data));
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

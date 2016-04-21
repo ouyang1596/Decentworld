@@ -19,6 +19,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.ui.RechargeComponent_;
 import cn.sx.decentworld.widget.GridViewForScrollView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
@@ -35,26 +36,28 @@ public final class ExamineWelcomeActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        rechargeComponent = RechargeComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvSupport = ((TextView) findViewById(id.tv_support));
-        tvTryAgainBuy = ((TextView) findViewById(id.tv_try_again_buy));
-        sclView = ((ScrollView) findViewById(id.sclView));
-        sbSupport = ((SeekBar) findViewById(id.sb_support));
-        sbNotReal = ((SeekBar) findViewById(id.sb_not_real));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        llCeshi = ((LinearLayout) findViewById(id.ll_ceshi));
-        gvSupporters = ((GridViewForScrollView) findViewById(id.gv_supporters));
-        sbDisLike = ((SeekBar) findViewById(id.sb_dislike));
-        tvFailureReason = ((TextView) findViewById(id.tv_failure_reason));
-        llGv = ((LinearLayout) findViewById(id.ll_gv));
-        tvComplain = ((TextView) findViewById(id.tv_complain));
         tvDislike = ((TextView) findViewById(id.tv_dislike));
-        viewMask = ((View) findViewById(id.view_mask));
-        tvNotReal = ((TextView) findViewById(id.tv_not_real));
-        llDoubtFinish = ((LinearLayout) findViewById(id.ll_doubt_finish));
+        sbDisLike = ((SeekBar) findViewById(id.sb_dislike));
         tvGoDoubt = ((TextView) findViewById(id.tv_go_doubt));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        llDoubtFinish = ((LinearLayout) findViewById(id.ll_doubt_finish));
+        gvSupporters = ((GridViewForScrollView) findViewById(id.gv_supporters));
+        tvFailureReason = ((TextView) findViewById(id.tv_failure_reason));
+        tvTryAgainBuy = ((TextView) findViewById(id.tv_try_again_buy));
+        tvComplain = ((TextView) findViewById(id.tv_complain));
+        viewMask = ((View) findViewById(id.view_mask));
+        llCeshi = ((LinearLayout) findViewById(id.ll_ceshi));
+        sclView = ((ScrollView) findViewById(id.sclView));
+        tvSupport = ((TextView) findViewById(id.tv_support));
+        llGv = ((LinearLayout) findViewById(id.ll_gv));
+        sbNotReal = ((SeekBar) findViewById(id.sb_not_real));
+        tvNotReal = ((TextView) findViewById(id.tv_not_real));
+        sbSupport = ((SeekBar) findViewById(id.sb_support));
+        ((RechargeComponent_) rechargeComponent).afterSetContentView_();
         init();
     }
 

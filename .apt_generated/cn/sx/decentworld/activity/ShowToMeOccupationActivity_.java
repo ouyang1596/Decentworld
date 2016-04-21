@@ -39,11 +39,11 @@ public final class ShowToMeOccupationActivity_
     }
 
     private void afterSetContentView_() {
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
         llShowToMeSchool = ((LinearLayout) findViewById(id.ll_show_to_me_occupation));
         tvCancel = ((TextView) findViewById(id.tv_cancel));
         ivBack = ((ImageView) findViewById(id.iv_back));
         lvOccupation = ((ListView) findViewById(id.lv_occupation));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
         etvOccupation = ((EditText) findViewById(id.etv_occupation));
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         init();

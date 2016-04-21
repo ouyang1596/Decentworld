@@ -1,0 +1,158 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.setting;
+
+import android.app.Fragment;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.manager.VersionInfoManager;
+import cn.sx.decentworld.utils.NetworkUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.utils.UpgradeVersion;
+
+/**
+ * 
+ * @ClassName: AboutUsFragment.java
+ * @Description: 关于我们
+ * @author: cj
+ * @date: 2016年3月14日 上午11:31:17
+ */
+public class AboutUsFragment extends Fragment implements OnClickListener
+{
+    private static final String TAG = "AboutUsFragment";
+    
+    /**
+     * 变量
+     */
+    // 显示软件版本号
+    private TextView tvVersionCode;
+    // 显示软件版本名
+    private TextView tvVersionName;
+    // 显示数据库的版本号
+    private TextView tvDatabaseVersionCode;
+    private TextView tvCheckNewVersion;
+    
+    private LinearLayout mVersionNameContainer;
+    private LinearLayout mVersionCodeContainer;
+    private LinearLayout mDBNameContainer;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        return inflater.inflate(R.layout.fragment_about_us, null);
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        initVar();
+        initData();
+    }
+
+    /**
+     * 初始化变量
+     */
+    private void initVar()
+    {
+        tvVersionCode = (TextView) getView().findViewById(R.id.tv_about_us_software_version_code);
+        tvVersionName = (TextView) getView().findViewById(R.id.tv_about_us_software_version_name);
+        tvDatabaseVersionCode = (TextView) getView().findViewById(R.id.tv_about_us_database_version_code);
+        tvCheckNewVersion = (TextView) getView().findViewById(R.id.tv_about_us_check_new_version);
+        tvCheckNewVersion.setOnClickListener(this);
+        
+        //设置隐藏
+        mVersionNameContainer = (LinearLayout) getView().findViewById(R.id.ll_versionName);
+        mVersionCodeContainer = (LinearLayout) getView().findViewById(R.id.ll_versionCode);
+        mDBNameContainer = (LinearLayout) getView().findViewById(R.id.ll_dbCode);
+        mVersionNameContainer.setOnLongClickListener(new OnLongClickListener()
+        {
+            
+            @Override
+            public boolean onLongClick(View v)
+            {
+                if(mVersionCodeContainer.getVisibility() == View.GONE)
+                {
+                    mVersionCodeContainer.setVisibility(View.VISIBLE);
+                }else
+                {
+                    mVersionCodeContainer.setVisibility(View.GONE);
+                }
+                if(mDBNameContainer.getVisibility() == View.GONE)
+                {
+                    mDBNameContainer.setVisibility(View.VISIBLE);
+                }else
+                {
+                    mDBNameContainer.setVisibility(View.GONE);
+                }
+                return true;
+            }
+        });
+        
+        
+    }
+
+    /**
+     * 初始化数据
+     */
+    private void initData()
+    {
+        checkSFVersionCode();
+        checkSFVersionName();
+        checkDBVersionCode();
+    }
+
+    /**
+     * 检查软件版本号
+     */
+    private void checkSFVersionCode()
+    {
+        tvVersionCode.setText("" + new VersionInfoManager(getActivity()).getAppVersionCode());
+    }
+
+    /**
+     * 检查软件版本名
+     */
+    private void checkSFVersionName()
+    {
+        tvVersionName.setText("v" + new VersionInfoManager(getActivity()).getAppVersionName());
+    }
+
+    /**
+     * 检查数据库的版本号
+     */
+    private void checkDBVersionCode()
+    {
+        int dbVersionCode = new VersionInfoManager(getActivity()).getApplicationIntMetaData("AA_DB_VERSION");
+        tvDatabaseVersionCode.setText(dbVersionCode + "");
+    }
+
+    /**
+     * 手动检查是否有新的版本
+     */
+    @Override
+    public void onClick(View v)
+    {
+        /** 如果有网，则进行网络升级检查 **/
+        if (NetworkUtils.isNetWorkConnected(getActivity()))
+        {
+            /**
+             * 检查是否满足更新的条件
+             */
+            new UpgradeVersion(getActivity() , true);
+        }
+        else
+        {
+            ToastUtil.showToast("请检查网络！");
+        }
+    }
+
+}

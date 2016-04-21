@@ -21,7 +21,6 @@ import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.KeyboardComponent_;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.network.request.GetUserInfo_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class LoginActivity_
@@ -37,22 +36,20 @@ public final class LoginActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        getUserInfo = GetUserInfo_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
         keyboardComponent = KeyboardComponent_.getInstance_(this);
+        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        etMobile = ((EditText) findViewById(id.et_mobile));
-        flLogin = ((LinearLayout) findViewById(id.fl_login));
-        etPassword = ((EditText) findViewById(id.et_password));
-        ivRegister = ((ImageView) findViewById(id.iv_register));
-        btnLogin = ((Button) findViewById(id.btn_login));
         tvCeshi = ((TextView) findViewById(id.tv_ceshi));
         ivForgetPwd = ((ImageView) findViewById(id.iv_forget_password));
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
+        etPassword = ((EditText) findViewById(id.et_password));
+        flLogin = ((LinearLayout) findViewById(id.fl_login));
+        etMobile = ((EditText) findViewById(id.et_mobile));
+        ivRegister = ((ImageView) findViewById(id.iv_register));
+        btnLogin = ((Button) findViewById(id.btn_login));
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

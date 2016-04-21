@@ -1,0 +1,5 @@
+1.用户收到被挤下线的XMPPMessage后，会调用ConnectionListener的connectionClosedOnError（）;
+2.将被挤下线的状态保存到UserInfoHelper的sp中，设置为true；
+3.立即将该消息路由到MainActivity中，然后显示被挤下线的对话框，当点击确定后，将该用户的被挤下线的状态设置为false；
+4.还有一种情况是，当出现被挤下线的对话框时，用户销毁了进程，那么用户再次打开软件的时候，在DefaultActivity中判断被挤下线的状态，同样弹出提示框，
+当用户点击确定后，将该用户的被挤下线的状态设置为false；

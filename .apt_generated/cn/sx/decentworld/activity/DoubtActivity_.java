@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.ui.RechargeComponent_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class DoubtActivity_
@@ -31,12 +32,14 @@ public final class DoubtActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        rechargeComponent = RechargeComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         llDoubt = ((LinearLayout) findViewById(id.ll_doubt));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         llWan = ((LinearLayout) findViewById(id.ll_wan));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        ((RechargeComponent_) rechargeComponent).afterSetContentView_();
         init();
     }
 

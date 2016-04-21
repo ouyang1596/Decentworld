@@ -1,0 +1,387 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.network.request;
+
+import java.io.File;
+import java.util.HashMap;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+import cn.sx.decentworld.activity.ChatRoomMeActivity;
+import cn.sx.decentworld.activity.ChatRoomPayActivity;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EBean;
+import com.googlecode.androidannotations.annotations.RootContext;
+
+/**
+ * @ClassName: SetFriendInfo.java
+ * @Description: 获取朋友相关信息 1. 获取联系人列表 2.
+ * @author: cj
+ * @date: 2015年9月25日 上午10:30:58
+ */
+@EBean
+public class ChatRoomInfoSettingAndGetting {
+	private static String TAG = "ChatRoomInfoSettingAndGetting";
+	@RootContext
+	Context context;
+	@RootContext
+	Activity activity;
+	@Bean
+	ToastComponent toast;
+	private SendUrl sendUrl;
+
+	@AfterViews
+	void init() {
+		sendUrl = new SendUrl(context);
+	}
+
+	/**
+	 * 获得自己聊天室列表
+	 */
+	public void getChatRooms(HashMap map, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + Constants.API_GET_MY_ROOMS, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "getChatRooms===>" + "ResultCode-->" + msg.getResultCode() + "--Data-->"
+								+ msg.getData().toString() + "--Msg-->" + msg.getMsg());
+						hideProgressDialog();
+						if (msg.getResultCode() == 2222)// 获取成功
+						{
+							Message message = handler.obtainMessage();
+							message.what = ChatRoomMeActivity.GET_CHATROOMS;
+							message.obj = msg.getData().toString();
+							handler.sendMessage(message);
+						} else {
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.e(TAG, "getChatRooms===>" + "e-->" + e);
+						hideProgressDialog();
+						showToast("failure");
+					}
+				});
+	}
+
+	/**
+	 * 创建聊天室主题
+	 */
+	public void createSubject(HashMap map, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + Constants.API_CREATE_SUBJECT, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "createSubject===>" + "ResultCode-->" + msg.getResultCode() + "--Data-->"
+								+ msg.getData().toString() + "--Msg-->" + msg.getMsg());
+						hideProgressDialog();
+						if (msg.getResultCode() == 2222)// 获取成功
+						{
+							showToast("succ");
+						} else {
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.e(TAG, "createSubject===>" + "e-->" + e);
+						hideProgressDialog();
+						showToast("failure");
+					}
+
+				});
+	}
+
+	/**
+	 * 创建聊天室
+	 */
+	public void createChatRoom(HashMap map, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + Constants.API_CREATE_CHATROOM, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "createChatRoom===>" + "ResultCode-->" + msg.getResultCode() + "--Data-->"
+								+ msg.getData().toString() + "--Msg-->" + msg.getMsg());
+						hideProgressDialog();
+						if (msg.getResultCode() == 2222)// 获取成功
+						{
+							Message message = handler.obtainMessage();
+							message.what = ChatRoomPayActivity.CREATE_CHATROOM;
+							message.obj = msg.getData().toString();
+							handler.sendMessage(message);
+						} else {
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						hideProgressDialog();
+						showToast("failure");
+						LogUtils.e(TAG, "createChatRoom===>" + "e-->" + e);
+					}
+				});
+	}
+
+	/**
+	 * 设置聊天室主人简介
+	 */
+	public void setOwnerProfile(HashMap map, final Handler hadnler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + Constants.API_SET_OWNER_PROFILE, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "setOwnerProfile===>" + "ResultCode-->" + msg.getResultCode() + "--Data-->"
+								+ msg.getData().toString() + "--Msg-->" + msg.getMsg());
+						hideProgressDialog();
+						if (msg.getResultCode() == 2222)// 获取成功
+						{
+							showToast("succ");
+						} else {
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						hideProgressDialog();
+						LogUtils.e(TAG, "createChatRoom===>" + "e-->" + e);
+						showToast("failure");
+					}
+				});
+	}
+
+	/**
+	 * 获取该聊天室当前主题详细信息
+	 */
+	public void getCurrentSubject(HashMap map, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + Constants.API_GET_CURRENT_SUBJECT, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "getCurrentSubject===>" + "ResultCode-->" + msg.getResultCode() + "--Data-->"
+								+ msg.getData().toString() + "--Msg-->" + msg.getMsg());
+						hideProgressDialog();
+						if (msg.getResultCode() == 2222)// 获取成功
+						{
+							LogUtils.i("bm", "--getCurrentSubject--" + msg.getData().toString());
+							showToast("succ");
+							Message message = handler.obtainMessage();
+							message.obj = msg.getData().toString();
+							handler.sendMessage(message);
+						} else {
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						hideProgressDialog();
+						showToast("failure");
+						LogUtils.e(TAG, "getCurrentSubject===>" + "e-->" + e);
+					}
+				});
+	}
+
+	/**
+	 * 设置费用
+	 */
+	public void setChargeAmount(HashMap map, final Handler handler) {
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + Constants.API_SET_CHARGE_AMOUNT, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "setChargeAmount===>" + "ResultCode-->" + msg.getResultCode() + "--Data-->"
+								+ msg.getData().toString() + "--Msg-->" + msg.getMsg());
+						if (msg.getResultCode() == 2222)// 获取成功
+						{
+							showToast("setChargeAmount_SUCC");
+							handler.sendEmptyMessage(2222);
+						} else {
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToast("failure");
+						LogUtils.e(TAG, "setChargeAmount===>" + "e-->" + e);
+					}
+				});
+	}
+
+	/**
+	 * 获取该聊天室主题列表信息
+	 */
+	public void getSubjectList(HashMap map, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + Constants.API_GET_SUBJECT_LIST, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "getSubjectList===>" + "ResultCode-->" + msg.getResultCode() + "--Data-->"
+								+ msg.getData().toString() + "--Msg-->" + msg.getMsg());
+						hideProgressDialog();
+						if (msg.getResultCode() == 2222)// 获取成功
+						{
+							Message message = handler.obtainMessage();
+							message.obj = msg.getData().toString();
+							handler.sendMessage(message);
+						} else {
+							showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.e(TAG, "getSubjectList===>" + "e-->" + e);
+						hideProgressDialog();
+						showToast("failure");
+					}
+				});
+	}
+
+	/**
+	 * 获取该聊天室主题列表信息
+	 */
+	public void getOwnerInfo(HashMap map, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + Constants.API_GET_OWNER_INFO, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "getOwnerInfo===>" + "ResultCode-->" + msg.getResultCode() + "--Data-->"
+								+ msg.getData().toString() + "--Msg-->" + msg.getMsg());
+						hideProgressDialog();
+						Message message = handler.obtainMessage();
+						if (msg.getResultCode() == 2222)// 获取成功
+						{
+							message.obj = msg.getData().toString();
+						} else {
+							showToast(msg.getMsg());
+						}
+						message.what = msg.getResultCode();
+						handler.sendMessage(message);
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.e(TAG, "getOwnerInfo===>" + "e-->" + e);
+						hideProgressDialog();
+						showToast("failure");
+					}
+				});
+	}
+
+	public void deleteSubject(HashMap<String, String> map, String api, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + api, Method.POST, new HttpCallBack() {
+
+			@Override
+			public void onSuccess(String resultJSON, ResultBean resultBean) {
+				LogUtils.i(TAG, "deleteSubject===>" + "ResultCode-->" + resultBean.getResultCode() + "--Data-->"
+						+ resultBean.getData().toString() + "--Msg-->" + resultBean.getMsg());
+				hideProgressDialog();
+				if (resultBean.getResultCode() == 2222) {
+					showToast("succ");
+					handler.sendEmptyMessage(2222);
+				} else {
+					showToast("失败");
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				LogUtils.e(TAG, "deleteSubject===>" + "e-->" + e);
+				hideProgressDialog();
+				showToast(Constants.NET_WRONG);
+			}
+		});
+	}
+
+	public void submitImageWithParams(HashMap<String, String> hashmap, File[] images, String api, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithImage(hashmap, images, Constants.CONTEXTPATH_OPENFIRE + api, new HttpCallBack() {
+
+			@Override
+			public void onSuccess(String response, ResultBean resultBean) {
+				LogUtils.i(TAG, "submitImageWithParams===>" + "ResultCode-->" + resultBean.getResultCode() + "--Data-->"
+						+ resultBean.getData().toString() + "--Msg-->" + resultBean.getMsg());
+				hideProgressDialog();
+				if (resultBean.getResultCode() == 2222) {
+					showToast("succ");
+					Message mesg = handler.obtainMessage();
+					mesg.what = 2222;
+					mesg.obj = resultBean.getData().toString();
+					handler.sendMessage(mesg);
+				} else {
+					showToast(resultBean.getMsg());
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				LogUtils.e(TAG, "deleteSubject===>" + "e-->" + e);
+				hideProgressDialog();
+				showToast("failure");
+			}
+		});
+	}
+
+	private ProgressDialog mProDialog;
+
+	private void showProgressDialog() {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (null == mProDialog) {
+					mProDialog = ProgressDialog.show(context, null, "loading");
+				} else {
+					mProDialog.show();
+				}
+			}
+		});
+	}
+
+	private void hideProgressDialog() {
+		activity.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (null != mProDialog) {
+					mProDialog.hide();
+				}
+			}
+		});
+	}
+
+	private void showToast(final String data) {
+		activity.runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				toast.show(data);
+			}
+		});
+	}
+}

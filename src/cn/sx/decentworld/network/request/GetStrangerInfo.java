@@ -3,7 +3,6 @@
  */
 package cn.sx.decentworld.network.request;
 
-import java.io.File;
 import java.util.HashMap;
 
 import android.app.Activity;
@@ -12,12 +11,15 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import cn.sx.decentworld.activity.NearCardDetail2Activity;
+import cn.sx.decentworld.common.ConstantNet;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.fragment.index.StrangerFragment;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.SendUrl.HttpCallBack;
 import cn.sx.decentworld.network.entity.ResultBean;
-import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
 
 import com.android.volley.Request.Method;
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -39,8 +41,6 @@ public class GetStrangerInfo {
 	Context context;
 	@RootContext
 	Activity activity;
-	@Bean
-	ToastComponent toast;
 	private SendUrl sendUrl;
 
 	@AfterViews
@@ -51,17 +51,17 @@ public class GetStrangerInfo {
 	/**
 	 * 1. 获取附近的人的列表
 	 */
-	public void getNearStrangerInfo(HashMap<String, String> map, final Handler handler) {
+	public void getNearStrangerList(HashMap<String, String> map, final Handler handler) {
 		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + Constants.API_GET_NEARBY_STRANGER, Method.GET,
 				new HttpCallBack() {
 
 					@Override
 					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.d(TAG, "getNearStrangerList---" + msg.toString());
+						StrangerFragment.isRequesting = false;
 						if (msg.getResultCode() == 2222) {
 							Message message = handler.obtainMessage();
 							message.obj = msg.getData().toString();
-
-							LogUtils.i("bm", "----data-----" + msg.getData().toString());
 							message.what = msg.getResultCode();
 							handler.sendMessage(message);
 						}
@@ -72,6 +72,8 @@ public class GetStrangerInfo {
 
 					@Override
 					public void onFailure(String e) {
+						LogUtils.e(TAG, "getNearStrangerList---error---" + e);
+						StrangerFragment.isRequesting = false;
 						showToast(Constants.NET_WRONG);
 						handler.sendEmptyMessage(Constants.FAILURE);
 					}
@@ -84,6 +86,7 @@ public class GetStrangerInfo {
 
 					@Override
 					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.d(TAG, "showToMe---" + msg.toString());
 						if (msg.getResultCode() == 2222) {
 							Message message = Message.obtain();
 							message.obj = msg.getData().toString();
@@ -93,7 +96,8 @@ public class GetStrangerInfo {
 
 					@Override
 					public void onFailure(String e) {
-						showToast(Constants.NET_WRONG + e);
+						showToast(Constants.NET_WRONG);
+						LogUtils.e(TAG, "showToMe---error---" + e);
 					}
 				});
 	}
@@ -103,6 +107,7 @@ public class GetStrangerInfo {
 
 			@Override
 			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.d(TAG, "likeStranger---" + msg.toString());
 				if (msg.getResultCode() == 6000) {
 					Message message = Message.obtain();
 					message.what = msg.getResultCode();
@@ -119,7 +124,8 @@ public class GetStrangerInfo {
 
 			@Override
 			public void onFailure(String e) {
-				showToast(Constants.NET_WRONG + e);
+				showToast(Constants.NET_WRONG);
+				LogUtils.e(TAG, "likeStranger---error---" + e);
 			}
 		});
 	}
@@ -129,12 +135,11 @@ public class GetStrangerInfo {
 				new HttpCallBack() {
 					@Override
 					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.d(TAG, "dislikeStranger---" + msg.toString());
 						if (msg.getResultCode() == 6000) {
 							Message message = Message.obtain();
 							message.obj = msg.getData().toString();
 							handler.sendMessage(message);
-							// LogUtils.i("bm", "like" +
-							// msg.getData().toString());
 						} else {
 							showToast(msg.getMsg());
 						}
@@ -142,9 +147,8 @@ public class GetStrangerInfo {
 
 					@Override
 					public void onFailure(String e) {
+						LogUtils.e(TAG, "dislikeStranger---error---" + e);
 						showToast(Constants.NET_WRONG);
-						// LogUtils.i("bm",
-						// "getNearStrangerInfo...failure,cause by:" + e);
 					}
 				});
 	}
@@ -154,8 +158,15 @@ public class GetStrangerInfo {
 
 			@Override
 			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.d(TAG, "getNearStrangerDetailInfo---" + msg.toString());
 				if (msg.getResultCode() == 2222) {
 					Message message = Message.obtain();
+					message.what = 2222;
+					message.obj = msg.getData().toString();
+					handler.sendMessage(message);
+				} else if (msg.getResultCode() == 3333) {
+					Message message = Message.obtain();
+					message.what = 3333;
 					message.obj = msg.getData().toString();
 					handler.sendMessage(message);
 				} else {
@@ -165,6 +176,33 @@ public class GetStrangerInfo {
 
 			@Override
 			public void onFailure(String e) {
+				showToast(Constants.NET_WRONG);
+				LogUtils.e(TAG, "getNearStrangerDetailInfo---error---" + e);
+			}
+		});
+	}
+
+	public void getHistoryWorth(HashMap<String, String> map, final Handler handler) {
+		showProgressDialog();
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_HISTORY_WORTH, Method.GET, new HttpCallBack() {
+
+			@Override
+			public void onSuccess(String resultJSON, ResultBean resultBean) {
+				LogUtils.d(TAG, "getHistoryWorth---" + resultBean.toString());
+				hideProgressDialog();
+				if (resultBean.getResultCode() == 2222) {
+					Message message = handler.obtainMessage();
+					message.obj = resultBean.getData();
+					handler.sendMessage(message);
+				} else {
+					showToast(resultBean.getMsg());
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				LogUtils.e(TAG, "getHistoryWorth---error---" + e);
+				hideProgressDialog();
 				showToast(Constants.NET_WRONG);
 			}
 		});
@@ -208,6 +246,7 @@ public class GetStrangerInfo {
 				message.obj = msg.getData().toString();
 				message.what = NearCardDetail2Activity.GET_ANONYMOUSINFO;
 				handler.sendMessage(message);
+
 			}
 
 			@Override
@@ -252,7 +291,7 @@ public class GetStrangerInfo {
 
 			@Override
 			public void run() {
-				toast.show(netWrong);
+				ToastUtil.showToast(netWrong);
 			}
 		});
 	}

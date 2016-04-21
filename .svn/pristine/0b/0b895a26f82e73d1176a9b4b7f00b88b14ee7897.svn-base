@@ -1,0 +1,554 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.utils;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.zip.ZipOutputStream;
+
+import org.jivesoftware.smack.ReconnectionManager;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.util.Log;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.CrashHandler;
+import cn.sx.decentworld.common.FileName;
+import cn.sx.decentworld.common.FilePath;
+
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
+
+/**
+ * @ClassName: LogRecord.java
+ * @Description: 记录打印的日志，并定期上传到服务器；
+ * @author: cj
+ * @date: 2016年3月1日 上午9:57:45
+ */
+public class LogRecord
+{
+    /**
+     * 变量
+     */
+    public static final String TAG = "LogRecord";
+    private static Object INSTANCE_LOCK = new Object();
+    private static LogRecord instance = null;
+    // 存储Log信息
+    private HashMap<String, String> logMap = new HashMap<String, String>();
+
+    /**
+     * Log类型
+     */
+    // 普通
+    public static final int LOG_TYPE_GENERAL = 0;
+    // 异常
+    public static final int LOG_TYPE_EXCEPTION = 1;
+    private String[] logType = new String[]
+    { "Gkey", "Ekey" };
+
+    private Context context;
+    public static final String FILE_EXT = ".properties";
+    // 设备ID
+    private String IMEI = "000000";
+
+    /**
+     * 私有构造函数，防止在外部产生多个对象
+     */
+    private LogRecord()
+    {
+
+    }
+
+    // ///////////////////////////////////////////////////初始化类
+
+    /**
+     * 获取实例
+     * 
+     * @return
+     */
+    public static LogRecord getInstance()
+    {
+        if (instance == null)
+        {
+            synchronized (INSTANCE_LOCK)
+            {
+                if (instance == null)
+                    instance = new LogRecord();
+            }
+        }
+        return instance;
+    }
+
+    // ///////////////////////////////////////////////////清理数据
+
+    /**
+     * 清除内存中的Log（暂时没实现）
+     */
+    private void clearMemoryLog()
+    {
+        // 暂时没用
+        //
+        logMap.clear();
+    }
+
+    /**
+     * 清除文件中的Log
+     */
+    public void clearDiskLog()
+    {
+        SharedPreferences sp = DecentWorldApp.getGlobalContext().getSharedPreferences(FileName.SP_LOGRECORD_XML, 0);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.clear();
+        editor.commit();
+    }
+
+    // ///////////////////////////////////////////////////保存收集到的数据到Sp.xml文件中
+
+    /**
+     * 保存普通的Log信息,目前只支持英文，中文可能出现乱码
+     */
+    public void saveGeneralLog(String key, String value)
+    {
+        String[] result = handlerParams(key, value, LOG_TYPE_GENERAL);
+        savaLog2Sp(result[0], result[1]);
+    }
+
+    /**
+     * 保存可能产生异常的Log信息
+     */
+    public void saveExceptionLog(String key, String value)
+    {
+        String[] result = handlerParams(key, value, LOG_TYPE_EXCEPTION);
+        savaLog2Sp(result[0], result[1]);
+    }
+
+    /**
+     * 处理参数
+     */
+    private String[] handlerParams(String key, String value, int type)
+    {
+        String[] result = new String[2];
+        if (CommUtil.isBlank(key))
+        {
+            key = TimeUtils.getDateAllMessage() + " " + key;
+            key = logType[type];
+        }
+        else
+        {
+            key = TimeUtils.getDateAllMessage() + " " + key;
+            key = logType[type].charAt(0) + key;
+        }
+        result[0] = key;
+
+        if (CommUtil.isBlank(value))
+        {
+            value = "null";
+        }
+        else
+        {
+            value = value;
+        }
+        result[1] = value;
+        return result;
+    }
+
+    /**
+     * 将收集的Log信息保存到sp.xml文件中
+     * 
+     * @param key
+     * @param value
+     */
+    private void savaLog2Sp(String key, String value)
+    {
+        SharedPreferences sp = DecentWorldApp.getGlobalContext().getSharedPreferences(FileName.SP_LOGRECORD_XML, 0);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(key, value);
+        editor.commit();
+    }
+
+    // ///////////////////////////////////////////////////从Sp.xml文件中读取数据
+
+    /**
+     * 将sp.xml中的数据转化成Map
+     * 
+     * @return
+     */
+    public Map<String, String> getLogSp2Map()
+    {
+        SharedPreferences sp = SPUtils.getSharedPreferences(FileName.SP_LOGRECORD_XML);
+        Map<String, String> all = (Map<String, String>) sp.getAll();
+        return all;
+    }
+
+    /**
+     * 将sp.xml中的数据转化成Map
+     * 
+     * @return
+     */
+    public String getLogSp2String()
+    {
+        SharedPreferences sp = SPUtils.getSharedPreferences(FileName.SP_LOGRECORD_XML);
+        Map<String, String> all = (Map<String, String>) sp.getAll();
+        StringBuffer sb = new StringBuffer();
+        if (all != null && all.size() > 0)
+        {
+            // 将信息保存在sb中
+            for (Entry<String, String> s : all.entrySet())
+            {
+                String tKey = s.getKey();
+                String tValue = s.getValue();
+                sb.append(tKey).append('=').append(tValue).append('\n');
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * 收集设备参数信息保存到map中
+     * 
+     * @param context
+     */
+    private void collectDeviceInfo(HashMap<String, String> map)
+    {
+        // 获取上下文
+        Context context = DecentWorldApp.getInstance().getApplicationContext();
+        // 设定所需的信息字段
+        String saveMsg = "FINGERPRINT,HARDWARE,BOARD,PRODUCT,DISPLAY,DEVICE," + "TAGS,MODEL,BOOTLOADER,CPU_ABI,CPU_ABI2,IS_DEBUGGABLE," + "ID,SERIAL,MANUFACTURER,BRAND,TYPE";
+        // 将设备信息加入到map中
+        try
+        {
+            PackageManager pm = context.getPackageManager();
+            PackageInfo pi = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_ACTIVITIES);
+            if (pi != null)
+            {
+                String versionName = pi.versionName == null ? "null" : pi.versionName;
+                String versionCode = pi.versionCode + "";
+                map.put("versionname", versionName);
+                map.put("versioncode", versionCode);
+                map.put("android_version", android.os.Build.VERSION.RELEASE);
+                map.put("package", pi.packageName);
+                map.put("time", TimeUtils.getDateAllMessage());
+            }
+        }
+        catch (PackageManager.NameNotFoundException e)
+        {
+            Log.e(TAG, "an error occured when collect package info", e);
+        }
+        // 设备的其它信息
+        Field[] fields = Build.class.getDeclaredFields();
+        for (Field field : fields)
+        {
+            try
+            {
+                field.setAccessible(true);
+                String name = field.getName();
+                if (!saveMsg.contains(name))
+                {
+                    continue;
+                }
+                String lowName = name.toLowerCase();
+                map.put(lowName, field.get(null).toString());
+                Log.d(TAG, field.getName() + " : " + field.get(null));
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "an error occured when collect crash info", e);
+            }
+        }
+    }
+
+    /**
+     * 保存错误信息到文件中
+     *
+     * @param map
+     * @return 返回文件名称, 便于将文件传送到服务器
+     */
+    private String saveLogInfo2File(HashMap<String, String> map)
+    {
+        StringBuffer sb = new StringBuffer();
+        // 将设备信息写到sb中
+        for (Map.Entry<String, String> entry : map.entrySet())
+        {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            sb.append(key).append('=').append(value).append('\n');
+        }
+
+        // 将收集的信息写到sb中
+        String logInfo = getLogSp2String();
+        if (CommUtil.isBlank(logInfo))
+        {
+            logInfo = "null";
+        }
+        // 其中exception字段的值回车符用了三个竖线（|||）隔开,服务器需要在保存时转回来。
+        String result = logInfo.replaceAll("\\r?\\n", "|||");
+        sb.append("exception=").append("logInfo" + result).append('\n');
+
+        // 将日志信息写到文件中
+        FileOutputStream fos = null;
+        String fileName = System.currentTimeMillis() + FILE_EXT;
+        try
+        {
+            File dir = new File(FilePath.HOME_LOG_REPORT);
+            if (!dir.exists())
+            {
+                dir.mkdirs();
+            }
+            fos = new FileOutputStream(FilePath.HOME_LOG_REPORT + fileName);
+            fos.write(sb.toString().getBytes("UTF-8"));
+            return fileName;
+        }
+        catch (FileNotFoundException ef)
+        {
+            Log.w(TAG, "Could not find files: " + FilePath.HOME_LOG_REPORT + fileName);
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "an error occured while writing file...", e);
+        }
+        finally
+        {
+            if (fos != null)
+            {
+                try
+                {
+                    fos.close();
+                }
+                catch (IOException e)
+                {
+                    // 关闭文件异常
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 提交日志报告到服务器
+     */
+    public void sendLogReport()
+    {
+        // 清理logMap中的信息
+        clearMemoryLog();
+        // 收集设备参数信息
+        collectDeviceInfo(logMap);
+        // 保存文件并返回文件名，包括扩展名： ***.properties
+        String error_msg = saveLogInfo2File(logMap);
+        if (CommUtil.isBlank(error_msg))
+            return;
+        // 提取文件名
+        String fileName = error_msg;
+        if (fileName.endsWith(CrashHandler.FILE_EXT))
+        {
+            fileName = fileName.substring(0, fileName.length() - CrashHandler.FILE_EXT.length());
+        }
+
+        File newFile = new File(FilePath.HOME_LOG_REPORT + IMEI + "_" + error_msg);
+        File oldFile = new File(FilePath.HOME_LOG_REPORT + error_msg);
+        File zipFile = new File(FilePath.HOME_LOG_REPORT + IMEI + "_" + fileName + ".zip");
+        if (!oldFile.exists())
+        {
+            Log.d("TAG", "异常捕获存储目录不存在");
+            return;
+        }
+
+        // 文件名添加IMEI信息,
+        boolean renameTo = oldFile.renameTo(newFile);
+        BufferedWriter attachWriter = null;
+        try
+        {
+            attachWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newFile , true) , "utf-8"));
+            attachWriter.write("imei=" + IMEI + "\r\n");
+            attachWriter.write("time=" + fileName + "\r\n");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (attachWriter != null)
+            {
+                try
+                {
+                    attachWriter.close();
+                }
+                catch (IOException e)
+                {
+                    //
+                }
+            }
+        }
+        if (renameTo)
+        {
+            // 压缩文件
+            try
+            {
+                FileUtils.zipFile(newFile, new ZipOutputStream(new FileOutputStream(zipFile)), null);
+                // 发送数据
+                Log.d("TAG", "异常捕获存_发送数据");
+                submitExFile(zipFile);
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 发送日志数据
+     */
+    private void submitExFile(File file)
+    {
+        String dwID = DecentWorldApp.getInstance().getDwID();
+        RequestParams mParams = new RequestParams();
+        mParams.addBodyParameter("file", file);
+        mParams.addBodyParameter("dwID", dwID);
+        LogUtils.i(TAG, "异常捕获—开始上传,filePath=" + file.getAbsolutePath() + ",dwID=" + dwID);
+
+        HttpUtils mHttp = new HttpUtils(60 * 1000);
+        String url = Constants.CONTEXTPATH + ConstantNet.API_LOG_REPORT_UPLOAD;
+        mHttp.send(HttpRequest.HttpMethod.POST, url, mParams, new RequestCallBack<String>()
+        {
+            @Override
+            public void onStart()
+            {
+                LogUtils.e(TAG, "开始上传日志报告");
+            }
+
+            @Override
+            public void onLoading(long total, long current, boolean isUploading)
+            {
+                if (isUploading)
+                {
+                    LogUtils.e(TAG, "开始上传日志报告--" + current + "/" + total);
+                }
+            }
+
+            @Override
+            public void onSuccess(ResponseInfo<String> responseInfo)
+            {
+                uploadLogReportState(true);
+            }
+
+            @Override
+            public void onFailure(HttpException error, String msg)
+            {
+                uploadLogReportState(false);
+            }
+        });
+    }
+
+    /**
+     * @param flag
+     *            标记是否上传了错误日志,如果上传了，那么删掉原来的文件
+     */
+    private void uploadLogReportState(boolean flag)
+    {
+        SharedPreferences mSharedPreferences = SPUtils.getSharedPreferences(FileName.SP_APP_INFO_XML);
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putBoolean("log_report_upload_state", flag);
+        editor.commit();
+        if (flag)
+        {
+            LogUtils.e(TAG, "Log报告上传成功");
+            FileUtils.deleteAllFile(FilePath.HOME_LOG_REPORT);
+            clearDiskLog();
+        }
+        else
+        {
+            LogUtils.e(TAG, "Log报告上传失败");
+        }
+    }
+
+    // ///////////////////////////////////获取一些重要参数的方法///////////////////////////
+
+    /**
+     * 获取当前重连的次数，当返回 -1 时表示重连线程没有启动；
+     * 
+     * @return
+     */
+    public int getReconnectCount()
+    {
+        boolean reconnectThreadIsAlive = false;
+        Thread ta[] = new Thread[Thread.activeCount()];
+        Thread.enumerate(ta);
+        for (Thread t : ta)
+        {
+            if (t != null && t.getName().equals("Smack Reconnection Manager"))
+            {
+                reconnectThreadIsAlive = true;
+                break;
+            }
+        }
+        int count = -1;
+        if (reconnectThreadIsAlive)
+        {
+            count = ReconnectionManager.logReconnectCount;
+        }
+        return count;
+    }
+
+    
+    /////////////////////////////////////////发送错误报告///////////////////////////////////////////
+    /**
+     * 当发送消息出错时提交错误报告
+     */
+    public void sendReportWhenError()
+    {
+        //为该报告做标记
+        LogRecord.getInstance().saveGeneralLog("sendReportWhenError", "sendReportWhenError");
+        // 提交日志报告
+        LogRecord.getInstance().sendLogReport();
+    }
+
+    /**
+     * 手动连接时发送错误报告
+     */
+    public void sendReportWhenManualConn()
+    {
+        // 记录目前运行的所有进程
+        Map<String, String> threadInfo = ThreadUtils.getThreadInfo();
+        for (Entry<String, String> entry : threadInfo.entrySet())
+        {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            LogRecord.getInstance().saveGeneralLog(key, value);
+        }
+        // 记录重连的次数
+        int reconnectCount = LogRecord.getInstance().getReconnectCount();
+        if (reconnectCount != -1)
+        {
+            LogRecord.getInstance().saveGeneralLog("reconnectCount", reconnectCount + "");
+        }
+        else
+        {
+            LogRecord.getInstance().saveGeneralLog("reconnectCount", "0");
+        }
+        //为该报告做标记
+        LogRecord.getInstance().saveGeneralLog("conn", "sendReportWhenManualConn");
+        // 提交日志报告
+        LogRecord.getInstance().sendLogReport();
+    }
+
+}

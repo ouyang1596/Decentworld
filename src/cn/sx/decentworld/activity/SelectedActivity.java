@@ -22,7 +22,7 @@ import cn.sx.decentworld.bean.ChoiceInfo;
 import cn.sx.decentworld.bean.SelectInfo;
 import cn.sx.decentworld.common.CommUtil;
 import cn.sx.decentworld.common.Constants;
-import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.widget.ListViewForScrollView;
 import cn.sx.decentworld.widget.RangeSeekBar;
 import cn.sx.decentworld.widget.RangeSeekBar.OnRangeSeekBarChangeListener;
@@ -49,35 +49,17 @@ OnRangeSeekBarChangeListener<Integer>, OnSingleSeekBarChangeListener<Integer> {
 	LinearLayout llGirl;
 	@ViewById(R.id.tv_money)
 	TextView tvMoney;
-	// @ViewById(R.id.tv_age)
-	// TextView tvAge;
-	// @ViewById(R.id.tv_distance)
-	// TextView tvDistacne;
-	// @ViewById(R.id.sb_money)
-	// SeekBar sbMoney;
 	@ViewById(R.id.tv_age_scope)
 	TextView tvAgeScope;
 	@ViewById(R.id.tv_distance_scope)
 	TextView tvDistanceScope;
 	@ViewById(R.id.tv_worth_scope)
 	TextView tvWorthScope;
-	// @ViewById(R.id.sb_age)
-	// SeekBar sbAge;
-	// @ViewById(R.id.sb_distance)
-	// SeekBar sbDistance;
 	LinearLayout llReligion;
 	@ViewById(R.id.btn_OK)
 	Button btnOk;
 	@ViewById(R.id.lv_select)
 	ListViewForScrollView lvSelect;
-	// @ViewById(R.id.ll_ageJudge)
-	// LinearLayout llAgeJudge;
-	// @ViewById(R.id.ll_worthJudge)
-	// LinearLayout llWorthJudge;
-	// @ViewById(R.id.tv_ageJudge)
-	// TextView tvAgejudge;
-	// @ViewById(R.id.tv_worthJudge)
-	// TextView tvWorthJudge;
 	@ViewById(R.id.ll_container_age)
 	LinearLayout llContainerAge;
 	@ViewById(R.id.ll_container_distance)
@@ -89,9 +71,6 @@ OnRangeSeekBarChangeListener<Integer>, OnSingleSeekBarChangeListener<Integer> {
 	private static final int OTHER = 2;
 	public static final String NAME = "name";
 	public static final String VALUE = "value";
-	// private int ageCount;
-	// private int moneyCount;
-	// private int distanceCount;
 	private String sex;
 	private boolean boyFlag;
 	private boolean girlFlag;
@@ -339,38 +318,12 @@ OnRangeSeekBarChangeListener<Integer>, OnSingleSeekBarChangeListener<Integer> {
 	@Override
 	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 		switch (seekBar.getId()) {
-		// case R.id.sb_age:
-		// if (progress < 1) {
-		// progress = 1;
-		// }
-		// setAge(progress);
-		// ageCount = progress;
-		// break;
-		// case R.id.sb_money:
-		// if (progress < 1) {
-		// progress = 1;
-		// }
-		// setMoney(progress);
-		// moneyCount = progress;
-		// break;
-		// case R.id.sb_distance:
-		// setDistance(progress);
-		// distanceCount = progress;
-		// break;
 		}
 	}
-
-	// public void setDistance(int progress) {
-	// tvDistacne.setText(progress + "KM");
-	// }
 
 	public void setMoney(int progress) {
 		tvMoney.setText("¥" + progress);
 	}
-
-	// public void setAge(int progress) {
-	// tvAge.setText(progress + "岁");
-	// }
 
 	class SelectAdapter extends BaseAdapter {
 
@@ -441,27 +394,6 @@ OnRangeSeekBarChangeListener<Integer>, OnSingleSeekBarChangeListener<Integer> {
 		}
 	}
 
-	// @Override
-	// public void onClick(View view) {
-	// switch (view.getId()) {
-	// case R.id.ll_ageJudge:
-	// String ageJudge = tvAgejudge.getText().toString();
-	// if ("0".equals(ageJudge)) {
-	// tvAgejudge.setText("1");
-	// } else {
-	// tvAgejudge.setText("0");
-	// }
-	// break;
-	// case R.id.ll_worthJudge:
-	// String worthJudge = tvWorthJudge.getText().toString();
-	// if ("0".equals(worthJudge)) {
-	// tvWorthJudge.setText("1");
-	// } else {
-	// tvWorthJudge.setText("0");
-	// }
-	// break;
-	// }
-	// }
 
 	private int worthMaxValue, worthMinValue, ageMinValue, ageMaxValue, distanceMaxValue;
 

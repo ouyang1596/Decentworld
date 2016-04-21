@@ -1,0 +1,572 @@
+package cn.sx.decentworld.fragment;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
+import android.widget.EditText;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.discover.MomentActivity;
+import cn.sx.decentworld.activity.discover.WorksCircleActivity;
+import cn.sx.decentworld.adapter.GridViewFriendsCircleAdapter;
+import cn.sx.decentworld.adapter.GridViewFriendsCircleAdapter.OnImageItemSizeListener;
+import cn.sx.decentworld.bean.DWException.OnExceptionListener;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.MediaManager;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.widget.RecorderButton;
+import cn.sx.decentworld.widget.RecorderButton.AudioFinishedRecordeListener;
+import cn.sx.decentworld.widget.SideBar;
+import cn.sx.decentworld.widget.SideBar.OnChooseChangeListener;
+
+import com.nui.multiphotopicker.model.ImageItem;
+import com.nui.multiphotopicker.util.CustomConstants;
+import com.nui.multiphotopicker.util.IntentConstants;
+import com.nui.multiphotopicker.view.PopupWindows;
+
+public class PublishFragment extends Fragment implements OnClickListener, AudioFinishedRecordeListener, TextWatcher,
+		OnTouchListener, OnItemLongClickListener, OnImageItemSizeListener, OnChooseChangeListener, OnGlobalLayoutListener {
+	private GridView gv;// 展示选中的图片
+	private ImageView ivPic;
+	private TextView tvSend;
+	private RecorderButton rBtn;
+	private EditText etText;
+	private RelativeLayout relRoot;
+	private GridViewFriendsCircleAdapter mAdapter;
+	private PopupWindows mPopupWindows;
+	private SideBar mSideBar;
+	private ImageView ivPlayer;// 播放音频文件
+	private SeekBar mSbVoiceProgress;
+	private ImageView ivDeleteVoice;
+	private RelativeLayout relRootSend;
+	private LinearLayout llVoice;
+	RelativeLayout relSend;
+	private TextView tvTime;
+	private float mVoiceTime;
+	private ImageView ivVoiceCover;// 声音图片
+	private String mVoiceFilePath;// 声音文件路径
+	private List<ImageItem> mImageItems;// 用于储存图片
+	// private String text;// 文本信息
+	private String voiceCoverPath;// 语音封面路径
+	private TimerTask mTimeTask;
+	private Timer mTime;
+	private boolean isStop;
+	private boolean isVoice;// true 发送语音 false发送图片
+	private boolean ifSingle;// 多张图片选择还是单张图片选择
+	private boolean ifShowRecorderButton = true;// 是否显示录音按钮
+	private TouchGoupAsync mTouchAsync;
+	private int height;// 视图变化的高度
+	public int type;// 文字 0 ，语音 1，图片2
+	public static final int TYPE_TEXT = 0;
+	public static final int TYPE_VOICE = 1;
+	public static final int TYPE_PICTURE = 2;
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.layout_send_message, null);
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		initView();
+		initListener();
+	}
+
+	private void initView() {
+		isVoice = true;
+		mImageItems = new ArrayList<ImageItem>();
+		gv = (GridView) getView().findViewById(R.id.gv_pic);
+		ivPlayer = (ImageView) getView().findViewById(R.id.iv_play);
+		mAdapter = new GridViewFriendsCircleAdapter(getActivity(), mImageItems);
+		gv.setAdapter(mAdapter);
+		mSideBar = (SideBar) getView().findViewById(R.id.sb_send);
+		mSbVoiceProgress = (SeekBar) getView().findViewById(R.id.sb_voice_progress);
+		mSideBar.setVisibility(View.GONE);
+		ivPic = (ImageView) getView().findViewById(R.id.iv_voice_img);
+		tvSend = (TextView) getView().findViewById(R.id.tv_send);
+		etText = (EditText) getView().findViewById(R.id.et_text);
+		rBtn = (RecorderButton) getView().findViewById(R.id.btn_voice);
+		relRoot = (RelativeLayout) getView().findViewById(R.id.rel_root);
+		ivDeleteVoice = (ImageView) getView().findViewById(R.id.iv_delete_voice);
+		llVoice = (LinearLayout) getView().findViewById(R.id.ll_voice);
+		llVoice.setVisibility(View.GONE);
+		tvTime = (TextView) getView().findViewById(R.id.tv_time);
+		ivVoiceCover = (ImageView) getView().findViewById(R.id.iv_cover);
+		relRootSend = (RelativeLayout) getView().findViewById(R.id.rel_root_send);
+		relSend = (RelativeLayout) getView().findViewById(R.id.rel_send);
+	}
+
+	private void initListener() {
+		ivPlayer.setOnClickListener(this);
+		mAdapter.setOnImageItemSizeListener(this);
+		gv.setOnItemLongClickListener(this);
+		mSideBar.setOnChooseChangeListener(this);
+		ivPic.setOnClickListener(this);
+		tvSend.setOnClickListener(this);
+		etText.addTextChangedListener(this);
+		rBtn.setAudioFishedRecorde(this);
+		ivDeleteVoice.setOnClickListener(this);
+		ivVoiceCover.setOnClickListener(this);
+		// 监听mSideBar视图变化
+		mSideBar.getViewTreeObserver().addOnGlobalLayoutListener(this);
+		relRootSend.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+
+			@Override
+			public void onGlobalLayout() {
+				if (height == relRootSend.getHeight()) {
+					return;
+				}
+				height = relRootSend.getHeight();
+				LogUtils.i("bm", "width--" + relRootSend.getWidth() + "height--" + relRootSend.getHeight());
+				if (null != mOnPublishChangeListener) {
+					mOnPublishChangeListener.onHeightChnage(height);
+				}
+			}
+		});
+		relSend.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+
+			@Override
+			public void onGlobalLayout() {
+				relSend.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				LayoutParams layoutParams = mSideBar.getLayoutParams();
+				if (PublishFragment.this.getActivity() instanceof WorksCircleActivity) {
+					layoutParams.height = ((WorksCircleActivity) PublishFragment.this.getActivity()).getHeight()
+							- relSend.getHeight() - 70;
+				} else {
+					layoutParams.height = ((MomentActivity) PublishFragment.this.getActivity()).getHeight() - relSend.getHeight()
+							- 70;
+				}
+
+				mSideBar.setLayoutParams(layoutParams);
+				LogUtils.i("bm", "relSend.getHeight()--" + relSend.getHeight());
+			}
+		});
+	}
+
+	@Override
+	public boolean onTouch(View v, MotionEvent event) {
+		switch (event.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			if (!mSideBar.isShown()) {
+				mSideBar.setVisibility(View.VISIBLE);
+			}
+			isStop = false;
+			new TouchGoupAsync().execute();
+			break;
+		case MotionEvent.ACTION_UP:
+			isStop = true;
+			rangeOfChoice();
+			mSideBar.setVisibility(View.GONE);
+			setOnPublishChange();
+			break;
+		default:
+			if (event.getY() < 0) {
+				isStop = true;
+				mSideBar.mY = mSideBar.getHeight() - Math.abs(event.getY());
+				goSideBar();
+			} else {
+				if (null == mTouchAsync) {
+					isStop = false;
+					mTouchAsync = new TouchGoupAsync();
+					mTouchAsync.execute();
+				} else {
+
+				}
+			}
+			break;
+		}
+		return false;
+	}
+
+	private void rangeOfChoice() {
+		for (int i = 0; i < mSideBar.b.length; i++) {
+			if (i >= mSideBar.choose) {
+				LogUtils.i("bm", "choose--" + mSideBar.b[i]);
+			}
+		}
+	}
+
+	private boolean isUpOrDown = true;// true上升false下降
+
+	class TouchGoupAsync extends AsyncTask<Void, Void, Void> {
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			while (true) {
+				if (isStop) {
+					mTouchAsync = null;
+					break;
+				}
+				try {
+					Thread.sleep(5);
+				} catch (InterruptedException e) {
+
+				}
+				getActivity().runOnUiThread(mRunnable);
+			}
+			return null;
+		}
+
+		private Runnable mRunnable = new Runnable() {
+
+			@Override
+			public void run() {
+				if (isUpOrDown) {
+					mSideBar.mY = mSideBar.mY - 1;
+					goSideBar();
+					if (mSideBar.mY <= 1) {
+						isUpOrDown = false;
+					}
+				} else {
+					mSideBar.mY = mSideBar.mY + 1;
+					goSideBar();
+					if (mSideBar.mY >= mSideBar.getHeight()) {
+						isUpOrDown = true;
+					}
+				}
+			}
+		};
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.tv_send:
+			if ("发送".equals(tvSend.getText().toString())) {
+				return;
+			}
+			if (isVoice) {
+				if (CommUtil.isNotBlank(mVoiceFilePath)) {
+					return;
+				}
+				ivPic.setImageResource(R.drawable.image_friend_circle);
+				tvSend.setText("发送图片");
+				rBtn.setVisibility(View.GONE);
+				etText.setVisibility(View.VISIBLE);
+				isVoice = false;
+				type = TYPE_PICTURE;
+			} else {
+				if (mImageItems.size() > 0 || CommUtil.isNotBlank(etText.getText().toString())) {
+					return;
+				}
+				ivPic.setImageResource(R.drawable.voice_friend_circle);
+				tvSend.setText("发送语音");
+				isVoice = true;
+				type = TYPE_VOICE;
+			}
+			break;
+		case R.id.iv_voice_img:
+			if (isVoice) {
+				if (ifShowRecorderButton) {
+					rBtn.setVisibility(View.VISIBLE);
+					etText.setVisibility(View.GONE);
+					ifShowRecorderButton = false;
+				} else {
+					rBtn.setVisibility(View.GONE);
+					etText.setVisibility(View.VISIBLE);
+					ifShowRecorderButton = true;
+				}
+			} else {
+				ifSingle = false;
+				mPopupWindows = new PopupWindows(getActivity(), PublishFragment.this, mImageItems, relRoot, ifSingle);
+			}
+			break;
+		case R.id.iv_play:
+			if (CommUtil.isNotBlank(mVoiceFilePath)) {
+				mTime = new Timer();
+				mTimeTask = new TimerTask() {
+
+					@Override
+					public void run() {
+						if (null != MediaManager.mMediaPlayer) {
+							try {
+								mSbVoiceProgress.setProgress(MediaManager.mMediaPlayer.getCurrentPosition());
+								LogUtils.i("bm", "progress---" + MediaManager.mMediaPlayer.getCurrentPosition());
+							} catch (Exception e) {
+								LogUtils.e("bm", "e--" + e.getLocalizedMessage());
+							}
+						}
+					}
+				};
+				mTime.schedule(mTimeTask, 0, 50);
+				playLocalMusic(Constants.URI_FILE + mVoiceFilePath);
+				mSbVoiceProgress.setMax(MediaManager.mMediaPlayer.getDuration());
+			}
+			break;
+		case R.id.iv_delete_voice:
+			if (null != mVoiceFilePath) {
+				File file = new File(mVoiceFilePath);
+				if (file.delete()) {
+					llVoice.setVisibility(View.GONE);
+					mVoiceFilePath = null;
+					if (CommUtil.isBlank(etText.getText().toString())) {
+						mSideBar.setVisibility(View.GONE);
+						tvSend.setOnTouchListener(null);
+						tvSend.setText("发送语音");
+					}
+				}
+			}
+			break;
+		case R.id.iv_cover:
+			ifSingle = true;
+			mPopupWindows = new PopupWindows(getActivity(), PublishFragment.this, mImageItems, relRoot, ifSingle);
+			break;
+		}
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+	}
+
+	@Override
+	public void onTextChanged(CharSequence s, int start, int before, int count) {
+		// text = s.toString();
+		if (s.length() > 0) {
+			tvSend.setText("发送");
+			tvSend.setOnTouchListener(this);
+		} else {
+			if (isVoice) {
+				if (CommUtil.isBlank(mVoiceFilePath)) {
+					tvSend.setOnTouchListener(null);
+					mSideBar.setVisibility(View.GONE);
+					tvSend.setText("发送语音");
+				} else {
+					tvSend.setText("发送");
+				}
+			} else {
+				if (mImageItems.size() <= 0) {
+					tvSend.setOnTouchListener(null);
+					mSideBar.setVisibility(View.GONE);
+					tvSend.setText("发送图片");
+				} else {
+					tvSend.setText("发送");
+				}
+			}
+		}
+	}
+
+	@Override
+	public void afterTextChanged(Editable s) {
+
+	}
+
+	@Override
+	public void FinishedRecordeListener(Float time, String filePath) {
+		mVoiceFilePath = filePath;
+		mVoiceTime = time;
+		llVoice.setVisibility(View.VISIBLE);
+		String t = String.format("%.1f", time);
+		tvTime.setText(t + "s");
+		tvSend.setOnTouchListener(this);
+		tvSend.setText("发送");
+	}
+
+	private void playLocalMusic(String uri) {
+		MediaManager.startLocal(getActivity(), uri, new OnCompletionListener() {
+			@Override
+			public void onCompletion(MediaPlayer mp) {
+				mSbVoiceProgress.setProgress(MediaManager.mMediaPlayer.getDuration());
+				mTime.cancel();
+				MediaManager.stop();
+			}
+		}, new OnExceptionListener() {
+
+			@Override
+			public void onException(Exception e) {
+
+			}
+		});
+	}
+
+	@Override
+	public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+		mAdapter.setIfShowDeleteButton(true);
+		mAdapter.notifyDataSetChanged();
+		return false;
+	}
+
+	// @Override
+	// public void onBackPressed() {
+	// if (mAdapter.isIfShowDeleteButton()) {
+	// mAdapter.setIfShowDeleteButton(false);
+	// mAdapter.notifyDataSetChanged();
+	// } else {
+	// super.onBackPressed();
+	// }
+	// }
+
+	@Override
+	public void OnImageItemSize(List<ImageItem> imageItems) {
+		if (imageItems.size() <= 0) {
+			tvSend.setOnTouchListener(null);
+			mSideBar.setVisibility(View.GONE);
+			tvSend.setText("发送图片");
+		} else {
+			tvSend.setText("发送");
+		}
+	}
+
+	private void goSideBar() {
+		mSideBar.choose = (int) (mSideBar.mY / mSideBar.getHeight() * mSideBar.b.length);
+		mSideBar.invalidate();
+	}
+
+	@Override
+	public void onChooseChange(int choose) {
+		rangeOfChoice();
+		mSideBar.setVisibility(View.GONE);
+		setOnPublishChange();
+	}
+
+	private void setOnPublishChange() {
+
+		if (null != mOnPublishChangeListener) {
+			mOnPublishChangeListener.onPublishChange(mSideBar.choose);
+		}
+	}
+
+	@Override
+	public void onGlobalLayout() {
+		if (mSideBar.ifNeedMeasure) {
+			mSideBar.mY = mSideBar.getHeight();
+			mSideBar.invalidate();
+		} else {
+			mSideBar.ifNeedMeasure = true;
+		}
+	}
+
+	/**
+	 * 判断是发送语音文字还是发送图片文字
+	 */
+	public boolean isVoice() {
+		return isVoice;
+	}
+
+	public String getVoiceFilePath() {
+		return mVoiceFilePath;
+	}
+
+	public String getText() {
+		return etText.getText().toString();
+	}
+
+	public String getVoiceCoverPath() {
+		return voiceCoverPath;
+	}
+
+	public List<ImageItem> getImageItems() {
+		return mImageItems;
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		switch (requestCode) {
+		case Constants.ALBUM:
+			if (null == data) {
+				return;
+			}
+			if (isVoice) {
+				ImageItem imageItem = (ImageItem) data.getSerializableExtra(IntentConstants.EXTRA_IMAGE_ITEM);
+				voiceCoverPath = imageItem.sourcePath;
+				ivVoiceCover.setImageBitmap(ImageUtils.getBitmapFrom(imageItem.sourcePath));
+				LogUtils.i("bm", "thumbnailPath--" + imageItem.thumbnailPath);
+			} else {
+				List<ImageItem> incomingDataList = (List<ImageItem>) data.getSerializableExtra(IntentConstants.EXTRA_IMAGE_LIST);
+				mImageItems.addAll(incomingDataList);
+				mAdapter.notifyDataSetChanged();
+			}
+			break;
+		case Constants.TAKE_PICTURE:
+			if (isVoice) {
+				if (!TextUtils.isEmpty(mPopupWindows.getPath())) {
+					ivVoiceCover.setImageBitmap(ImageUtils.getBitmapFrom(mPopupWindows.getPath()));
+				}
+			} else {
+				if (mImageItems.size() < CustomConstants.MAX_IMAGE_SIZE && resultCode == -1
+						&& !TextUtils.isEmpty(mPopupWindows.getPath())) {
+					ImageItem item = new ImageItem();
+					item.sourcePath = mPopupWindows.getPath();
+					mImageItems.add(item);
+					mAdapter.notifyDataSetChanged();
+				} else {
+					if (mImageItems.size() >= CustomConstants.MAX_IMAGE_SIZE) {
+						ToastUtil.showToast("最多只能选择九张");
+					}
+				}
+			}
+			break;
+		}
+		if (mImageItems.size() > 0) {
+			tvSend.setOnTouchListener(this);
+		} else {
+			tvSend.setOnTouchListener(null);
+			mSideBar.setVisibility(View.GONE);
+		}
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		try {
+			Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+			childFragmentManager.setAccessible(true);
+			childFragmentManager.set(this, null);
+		} catch (NoSuchFieldException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private OnPublishChangeListener mOnPublishChangeListener;
+
+	public interface OnPublishChangeListener {
+		void onPublishChange(int choose);
+
+		void onHeightChnage(int height);
+	}
+
+	public void setOnPublishChangeListener(OnPublishChangeListener onPublishChangeListener) {
+		mOnPublishChangeListener = onPublishChangeListener;
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		relRootSend.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+	}
+}

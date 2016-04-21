@@ -1,0 +1,180 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.engine;
+
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+
+import cn.bmob.v3.listener.SaveListener;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.entity.TestConnEntity;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.TimeUtils;
+
+/**
+ * @ClassName: TestConnEngine.java
+ * @Description: 测试连接时，向Bmob服务器提交数据时用到的类
+ * @author: cj
+ * @date: 2016年4月12日 上午10:37:55
+ */
+public class TestConnEngine
+{
+    private static final String TAG = "TestConnEngine";
+    private static TestConnEngine mInstance = null;
+
+    /**
+     * 
+     */
+    private TestConnEngine()
+    {
+        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * 获取实例
+     * 
+     * @return
+     */
+    public static TestConnEngine getInstance()
+    {
+        if (mInstance == null)
+        {
+            synchronized (SettingEngine.class)
+            {
+                if (mInstance == null)
+                    mInstance = new TestConnEngine();
+            }
+        }
+        return mInstance;
+    }
+
+    // //////////////////////////////////////////共有方法/////////////////////////////////////////
+    /**
+     * 发送文字信息时提交信息到Bmob
+     * 
+     * @param dwMessage
+     *            消息内容
+     * @param connection
+     *            连接状态
+     */
+    public void uploadLogWhenSendMsg(String tag,DWMessage dwMessage, XMPPConnection connection)
+    {
+        TestConnEntity connEntity = getTestConnEntity();
+        connEntity.setTestTag(tag);
+        connEntity.setDwMessage(dwMessage.toString());
+        if(connection == null)
+            connEntity.setConnnection("conn==null");
+        else
+            connEntity.setConnnection(connection.toString());
+        connEntity.save(DecentWorldApp.getGlobalContext(), new SaveListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                LogUtils.d(TAG, "uploadLogWhenSendMsg...success");
+            }
+
+            @Override
+            public void onFailure(int arg0, String arg1)
+            {
+                LogUtils.d(TAG, "uploadLogWhenSendMsg...failure");
+
+            }
+        });
+    }
+    
+    /**
+     * 上传消息到Bmob服务器 
+     * @param tag
+     * @param message
+     */
+    public void uploadMessage(String tag,Message message)
+    {
+        TestConnEntity connEntity = getTestConnEntity();
+        connEntity.setTestTag(tag);
+        connEntity.setMsgBody(message.toString());
+        connEntity.save(DecentWorldApp.getGlobalContext(), new SaveListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                LogUtils.d(TAG, "uploadMessage...success");
+            }
+
+            @Override
+            public void onFailure(int arg0, String arg1)
+            {
+                LogUtils.d(TAG, "uploadMessage...failure");
+
+            }
+        });
+    }
+    
+    public void uploadMessageException(String tag,String message)
+    {
+        TestConnEntity connEntity = getTestConnEntity();
+        connEntity.setTestTag(tag);
+        connEntity.setMsgBody(message);
+        connEntity.save(DecentWorldApp.getGlobalContext(), new SaveListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                LogUtils.d(TAG, "uploadMessage...success");
+            }
+
+            @Override
+            public void onFailure(int arg0, String arg1)
+            {
+                LogUtils.d(TAG, "uploadMessage...failure");
+
+            }
+        });
+    }
+    
+    /**
+     * 上传普通日志信息
+     * @param tag
+     * @param info
+     */
+    public void uploadGeneralLog(String tag,String info)
+    {
+        TestConnEntity connEntity = getTestConnEntity();
+        connEntity.setTestTag(tag);
+        connEntity.setMsgBody(info);
+        connEntity.save(DecentWorldApp.getGlobalContext(), new SaveListener()
+        {
+            @Override
+            public void onSuccess()
+            {
+                LogUtils.d(TAG, "uploadMessage...success");
+            }
+
+            @Override
+            public void onFailure(int arg0, String arg1)
+            {
+                LogUtils.d(TAG, "uploadMessage...failure");
+
+            }
+        });
+    }
+
+    // //////////////////////////////////////////私有方法/////////////////////////////////////////
+    /**
+     * 
+     * @return
+     */
+    private TestConnEntity getTestConnEntity()
+    {
+        TestConnEntity connEntity = new TestConnEntity();
+        connEntity.setUserID(DecentWorldApp.getInstance().getDwID());
+        connEntity.setPhoneNum(DecentWorldApp.getInstance().getUserName());
+        connEntity.setShowName("Jack");
+        connEntity.setTime(TimeUtils.getDateAllMessage());
+        return connEntity;
+    }
+
+}

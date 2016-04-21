@@ -40,9 +40,9 @@ public final class ShowToMeSchoolActivity_
     }
 
     private void afterSetContentView_() {
-        tvCancel = ((TextView) findViewById(id.tv_cancel));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         aTvUniversity = ((AutoCompleteTextView) findViewById(id.act_university));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        tvCancel = ((TextView) findViewById(id.tv_cancel));
         llShowToMeSchool = ((LinearLayout) findViewById(id.ll_show_to_me_school));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();

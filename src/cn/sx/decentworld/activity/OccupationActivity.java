@@ -16,12 +16,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.ListView;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.adapter.OccupationAdapter;
 import cn.sx.decentworld.adapter.ProfessionAdapter;
+import cn.sx.decentworld.adapter.UniversityAdapter;
 import cn.sx.decentworld.bean.OccupationBean;
 import cn.sx.decentworld.component.ToastComponent;
 
@@ -90,20 +90,6 @@ public class OccupationActivity extends BaseFragmentActivity {
 		} catch (JSONException e) {
 			toast.show("解析失败");
 		}
-		// for (int i = 0; i < 10; i++) {
-		// OccupationBean bean = new OccupationBean();
-		// bean.occupationList = new ArrayList<String>();
-		// bean.profession = "item--" + i;
-		// for (int j = 0; j < 10; j++) {
-		// bean.occupationList.add("item" + i + "ouyang" + j);
-		// }
-		// occupationBeanList.add(bean);
-		// }
-		// for (int i = 0; i < data.length; i++) {
-		// OccupationBean bean = new OccupationBean();
-		// bean.profession = data[i];
-		// occupationBeanList.add(bean);
-		// }
 		professionAdapter = new ProfessionAdapter(this, occupationBeanList);
 		lvProfession.setAdapter(professionAdapter);
 		OccupationBean occupationBean = professionAdapter.getItem(professionAdapter.getPositionPress());
@@ -187,13 +173,13 @@ public class OccupationActivity extends BaseFragmentActivity {
 		return result;
 	}
 
-	ArrayAdapter<String> adapter;
+	UniversityAdapter adapter;
 
 	/**
 	 * 为AutoCompleteTextView设置Adpater
 	 */
 	private void setAutoApdater() {
-		adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, allUniveList);
+		adapter = new UniversityAdapter(mContext, allUniveList);
 		etSchool.setAdapter(adapter);
 		etSchool.setOnItemClickListener(new OnItemClickListener() {
 
@@ -204,4 +190,5 @@ public class OccupationActivity extends BaseFragmentActivity {
 			}
 		});
 	}
+
 }

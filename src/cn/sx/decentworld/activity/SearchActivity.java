@@ -8,18 +8,25 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.adapter.SearchAdapter;
+import cn.sx.decentworld.bean.DWMessage;
 import cn.sx.decentworld.bean.SearchResult;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.component.ToastComponent;
 import cn.sx.decentworld.component.ui.SearchComponent;
+import cn.sx.decentworld.entity.LaunchChatEntity;
+import cn.sx.decentworld.entity.dao.ContactUserDao;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.utils.JsonUtils;
-import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
 import cn.sx.decentworld.widget.ClearEditText;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -39,6 +46,7 @@ import com.handmark.pulltorefresh.library.PullToRefreshListView;
  */
 @EActivity(R.layout.activity_contact_search)
 public class SearchActivity extends BaseFragmentActivity implements OnClickListener {
+	private static final String TAG = "SearchActivity";
 	@ViewById(R.id.cet_search)
 	ClearEditText cetSearch;
 	@ViewById(R.id.tv_cancel)
@@ -50,8 +58,6 @@ public class SearchActivity extends BaseFragmentActivity implements OnClickListe
 	private int page;
 	@Bean
 	SearchComponent searchComponent;
-	@Bean
-	ToastComponent toast;
 	private String mSearchType;// 0表示手机号1表示dwID号3表示普通搜索
 	// private int searchType = SearchResult.SEARCH_TYPE_PHONE;//
 	// 搜索类型,默认为按电话号码搜素
@@ -87,6 +93,22 @@ public class SearchActivity extends BaseFragmentActivity implements OnClickListe
 				searchPeople(page);
 			}
 		});
+		lvSearch.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				position = position - 1;
+				SearchResult item = searchAdapter.getItem(position);
+				Intent intent = new Intent(mContext, ChatActivity_.class);
+
+				LaunchChatEntity entity = new LaunchChatEntity(item.dwID, item.name, Float.valueOf(item.worth),
+						DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_FRIEND, Integer.valueOf(item.userType));
+				if (!ContactUserDao.isContact(item.dwID))
+					entity.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+				intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity);
+				startActivity(intent);
+			}
+		});
 	}
 
 	@Override
@@ -105,7 +127,7 @@ public class SearchActivity extends BaseFragmentActivity implements OnClickListe
 
 	private void searchPeople(int page) {
 		if (cetSearch.length() <= 0) {
-			toast.show("请输入要搜索的内容");
+			ToastUtil.showToast("请输入要搜索的内容");
 			return;
 		}
 		HashMap<String, String> map = new HashMap<String, String>();
@@ -123,7 +145,6 @@ public class SearchActivity extends BaseFragmentActivity implements OnClickListe
 					JSONObject object = new JSONObject(msg.obj.toString());
 					mSearchType = object.getString("searchType");
 					JSONArray array = object.getJSONArray("result");
-					LogUtils.e("bm", "array--" + array.toString());
 					List<SearchResult> datas = (List<SearchResult>) JsonUtils
 							.json2BeanArray(array.toString(), SearchResult.class);
 					searchAdapter.setTag(Constants.SEARCH_TYPE, mSearchType);
@@ -133,7 +154,7 @@ public class SearchActivity extends BaseFragmentActivity implements OnClickListe
 						searchAdapter.notifyDataSetChanged();
 					}
 				} catch (JSONException e) {
-					toast.show("解析错误");
+					LogUtils.e(TAG, "error---" + e);
 				}
 				break;
 			default:

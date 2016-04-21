@@ -32,8 +32,6 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
-    
-    
 
     <style name="anim_popup_dir">
         <item name="android:windowEnterAnimation">@anim/activity_picturechoice_slide_in</item>

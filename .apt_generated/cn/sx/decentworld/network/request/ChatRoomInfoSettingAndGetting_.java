@@ -8,7 +8,6 @@ package cn.sx.decentworld.network.request;
 import android.app.Activity;
 import android.content.Context;
 import android.view.View;
-import cn.sx.decentworld.component.ToastComponent_;
 
 public final class ChatRoomInfoSettingAndGetting_
     extends ChatRoomInfoSettingAndGetting
@@ -25,7 +24,6 @@ public final class ChatRoomInfoSettingAndGetting_
         if (!(context_ instanceof Activity)) {
             return ;
         }
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 
@@ -43,11 +41,10 @@ public final class ChatRoomInfoSettingAndGetting_
         if (context_ instanceof Activity) {
             Activity activity = ((Activity) context_);
         }
-        context = context_;
         if (context_ instanceof Activity) {
             activity = ((Activity) context_);
         }
-        toast = ToastComponent_.getInstance_(context_);
+        context = context_;
     }
 
     public static ChatRoomInfoSettingAndGetting_ getInstance_(Context context) {

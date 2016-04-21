@@ -1,0 +1,341 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.index;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.fragment.main.ContactFragment;
+import cn.sx.decentworld.fragment.main.ContactFragment_;
+import cn.sx.decentworld.fragment.main.ConversationFragment;
+import cn.sx.decentworld.fragment.main.ConversationFragment_;
+import cn.sx.decentworld.fragment.main.FindFragment;
+import cn.sx.decentworld.fragment.main.FindFragment_;
+import cn.sx.decentworld.fragment.main.MeFragment;
+import cn.sx.decentworld.fragment.main.MeFragment_;
+import cn.sx.decentworld.utils.LogRecord;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+import com.umeng.analytics.MobclickAgent;
+
+/**
+ * @ClassName: MainFragment.java
+ * @Description: 主界面,包含四个Tab
+ * @author: cj
+ * @date: 2016年1月11日 上午9:52:46
+ */
+@EFragment(R.layout.fragment_main)
+public class MainFragment extends BaseFragment implements OnClickListener {
+	private static final String TAG = "MainFragment";
+	private int startIndex = 4;
+	/** 用于对Fragment进行管理 **/
+	private FragmentManager fragmentManager;
+	/** mai **/
+	private ConversationFragment conversationFragment;
+	private ContactFragment contactFragment;
+	private FindFragment findFragment;
+	private MeFragment meFragment;
+
+	/**
+	 * 放置四个Fragment的容器
+	 */
+	@ViewById(R.id.mainFragmentContainer)
+	FrameLayout mainFragmentContainer;
+
+	/**
+	 * 底部Tab键资源
+	 */
+	// 底部TAB的显示图片
+	@ViewById(R.id.menu_tab1_iv)
+	ImageView menu_tab1_iv;
+	@ViewById(R.id.menu_tab2_iv)
+	ImageView menu_tab2_iv;
+	@ViewById(R.id.menu_tab3_iv)
+	ImageView menu_tab3_iv;
+	@ViewById(R.id.menu_tab4_iv)
+	ImageView menu_tab4_iv;
+	// 底部TAB的显示文字
+	@ViewById(R.id.menu_tab1_tv)
+	TextView menu_tab1_tv;
+	@ViewById(R.id.menu_tab2_tv)
+	TextView menu_tab2_tv;
+	@ViewById(R.id.menu_tab3_tv)
+	TextView menu_tab3_tv;
+	@ViewById(R.id.menu_tab4_tv)
+	TextView menu_tab4_tv;
+
+	/** 未读消息的小红点 **/
+	@ViewById(R.id.menu_tab1_unread_msg_number)
+	TextView conversationUnreadLabel;
+	@ViewById(R.id.menu_tab2_unread_msg_number)
+	TextView contactUnreadLabel;
+	@ViewById(R.id.menu_tab3_unread_msg_number)
+	TextView findUnreadLabel;
+	@ViewById(R.id.menu_tab4_unread_msg_number)
+	TextView meUnreadLabel;
+
+	/** 按钮布局 **/
+	@ViewById(R.id.menu_tab_1)
+	RelativeLayout menu_tab_1;
+	@ViewById(R.id.menu_tab_2)
+	RelativeLayout menu_tab_2;
+	@ViewById(R.id.menu_tab_3)
+	RelativeLayout menu_tab_3;
+	@ViewById(R.id.menu_tab_4)
+	RelativeLayout menu_tab_4;
+
+	/**
+	 * 入口
+	 */
+	@AfterViews
+	void init() {
+		LogUtils.i(TAG, "init");
+		EventBus.getDefault().register(this);
+		fragmentManager = getFragmentManager();
+		initListener();
+		initAllFragment();
+		setTabSelection(startIndex);
+		isPrepared = true;
+		// /** 初始化完毕，可以接受离线消息 **/
+		// DecentWorldApp.getInstance().setMainActivityInit(true);
+		// XmppHelper.sendPresence();
+		lazyLoad();
+	}
+
+	/**
+	 * 初始化所有的Fragment
+	 */
+	private void initAllFragment() {
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		if (conversationFragment == null) {
+			/** 如果conversationFragment为空，则创建一个并添加到界面上 **/
+			conversationFragment = new ConversationFragment_();
+			transaction.add(R.id.mainFragmentContainer, conversationFragment);
+		}
+		if (contactFragment == null) {
+			/** 如果contactFragment为空，则创建一个并添加到界面上 **/
+			contactFragment = new ContactFragment_();
+			transaction.add(R.id.mainFragmentContainer, contactFragment);
+		}
+		if (findFragment == null) {
+			/** 如果findFragment为空，则创建一个并添加到界面上 **/
+			findFragment = new FindFragment_();
+			transaction.add(R.id.mainFragmentContainer, findFragment);
+		}
+		if (meFragment == null) {
+			/** 如果meFragment为空，则创建一个并添加到界面上 **/
+			meFragment = new MeFragment_();
+			transaction.add(R.id.mainFragmentContainer, meFragment);
+		}
+		transaction.commit();
+	}
+
+	/**
+	 * 为底部四个按钮设置监听
+	 */
+	private void initListener() {
+		menu_tab_1.setOnClickListener(this);
+		menu_tab_2.setOnClickListener(this);
+		menu_tab_3.setOnClickListener(this);
+		menu_tab_4.setOnClickListener(this);
+	}
+
+	/**
+	 * 设置默认的图标和文字
+	 */
+	private void setTabDefaultBackground() {
+		menu_tab1_iv.setImageResource(R.drawable.main_chat_selector);
+		menu_tab1_tv.setTextColor(getResources().getColor(R.color.main_grey));
+		menu_tab2_iv.setImageResource(R.drawable.main_contact_selector);
+		menu_tab2_tv.setTextColor(getResources().getColor(R.color.main_grey));
+		menu_tab3_iv.setImageResource(R.drawable.main_find_selector);
+		menu_tab3_tv.setTextColor(getResources().getColor(R.color.main_grey));
+		menu_tab4_iv.setImageResource(R.drawable.main_me_selector);
+		menu_tab4_tv.setTextColor(getResources().getColor(R.color.main_grey));
+	}
+
+	private void setTabSelection(int index) {
+		setTabDefaultBackground();
+		/** 开启一个Fragment事务 **/
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		/** 先隐藏掉所有的Fragment，以防止有多个Fragment显示在界面上的情况 **/
+		hideFragments(transaction);
+		switch (index) {
+		case 1:
+			menu_tab1_iv.setImageResource(R.drawable.main_chat_select);
+			menu_tab1_tv.setTextColor(getResources().getColor(R.color.black));
+			if (conversationFragment == null) {
+				/** 如果conversationFragment为空，则创建一个并添加到界面上 **/
+				conversationFragment = new ConversationFragment_();
+				transaction.add(R.id.mainFragmentContainer, conversationFragment);
+			} else {
+				transaction.show(conversationFragment);
+			}
+			break;
+		case 2:
+			menu_tab2_iv.setImageResource(R.drawable.main_contact_select);
+			menu_tab2_tv.setTextColor(getResources().getColor(R.color.black));
+			if (contactFragment == null) {
+				/** 如果contactFragment为空，则创建一个并添加到界面上 **/
+				contactFragment = new ContactFragment_();
+				transaction.add(R.id.mainFragmentContainer, contactFragment);
+			} else {
+				transaction.show(contactFragment);
+				contactFragment.setScrollY();
+			}
+			break;
+		case 3:
+			menu_tab3_iv.setImageResource(R.drawable.main_find_select);
+			menu_tab3_tv.setTextColor(getResources().getColor(R.color.black));
+			if (findFragment == null) {
+				/** 如果findFragment为空，则创建一个并添加到界面上 **/
+				findFragment = new FindFragment_();
+				transaction.add(R.id.mainFragmentContainer, findFragment);
+			} else {
+				transaction.show(findFragment);
+			}
+
+			break;
+		case 4:
+			menu_tab4_iv.setImageResource(R.drawable.main_me_select);
+			menu_tab4_tv.setTextColor(getResources().getColor(R.color.black));
+			if (meFragment == null) {
+				/** 如果meFragment为空，则创建一个并添加到界面上 **/
+				meFragment = new MeFragment_();
+				transaction.add(R.id.mainFragmentContainer, meFragment);
+			} else {
+				transaction.show(meFragment);
+			}
+			break;
+		}
+		transaction.commit();
+	}
+
+	/**
+	 * 先隐藏掉所有的Fragment，以防止有多个Fragment显示在界面上的情况
+	 * 
+	 * @param transaction
+	 */
+	private void hideFragments(FragmentTransaction transaction) {
+		if (conversationFragment != null) {
+			transaction.hide(conversationFragment);
+		}
+		if (contactFragment != null) {
+			transaction.hide(contactFragment);
+		}
+		if (findFragment != null) {
+			transaction.hide(findFragment);
+		}
+		if (meFragment != null) {
+			transaction.hide(meFragment);
+		}
+	}
+
+	@Override
+	protected void lazyLoad() {
+		if (isPrepared) {
+
+		}
+	}
+
+	@Override
+	public void turnToTab(int tab) {
+
+	}
+
+	/**
+	 * 点击事件
+	 */
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.menu_tab_1:
+			LogRecord.getInstance().saveGeneralLog(TAG, "select the conversation Tab");
+			setTabSelection(1);
+			break;
+		case R.id.menu_tab_2:
+			LogRecord.getInstance().saveGeneralLog(TAG, "select the contact Tab");
+			setTabSelection(2);
+			break;
+		case R.id.menu_tab_3:
+			LogRecord.getInstance().saveGeneralLog(TAG, "select the discovery Tab");
+			setTabSelection(3);
+			break;
+		case R.id.menu_tab_4:
+			LogRecord.getInstance().saveGeneralLog(TAG, "select the me Tab");
+			setTabSelection(4);
+			break;
+		default:
+			break;
+		}
+	}
+
+	/**
+	 * 刷新未读会话消息数
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_UNREAD_CONVERSATION_COUNT)
+	public void refreshUnReadConversation(int count) {
+		LogUtils.i(TAG, "refreshUnReadConversation,count=" + count);
+		if (count > 0) {
+			conversationUnreadLabel.setVisibility(View.VISIBLE);
+			conversationUnreadLabel.setText("" + count);
+		} else {
+			conversationUnreadLabel.setVisibility(View.INVISIBLE);
+		}
+	}
+
+	/**
+	 * 未读新的联系人数
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_UNREAD_CONTACT_COUNT)
+	public void refreshUnReadContact(int count) {
+		if (count > 0) {
+			contactUnreadLabel.setVisibility(View.VISIBLE);
+			contactUnreadLabel.setText("" + count);
+		} else {
+			contactUnreadLabel.setVisibility(View.INVISIBLE);
+		}
+	}
+
+	/**
+	 * 未读作品圈数
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_UNREAD_FIND_COUNT)
+	public void refreshUnReadFindMsg(int count) {
+
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		EventBus.getDefault().unregister(this);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		MobclickAgent.onPageStart(TAG);
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		MobclickAgent.onPageEnd(TAG);
+	}
+
+}

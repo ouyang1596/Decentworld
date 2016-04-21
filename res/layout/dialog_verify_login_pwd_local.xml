@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog_me_setting_check_password_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="@dimen/dig_width"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:background="@color/white"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/textview_hint_password"
+            android:layout_marginTop="@dimen/dig_margin_interval_1"
+            android:textColor="@color/two_black"
+            android:textSize="@dimen/dig_title_size" />
+
+        <EditText
+            android:id="@+id/et_verify_login_pwd_local"
+            android:layout_width="240dp"
+            android:layout_height="43dp"
+            android:paddingLeft="10dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/dig_margin_interval_1"
+            android:background="@drawable/edittext_selector"
+            android:hint="@string/editview_hint_check_password"
+            android:inputType="numberPassword"
+            android:singleLine="true"
+            android:textColor="@color/one_black"
+            android:textSize="@dimen/text_size_18" />
+
+        <include
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/dig_margin_interval_1"
+            android:layout_marginTop="@dimen/dig_margin_interval_1"
+            layout="@layout/btn_belong_dialog_submit" />
+    </LinearLayout>
+
+</LinearLayout>

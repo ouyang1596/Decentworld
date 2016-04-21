@@ -1,0 +1,872 @@
+package cn.sx.decentworld.activity;
+
+import java.io.File;
+import java.util.HashMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.ProgressDialog;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.fragment.chatroom.ChatRoomAddThemeContentFragment;
+import cn.sx.decentworld.fragment.chatroom.ChatRoomAddThemeFeeScaleFragment;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_edit)
+public class ChatRoomEditActivity extends BaseFragmentActivity implements OnClickListener, OnCheckedChangeListener {
+	@ViewById(R.id.rg_content)
+	RadioGroup rgContentFee;
+	@ViewById(R.id.rb_content)
+	RadioButton rbContent;
+	@ViewById(R.id.rb_fee_scale)
+	RadioButton rbFeeScale;
+	@ViewById(R.id.tv_send)
+	TextView tvSend;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	private int subjectID;// 当前主题的id
+	private String coverPath;
+	private ChatRoomAddThemeContentFragment mChatRoomContentFragment;
+	private ChatRoomAddThemeFeeScaleFragment mChatRoomFeeScaleFragment;
+	private SendUrl mSendUrl;
+	private Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			finish();
+		};
+	};
+
+	@AfterViews
+	public void init() {
+		CGetIntent();
+		mSendUrl = new SendUrl(this);
+		mChatRoomContentFragment = new ChatRoomAddThemeContentFragment();
+		mChatRoomContentFragment.isNewOrEdit = 1;
+		mChatRoomFeeScaleFragment = new ChatRoomAddThemeFeeScaleFragment();
+		mChatRoomFeeScaleFragment.isNewOrEdit = 1;
+		getSupportFragmentManager().beginTransaction().add(R.id.fl_container_content_fee, mChatRoomContentFragment, "")
+				.add(R.id.fl_container_content_fee, mChatRoomFeeScaleFragment, "").hide(mChatRoomFeeScaleFragment).commit();
+		rgContentFee.setOnCheckedChangeListener(this);
+		tvSend.setOnClickListener(this);
+		ivBack.setOnClickListener(this);
+		// if (null == SubjectBean.queryByRoomIDAndIsNewOrEdit(roomID, 1)) {
+		getCurrentSubject();
+		// }
+	}
+
+	@Override
+	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		switch (group.getCheckedRadioButtonId()) {
+		case R.id.rb_content:
+			getSupportFragmentManager().beginTransaction().hide(mChatRoomFeeScaleFragment).show(mChatRoomContentFragment)
+					.commit();
+			break;
+		case R.id.rb_fee_scale:
+			getSupportFragmentManager().beginTransaction().hide(mChatRoomContentFragment).show(mChatRoomFeeScaleFragment)
+					.commit();
+			break;
+		}
+	}
+
+	@Bean
+	ChatRoomInfoSettingAndGetting chatRoomInfoSettingAndGetting;
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.tv_send:
+			if (CommUtil.isBlank(mChatRoomContentFragment.getCover())) {
+				ToastUtil.showToast("请先上传一张图片");
+				return;
+			}
+			if (CommUtil.isBlank(mChatRoomContentFragment.getSubjectName())) {
+				ToastUtil.showToast("请先输入主题名");
+				return;
+			}
+			if (CommUtil.isBlank(mChatRoomContentFragment.getSubjectContent())) {
+				ToastUtil.showToast("请先输入主题内容");
+				return;
+			}
+			if (CommUtil.isBlank(mChatRoomFeeScaleFragment.getFee())) {
+				ToastUtil.showToast("请先输入收费标准");
+				return;
+			}
+			HashMap<String, String> map = new HashMap<String, String>();
+			map.put("subjectName", mChatRoomContentFragment.getSubjectName());
+			map.put("roomID", roomID);
+			map.put("subjectID", "" + subjectID);
+			map.put("ownerID", DecentWorldApp.getInstance().getDwID());
+			map.put("subjectContent", mChatRoomContentFragment.getSubjectContent());
+			File[] file = new File[1];
+			file[0] = new File(mChatRoomContentFragment.getCover());
+			showProgressDialog();
+			mSendUrl.httpRequestWithImage(map, file, Constants.CONTEXTPATH_OPENFIRE + Constants.API_UPDATA_SUBJECT,
+					new HttpCallBack() {
+
+						@Override
+						public void onSuccess(String resultJSON, ResultBean resultBean) {
+							hideProgressDialog();
+							if (resultBean.getResultCode() == 2222) {
+								showToast("succ");
+								mHandler.sendEmptyMessage(2222);
+							} else {
+								showToast(resultBean.getMsg());
+							}
+						}
+
+						@Override
+						public void onFailure(String e) {
+							hideProgressDialog();
+							showToast(Constants.NET_WRONG);
+						}
+					});
+			break;
+		case R.id.iv_back:
+			finish();
+			break;
+		}
+	}
+
+	private Handler mGetCurrentHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			try {
+				JSONObject object = new JSONObject(msg.obj.toString());
+				String chargeAmount = object.getString("chargeAmount");
+				mChatRoomFeeScaleFragment.etFee.setText(chargeAmount);
+				JSONObject jsonData = object.getJSONObject("subject");
+				String roomID = jsonData.getString("roomId");
+				subjectID = jsonData.getInt("id");
+				coverPath = jsonData.getString("subjectBackground");
+				ImageLoaderHelper.mImageLoader.displayImage(coverPath, mChatRoomContentFragment.ivCover,
+						ImageLoaderHelper.mOptions);
+				String subjectName = jsonData.getString("subjectName");
+				mChatRoomContentFragment.etSubjectName.setText(subjectName);
+				// if (jsonData.has("subjectContent")) {
+				// String subjectContent = jsonData.getString("subjectContent");
+				// Spanned spanned = Html.fromHtml(subjectContent, new
+				// MyImageGetter(mContext,
+				// mChatRoomContentFragment.etSubjectContent), null);
+				// mChatRoomContentFragment.etSubjectContent.setText(spanned);
+				// mChatRoomContentFragment.etSubjectContent.setMovementMethod(LinkMovementMethod.getInstance());
+				// }
+			} catch (JSONException e) {
+			}
+		};
+	};
+
+	private void getCurrentSubject() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("roomID", roomID);
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + Constants.API_GET_CURRENT_SUBJECT, Method.GET,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String resultJSON, ResultBean resultBean) {
+						if (resultBean.getResultCode() == 2222)// 获取成功
+						{
+							LogUtils.i("bm", "currentSubject--" + resultBean.getData().toString());
+							Message message = mGetCurrentHandler.obtainMessage();
+							message.obj = resultBean.getData().toString();
+							message.what = 2222;
+							mGetCurrentHandler.sendMessage(message);
+						} else {
+							showToast(resultBean.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						showToast(Constants.NET_WRONG);
+					}
+				});
+	}
+
+	private ProgressDialog mProDialog;
+
+	private void showProgressDialog() {
+		if (null == mProDialog) {
+			mProDialog = ProgressDialog.show(this, null, "loading");
+		} else {
+			mProDialog.show();
+		}
+	}
+
+	private void hideProgressDialog() {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (null != mProDialog) {
+					mProDialog.hide();
+				}
+			}
+		});
+	}
+
+	private void showToast(final String data) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				ToastUtil.showToast(data);
+			}
+		});
+	}
+
+	private String roomID;
+
+	private void CGetIntent() {
+		roomID = getIntent().getStringExtra(ChatRoomMeActivity.ROOMID);
+	}
+
+	public String getRoomID() {
+		return roomID;
+	}
+
+	// @ViewById(R.id.root_activity_edit)
+	// LinearLayout llEdit;
+	// @ViewById(R.id.rb_fee_scale)
+	// TextView tvFeeScale;
+	// @ViewById(R.id.rg_fee_Scale)
+	// RadioGroup rgFeeScale;
+	// // @ViewById(R.id.rb_scale)
+	// // RadioButton rbScale;
+	// @ViewById(R.id.rb_fixed)
+	// RadioButton rbFixed;
+	// @ViewById(R.id.tv_percent)
+	// TextView tvPercent;
+	// @ViewById(R.id.btn_fee_scale_save)
+	// Button btnFeeScaleSave;
+	// @ViewById(R.id.btn_content_save)
+	// Button btnContentSave;
+	// @ViewById(R.id.rg_content)
+	// RadioGroup rgFeeContent;
+	// @ViewById(R.id.et_fee)
+	// EditText etFee;
+	// @ViewById(R.id.rb_content)
+	// RadioButton rbContent;
+	// @ViewById(R.id.rb_fee_scale)
+	// RadioButton rbFeeScale;
+	// @ViewById(R.id.iv_cover)
+	// ImageView ivCover;
+	// @ViewById(R.id.sl_fee)
+	// public ScrollLayout slFee;
+	// @ViewById(R.id.tv_send)
+	// TextView tvSend;
+	// @ViewById(R.id.iv_back)
+	// ImageView ivBack;
+	// @ViewById(R.id.lv_add_new_theme)
+	// ListView lvAddNewTheme;
+	// @ViewById(R.id.et_subjectname)
+	// EditText etSubjectName;
+	// public static final int GET_CURRENT_SUBJECT = 1;
+	// public static final int SET_CHARGE_AMOUNT = 2;
+	// private int requestCode;// 请求码：REQUEST_CODE_COVER，REQUEST_CODE_PIC
+	// private boolean ifFeeScaleShow;
+	// private boolean isScaleOrFixed;// true Scale,false fixed
+	// @Bean
+	// ToastComponent toast;
+	// File[] file = new File[4];
+	// private ArrayList<String> imgUrls = new ArrayList<String>();
+	// @Bean
+	// ChatRoomInfoSettingAndGetting chatRoomInfoSettingAndGetting;
+	// private Handler mHandler = new Handler() {
+	// public void handleMessage(android.os.Message msg) {
+	// switch (msg.what) {
+	// case GET_CURRENT_SUBJECT:
+	// try {
+	// LogUtils.i("bm", "data--" + msg.obj.toString());
+	// JSONObject object = new JSONObject(msg.obj.toString());
+	// String chargeAmount = object.getString("chargeAmount");
+	// etFee.setText(chargeAmount);
+	// JSONObject jsonData = object.getJSONObject("subject");
+	// String roomID = jsonData.getString("roomId");
+	// coverPath = jsonData.getString("subjectBackground");
+	// ImageLoaderHelper.mImageLoader.displayImage(coverPath, ivCover,
+	// ImageLoaderHelper.mOptions);
+	// String subjectName = jsonData.getString("subjectName");
+	// etSubjectName.setText(subjectName);
+	// ThemeBean themeBean = new ThemeBean();
+	// if (jsonData.has("subjectContent")) {
+	// String subjectContent = jsonData.getString("subjectContent");
+	// themeBean.subjectContent = subjectContent;
+	// }
+	// if (jsonData.has("imgUrl")) {
+	// String imgUrl = jsonData.getString("imgUrl");
+	// themeBean.picPath = imgUrl;
+	// imgUrls.add(imgUrl);
+	// }
+	// ThemeBean themeBean1 = new ThemeBean();
+	// if (jsonData.has("subjectContent1")) {
+	// String subjectContent1 = jsonData.getString("subjectContent1");
+	// themeBean1.subjectContent = subjectContent1;
+	// }
+	// if (jsonData.has("imgUrl1")) {
+	// String imgUrl1 = jsonData.getString("imgUrl1");
+	// themeBean1.picPath = imgUrl1;
+	// imgUrls.add(imgUrl1);
+	// }
+	// ThemeBean themeBean2 = new ThemeBean();
+	// if (jsonData.has("subjectContent2")) {
+	// String subjectContent2 = jsonData.getString("subjectContent2");
+	// themeBean2.subjectContent = subjectContent2;
+	// }
+	// if (jsonData.has("imgUrl2")) {
+	// String imgUrl2 = jsonData.getString("imgUrl2");
+	// themeBean2.picPath = imgUrl2;
+	// imgUrls.add(imgUrl2);
+	// }
+	// if (null != themeBean.picPath && null != themeBean.subjectContent) {
+	// mData.add(themeBean);
+	// }
+	// if (null != themeBean1.picPath && null != themeBean1.subjectContent) {
+	// mData.add(themeBean1);
+	// }
+	// if (null != themeBean2.picPath && null != themeBean2.subjectContent) {
+	// mData.add(themeBean2);
+	// }
+	// adapter.setIfLocalNotifyDataSetChanged(false);
+	// } catch (JSONException e) {
+	// toast.show("解析错误");
+	// }
+	// break;
+	// default:
+	// for (int i = 0; i < imgUrls.size(); i++) {
+	// ImageLoaderHelper.clearCacheByUrl(imgUrls.get(i));
+	// }
+	// ImageLoaderHelper.clearCacheByUrl(ImageUtils.getSubjectBackground(roomID));
+	// finish();
+	// break;
+	// }
+	// };
+	// };
+	//
+	// @AfterViews
+	// public void init() {
+	// ViewUtil.scaleContentView(llEdit);
+	// // ImageLoaderHelper.initImageLoader(this);
+	// CGetIntent();
+	// initAdapter();
+	// SubjectBean subjectBean = SubjectBean.queryByRoomIDAndIsNewOrEdit(roomID,
+	// Constants.EDIT_NEW_THEME);
+	// if (null != subjectBean) {
+	// getNewTheme();
+	// } else {
+	// initRequest();
+	// }
+	// rgFeeScale.setOnClickListener(this);
+	// tvFeeScale.setOnClickListener(this);
+	// rbFixed.setOnClickListener(this);
+	// etFee.addTextChangedListener(mTextWatcher);
+	// rgFeeContent.setOnCheckedChangeListener(this);
+	// rgFeeScale.setOnCheckedChangeListener(this);
+	// tvSend.setOnClickListener(this);
+	// ivCover.setOnClickListener(this);
+	// ivBack.setOnClickListener(this);
+	// btnContentSave.setOnClickListener(this);
+	// btnFeeScaleSave.setOnClickListener(this);
+	// }
+	//
+	// private void initRequest() {
+	// HashMap<String, String> map = new HashMap<String, String>();
+	// map.put("roomID", roomID);
+	// chatRoomInfoSettingAndGetting.getCurrentSubject(map, mHandler);
+	// }
+	//
+	// private String roomID;
+	//
+	// private void CGetIntent() {
+	// roomID = getIntent().getStringExtra(ChatRoomMeActivity.ROOMID);
+	// }
+	//
+	// @Override
+	// public void onClick(View view) {
+	// switch (view.getId()) {
+	// case R.id.rg_fee_Scale:
+	// if (ifFeeScaleShow) {
+	// rgFeeScale.setVisibility(View.GONE);
+	// } else {
+	// rgFeeScale.setVisibility(View.VISIBLE);
+	// }
+	// break;
+	// case R.id.tv_send:
+	// switch (rgFeeContent.getCheckedRadioButtonId()) {
+	// case R.id.rb_content:
+	// updataSubject();
+	// break;
+	// case R.id.rb_fee_scale:
+	// if (etFee.length() <= 0) {
+	// toast.show("请先填写数值");
+	// return;
+	// }
+	// Float count = Float.valueOf(etFee.getText().toString());
+	// if (isScaleOrFixed) {
+	// count = count / 100.0f;
+	// }
+	// HashMap<String, String> map = new HashMap<String, String>();
+	// map.put("roomID", roomID);
+	// map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+	// map.put("amount", "" + count);
+	// chatRoomInfoSettingAndGetting.setChargeAmount(map, mHandler);
+	// break;
+	// }
+	// break;
+	// case R.id.iv_cover:
+	// requestCode = Constants.REQUEST_CODE_COVER;
+	// showCameraAlbumDialog();
+	// break;
+	// case R.id.iv_back:
+	// finish();
+	// break;
+	// case R.id.btn_content_save:
+	// saveNewTheme();
+	// break;
+	// case R.id.btn_fee_scale_save:
+	// saveChargeAmount();
+	// break;
+	// }
+	// }
+	//
+	// private void updataSubject() {
+	// HashMap<String, String> map = new HashMap<String, String>();
+	// if (null == coverPath) {
+	// toast.show("请先重新选择一张背景图片");
+	// return;
+	// }
+	// if (etSubjectName.length() <= 0) {
+	// toast.show("请先填写聊天室名字");
+	// return;
+	// }
+	// file[0] = new File(coverPath);
+	// map.put("subjectName", etSubjectName.getText().toString());
+	// map.put("roomID", roomID);
+	// for (int i = 0; i < mData.size(); i++) {
+	// ThemeBean theme = mData.get(i);
+	// if (null != theme.picPath) {
+	// file[1 + i] = new File(theme.picPath);
+	// }
+	// switch (i) {
+	// case 0:
+	// if (null != theme.subjectContent) {
+	// map.put("subjectContent", theme.subjectContent);
+	// }
+	// break;
+	// case 1:
+	// if (null != theme.subjectContent) {
+	// map.put("subjectContent1", theme.subjectContent);
+	// }
+	// break;
+	// case 2:
+	// if (null != theme.subjectContent) {
+	// map.put("subjectContent2", theme.subjectContent);
+	// }
+	// break;
+	// }
+	// }
+	// LogUtils.e("bm", "roomID--" + roomID);
+	// chatRoomInfoSettingAndGetting.submitImageWithParams(map, file,
+	// Constants.API_UPDATA_SUBJECT, mHandler);
+	// }
+	//
+	// ThemeAdapter adapter;
+	// Integer position;
+	// private List<ThemeBean> mData;
+	// private CameraAlbumDialogFragment cameraAlbumDialogFragment;
+	//
+	// private void initAdapter() {
+	// mData = new ArrayList<ThemeBean>();
+	// adapter = new ThemeAdapter(this, mData, false);
+	// View view = View.inflate(mContext, R.layout.item_edit_theme_bottom,
+	// null);
+	// lvAddNewTheme.addFooterView(view);
+	// lvAddNewTheme.setAdapter(adapter);
+	// adapter.setOnThemeClickListener(new OnThemeClickListener() {
+	//
+	// @Override
+	// public void onClick(View view) {
+	// position = (Integer) view.getTag(Constants.ITEM_POSITION);
+	// switch (view.getId()) {
+	// case R.id.iv_add_pic:
+	// requestCode = Constants.REQUEST_CODE_PIC;
+	// showCameraAlbumDialog();
+	// break;
+	// }
+	// }
+	//
+	// });
+	// lvAddNewTheme.setOnItemClickListener(new OnItemClickListener() {
+	//
+	// @Override
+	// public void onItemClick(AdapterView<?> arg0, View arg1, int position,
+	// long arg3) {
+	// if (position == adapter.getCount()) {
+	// mData.add(new ThemeBean());
+	// adapter.setIfLocalNotifyDataSetChanged(true);
+	// }
+	// }
+	// });
+	// }
+	//
+	// /**
+	// * 显示拍照相册对话框
+	// * */
+	// private void showCameraAlbumDialog() {
+	// if (null == cameraAlbumDialogFragment) {
+	// cameraAlbumDialogFragment = new CameraAlbumDialogFragment();
+	// }
+	// cameraAlbumDialogFragment.setOnCameraAlbumClickListener(ChatRoomEditActivity.this);
+	// cameraAlbumDialogFragment.show(getSupportFragmentManager(),
+	// "cameraAlbumDialogFragment");
+	// }
+	//
+	// private TextWatcher mTextWatcher = new TextWatcher() {
+	//
+	// @Override
+	// public void onTextChanged(CharSequence data, int arg1, int arg2, int
+	// arg3) {
+	// if (isScaleOrFixed) {
+	// Float feeCount = null;
+	// if (null != data.toString() && !("".equals(data.toString()))) {
+	// feeCount = Float.valueOf(data.toString());
+	// }
+	// if (feeCount == null) {
+	// return;
+	// }
+	// if (feeCount > 100 || feeCount < 0) {
+	// etFee.setText("");
+	// }
+	// LogUtils.e("bm", "---" + feeCount);
+	// }
+	// }
+	//
+	// @Override
+	// public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int
+	// arg3) {
+	//
+	// }
+	//
+	// @Override
+	// public void afterTextChanged(Editable arg0) {
+	//
+	// }
+	// };
+	//
+	// @Override
+	// public void onCheckedChanged(RadioGroup radioGroup, int arg1) {
+	// switch (radioGroup.getId()) {
+	// case R.id.rg_content:
+	// switch (radioGroup.getCheckedRadioButtonId()) {
+	// case R.id.rb_content:
+	// slFee.setToScreen(0);
+	// break;
+	// case R.id.rb_fee_scale:
+	// slFee.setToScreen(1);
+	// break;
+	// }
+	// break;
+	// case R.id.rg_fee_Scale:
+	// switch (radioGroup.getCheckedRadioButtonId()) {
+	// // case R.id.rb_scale:
+	// // isScaleOrFixed = true;
+	// // tvPercent.setVisibility(View.VISIBLE);
+	// // break;
+	// case R.id.rb_fixed:
+	// isScaleOrFixed = false;
+	// tvPercent.setVisibility(View.GONE);
+	// break;
+	// }
+	// break;
+	// }
+	// }
+	//
+	// public void addNewTheme() {
+	// HashMap<String, String> map = new HashMap<String, String>();
+	// if (null == coverPath) {
+	// toast.show("请先选择一张背景图片");
+	// return;
+	// }
+	// if (etSubjectName.length() <= 0) {
+	// toast.show("请先填写聊天室名字");
+	// return;
+	// }
+	// if (etFee.length() <= 0) {
+	// toast.show("请先填写收费标准");
+	// return;
+	// }
+	// file[0] = new File(coverPath);
+	// map.put("subjectName", etSubjectName.getText().toString());
+	// map.put("roomID", roomID);
+	// map.put("ownerID", DecentWorldApp.getInstance().getDwID());
+	// map.put("chargeAmount", "" + etFee.getText().toString());
+	// for (int i = 0; i < mData.size(); i++) {
+	// ThemeBean theme = mData.get(i);
+	// if (null != theme.picPath) {
+	// file[1 + i] = new File(theme.picPath);
+	// }
+	// switch (i) {
+	// case 0:
+	// if (null != theme.subjectContent) {
+	// map.put("subjectContent", theme.subjectContent);
+	// }
+	// break;
+	// case 1:
+	// if (null != theme.subjectContent) {
+	// map.put("subjectContent1", theme.subjectContent);
+	// }
+	// break;
+	// case 2:
+	// if (null != theme.subjectContent) {
+	// map.put("subjectContent2", theme.subjectContent);
+	// }
+	// break;
+	// }
+	// }
+	// chatRoomInfoSettingAndGetting.submitImageWithParams(map, file,
+	// Constants.API_CREATE_SUBJECT, mHandler);
+	// }
+	//
+	// public void saveChargeAmount() {
+	// SubjectBean info = SubjectBean.queryByRoomIDAndIsNewOrEdit(roomID,
+	// Constants.EDIT_NEW_THEME);
+	// if (null == info) {
+	// info = new SubjectBean(roomID, Constants.EDIT_NEW_THEME);
+	// }
+	// switch (rgFeeScale.getCheckedRadioButtonId()) {
+	// case R.id.rb_fixed:
+	// info.isFixedOrPercent = Constants.FIXED;
+	// break;
+	// // case R.id.rb_scale:
+	// // info.isFixedOrPercent = Constants.PERCENT;
+	// // break;
+	// }
+	// if (etFee.length() > 0) {
+	// info.chargeAmount = etFee.getText().toString();
+	// info.save();
+	// }
+	// toast.show("已暂存");
+	// }
+	//
+	// public void saveNewTheme() {
+	// SubjectBean info = SubjectBean.queryByRoomIDAndIsNewOrEdit(roomID,
+	// Constants.EDIT_NEW_THEME);
+	// if (null == info) {
+	// info = new SubjectBean(roomID, Constants.EDIT_NEW_THEME);
+	// }
+	// if (null != coverPath) {
+	// info.subjectBackground = coverPath;
+	// } else {
+	// info.subjectBackground = null;
+	// }
+	// if (etSubjectName.length() > 0) {
+	// info.subjectName = etSubjectName.getText().toString();
+	// } else {
+	// info.subjectName = null;
+	// }
+	// for (int i = 0; i < mData.size(); i++) {
+	// ThemeBean theme = mData.get(i);
+	// if (null != theme.picPath) {
+	// switch (i) {
+	// case 0:
+	// info.imgUrl = theme.picPath;
+	// break;
+	// case 1:
+	// info.imgUrl1 = theme.picPath;
+	// break;
+	// case 2:
+	// info.imgUrl2 = theme.picPath;
+	// break;
+	// }
+	// } else {
+	// switch (i) {
+	// case 0:
+	// info.imgUrl = null;
+	// break;
+	// case 1:
+	// info.imgUrl1 = null;
+	// break;
+	// case 2:
+	// info.imgUrl2 = null;
+	// break;
+	// }
+	// }
+	// if (null != theme.subjectContent) {
+	// switch (i) {
+	// case 0:
+	// info.subjectContent = theme.subjectContent;
+	// break;
+	// case 1:
+	// info.subjectContent1 = theme.subjectContent;
+	// break;
+	// case 2:
+	// info.subjectContent2 = theme.subjectContent;
+	// break;
+	// }
+	// } else {
+	// switch (i) {
+	// case 0:
+	// info.subjectContent = null;
+	// break;
+	// case 1:
+	// info.subjectContent1 = null;
+	// break;
+	// case 2:
+	// info.subjectContent2 = null;
+	// break;
+	// }
+	// }
+	//
+	// }
+	// info.save();
+	// toast.show("已暂存");
+	// }
+	//
+	// public void getNewTheme() {
+	// SubjectBean info = SubjectBean.queryByRoomIDAndIsNewOrEdit(roomID,
+	// Constants.EDIT_NEW_THEME);
+	// if (null == info) {
+	// return;
+	// }
+	// if (null != info.subjectBackground) {
+	// coverPath = info.subjectBackground;
+	// // Picasso.with(mContext).load(new File(coverPath)).into(ivCover);
+	// ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE +
+	// coverPath, ivCover, ImageLoaderHelper.mOptions);
+	// }
+	// if (null != info.subjectName) {
+	// etSubjectName.setText(info.subjectName);
+	// }
+	// if (null != info.imgUrl || null != info.subjectContent) {
+	// ThemeBean themeBean = new ThemeBean();
+	// themeBean.picPath = info.imgUrl;
+	// themeBean.subjectContent = info.subjectContent;
+	// mData.add(themeBean);
+	// }
+	// if (null != info.imgUrl1 || null != info.subjectContent1) {
+	// ThemeBean themeBean = new ThemeBean();
+	// themeBean.picPath = info.imgUrl1;
+	// themeBean.subjectContent = info.subjectContent1;
+	// mData.add(themeBean);
+	// }
+	// if (null != info.imgUrl2 || null != info.subjectContent2) {
+	// ThemeBean themeBean = new ThemeBean();
+	// themeBean.picPath = info.imgUrl2;
+	// themeBean.subjectContent = info.subjectContent2;
+	// mData.add(themeBean);
+	// }
+	// adapter.notifyDataSetChanged();
+	// if (null != info.chargeAmount && null != info.isFixedOrPercent) {
+	// if (Constants.FIXED.equals(info.isFixedOrPercent)) {
+	// rbFixed.setChecked(true);
+	// tvPercent.setVisibility(View.GONE);
+	// } else if (Constants.PERCENT.equals(info.isFixedOrPercent)) {
+	// // rbScale.setChecked(true);
+	// // tvPercent.setVisibility(View.VISIBLE);
+	// }
+	// etFee.setText(info.chargeAmount);
+	// }
+	// }
+	//
+	// @Override
+	// public void onCameraAlbumClick(View view) {
+	// Intent intent;
+	// switch (view.getId()) {
+	// case R.id.tv_camera:
+	// intent = new Intent(this, PictureClipActivity_.class);
+	// intent.putExtra(Constants.CAMERA_ALBUM, 1);
+	// intent.putExtra(Constants.ASPECTX, 1);
+	// intent.putExtra(Constants.ASPECTY, 1);
+	// intent.putExtra(Constants.OUTPUTX, 400);
+	// intent.putExtra(Constants.OUTPUTY, 400);
+	// startActivityForResult(intent, requestCode);
+	// break;
+	// case R.id.tv_album:
+	// intent = new Intent(this, PictureClipActivity_.class);
+	// intent.putExtra(Constants.CAMERA_ALBUM, 0);
+	// intent.putExtra(Constants.ASPECTX, 1);
+	// intent.putExtra(Constants.ASPECTY, 1);
+	// intent.putExtra(Constants.OUTPUTX, 400);
+	// intent.putExtra(Constants.OUTPUTY, 400);
+	// startActivityForResult(intent, requestCode);
+	// break;
+	// case R.id.tv_cancel:
+	// cameraAlbumDialogFragment.dismiss();
+	// break;
+	// }
+	// // Intent intent = new Intent(getApplicationContext(),
+	// // TakePhotosAndpictureSingleActivity.class);
+	// // intent.putExtra(Constants.ASPECTX, Constants.CHAT_ROOM_SEVEN);
+	// // intent.putExtra(Constants.ASPECTY, Constants.CHAT_ROOM_FOUR);
+	// // intent.putExtra(Constants.OUTPUTX,
+	// // Constants.CHAT_ROOM_SEVEN_HUNDRED);
+	// // intent.putExtra(Constants.OUTPUTY,
+	// // Constants.CHAT_ROOM_OUTPUT_FOUR_HUNDRED);
+	// // startActivityForResult(intent, REQUEST_CODE_COVER);
+	//
+	// // Intent intentPic = new Intent(getApplicationContext(),
+	// // TakePhotosAndpictureActivity.class);
+	// // intentPic.putExtra("max_count", Constants.CHOICE_ONE_PIC);
+	// // startActivityForResult(intentPic, REQUEST_CODE_PIC);
+	// }
+	//
+	// private String coverPath;
+	//
+	// @Override
+	// protected void onActivityResult(int requestCode, int resultCode, Intent
+	// data) {
+	// super.onActivityResult(requestCode, resultCode, data);
+	// if (null == data) {
+	// return;
+	// }
+	// String filePath = data.getStringExtra("filePath");
+	// // String img = "<img src=" +
+	// // "http://112.74.13.117/data/834858/icon/sicon.jpg" + " alt=" + "" +
+	// // "/>";
+	// textWrap(filePath);
+	// switch (requestCode) {
+	// case Constants.REQUEST_CODE_COVER:
+	// coverPath = filePath;
+	// // Picasso.with(mContext).load(new File(filePath)).into(ivCover);
+	// ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE +
+	// filePath, ivCover, ImageLoaderHelper.mOptions);
+	// LogUtils.i("bm", "tag-------------");
+	// break;
+	// case Constants.REQUEST_CODE_PIC:
+	// ThemeBean theme = mData.get(position);
+	// theme.picPath = filePath;
+	// adapter.setIfLocalNotifyDataSetChanged(true);
+	// break;
+	// }
+	// }
+	//
+	// private void textWrap(String absolutePathTakePhoto) {
+	// Bitmap bitmap = BitmapFactory.decodeFile(absolutePathTakePhoto);
+	// ImageSpan span = new ImageSpan(this, bitmap);
+	// SpannableString ss = new SpannableString(absolutePathTakePhoto);
+	// ss.setSpan(span, 0, absolutePathTakePhoto.length(),
+	// Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+	// etSubjectName.append(ss);
+	// LogUtils.i("bm", "content--" + etSubjectName.getText().toString());
+	// }
+}

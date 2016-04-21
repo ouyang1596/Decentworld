@@ -1,0 +1,333 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.db;
+
+import java.io.Serializable;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.alibaba.fastjson.annotation.JSONField;
+
+/**
+ * 
+ * @ClassName: ContactUser.java
+ * @Description: 本地数据库存放用户好友的表
+ * @author: cj
+ * @date: 2016年3月24日 下午7:07:08
+ */
+@Table(name = "contactUser")
+public class ContactUser extends Model implements Serializable
+{
+    private static final long serialVersionUID = 1L;
+    private static final String TAG = "ContactUser";
+    public String sortLetters;
+
+    /** 用户类型 **/
+    public enum UserType
+    {
+        IMPEACH(0, "疑"), NORMAL(1, "真"), VIP(2, "腕");
+        private int index;
+        private String info;
+
+        /**
+         * 
+         */
+        private UserType(int index, String info)
+        {
+            this.index = index;
+            this.info = info;
+        }
+
+        /**
+         * @return the index
+         */
+        public int getIndex()
+        {
+            return index;
+        }
+
+        /**
+         * @return the info
+         */
+        public String getInfo()
+        {
+            return info;
+        }
+
+    }
+
+    /** 存放用户的朋友的头像 （暂时保留） */
+    @Column(name = "icon")
+    public String icon;
+
+    /** 用户dwID **/
+    @JSONField(serialize = false)
+    @Column(name = "userID")
+    public String userID;
+
+    /** 存放对方的ID */
+    @Column(name = "friendID")
+    public String friendID;
+
+    /** 对方职业 **/
+    @Column(name = "occupation")
+    public String occupation;
+
+    /** 备注 **/
+    @Column(name = "showName")
+    public String showName;
+
+    /** 性别 **/
+    @Column(name = "gender")
+    public String gender;
+
+    /** 用户类型 **/
+    @Column(name = "userType")
+    public int userType;
+
+    /** 对方身价 **/
+    @Column(name = "worth")
+    public float worth;
+
+    /** 保留字段，用于扩展 */
+    @Column(name = "remain")
+    public String remain;
+
+    @Column(name = "nameLetter")
+    public String nameLetter;
+
+    public boolean checked = false;
+
+    /**
+     * 
+     */
+    public ContactUser()
+    {
+
+    }
+
+    public ContactUser(String friendID, String showName, float worth, int userType)
+    {
+        this.friendID = friendID;
+        this.showName = showName;
+        this.worth = worth;
+        this.userType = userType;
+    }
+
+    /**
+     * @return the sortLetters
+     */
+    public String getSortLetters()
+    {
+        return sortLetters;
+    }
+
+    /**
+     * @param sortLetters
+     *            the sortLetters to set
+     */
+    public void setSortLetters(String sortLetters)
+    {
+        this.sortLetters = sortLetters;
+    }
+
+    /**
+     * @return the icon
+     */
+    public String getIcon()
+    {
+        return icon;
+    }
+
+    /**
+     * @param icon
+     *            the icon to set
+     */
+    public void setIcon(String icon)
+    {
+        this.icon = icon;
+    }
+
+    /**
+     * @return the userID
+     */
+    public String getUserID()
+    {
+        return userID;
+    }
+
+    /**
+     * @param userID
+     *            the userID to set
+     */
+    public void setUserID(String userID)
+    {
+        this.userID = userID;
+    }
+
+    /**
+     * @return the friendID
+     */
+    public String getFriendID()
+    {
+        return friendID;
+    }
+
+    /**
+     * @param friendID
+     *            the friendID to set
+     */
+    public void setFriendID(String friendID)
+    {
+        this.friendID = friendID;
+    }
+
+    /**
+     * @return the occupation
+     */
+    public String getOccupation()
+    {
+        return occupation;
+    }
+
+    /**
+     * @param occupation
+     *            the occupation to set
+     */
+    public void setOccupation(String occupation)
+    {
+        this.occupation = occupation;
+    }
+
+    /**
+     * @return the showName
+     */
+    public String getShowName()
+    {
+        return showName;
+    }
+
+    /**
+     * @param showName
+     *            the showName to set
+     */
+    public void setShowName(String showName)
+    {
+        this.showName = showName;
+    }
+
+    /**
+     * @return the gender
+     */
+    public String getGender()
+    {
+        return gender;
+    }
+
+    /**
+     * @param gender
+     *            the gender to set
+     */
+    public void setGender(String gender)
+    {
+        this.gender = gender;
+    }
+
+    /**
+     * @return the userType
+     */
+    public int getUserType()
+    {
+        return userType;
+    }
+
+    /**
+     * @param userType
+     *            the userType to set
+     */
+    public void setUserType(int userType)
+    {
+        this.userType = userType;
+    }
+
+    /**
+     * @return the worth
+     */
+    public float getWorth()
+    {
+        return worth;
+    }
+
+    /**
+     * @param worth
+     *            the worth to set
+     */
+    public void setWorth(float worth)
+    {
+        this.worth = worth;
+    }
+
+    /**
+     * @return the remain
+     */
+    public String getRemain()
+    {
+        return remain;
+    }
+
+    /**
+     * @param remain
+     *            the remain to set
+     */
+    public void setRemain(String remain)
+    {
+        this.remain = remain;
+    }
+
+    /**
+     * @return the nameLetter
+     */
+    public String getNameLetter()
+    {
+        return nameLetter;
+    }
+
+    /**
+     * @param nameLetter
+     *            the nameLetter to set
+     */
+    public void setNameLetter(String nameLetter)
+    {
+        this.nameLetter = nameLetter;
+    }
+
+    /**
+     * @return the checked
+     */
+    public boolean isChecked()
+    {
+        return checked;
+    }
+
+    /**
+     * @param checked
+     *            the checked to set
+     */
+    public void setChecked(boolean checked)
+    {
+        this.checked = checked;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "ContactUser [userID=" + userID + ", friendID=" + friendID + ", occupation=" + occupation + ", showName=" + showName + ", gender=" + gender + ", userType=" + userType + ", worth="
+                + worth + "]";
+    }
+    
+    
+    
+
+}

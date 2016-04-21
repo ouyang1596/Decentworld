@@ -1,0 +1,45 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.dao;
+
+import cn.sx.decentworld.bean.DWMessage;
+
+import com.activeandroid.query.Select;
+
+/**
+ * @ClassName: DWMessageDao.java
+ * @Description: 消息数据库访问
+ * @author: cj
+ * @date: 2016年4月18日 上午9:56:53
+ */
+public class DWMessageDao
+{
+    /**
+     * 构造函数
+     */
+    public DWMessageDao()
+    {
+
+    }
+
+    // /////////////////////////////////////////静态方法///////////////////////////////////////////////////////
+    
+    /**
+     * 根据文本消息的packetID搜索唯一的DWMessage
+     * @param packetID
+     * @return
+     */
+    public static DWMessage queryItem(String packetID)
+    {
+        return new Select().from(DWMessage.class).where("txtMsgID = ?", packetID).executeSingle();
+    }
+
+    public static DWMessage queryItem(long mid)
+    {
+        return new Select().from(DWMessage.class).where("mid = ?", mid).executeSingle();
+    }
+
+    // /////////////////////////////////////////私有方法///////////////////////////////////////////////////////
+
+}

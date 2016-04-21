@@ -1,0 +1,100 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.util.List;
+
+import android.content.Context;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.WorkBean;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.TimeUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+/**
+ * @ClassName: WorkCircleAdapter.java
+ * @author: yj
+ * @date: 2016年3月7日 下午3:05:29
+ */
+public class WorkCircleAdapter extends BaseAdapter {
+	private Context mContext;
+	private List<WorkBean> mWorkBeans;
+
+	public WorkCircleAdapter(Context context, List<WorkBean> workBean) {
+		mContext = context;
+		mWorkBeans = workBean;
+	}
+
+	@Override
+	public int getCount() {
+		return null == mWorkBeans ? 0 : mWorkBeans.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return mWorkBeans.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View con, ViewGroup parent) {
+		ViewHolder vh;
+		if (null == con) {
+			con = View.inflate(mContext, R.layout.layout_work_circle_item, null);
+			vh = new ViewHolder();
+			vh.tvContent = (TextView) con.findViewById(R.id.tv_content);
+			vh.tvName = (TextView) con.findViewById(R.id.tv_name);
+			vh.ivAvatar = (ImageView) con.findViewById(R.id.iv_avatar);
+			vh.tvCai = (TextView) con.findViewById(R.id.tv_cai);
+			vh.tvTime = (TextView) con.findViewById(R.id.tv_time);
+			vh.tvZan = (TextView) con.findViewById(R.id.tv_zan);
+			vh.tvTime = (TextView) con.findViewById(R.id.tv_time);
+			vh.tvDelete = (TextView) con.findViewById(R.id.tv_delete);
+			vh.tvComment = (TextView) con.findViewById(R.id.tv_comment);
+			vh.ivAvatar = (ImageView) con.findViewById(R.id.iv_avatar);
+			con.setTag(vh);
+		} else {
+			vh = (ViewHolder) con.getTag();
+		}
+		WorkBean workBean = mWorkBeans.get(position);
+		vh.tvContent.setText(workBean.content);
+		vh.tvName.setText(workBean.publisherName);
+		ImageLoaderHelper.mImageLoader.displayImage(ImageUtils.getIconByDwID(workBean.dwID, ImageUtils.ICON_MAIN), vh.ivAvatar,
+				ImageLoaderHelper.mOptions);
+		String time = TimeUtils.getFormatTime(workBean.time, "MM-dd-HH:mm");
+		vh.tvZan.setText("赞（" + workBean.like + "）");
+		vh.tvCai.setText("踩（" + workBean.dislike + "）");
+		vh.tvTime.setText(time);
+		return con;
+	}
+
+	private OnClickListener mOnClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			Integer position = (Integer) v.getTag();
+			switch (v.getId()) {
+			case R.id.tv_comment:
+				ToastUtil.showToast("position--" + position);
+				break;
+			}
+		}
+	};
+
+	class ViewHolder {
+		TextView tvContent, tvName, tvCai, tvZan, tvDelete, tvComment, tvTime;
+		ImageView ivAvatar;
+	}
+}

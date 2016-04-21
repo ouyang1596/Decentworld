@@ -38,10 +38,10 @@ public final class EditSchoolActivity_
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
         btn_edit_school_complete = ((Button) findViewById(id.btn_edit_school_complete));
         aTvUniversity = ((AutoCompleteTextView) findViewById(id.act_edit_school));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

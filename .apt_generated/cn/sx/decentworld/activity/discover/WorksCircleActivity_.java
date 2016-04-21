@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.KeyboardComponent_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
@@ -30,10 +31,13 @@ public final class WorksCircleActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        KeyboardComponent = KeyboardComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        viewMask = ((View) findViewById(id.view_mask));
         plvWorkCircle = ((PullToRefreshListView) findViewById(id.plv_work_circle));
+        ((KeyboardComponent_) KeyboardComponent).afterSetContentView_();
         inti();
     }
 

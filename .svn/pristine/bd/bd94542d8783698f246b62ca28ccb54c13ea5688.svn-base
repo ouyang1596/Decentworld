@@ -1,0 +1,810 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.engine;
+
+import java.io.File;
+import java.util.HashMap;
+
+import org.json.JSONException;
+import org.simple.eventbus.EventBus;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.activity.MainActivity_;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.listener.NetCallback;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.Base64Util;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.MsgVerify;
+import cn.sx.decentworld.utils.SPUtils;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+
+/**
+ * @ClassName: UserKey.java
+ * @Description: 获取publicKey，然后生成一个随机字符串，用随机字符串对publicKey进行加密生成一个newKey；
+ *               将newKey上传到服务器，上传成功后，将随机字符串保存在本地；
+ * @author: cj
+ * @date: 2016年3月9日 下午5:37:35
+ */
+public class UserDataEngine {
+	private static final String TAG = "UserDataEngine";
+	private static UserDataEngine instance = null;
+
+	/**
+	 * 防止外部创建多个对象
+	 */
+	private UserDataEngine() {
+
+	}
+
+	/**
+	 * 获取实例
+	 * 
+	 * @return
+	 */
+	public static UserDataEngine getInstance() {
+		if (instance == null)
+			synchronized (UserDataEngine.class) {
+				if (instance == null)
+					instance = new UserDataEngine();
+			}
+		return instance;
+	}
+
+	// ////////////////////////////////////////////获取和上传key//////////////////////////////////////
+	/**
+	 * 获取公匙
+	 */
+	public void getKey(Context context, UserKeyListener listener) {
+		getKeyE(context, listener);
+	}
+
+	/**
+	 * 回调接口
+	 */
+	public interface UserKeyListener {
+		// 获取公匙成功
+		public void onSucceed();
+
+		// 获取公匙失败
+		public void onFailed(String casue);
+	}
+
+	// ///////////////////////////////////////////checkVersion:检查用户信息的版本号///////////////////////////////////////
+	/**
+	 * 验证个人信息的版本号
+	 * 
+	 * @param checkUserInfoVersionListener
+	 */
+	public void checkUserInfoVersion(CheckUserInfoVersionListener checkUserInfoVersionListener) {
+		String userID = DecentWorldApp.getInstance().getDwID();
+		String allUserInfoVersion = UserInfoHelper.getAllUserInfoVersion(userID);
+		LogUtils.i(TAG, "checkUserInfoVersion,当前版本号为:" + allUserInfoVersion);
+		checkUserInfoVersionE(userID, allUserInfoVersion, checkUserInfoVersionListener);
+	}
+
+	public interface CheckUserInfoVersionListener {
+		// 版本相同
+		void onSameVersion(String info);
+
+		// 版本不相同，更新本地数据
+		void onSuccess(String jsonStr);
+
+		void onFailure(String cause);
+	}
+
+	/**
+	 * 获取用户的ID
+	 * 
+	 * @param phoneNum
+	 *            电话号码
+	 * @param listener
+	 *            回调监听
+	 */
+	public void getUserID(String phoneNum, GetUserIDListener listener) {
+		getUserdwID(phoneNum, listener);
+	}
+
+	/**
+	 * 获取用户ID回调监听
+	 */
+	public interface GetUserIDListener {
+		void onSuccess(String userID, String token);
+
+		void onFailure(String cause);
+	}
+
+	/**
+	 * 获取身家
+	 * 
+	 * @param listener
+	 */
+	public void getWealth(GetWealthListener listener) {
+		getWealthE(listener);
+	}
+
+	public interface GetWealthListener {
+		// 返回身家
+		void onGetWealthFinished(String wealth);
+	}
+
+	/**
+	 * 获取身价(暂时没有用到)
+	 * 
+	 * @param listener
+	 */
+	public void getWorth(GetWorthListener listener) {
+		getWorththE(listener);
+	}
+
+	public interface GetWorthListener {
+		// 返回身家
+		void onGetWorthFinished(String worth);
+	}
+
+	/**
+	 * 设置身价
+	 * 
+	 * @param worth
+	 *            身价
+	 * @param listener
+	 *            回调监听
+	 */
+	public void setWorth(String worth, SetWorthListener listener) {
+		setWorththE(worth, listener);
+	}
+
+	/**
+	 * 设置身价回调监听
+	 */
+	public interface SetWorthListener {
+		// 当前身价
+		void onSuccess(String currentWorth);
+
+		// 设置失败
+		void onFailure(String cause);
+	}
+
+	/**
+	 * 设置用户的信息
+	 * 
+	 * @param authority
+	 */
+	public void setUserInfo(String allUserInfo, NetCallback listener) {
+		setUserInfoE(allUserInfo, listener);
+	}
+
+	/**
+	 * 设置用户信息的权限
+	 * 
+	 * @param authority
+	 */
+	public void setUserInfoAuthority(String authority, NetCallback listener) {
+		setUserInfoAuthorityE(authority, listener);
+	}
+
+	/**
+	 * 设置用户的头像
+	 * 
+	 * @param authority
+	 */
+	public void setUserIcon(File[] icon, int count, NetCallback listener) {
+		setUserIconE(icon, count, listener);
+	}
+
+	// ///////////////////////////////////////////私有方法////////////////////////////////////////////
+
+	/**
+	 * 发送通知
+	 * 
+	 * @param handler
+	 * @param what
+	 * @param info
+	 */
+	private void sendHandlerMsg(Handler handler, int what, String info) {
+		Message message = Message.obtain();
+		message.what = what;
+		message.obj = info;
+		handler.sendMessage(message);
+	}
+
+	/**
+	 * @param context
+	 * @param listener
+	 */
+	private void getKeyE(Context context, final UserKeyListener listener) {
+		String userID = DecentWorldApp.getInstance().getDwID();
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", userID);
+		LogUtils.i(TAG, "getKey...begin,userID=" + userID);
+		SendUrl sendUrl = new SendUrl(context);
+		final HandKey handKey = new HandKey(context, listener);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_GET_KEY, Method.GET, new HttpCallBack() {
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.i(TAG, "getKey...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg()
+						+ ",msg.getData=" + msg.getData());
+				if (msg.getResultCode() == 2222) {
+					JSONObject result = JSON.parseObject(msg.getData().toString());
+					String key = result.getString("key");
+					// 上传key
+					Message message = Message.obtain();
+					message.obj = key;
+					handKey.sendMessage(message);
+				} else if (msg.getResultCode() == 3333) {
+					LogUtils.i(TAG, "getKey...failure,cause by:" + msg.getMsg());
+					if (CommUtil.isNotBlank(msg.getMsg())) {
+						listener.onFailed(msg.getMsg());
+					} else {
+						listener.onFailed("获取key失败");
+					}
+				} else {
+					LogUtils.i(TAG, "getKey...failure,cause by:未知的返回码。");
+					listener.onFailed("getKey未知返回码");
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				listener.onFailed(Constants.NET_WRONG);
+			}
+		});
+
+	}
+
+	/**
+	 * 获取到服务器传回的publicKey后用生成的随机字符串进行加密，加密后上传
+	 */
+	private class HandKey extends Handler {
+		private UserKeyListener listener;
+		private String key;
+		private Context context;
+
+		/**
+		 * 构造函数
+		 */
+		public HandKey(Context context, UserKeyListener listener) {
+			this.context = context;
+			this.listener = listener;
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			this.key = msg.obj.toString();
+			// 获取随机字符串
+			String randomStr = MsgVerify.getSalt();
+			try {
+				// 用生成的随机字符串加密publicKey生成newKey
+				String newKey = Base64Util.encodeToString(MsgVerify.encrypt(MsgVerify.getPublicKey(key), randomStr.getBytes()));
+				String password = DecentWorldApp.getInstance().getPassword();
+				LogUtils.i(TAG, "password=" + password + ",randomStr=" + randomStr + ",newKey=" + newKey);
+				uploadKey(context, password, newKey, randomStr, listener);
+			} catch (Exception e) {
+				LogUtils.i(TAG, "加密异常，cause by:" + e.toString());
+				listener.onFailed("生成key失败");
+			}
+		}
+	}
+
+	/**
+	 * 将newKey上传到服务器
+	 * 
+	 * @param context
+	 * @param password
+	 * @param newKey
+	 * @param randomStr
+	 * @param listener
+	 */
+	private void uploadKey(final Context context, String password, String newKey, final String randomStr,
+			final UserKeyListener listener) {
+		String userID = DecentWorldApp.getInstance().getDwID();
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", userID);
+		map.put("password", password);
+		map.put("newKey", newKey);
+		SendUrl sendUrl = new SendUrl(context);
+		LogUtils.i(TAG, "uploadKey...begin,userID=" + userID + ",password=" + password + ",newKey=" + newKey);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_UPLOAD_KEY, Method.GET, new HttpCallBack() {
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.i(TAG, "uploadKey...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg=" + msg.getMsg()
+						+ ",msg.getData=" + msg.getData());
+				if (msg.getResultCode() == 2222) {
+					LogUtils.i(TAG, "uploadKey...success");
+					// 保存数据
+					SPUtils.put(context, SPUtils.randomStr, randomStr);
+					LogUtils.i(TAG, "加密后的randomStr已经上传服务器,加密前的randomStr=" + randomStr);
+					// 成功回调
+					listener.onSucceed();
+				} else if (msg.getResultCode() == 3333) {
+					LogUtils.i(TAG, "uploadKey...failure,cause by:" + msg.getMsg());
+					if (CommUtil.isNotBlank(msg.getMsg())) {
+						listener.onFailed(msg.getMsg());
+					} else {
+						listener.onFailed("上传key失败");
+					}
+				} else {
+					LogUtils.i(TAG, "uploadKey...failure,cause by:未知的返回码");
+					listener.onFailed("uploadKey未知的返回码");
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				LogUtils.i(TAG, "uploadKey...onFailure,cause by:" + e);
+				listener.onFailed(Constants.NET_WRONG);
+			}
+		});
+	}
+
+	/**
+	 * 验证个人信息的版本号
+	 * 
+	 * @param userID
+	 * @param version
+	 * @param checkUserInfoVersionListener
+	 */
+	private void checkUserInfoVersionE(final String userID, String version,
+			final CheckUserInfoVersionListener checkUserInfoVersionListener) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case 0:
+					checkUserInfoVersionListener.onFailure(msg.obj.toString());
+					break;
+				case 1:
+					checkUserInfoVersionListener.onSameVersion(msg.obj.toString());
+					break;
+				case 2:
+					checkUserInfoVersionListener.onSuccess(msg.obj.toString());
+					break;
+				default:
+					break;
+				}
+			};
+		};
+		Context context = DecentWorldApp.getGlobalContext();
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", userID);
+		map.put("selfVersion", version);
+		SendUrl sendUrl = new SendUrl(context);
+		LogUtils.i(TAG, "checkUserInfoVersionE...begin,userID=" + userID + ",selfVersion=" + version);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_LOAD_ALL_DATA_V6, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "checkUserInfoVersionE...begin,msg.getResultCode=" + msg.getResultCode() + ",msg.getMsg="
+								+ msg.getMsg() + ",msg.getData=" + msg.getData());
+						// V6版本
+						if (msg.getResultCode() == 2222) {
+							String jsonStr = msg.getData().toString();
+							JSONObject jsonObject = JSON.parseObject(jsonStr);
+							Float wealth = jsonObject.getFloat("wealth");
+							sendHandlerMsg(handler, 1, "版本相同，身家更新为：" + wealth);
+							LogUtils.i(TAG, "checkUserInfoVersionE...版本相同，不需要更新数据,身家为：" + wealth);
+						}
+						if (msg.getResultCode() == 3333) {
+							String jsonStr = msg.getData().toString();
+							JSONObject jsonObject = JSON.parseObject(jsonStr);
+							String versionNum = jsonObject.getString("versionNum");
+							UserInfoHelper.setAllUserInfoVersion(userID, versionNum);
+							sendHandlerMsg(handler, 2, jsonStr);
+							LogUtils.i(TAG, "checkUserInfoVersionE...版本不同,获取的服务器版本号=" + versionNum);
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.i(TAG, "checkUserInfoVersionE...onFailure,cause by:" + e);
+						sendHandlerMsg(handler, 0, Constants.NET_WRONG);
+					}
+				});
+	}
+
+	/**
+	 * 根据电话号码获取dwID
+	 * 
+	 * @param phoneNum
+	 */
+	private void getUserdwID(final String phoneNum, final GetUserIDListener listener) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case -1:
+					String cause = msg.obj.toString();
+					listener.onFailure(cause);
+					break;
+				case 0:
+					JSONObject object = JSON.parseObject(msg.obj.toString());
+					String userID = object.getString("dwID");
+					String token = object.getString("token");
+					listener.onSuccess(userID, token);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("phoneNum", phoneNum);
+		LogUtils.i(TAG, "getUserdwID...begin,phoneNum=" + phoneNum);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_LOGIN_GET_DWID, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, final ResultBean bean) {
+						LogUtils.i(TAG, "getUserdwID...onSuccess," + response);
+						if (bean.getResultCode() == 2222) {
+							sendHandlerMsg(handler, 0, bean.getData().toString());
+						} else if (bean.getResultCode() == 3333) {
+							sendHandlerMsg(handler, -1, bean.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.i(TAG, "getUserdwID...onFailure");
+						sendHandlerMsg(handler, -1, Constants.NET_WRONG);
+					}
+				});
+	}
+
+	/**
+	 * 获取身家
+	 */
+	private void getWealthE(final GetWealthListener listener) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case -1:
+					UserInfo userInfo = UserInfoEngine.getInstance().getUserInfo();
+					if (userInfo != null) {
+						float wealth = UserInfoEngine.getInstance().getUserInfo().getWealth();
+						listener.onGetWealthFinished(String.valueOf(wealth));
+					} else {
+						listener.onGetWealthFinished("0.0");
+					}
+					break;
+				case 0:
+					JSONObject json = JSON.parseObject(msg.obj.toString());
+					String wealth = json.getString("wealth");
+					UserInfoEngine.getInstance().notifyWealthChanged(Float.valueOf(wealth));
+					listener.onGetWealthFinished(wealth);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		LogUtils.i(TAG, "getWealth...begin，dwID=" + dwID);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_GET_WEALTH, Method.GET, new HttpCallBack() {
+			@Override
+			public void onSuccess(String response, ResultBean bean) {
+				LogUtils.i(TAG, "getWealth...," + response);
+				if (bean.getResultCode() == 2222) {
+					LogUtils.i(TAG, "getWealth...success");
+					sendHandlerMsg(handler, 0, bean.getData().toString());
+				}
+				if (bean.getResultCode() == 3333) {
+					LogUtils.i(TAG, "getWealth...failure,cause by:" + bean.getMsg());
+					sendHandlerMsg(handler, -1, "获取身家失败");
+				}
+			}
+
+			@Override
+			public void onFailure(String cause) {
+				LogUtils.i(TAG, "getWealth...onFailure,cause by:" + cause);
+				sendHandlerMsg(handler, -1, cause);
+			}
+		});
+
+	}
+
+	/**
+	 * @param listener
+	 */
+	private void getWorththE(final GetWorthListener listener) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case -1:
+					UserInfo userInfo = UserInfoEngine.getInstance().getUserInfo();
+					if (userInfo != null) {
+						float worth = UserInfoEngine.getInstance().getUserInfo().getWorth();
+						listener.onGetWorthFinished(String.valueOf(worth));
+					} else {
+						listener.onGetWorthFinished("0.0");
+					}
+					break;
+				case 0:
+					JSONObject json = JSON.parseObject(msg.obj.toString());
+					String worth = json.getString("worth");
+					UserInfoEngine.getInstance().notifyWorthChanged(Float.valueOf(worth));
+					listener.onGetWorthFinished(worth);
+					break;
+				default:
+					break;
+				}
+			};
+		};
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		LogUtils.i(TAG, "getWorth...begin，dwID=" + dwID);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_GET_WORTH, Method.GET, new HttpCallBack() {
+			@Override
+			public void onSuccess(String response, ResultBean bean) {
+				LogUtils.i(TAG, "getWorth...," + response);
+				if (bean.getResultCode() == 2222) {
+					LogUtils.i(TAG, "getWorth...success");
+					sendHandlerMsg(handler, 0, bean.getData().toString());
+				}
+				if (bean.getResultCode() == 3333) {
+					LogUtils.i(TAG, "getWorth...failure,cause by:" + bean.getMsg());
+					sendHandlerMsg(handler, -1, "获取身价失败");
+				}
+			}
+
+			@Override
+			public void onFailure(String cause) {
+				LogUtils.i(TAG, "getWorth...onFailure,cause by:" + cause);
+				sendHandlerMsg(handler, -1, cause);
+			}
+		});
+
+	}
+
+	/**
+	 * @param listener
+	 */
+	private void setWorththE(final String worth, final SetWorthListener listener) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case -1:
+					listener.onFailure(msg.obj.toString());
+					break;
+				case 0:
+					UserInfoEngine.getInstance().notifyWorthChanged(Float.valueOf(worth));
+					listener.onSuccess(msg.obj.toString());
+					break;
+				case 1:
+					listener.onFailure(msg.obj.toString());
+					break;
+				default:
+					break;
+				}
+			};
+		};
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("worth", worth);
+		LogUtils.i(TAG, "setWorth...begin，dwID=" + dwID + ",worth=" + worth);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_SET_WORTH, Method.GET, new HttpCallBack() {
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.i(TAG, "setWorth...response:" + response);
+				if (msg.getResultCode() == 2222) {
+					// 设置成功
+					sendHandlerMsg(handler, 0, worth);
+				}
+				if (msg.getResultCode() == 3333) {
+					// 设置失败
+					sendHandlerMsg(handler, 1, msg.getMsg());
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				// 设置失败
+				sendHandlerMsg(handler, -1, Constants.NET_WRONG);
+			}
+		});
+	}
+
+	/**
+	 * 上传用户的信息
+	 */
+	private void setUserInfoE(String allUserInfo, final NetCallback listener) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case -1:
+					listener.onFailure(msg.obj.toString());
+					break;
+				case 0:
+					UserInfo userInfo = UserInfoEngine.getInstance().getUserInfo();
+					userInfo.setVersionNum(msg.obj.toString());
+					userInfo.save();
+					listener.onSuccess("修改个人信息成功");
+					break;
+				case 1:
+					listener.onFailure(msg.obj.toString());
+					break;
+				}
+			};
+		};
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+		final String dwID = DecentWorldApp.getInstance().getDwID();
+		// 正常情况下，将传入的要修改的个性签名内容保存，如果服务器返回成功结果码，在同步更新本地信息；
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("allUserInfo", allUserInfo);
+		LogUtils.i(TAG, "setUserInfoE...begin,allUserInfo = " + allUserInfo);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_SET_USER_INFO, Method.GET, new HttpCallBack() {
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.i(TAG, "setUserInfoE...response:" + response);
+				if (msg.getResultCode() == 2222) {
+					LogUtils.i(TAG, "setUserInfo...success");// 成功
+					JSONObject jsonObject = JSON.parseObject(msg.getData().toString());
+					String version = jsonObject.getString("versionNum");
+					sendHandlerMsg(handler, 0, version);
+				}
+				if (msg.getResultCode() == 3333) {
+					LogUtils.i(TAG, "setUserInfo...failure，cause by:" + msg.getMsg());// 失败
+					sendHandlerMsg(handler, 1, msg.getMsg());
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				LogUtils.i(TAG, "setUserInfo...failure,causer by:" + e);
+				sendHandlerMsg(handler, -1, Constants.NET_WRONG);
+			}
+		});
+	}
+
+	/**
+	 * 设置用户信息的权限
+	 * 
+	 * @param authority
+	 *            要上传的权限信息
+	 */
+	private void setUserInfoAuthorityE(final String authority, final NetCallback listener) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case -1:
+					listener.onFailure(msg.obj.toString());
+					break;
+				case 0:
+					listener.onSuccess(msg.obj.toString());
+					break;
+				case 1:
+					listener.onFailure(msg.obj.toString());
+					break;
+				default:
+					break;
+				}
+			};
+		};
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("authority", authority);
+		LogUtils.i(TAG, "setUserInfoAuthorityE...begin,dwID=" + dwID + ",authority = " + authority);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_SET_USER_INFO_AUTH, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "setUserInfoAuthorityE,response:" + response);
+						if (msg.getResultCode() == 3000) {
+							// 成功
+							LogUtils.i(TAG, "setUserInfoAuthorityE...success");
+							sendHandlerMsg(handler, 0, "成功");
+						}
+						if (msg.getResultCode() == 3001) {
+							LogUtils.i(TAG, "setUserInfoAuthorityE...failure,cause by:" + msg.getMsg());// 失败
+							sendHandlerMsg(handler, 1, msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.i(TAG, "setUserInfoAuthorityE...onFailure,causer by:" + e);
+						sendHandlerMsg(handler, -1, Constants.NET_WRONG);
+					}
+				});
+	}
+
+	/**
+	 * 上传用户的三张图片
+	 * 
+	 * @param dwID
+	 * @param icon
+	 * @param count
+	 *            代表第几张图片 count取值为 1/2/3
+	 * @param mHandler
+	 */
+	public void setUserIconE(File[] icon, final int count, final NetCallback listener) {
+		final Handler handler = new Handler() {
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+				case -1:
+					listener.onFailure(msg.obj.toString());
+					break;
+				case 0:
+					UserInfo userInfo = UserInfoEngine.getInstance().getUserInfo();
+					userInfo.setVersionNum(msg.obj.toString());
+					userInfo.save();
+					listener.onSuccess("上传成功");
+					// ImageLoaderHelper.clearCacheByUrl(ImageUtils.getIconByDwID(DecentWorldApp.getInstance().getDwID(),
+					// ImageUtils.ICON_MAIN));
+					// ImageLoaderHelper.clearCacheByUrl(ImageUtils.getIconByDwID(DecentWorldApp.getInstance().getDwID(),
+					// ImageUtils.ICON_EXTRA_1));
+					// ImageLoaderHelper.clearCacheByUrl(ImageUtils.getIconByDwID(DecentWorldApp.getInstance().getDwID(),
+					// ImageUtils.ICON_EXTRA_2));
+					break;
+				case 1:
+					listener.onFailure(msg.obj.toString());
+					break;
+				default:
+					break;
+				}
+			};
+		};
+
+		Context context = DecentWorldApp.getGlobalContext();
+		SendUrl sendUrl = new SendUrl(context);
+		final String dwID = DecentWorldApp.getInstance().getDwID();
+
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("count", String.valueOf(count));
+		LogUtils.i(TAG, "setUserIcon...begin,dwID=" + dwID);
+		sendUrl.httpRequestWithImage(map, icon, Constants.CONTEXTPATH + ConstantNet.API_SET_USER_ICON, new HttpCallBack() {
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.i(TAG, "setUserIcon...msg.getResultCode=" + msg.getResultCode());
+				if (msg.getResultCode() == 2222) {
+					LogUtils.i(TAG, "setUserInfo...success");// 成功
+					JSONObject jsonObject = JSON.parseObject(msg.getData().toString());
+					String versionNum = jsonObject.getString("versionNum");
+					sendHandlerMsg(handler, 0, versionNum);
+				}
+				if (msg.getResultCode() == 3333) {
+					LogUtils.i(TAG, "setUserIcon...failure caused by:" + msg.getMsg());
+					sendHandlerMsg(handler, 1, msg.getMsg());
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				LogUtils.i(TAG, "setUserIcon...onFailure caused by:" + e);
+				sendHandlerMsg(handler, -1, Constants.NET_WRONG);
+			}
+		});
+	}
+
+}

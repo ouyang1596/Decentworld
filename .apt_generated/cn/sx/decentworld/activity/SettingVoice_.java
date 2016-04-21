@@ -33,16 +33,16 @@ public final class SettingVoice_
     }
 
     private void init_(Bundle savedInstanceState) {
-        titleBar = TitleBar_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         tv_girl_voice = ((TextView) findViewById(id.tv_girl_voice));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         tv_child_voice = ((TextView) findViewById(id.tv_child_voice));
-        ((TitleBar_) titleBar).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
         init();
     }
 

@@ -1,0 +1,137 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.service;
+
+import java.util.HashMap;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.LocationBean;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.LocationProvider;
+import cn.sx.decentworld.listener.NotifyCallback;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.amap.api.location.AMapLocation;
+import com.android.volley.Request;
+
+/**
+ * 
+ * @ClassName: LocationService.java
+ * @Description: 地理位置的获取与上传服务器的服务
+ * @author: cj
+ * @date: 2016年1月18日 上午10:56:44
+ */
+public class LocationService extends Service {
+	private static final String TAG = "LocationService";
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		return null;
+	}
+
+	/**
+	 * 第一次启动时，会执行，再次启动便不会再执行
+	 * */
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		submitUserLocation();
+	}
+
+	/**
+	 * 如果Service已经启动，则执行此方法
+	 * */
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		flags = START_STICKY;
+		return super.onStartCommand(intent, flags, startId);
+	}
+
+	/**
+	 * 提交地理坐标到服务器
+	 */
+	private void submitUserLocation() {
+		LocationProvider provider = LocationProvider.getInstance(this);
+		provider.setNotify("SCHEDULE_LOCATION", new NotifyCallback() {
+			@Override
+			public void execute(AMapLocation location) {
+				if (location == null) {
+					return;
+				}
+				if (location.getLatitude() == 0.0 || location.getLongitude() == 0.0) {
+					LocationBean locationBean = LocationBean.queryByDwID(DecentWorldApp.getInstance().getDwID());
+					if (null == locationBean) {
+						return;
+					} else {
+						LocationProvider.latitude = locationBean.latitude;
+						LocationProvider.longitude = locationBean.longitude;
+						uploadLocation(DecentWorldApp.getInstance().getDwID(), LocationProvider.latitude,
+								LocationProvider.longitude);
+					}
+				} else {
+					LocationBean locationBean = LocationBean.queryByDwID(DecentWorldApp.getInstance().getDwID());
+					if (null == locationBean) {
+						locationBean = new LocationBean(DecentWorldApp.getInstance().getDwID());
+					}
+					locationBean.latitude = location.getLatitude();
+					locationBean.longitude = location.getLongitude();
+					locationBean.save();
+					LocationProvider.latitude = location.getLatitude();
+					LocationProvider.longitude = location.getLongitude();
+					uploadLocation(DecentWorldApp.getInstance().getDwID(), LocationProvider.latitude, LocationProvider.longitude);
+				}
+				LogUtils.i(
+						TAG,
+						"获取到定位信息" + "\n" + "locationAddress=" + location.getAddress() + "\n" + "laititude="
+								+ location.getLatitude() + "\nlongtitude=" + location.getLongitude() + "\n");
+			}
+		});
+		provider.startLocation(false);
+	}
+
+	/**
+	 * 上传用户所在位置的经纬度
+	 * 
+	 * @param latitude
+	 *            纬度
+	 * @param longitude
+	 *            经度
+	 */
+	public void uploadLocation(String dwID, final double latitude, final double longitude) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("user_lt", String.valueOf(latitude));
+		map.put("user_ln", String.valueOf(longitude));
+		// 实时上传用户坐标接口
+		SendUrl sendUrl = new SendUrl(this);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + "/user/updateLocation", Request.Method.GET,
+				new SendUrl.HttpCallBack() {
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						LogUtils.i(TAG, "uploadLocation===>" + "ResultCode-->" + msg.getResultCode() + "Data-->"
+								+ msg.getData().toString() + "Msg-->" + msg.getMsg());
+						if (msg.getResultCode() == 3001) {
+							ToastUtil.showToast("获取位置失败");
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.e(TAG, "likeStranger===>" + "e-->" + e);
+					}
+				});
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		LogUtils.i("bm", "-----service--onDestroy--------");
+	}
+}

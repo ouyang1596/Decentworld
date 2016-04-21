@@ -13,7 +13,6 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
@@ -33,14 +32,13 @@ public final class ChatRoomMySubjectListActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        ChatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
+        chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        llMySubjectList = ((LinearLayout) findViewById(id.root_activity_chat_room_my_subject_list));
         lvSubject = ((ListView) findViewById(id.lv_subject));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        ((ChatRoomInfoSettingAndGetting_) ChatRoomInfoSettingAndGetting).afterSetContentView_();
+        ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         init();
     }
 

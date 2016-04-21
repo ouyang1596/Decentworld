@@ -33,12 +33,12 @@ public final class AchievementFragment_
     }
 
     private void afterSetContentView_() {
-        ivAchievement = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_achievement));
-        tvShortIntroduce = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_short_introduce));
-        tvAchievement = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_achievement));
-        flAchievement = ((FrameLayout) findViewById(cn.sx.decentworld.R.id.fl_achievement));
-        ivEditIntroduce = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_edit_introduce));
         tvDetailIntroduce = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_detail_introduce));
+        tvShortIntroduce = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_short_introduce));
+        flAchievement = ((FrameLayout) findViewById(cn.sx.decentworld.R.id.fl_achievement));
+        ivAchievement = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_achievement));
+        tvAchievement = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_achievement));
+        ivEditIntroduce = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_edit_introduce));
         llIntroduce = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_introduce));
         ((ToastComponent_) toast).afterSetContentView_();
         init();

@@ -1,0 +1,254 @@
+package cn.sx.decentworld.activity;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.zip.ZipOutputStream;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.CrashHandler;
+import cn.sx.decentworld.common.FileName;
+import cn.sx.decentworld.common.FilePath;
+import cn.sx.decentworld.utils.ExitAppUtils;
+import cn.sx.decentworld.utils.FileUtils;
+import cn.sx.decentworld.utils.LogRecord;
+import cn.sx.decentworld.utils.LogUtils;
+import cn.sx.decentworld.utils.SPUtils;
+
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.ViewUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.RequestParams;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+import com.lidroid.xutils.http.client.HttpRequest;
+import com.lidroid.xutils.view.annotation.ViewInject;
+
+/**
+ *
+ */
+public class SendErrorActivity extends Activity implements View.OnClickListener
+{
+	private static final String TAG = "SendErrorActivity";
+
+	@ViewInject(R.id.ok)
+	private Button ok;
+	@ViewInject(R.id.cancel)
+	private Button cancel;
+	@ViewInject(R.id.upload_exception_state)
+	private TextView uploadExceptionState;
+	@ViewInject(R.id.upload_exception_ll)
+	private LinearLayout uploadExceptionLl;
+	@ViewInject(R.id.upload_exception_dialog)
+	private LinearLayout uploadExceptionDialog;
+
+	private String error_msg;
+	private String dwID;
+	private Context mContext = SendErrorActivity.this;
+	private String IMEI;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		ExitAppUtils.getInstance().addActivity(this);
+		setContentView(R.layout.activity_exception_info);
+		ViewUtils.inject(this);
+		
+		error_msg = getIntent().getStringExtra("msg");
+		dwID = getIntent().getStringExtra("dwID");
+
+		initData();
+		initEvent();
+
+	}
+
+	private void initData()
+	{
+		// 获取IMEI
+		TelephonyManager telephonyManager = (TelephonyManager) this.getSystemService(Context.TELEPHONY_SERVICE);
+		IMEI = telephonyManager.getDeviceId();
+	}
+
+	private void initEvent()
+	{
+		ok.setOnClickListener(this);
+		cancel.setOnClickListener(this);
+	}
+
+	@Override
+	public void onClick(View v)
+	{
+		switch (v.getId())
+		{
+			case R.id.ok:
+				uploadExceptionLl.setVisibility(View.VISIBLE);
+				uploadExceptionDialog.setVisibility(View.GONE);
+				Toast.makeText(this, R.string.send_err_msg, Toast.LENGTH_SHORT).show();
+				sendExceptionLog();
+				break;
+			case R.id.cancel:
+				rebootLoginActivity();
+				finish();
+				break;
+			default:
+				break;
+		}
+	}
+
+	/**
+	 * 发送异常报告到服务器
+	 */
+	private void sendExceptionLog()
+	{
+		String fileName = error_msg;
+		if (fileName.endsWith(CrashHandler.FILE_EXT))
+		{
+			fileName = fileName.substring(0, fileName.length() - CrashHandler.FILE_EXT.length());
+		}
+		File newFile = new File(FilePath.HOME_EXCEPTION_REPORT + IMEI + "_" + error_msg);
+		File oldFile = new File(FilePath.HOME_EXCEPTION_REPORT + error_msg);
+		File zipFile = new File(FilePath.HOME_EXCEPTION_REPORT + IMEI + "_" + fileName + ".zip");
+		if (!oldFile.exists())
+		{
+			Log.d("TAG", "异常捕获存储目录不存在");
+			return;
+		}
+		// 文件名添加IMEI信息,
+		boolean renameTo = oldFile.renameTo(newFile);
+		BufferedWriter attachWriter = null;
+		try
+		{
+			// 向文件中插入imei、time字段
+//			attachWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newFile , true)));
+			attachWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(newFile , true),"utf-8"));
+			attachWriter.write("imei=" + IMEI + "\r\n");
+			attachWriter.write("time=" + fileName + "\r\n");
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		finally
+		{
+			if (attachWriter != null)
+			{
+				try
+				{
+					attachWriter.close();
+				}
+				catch (IOException e)
+				{
+					//
+				}
+			}
+		}
+		if (renameTo)
+		{
+			// 压缩文件
+			try
+			{
+				FileUtils.zipFile(newFile, new ZipOutputStream(new FileOutputStream(zipFile)), null);
+				// 发送数据
+				Log.d("TAG", "异常捕获存_发送数据");
+				submitExFile(zipFile);
+			}
+			catch (FileNotFoundException e)
+			{
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * 发送日志数据
+	 */
+	public void submitExFile(File file)
+	{
+		RequestParams mParams = new RequestParams();
+		mParams.addBodyParameter("file", file);
+		mParams.addBodyParameter("dwID", dwID);
+		LogUtils.i(TAG, "异常捕获—开始上传,filePath="+file.getAbsolutePath()+",dwID="+dwID);
+		
+		HttpUtils mHttp = new HttpUtils(60 * 1000);
+		String url = Constants.CONTEXTPATH + ConstantNet.API_EXCEPTION_REPORT_UPLOAD;
+		mHttp.send(HttpRequest.HttpMethod.POST, url, mParams, new RequestCallBack<String>()
+		{
+			@Override
+			public void onStart()
+			{
+				LogUtils.e(TAG, "开始上传错误报告");
+			}
+
+			@Override
+			public void onLoading(long total, long current, boolean isUploading)
+			{
+				if (isUploading)
+				{
+					uploadExceptionState.setText(current + "/" + total);
+					LogUtils.e(TAG, "开始上传错误报告--"+current + "/" + total);
+				}
+			}
+
+			@Override
+			public void onSuccess(ResponseInfo<String> responseInfo)
+			{
+				uploadExceptionState(true);
+				rebootLoginActivity();
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg)
+			{
+				uploadExceptionState(false);
+				rebootLoginActivity();
+			}
+		});
+	}
+
+	/**
+	 * @param flag
+	 *            标记是否上传了错误日志,如果上传了，那么删掉原来的文件
+	 */
+	private void uploadExceptionState(boolean flag)
+	{
+	    SharedPreferences mSharedPreferences = SPUtils.getSharedPreferences(FileName.SP_APP_INFO_XML);
+		SharedPreferences.Editor editor = mSharedPreferences.edit();
+		editor.putBoolean("exception_report_upload_state", flag);
+		editor.commit();
+		if (flag)
+		{
+		    LogUtils.e(TAG, "Exception上传成功");
+			FileUtils.deleteAllFile(FilePath.HOME_EXCEPTION_REPORT);
+			LogRecord.getInstance().clearDiskLog();
+		}else
+		{
+		    LogUtils.e(TAG, "Exception上传失败");
+		}
+	}
+
+	private void rebootLoginActivity()
+	{
+		startActivity(new Intent(mContext , DefaultActivity_.class).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+		SendErrorActivity.this.finish();
+		ExitAppUtils.getInstance().delActivity(this);
+	}
+
+}

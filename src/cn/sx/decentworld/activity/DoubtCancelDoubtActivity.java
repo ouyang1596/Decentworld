@@ -5,10 +5,9 @@ import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.common.ConstantIntent;
-import cn.sx.decentworld.fragment.CancelDoubtSecondStepFragment;
 import cn.sx.decentworld.fragment.CancelDoubtFirstStepFragment;
 import cn.sx.decentworld.fragment.CancelDoubtFirstStepFragment.OnDoubtFirstClickListener;
-import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.fragment.CancelDoubtSecondStepFragment;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
 import com.googlecode.androidannotations.annotations.EActivity;
@@ -16,12 +15,12 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_doubt_verify)
 public class DoubtCancelDoubtActivity extends BaseFragmentActivity implements OnDoubtFirstClickListener, OnClickListener {
+	private static final String TAG = "DoubtCancelDoubtActivity";
 	private CancelDoubtFirstStepFragment mDoubtFirstStepFragment;
 	private CancelDoubtSecondStepFragment mDoubtSecondFragment;
 	@ViewById(R.id.iv_back)
 	ImageView ivBack;
 	private boolean isToSecond;
-	private SendUrl mSendUrl;
 	private String condition;
 	private int status;
 
@@ -37,7 +36,6 @@ public class DoubtCancelDoubtActivity extends BaseFragmentActivity implements On
 	}
 
 	private void initData() {
-		mSendUrl = new SendUrl(this);
 		mDoubtFirstStepFragment = new CancelDoubtFirstStepFragment();
 		mDoubtSecondFragment = new CancelDoubtSecondStepFragment();
 		mDoubtSecondFragment.setCondition(condition);

@@ -31,10 +31,10 @@ public final class FindFragment_
     }
 
     private void afterSetContentView_() {
-        rl_find_interest_group = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_find_interest_group));
         rl_find_works_circle = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_find_works_circle));
-        tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
         rl_find_friends_circle = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_find_friends_circle));
+        tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
+        rl_find_interest_group = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_find_interest_group));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

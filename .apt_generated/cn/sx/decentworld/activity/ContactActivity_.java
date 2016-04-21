@@ -16,7 +16,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.network.request.GetUserInfo_;
 import cn.sx.decentworld.widget.CustomScrollView;
 import cn.sx.decentworld.widget.ListViewForScrollView;
@@ -35,17 +34,15 @@ public final class ContactActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_delete_back));
-        cScro = ((CustomScrollView) findViewById(id.cScro));
         lvContact = ((ListViewForScrollView) findViewById(id.lv_contact));
-        lvRecommend = ((ListViewForScrollView) findViewById(id.lv_recommend));
         tvHeadTitle = ((TextView) findViewById(id.tv_header_title));
-        ((ToastComponent_) toast).afterSetContentView_();
+        cScro = ((CustomScrollView) findViewById(id.cScro));
+        ivBack = ((ImageView) findViewById(id.iv_delete_back));
+        lvRecommend = ((ListViewForScrollView) findViewById(id.lv_recommend));
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }

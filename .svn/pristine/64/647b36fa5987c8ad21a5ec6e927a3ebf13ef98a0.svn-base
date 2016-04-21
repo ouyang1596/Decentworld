@@ -1,0 +1,165 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.dialog;
+
+import java.util.HashMap;
+
+import android.app.Dialog;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.AES;
+import cn.sx.decentworld.utils.LogUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+
+/**
+ * @ClassName: SetIncomePwdDialog.java
+ * @Description: 验证登陆密码
+ * @author: cj
+ * @date: 2016年3月17日 上午9:51:24
+ */
+public class VerifyLoginPwdDialog extends DialogFragment implements OnClickListener {
+	private static final String TAG = "VerifyLoginPwdDialog";
+	// 密码
+	private EditText etPwd;
+	// 确认
+	private Button btnSubmit;
+	private VerifyLoginPwdListener listener;
+
+	/**
+	 * 设置监听
+	 * 
+	 * @param listener
+	 */
+	public void setListener(VerifyLoginPwdListener listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public Dialog onCreateDialog(Bundle savedInstanceState) {
+		Dialog dialog = new Dialog(getActivity(), R.style.ShouchangDialog);
+		return dialog;
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.dialog_verify_login_pwd, container, false);
+		etPwd = (EditText) view.findViewById(R.id.et_verify_login_pwd);
+		btnSubmit = (Button) view.findViewById(R.id.btn_belong_dialog_submit);
+		btnSubmit.setOnClickListener(this);
+		return view;
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		/** 设置提示信息 **/
+
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.btn_belong_dialog_submit:
+			// 判断密码
+			String pwd = etPwd.getText().toString();
+			if (CommUtil.isBlank(pwd)) {
+				Toast.makeText(getActivity(), "请输入密码", Toast.LENGTH_SHORT).show();
+				return;
+			}
+			verifyLoginPwd(pwd);
+			break;
+		default:
+			break;
+		}
+	}
+
+	/**
+	 * 监听回调接口
+	 */
+	public interface VerifyLoginPwdListener {
+		public void onSuccess(String token);
+
+		public void onFailure(String cause);
+	}
+
+	/**
+	 * 验证登录密码
+	 */
+	private void verifyLoginPwd(String pwd) {
+		final Handler handler = new Handler() {
+			public void handleMessage(android.os.Message msg) {
+				if (msg.what == 1) {
+					listener.onSuccess(msg.obj.toString());
+					dismiss();
+				} else {
+					listener.onFailure(msg.obj.toString());
+					dismiss();
+				}
+			};
+		};
+
+		String dwID = DecentWorldApp.getInstance().getDwID();
+		String password = AES.encodeWithRandomStr(pwd);
+
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", dwID);
+		map.put("password", password);
+		LogUtils.i(TAG, "verifyLoginPwd...begin,dwID=" + dwID + ",password=" + password);
+		SendUrl sendUrl = new SendUrl(getActivity());
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_VERIFY_LOGIN_PWD, Method.GET,
+				new HttpCallBack() {
+					@Override
+					public void onSuccess(String resultJSON, ResultBean resultBean) {
+						LogUtils.i(TAG,
+								"verifyLoginPwd...onSuccess,code=" + resultBean.getResultCode() + ",msg=" + resultBean.getMsg()
+										+ ",data=" + resultBean.getData());
+						if (resultBean.getResultCode() == 2222) {
+							LogUtils.i(TAG, "verifyLoginPwd...success");
+							String result = resultBean.getData().toString();
+							JSONObject jsonObject = JSON.parseObject(result);
+							Message message = Message.obtain();
+							message.what = 1;
+							message.obj = jsonObject.getString("token");
+							handler.sendMessage(message);
+						} else {
+							LogUtils.i(TAG, "verifyLoginPwd...failure,cause by:" + resultBean.getMsg());
+							Message message = Message.obtain();
+							message.what = 0;
+							message.obj = "密码错误";
+							handler.sendMessage(message);
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.i(TAG, "verifyLoginPwd...onFailure,cause by:" + e);
+						Message message = Message.obtain();
+						message.what = 0;
+						message.obj = Constants.NET_WRONG;
+						handler.sendMessage(message);
+					}
+				});
+	}
+
+}

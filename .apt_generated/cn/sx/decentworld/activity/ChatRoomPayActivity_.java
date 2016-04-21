@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.ImageView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
@@ -34,14 +33,12 @@ public final class ChatRoomPayActivity_
 
     private void init_(Bundle savedInstanceState) {
         chatRoomInfoSettingAndGetting = ChatRoomInfoSettingAndGetting_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        btnOK = ((Button) findViewById(id.btn_OK));
         ivBack = ((ImageView) findViewById(id.iv_back));
+        btnOK = ((Button) findViewById(id.btn_OK));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

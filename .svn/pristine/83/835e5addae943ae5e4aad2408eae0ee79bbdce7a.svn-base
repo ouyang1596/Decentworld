@@ -1,0 +1,181 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity;
+
+import cn.bmob.v3.BmobObject;
+
+/**
+ * @ClassName: TestConnEntity.java
+ * @Description: 测试连接时，向Bmob服务器提交数据时用到的类
+ * @author: cj
+ * @date: 2016年4月12日 上午10:33:27
+ */
+public class TestConnEntity extends BmobObject
+{
+    private String testTag;
+    private String userID;
+    private String time;
+    private String phoneNum;
+    private String showName;
+
+    private String dwMessage;
+    private String connnection;
+    private String msgBody;
+    
+    //构造体
+    {
+        testTag = "";
+        userID = "";
+        time = "";
+        phoneNum = "";
+        showName = "";
+        dwMessage = "";
+        connnection = "";
+        msgBody = "";
+    }
+
+    /**
+     * @return the userID
+     */
+    public String getUserID()
+    {
+        return userID;
+    }
+
+    /**
+     * @param userID
+     *            the userID to set
+     */
+    public void setUserID(String userID)
+    {
+        this.userID = userID;
+    }
+
+    /**
+     * @return the time
+     */
+    public String getTime()
+    {
+        return time;
+    }
+
+    /**
+     * @param time
+     *            the time to set
+     */
+    public void setTime(String time)
+    {
+        this.time = time;
+    }
+
+    /**
+     * @return the phoneNum
+     */
+    public String getPhoneNum()
+    {
+        return phoneNum;
+    }
+
+    /**
+     * @param phoneNum
+     *            the phoneNum to set
+     */
+    public void setPhoneNum(String phoneNum)
+    {
+        this.phoneNum = phoneNum;
+    }
+
+    /**
+     * @return the showName
+     */
+    public String getShowName()
+    {
+        return showName;
+    }
+
+    /**
+     * @param showName
+     *            the showName to set
+     */
+    public void setShowName(String showName)
+    {
+        this.showName = showName;
+    }
+
+    /**
+     * @return the dwMessage
+     */
+    public String getDwMessage()
+    {
+        return dwMessage;
+    }
+
+    /**
+     * @param dwMessage
+     *            the dwMessage to set
+     */
+    public void setDwMessage(String dwMessage)
+    {
+        this.dwMessage = dwMessage;
+    }
+
+    /**
+     * @return the connnection
+     */
+    public String getConnnection()
+    {
+        return connnection;
+    }
+
+    /**
+     * @param connnection
+     *            the connnection to set
+     */
+    public void setConnnection(String connnection)
+    {
+        this.connnection = connnection;
+    }
+
+    /**
+     * @return the testTag
+     */
+    public String getTestTag()
+    {
+        return testTag;
+    }
+
+    /**
+     * @param testTag
+     *            the testTag to set
+     */
+    public void setTestTag(String testTag)
+    {
+        this.testTag = testTag;
+    }
+
+    /**
+     * @return the msgBody
+     */
+    public String getMsgBody()
+    {
+        return msgBody;
+    }
+
+    /**
+     * @param msgBody
+     *            the msgBody to set
+     */
+    public void setMsgBody(String msgBody)
+    {
+        this.msgBody = msgBody;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "TestConnEntity [testTag=" + testTag + ", userID=" + userID + ", time=" + time + ", phoneNum=" + phoneNum + ", showName=" + showName + ", dwMessage=" + dwMessage + ", connnection="
+                + connnection + ", msgBody=" + msgBody + "]";
+    }
+
+}

@@ -20,7 +20,6 @@ import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.KeyboardComponent_;
-import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.component.ui.RegisterComponent_;
 import cn.sx.decentworld.widget.ClearEditText;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -40,20 +39,19 @@ public final class RegisterSetPasswordActivity_
     private void init_(Bundle savedInstanceState) {
         keyboardComponent = KeyboardComponent_.getInstance_(this);
         registerComponent = RegisterComponent_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        btnOk = ((Button) findViewById(id.btn_OK));
-        llRegisterSetPassword = ((LinearLayout) findViewById(id.root_activity_register_set_password));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        etRealName = ((ClearEditText) findViewById(id.et_realName));
-        etvPwd = ((EditText) findViewById(id.etv_reset_pwd));
-        ivPwdIsShow = ((ImageView) findViewById(id.iv_pwd_is_show));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        etRealName = ((ClearEditText) findViewById(id.et_realName));
+        btnOk = ((Button) findViewById(id.btn_OK));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        etvPwd = ((EditText) findViewById(id.etv_reset_pwd));
+        etSign = ((ClearEditText) findViewById(id.cet_sign));
+        ivPwdIsShow = ((ImageView) findViewById(id.iv_pwd_is_show));
+        llRegisterSetPassword = ((LinearLayout) findViewById(id.root_activity_register_set_password));
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((RegisterComponent_) registerComponent).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

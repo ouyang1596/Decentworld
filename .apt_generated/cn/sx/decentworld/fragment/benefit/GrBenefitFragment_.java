@@ -15,7 +15,6 @@ import android.widget.TextView;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.network.request.GetUserInfo_;
-import cn.sx.decentworld.network.request.SetUserInfo_;
 import cn.sx.decentworld.widget.CircularImage;
 import cn.sx.decentworld.widget.ListViewForScrollView;
 
@@ -28,7 +27,6 @@ public final class GrBenefitFragment_
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(getActivity());
         getUserInfo = GetUserInfo_.getInstance_(getActivity());
-        setUserInfo = SetUserInfo_.getInstance_(getActivity());
     }
 
     @Override
@@ -38,17 +36,16 @@ public final class GrBenefitFragment_
     }
 
     private void afterSetContentView_() {
+        tv_gr_rule = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_gr_rule));
+        iv_gr_icon = ((CircularImage) findViewById(cn.sx.decentworld.R.id.iv_gr_icon));
+        ll_gr_reminds = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_gr_remind));
+        sl_gr_benefit = ((ScrollView) findViewById(cn.sx.decentworld.R.id.sl_gr_benefit));
+        tv_gr_modify = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_gr_modify));
         lv_gr_list = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.lv_gr_list));
         tv_gr_delete = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_gr_delete));
-        iv_gr_icon = ((CircularImage) findViewById(cn.sx.decentworld.R.id.iv_gr_icon));
-        tv_gr_rule = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_gr_rule));
-        tv_gr_modify = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_gr_modify));
-        ll_gr_reminds = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_gr_remind));
         tv_gr_all_benefit = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_gr_all_benefit));
-        sl_gr_benefit = ((ScrollView) findViewById(cn.sx.decentworld.R.id.sl_gr_benefit));
         ((ToastComponent_) toast).afterSetContentView_();
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((SetUserInfo_) setUserInfo).afterSetContentView_();
         init();
     }
 

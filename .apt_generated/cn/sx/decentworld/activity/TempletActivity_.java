@@ -33,9 +33,9 @@ public final class TempletActivity_
     }
 
     private void afterSetContentView_() {
-        tvIntroduceDetail = ((TextView) findViewById(id.tv_introduce_detail));
-        tvBack = ((TextView) findViewById(id.tv_back));
         tvEnsure = ((TextView) findViewById(id.tv_ensure));
+        tvBack = ((TextView) findViewById(id.tv_back));
+        tvIntroduceDetail = ((TextView) findViewById(id.tv_introduce_detail));
         init();
     }
 

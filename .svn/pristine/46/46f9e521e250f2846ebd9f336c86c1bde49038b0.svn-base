@@ -1,0 +1,146 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.util.List;
+
+import android.content.Context;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.NearbyStrangerInfo;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.widget.CircularImageView;
+
+public class NearStrangerListAdapter extends BaseAdapter implements OnClickListener {
+	private Context mContext;
+	private List<NearbyStrangerInfo> datas;
+
+	public NearStrangerListAdapter(Context context, List data) {
+		this.mContext = context;
+		this.datas = data;
+	}
+
+	@Override
+	public int getCount() {
+		return datas == null ? 0 : datas.size();
+	}
+
+	@Override
+	public NearbyStrangerInfo getItem(int position) {
+		return datas.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View con, ViewGroup arg2) {
+		ViewHolder vh = null;
+		if (con == null) {
+			con = View.inflate(mContext, R.layout.item_stranger, null);
+			vh = new ViewHolder();
+			vh.ivStrangerPic = (CircularImageView) con.findViewById(R.id.iv_stranger_detail);
+			vh.ivStrangerPic.setOnClickListener(this);
+			vh.ivHeart = (ImageView) con.findViewById(R.id.iv_heart);
+			vh.ivHeart.setOnClickListener(this);
+			vh.tvTagOccupationShortIntroduce = (TextView) con.findViewById(R.id.tv_tag_occupation_shortIntroduce);
+			vh.tvAddr = (TextView) con.findViewById(R.id.tv_addr);
+			vh.tvWealth = (TextView) con.findViewById(R.id.tv_wealth);
+			vh.ivSex = (ImageView) con.findViewById(R.id.iv_sex_girl_boy);
+			vh.tvAgeCount = (TextView) con.findViewById(R.id.tv_age_count);
+			vh.tvNickName = (TextView) con.findViewById(R.id.tv_nickname);
+			vh.tvDistance = (TextView) con.findViewById(R.id.tv_distance);
+			vh.tvWorth = (TextView) con.findViewById(R.id.tv_worth);
+			vh.tvOccupationShortIntroduce = (TextView) con.findViewById(R.id.tv_occupation_shortIntroduce);
+			vh.ivUsertype = (ImageView) con.findViewById(R.id.iv_usertype);
+			con.setTag(vh);
+		} else {
+			vh = (ViewHolder) con.getTag();
+		}
+		vh.ivStrangerPic.setTag(Constants.ITEM_POSITION, position);
+		vh.ivHeart.setTag(Constants.ITEM_POSITION, position);
+		NearbyStrangerInfo info = datas.get(position);
+		vh.ivSex.setImageResource("女".equals(info.getSex()) ? R.drawable.stranger_girl : R.drawable.stranger_boy);
+		if ("秘密".equals(info.getAge())) {
+			vh.tvAgeCount.setText("最好的年龄");
+		} else {
+			vh.tvAgeCount.setText(info.getAge());
+		}
+		Double distance = Double.valueOf(info.getDistance());
+		distance = ((int) (distance * 100)) / 100.0;
+		vh.tvDistance.setText(distance + "km");
+		vh.tvNickName.setText(info.getName());
+		vh.tvWorth.setText(info.getWorth());
+		if (CommUtil.isNotBlank(info.getWealth())) {
+			vh.tvWealth.setText(info.getWealth());
+		} else {
+			vh.tvWealth.setText("此地无银");
+		}
+		vh.tvOccupationShortIntroduce.setText(info.getOccupation());
+		if (CommUtil.isNotBlank(info.getShortIntroduce())) {
+			vh.tvTagOccupationShortIntroduce.setVisibility(View.GONE);
+			vh.tvOccupationShortIntroduce.setText(info.getShortIntroduce());
+		} else {
+			vh.tvTagOccupationShortIntroduce.setVisibility(View.VISIBLE);
+			vh.tvTagOccupationShortIntroduce.setText("行业/学校：");
+		}
+		// Glide.with(mContext).load(info.getIcon()).into(vh.ivStrangerPic);
+		ImageLoaderHelper.mImageLoader.displayImage(ImageUtils.getIconByDwID(info.getDwID(), ImageUtils.ICON_MAIN),
+				vh.ivStrangerPic, ImageLoaderHelper.mOptions);
+		// if (info.getIfLike()) {
+		// vh.ivHeart.setImageResource(R.drawable.iv_new_heart_like_);
+		// } else {
+		// vh.ivHeart.setImageResource(R.drawable.iv_new_heart_);
+		// }
+		if ("0".equals(info.getUserType())) {
+			vh.ivUsertype.setVisibility(View.VISIBLE);
+			vh.ivUsertype.setImageResource(R.drawable.stranger_doubt);
+		} else if ("1".equals(info.getUserType())) {
+			vh.ivUsertype.setVisibility(View.GONE);
+		} else if ("2".equals(info.getUserType())) {
+			vh.ivUsertype.setVisibility(View.VISIBLE);
+			vh.ivUsertype.setImageResource(R.drawable.stranger_wan);
+		}
+		if ("1".equals(info.getLiked())) {
+			vh.ivHeart.setImageResource(R.drawable.iv_new_heart_like_);
+		} else {
+			vh.ivHeart.setImageResource(R.drawable.iv_new_heart_);
+		}
+		return con;
+	}
+
+	class ViewHolder {
+		ImageView /* ivAgreement, */ivHeart, ivSex, ivUsertype;
+		CircularImageView ivStrangerPic;
+		TextView tvAddr, tvDistance, tvWealth, tvAgeCount, tvNickName, tvWorth, tvTagOccupationShortIntroduce,
+				tvOccupationShortIntroduce;
+	}
+
+	@Override
+	public void onClick(View view) {
+		if (null != mOnClickListener) {
+			mOnClickListener.onClick(view);
+		}
+	}
+
+	public void setOnClickListener(OnClickListener onClickListener) {
+		this.mOnClickListener = onClickListener;
+	}
+
+	private OnClickListener mOnClickListener;
+
+	public interface OnClickListener {
+		public void onClick(View view);
+	}
+}

@@ -31,16 +31,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#aaffffff"
-            android:orientation="horizontal"
-            android:paddingBottom="5dp"
-            android:paddingTop="4dp" >
+            android:orientation="horizontal" >
 
             <Button
                 android:id="@+id/btn_set_mode_voice"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
+                android:layout_gravity="center"
                 android:layout_marginLeft="6dp"
-                android:layout_marginTop="2dp"
                 android:background="@drawable/chatting_setmode_voice_btn"
                 android:visibility="visible" />
 
@@ -82,6 +80,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginRight="35dip"
                     android:background="@null"
+                    android:gravity="center_vertical"
                     android:maxLines="3"
                     android:minHeight="40dp"
                     android:onClick="editClick"
@@ -122,6 +121,7 @@
                 android:id="@+id/btn_more"
                 android:layout_width="32dip"
                 android:layout_height="32dip"
+                android:layout_gravity="center"
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="10dp"
                 android:layout_marginTop="2dp"
@@ -132,8 +132,8 @@
                 android:id="@+id/btn_send"
                 android:layout_width="wrap_content"
                 android:layout_height="32dp"
+                android:layout_gravity="center_vertical"
                 android:layout_marginRight="4dp"
-                android:layout_marginTop="2dp"
                 android:background="@drawable/chat_send_btn_selector"
                 android:onClick="onClick"
                 android:text="@string/button_send"
@@ -155,7 +155,7 @@
             <LinearLayout
                 android:id="@+id/ll_face_container"
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="200dp"
                 android:orientation="vertical"
                 android:visibility="gone" >
 

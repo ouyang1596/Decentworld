@@ -7,16 +7,15 @@ import java.util.HashMap;
 
 import android.app.Service;
 import android.content.Intent;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.LocationBean;
 import cn.sx.decentworld.common.Constants;
 import cn.sx.decentworld.common.LocationProvider;
 import cn.sx.decentworld.listener.NotifyCallback;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.SendUrl;
 import cn.sx.decentworld.network.entity.ResultBean;
-import cn.sx.decentworld.utils.LogUtils;
 import cn.sx.decentworld.utils.ToastUtil;
 
 import com.amap.api.location.AMapLocation;
@@ -31,6 +30,8 @@ import com.android.volley.Request;
  */
 public class LocationService extends Service {
 	private static final String TAG = "LocationService";
+	private static final double DEFAULT_LONGITUDE = 113.900362;
+	private static final double DEFAULT_LATITUDE = 22.518638;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -64,13 +65,41 @@ public class LocationService extends Service {
 			@Override
 			public void execute(AMapLocation location) {
 				if (location == null) {
+					LocationProvider.latitude = DEFAULT_LATITUDE;
+					LocationProvider.longitude = DEFAULT_LONGITUDE;
+					uploadLocation(DecentWorldApp.getInstance().getDwID(), LocationProvider.latitude, LocationProvider.longitude);
 					return;
 				}
-				LocationProvider.latitude = location.getLatitude();
-				LocationProvider.longitude = location.getLongitude();
-				LogUtils.i(Constants.TAG_BM, "获取到定位信息" + "\n" + "locationAddress=" + location.getAddress() + "\n" + "laititude="
-						+ location.getLatitude() + "\nlongtitude=" + location.getLongitude() + "\n");
-				uploadLocation(DecentWorldApp.getInstance().getDwID(), location.getLatitude(), location.getLongitude());
+				if (location.getLatitude() == 0.0 || location.getLongitude() == 0.0) {
+					LocationBean locationBean = LocationBean.queryByDwID(DecentWorldApp.getInstance().getDwID());
+					if (null == locationBean) {
+						LocationProvider.latitude = DEFAULT_LATITUDE;
+						LocationProvider.longitude = DEFAULT_LONGITUDE;
+						uploadLocation(DecentWorldApp.getInstance().getDwID(), LocationProvider.latitude,
+								LocationProvider.longitude);
+						return;
+					} else {
+						LocationProvider.latitude = locationBean.latitude;
+						LocationProvider.longitude = locationBean.longitude;
+						uploadLocation(DecentWorldApp.getInstance().getDwID(), LocationProvider.latitude,
+								LocationProvider.longitude);
+					}
+				} else {
+					LocationBean locationBean = LocationBean.queryByDwID(DecentWorldApp.getInstance().getDwID());
+					if (null == locationBean) {
+						locationBean = new LocationBean(DecentWorldApp.getInstance().getDwID());
+					}
+					locationBean.latitude = location.getLatitude();
+					locationBean.longitude = location.getLongitude();
+					locationBean.save();
+					LocationProvider.latitude = location.getLatitude();
+					LocationProvider.longitude = location.getLongitude();
+					uploadLocation(DecentWorldApp.getInstance().getDwID(), LocationProvider.latitude, LocationProvider.longitude);
+				}
+				LogUtils.d(
+						TAG,
+						"获取到定位信息" + "\n" + "locationAddress=" + location.getAddress() + "\n" + "laititude="
+								+ location.getLatitude() + "\nlongtitude=" + location.getLongitude() + "\n");
 			}
 		});
 		provider.startLocation(false);
@@ -78,14 +107,13 @@ public class LocationService extends Service {
 
 	/**
 	 * 上传用户所在位置的经纬度
-	 *
+	 * 
 	 * @param latitude
 	 *            纬度
 	 * @param longitude
 	 *            经度
 	 */
 	public void uploadLocation(String dwID, final double latitude, final double longitude) {
-		LogUtils.e(Constants.TAG_BM, "location_request");
 		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("dwID", dwID);
 		map.put("user_lt", String.valueOf(latitude));
@@ -96,17 +124,15 @@ public class LocationService extends Service {
 				new SendUrl.HttpCallBack() {
 					@Override
 					public void onSuccess(String response, ResultBean msg) {
-						if (msg.getResultCode() == 3000) {
-							LogUtils.i("bm", "uploadLocation...end");
-						}
+						LogUtils.d(TAG, "uploadLocation---" + msg.toString());
 						if (msg.getResultCode() == 3001) {
-							LogUtils.i("bm", "uploadLocation...failure");
+							ToastUtil.showToast("获取位置失败");
 						}
 					}
 
 					@Override
 					public void onFailure(String e) {
-						LogUtils.e("bm", "failure--" + e);
+						LogUtils.e(TAG, "uploadLocation---error---" + e);
 					}
 				});
 	}
@@ -114,6 +140,5 @@ public class LocationService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		LogUtils.i("bm", "-----service--onDestroy--------");
 	}
 }

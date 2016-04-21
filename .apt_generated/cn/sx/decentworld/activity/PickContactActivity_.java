@@ -19,7 +19,6 @@ import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.TitleBar_;
 import cn.sx.decentworld.component.ToastComponent_;
-import cn.sx.decentworld.network.request.SetUserInfo_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class PickContactActivity_
@@ -35,7 +34,6 @@ public final class PickContactActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        setUserInfo = SetUserInfo_.getInstance_(this);
         titleBar = TitleBar_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
     }
@@ -44,7 +42,6 @@ public final class PickContactActivity_
         main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         lv_contact = ((ListView) findViewById(id.lv_contact));
         main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
-        ((SetUserInfo_) setUserInfo).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

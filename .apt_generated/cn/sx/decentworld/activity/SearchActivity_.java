@@ -15,7 +15,6 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.component.ui.SearchComponent_;
 import cn.sx.decentworld.widget.ClearEditText;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -34,7 +33,6 @@ public final class SearchActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(this);
         searchComponent = SearchComponent_.getInstance_(this);
     }
 
@@ -43,7 +41,6 @@ public final class SearchActivity_
         tvSearch = ((TextView) findViewById(id.tv_search));
         cetSearch = ((ClearEditText) findViewById(id.cet_search));
         lvSearch = ((PullToRefreshListView) findViewById(id.lv_search));
-        ((ToastComponent_) toast).afterSetContentView_();
         ((SearchComponent_) searchComponent).afterSetContentView_();
         init();
     }

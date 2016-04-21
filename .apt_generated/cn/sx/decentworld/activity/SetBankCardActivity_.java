@@ -11,11 +11,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ToastComponent_;
@@ -41,38 +41,9 @@ public final class SetBankCardActivity_
         ivEditRealname = ((ImageView) findViewById(id.iv_set_bank_card_edit));
         etAccount = ((EditText) findViewById(id.et_set_bank_card_account));
         etRealname = ((EditText) findViewById(id.et_set_bank_card_realname));
+        tvBack = ((TextView) findViewById(id.tv_set_bank_card_back));
+        mBankName = ((EditText) findViewById(id.et_set_bank_card_name));
         btnSubmit = ((Button) findViewById(id.btn_set_bank_card_submit));
-        etName = ((EditText) findViewById(id.et_set_bank_card_name));
-        {
-            View view = findViewById(id.btn_set_bank_card_submit);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        SetBankCardActivity_.this.submit(view);
-                    }
-
-                }
-                );
-            }
-        }
-        {
-            View view = findViewById(id.iv_set_bank_card_edit);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        SetBankCardActivity_.this.modifyRealname(view);
-                    }
-
-                }
-                );
-            }
-        }
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

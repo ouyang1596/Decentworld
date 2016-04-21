@@ -12,8 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.network.request.GetUserInfo_;
-import cn.sx.decentworld.network.request.SetUserInfo_;
 
 public final class AdvanceSettingFragment_
     extends AdvanceSettingFragment
@@ -22,8 +20,6 @@ public final class AdvanceSettingFragment_
     private View contentView_;
 
     private void init_(Bundle savedInstanceState) {
-        getUserInfo = GetUserInfo_.getInstance_(getActivity());
-        setUserInfo = SetUserInfo_.getInstance_(getActivity());
     }
 
     @Override
@@ -33,13 +29,11 @@ public final class AdvanceSettingFragment_
     }
 
     private void afterSetContentView_() {
-        iv_advance_setting_acceptCheckPush = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_setting_acceptCheckPush));
-        iv_advance_ifClose_voice_stranger = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_ifClose_voice_stranger));
-        iv_advance_setting_push_system = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_setting_push_system));
         ll_advance_setting_root = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_advance_setting_root));
+        iv_advance_setting_push_system = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_setting_push_system));
         iv_advance_ifClose_voice_friend = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_ifClose_voice_friend));
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((SetUserInfo_) setUserInfo).afterSetContentView_();
+        iv_advance_ifClose_voice_stranger = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_ifClose_voice_stranger));
+        iv_advance_setting_acceptCheckPush = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_setting_acceptCheckPush));
         init();
     }
 

@@ -14,7 +14,7 @@ import android.widget.ImageView;
 import cn.sx.decentworld.DecentWorldApp;
 import cn.sx.decentworld.R;
 import cn.sx.decentworld.common.Constants;
-import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.logSystem.LogUtils;
 import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting;
 
 import com.googlecode.androidannotations.annotations.AfterViews;
@@ -24,12 +24,11 @@ import com.googlecode.androidannotations.annotations.ViewById;
 
 @EActivity(R.layout.activity_chat_room_pay)
 public class ChatRoomPayActivity extends BaseFragmentActivity {
+	private static final String TAG = "ChatRoomPayActivity";
 	@ViewById(R.id.btn_OK)
 	Button btnOK;
 	@ViewById(R.id.iv_back)
 	ImageView ivBack;
-	@Bean
-	ToastComponent toast;
 	@Bean
 	ChatRoomInfoSettingAndGetting chatRoomInfoSettingAndGetting;
 	public static final int CREATE_CHATROOM = 0;
@@ -46,7 +45,7 @@ public class ChatRoomPayActivity extends BaseFragmentActivity {
 					startActivity(intent);
 					finish();
 				} catch (JSONException e) {
-					toast.show("解析错误");
+					LogUtils.e(TAG, "error---" + e.toString());
 				}
 				break;
 			}

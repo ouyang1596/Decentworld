@@ -1,0 +1,218 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.WorkBean;
+import cn.sx.decentworld.bean.DWException.OnExceptionListener;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.FilePath;
+import cn.sx.decentworld.common.MediaManager;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.TimeUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.widget.GridViewForScrollView;
+
+/**
+ * @ClassName: WorkCircleAdapter.java
+ * @author: yj
+ * @date: 2016年3月7日 下午3:05:29
+ */
+public class WorkCircleAdapter extends BaseAdapter {
+	private Context mContext;
+	private List<WorkBean> mWorkBeans;
+	private HashMap<Integer, Boolean> map = new HashMap<Integer, Boolean>();// 判断点击的位置是否正在播放音乐
+	private int playingPosition = -1;// 记录下正在播放的位置
+
+	public WorkCircleAdapter(Context context, List<WorkBean> workBean) {
+		mContext = context;
+		mWorkBeans = workBean;
+	}
+
+	@Override
+	public int getCount() {
+		return null == mWorkBeans ? 0 : mWorkBeans.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return mWorkBeans.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(int position, View con, ViewGroup parent) {
+		ViewHolder vh;
+		if (null == con) {
+			con = View.inflate(mContext, R.layout.layout_work_circle_item, null);
+			vh = new ViewHolder();
+			vh.tvContent = (TextView) con.findViewById(R.id.tv_content);
+			vh.tvName = (TextView) con.findViewById(R.id.tv_name);
+			vh.ivAvatar = (ImageView) con.findViewById(R.id.iv_avatar);
+			vh.tvCai = (TextView) con.findViewById(R.id.tv_cai);
+			vh.tvTime = (TextView) con.findViewById(R.id.tv_time);
+			vh.tvZan = (TextView) con.findViewById(R.id.tv_zan);
+			vh.tvTime = (TextView) con.findViewById(R.id.tv_time);
+			vh.btnPlaySound = (Button) con.findViewById(R.id.btn_play_sound);
+			vh.btnPlaySound.setOnClickListener(mOnClickListener);
+			vh.tvDelete = (TextView) con.findViewById(R.id.tv_delete);
+			vh.tvComment = (TextView) con.findViewById(R.id.tv_comment);
+			vh.ivAvatar = (ImageView) con.findViewById(R.id.iv_avatar);
+			vh.gvPic = (GridViewForScrollView) con.findViewById(R.id.gv_pic);
+			vh.adapetr = new PicShowAdapter(mContext);
+			vh.gvPic.setAdapter(vh.adapetr);
+			con.setTag(vh);
+		} else {
+			vh = (ViewHolder) con.getTag();
+		}
+		WorkBean workBean = mWorkBeans.get(position);
+		vh.tvContent.setText(workBean.content);
+		vh.tvName.setText(workBean.publisherName);
+		vh.btnPlaySound.setTag(position);
+		ImageLoaderHelper.mImageLoader.displayImage(ImageUtils.getIconByDwID(workBean.dwID, ImageUtils.ICON_MAIN), vh.ivAvatar,
+				ImageLoaderHelper.mOptions);
+		String time = TimeUtils.getFormatTime(workBean.time, "MM-dd-HH:mm");
+		vh.tvZan.setText("赞（" + workBean.like + "）");
+		vh.tvCai.setText("踩（" + workBean.dislike + "）");
+		vh.tvTime.setText(time);
+		if (workBean.contentType == 0) {
+			vh.gvPic.setVisibility(View.GONE);
+			vh.btnPlaySound.setVisibility(View.GONE);
+		} else if (workBean.contentType == 1) {
+			vh.gvPic.setVisibility(View.GONE);
+			vh.btnPlaySound.setVisibility(View.VISIBLE);
+		} else if (workBean.contentType == 2) {
+			vh.gvPic.setVisibility(View.VISIBLE);
+			vh.btnPlaySound.setVisibility(View.GONE);
+			if (CommUtil.isNotBlank(workBean.imgUrl)) {
+				vh.gvPic.setVisibility(View.VISIBLE);
+				String[] urls = workBean.imgUrl.split(";");
+				vh.adapetr.setUrls(urls);
+				vh.adapetr.notifyDataSetChanged();
+			} else {
+				vh.gvPic.setVisibility(View.GONE);
+			}
+		}
+		return con;
+	}
+
+	private OnClickListener mOnClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			Integer position = (Integer) v.getTag();
+			WorkBean workBean = mWorkBeans.get(position);
+			switch (v.getId()) {
+			case R.id.tv_comment:
+				ToastUtil.showToast("position--" + position);
+				break;
+			case R.id.btn_play_sound:
+				if (map.get(position) == null || map.get(position) == false) {
+					String audioFileName = workBean.audioUrl.substring(workBean.audioUrl.lastIndexOf("/"),
+							workBean.audioUrl.length() - 1);
+					File file = new File(FilePath.AUDIO_PATH + audioFileName);
+					if (file.exists()) {
+						playLocalMusic(file.getAbsolutePath(), position);
+					} else {
+						String url = workBean.audioUrl.substring(0, workBean.audioUrl.length() - 1);
+						DownLoadAudio(url, position);
+					}
+				} else {
+					MediaManager.stop();
+					map.put(position, false);
+				}
+				break;
+			}
+		}
+	};
+
+	private void playLocalMusic(String uri, final int position) {
+		map.put(playingPosition, false);// 将前一个正在播放的语音位置设置为false
+		map.put(position, true);// 将当前正在播放的语音位置设置为true
+		playingPosition = position;// 正在播放的位置改为当前点击的位置
+		MediaManager.startLocal(mContext, uri, new OnCompletionListener() {
+			@Override
+			public void onCompletion(MediaPlayer mp) {
+				map.put(position, false);
+			}
+		}, new OnExceptionListener() {
+			@Override
+			public void onException(Exception e) {
+				map.put(position, false);
+			}
+		});
+	}
+
+	HttpUtils httpUtils = new HttpUtils();
+
+	public void DownLoadAudio(String uri, final int position) {
+		String fileName = uri.substring(uri.lastIndexOf("/"));
+		showProgressDialog();
+		httpUtils.download(uri, FilePath.AUDIO_PATH + fileName, new RequestCallBack<File>() {
+			@Override
+			public void onSuccess(ResponseInfo<File> responseInfo) {
+				hideProgressDialog();
+				playLocalMusic(responseInfo.result.getAbsolutePath(), position);
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg) {
+				hideProgressDialog();
+				ToastUtil.showToast("语音文件下载失败");
+				notifyDataSetChanged();
+				map.put(position, false);
+			}
+		});
+	}
+
+	private ProgressDialog mProDialog;
+
+	private void showProgressDialog() {
+		if (null == mProDialog) {
+			mProDialog = ProgressDialog.show(mContext, null, "loading");
+		} else {
+			mProDialog.show();
+		}
+	}
+
+	private void hideProgressDialog() {
+		if (null != mProDialog) {
+			mProDialog.hide();
+		}
+	}
+
+	class ViewHolder {
+		TextView tvContent, tvName, tvCai, tvZan, tvDelete, tvComment, tvTime;
+		ImageView ivAvatar;
+		GridViewForScrollView gvPic;
+		PicShowAdapter adapetr;
+		Button btnPlaySound;
+	}
+}
