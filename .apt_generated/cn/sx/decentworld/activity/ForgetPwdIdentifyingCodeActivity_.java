@@ -43,13 +43,13 @@ public final class ForgetPwdIdentifyingCodeActivity_
     }
 
     private void afterSetContentView_() {
-        etvIdentifyingCode = ((EditText) findViewById(id.etv_identifying_code));
         tvTimeCount = ((TextView) findViewById(id.time_count));
-        btnOk = ((Button) findViewById(id.btn_OK));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        llForgetPwdIdentifyingCode = ((LinearLayout) findViewById(id.root__forget_pwd_identifying_code));
         tvReSend = ((TextView) findViewById(id.tv_re_send));
+        llForgetPwdIdentifyingCode = ((LinearLayout) findViewById(id.root__forget_pwd_identifying_code));
+        etvIdentifyingCode = ((EditText) findViewById(id.etv_identifying_code));
         tvMobile = ((TextView) findViewById(id.tv_mobile));
+        btnOk = ((Button) findViewById(id.btn_OK));
         ((ToastComponent_) toast).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();

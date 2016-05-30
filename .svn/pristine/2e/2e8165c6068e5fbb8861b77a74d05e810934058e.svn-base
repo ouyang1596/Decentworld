@@ -1,0 +1,58 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.manager;
+
+import org.jivesoftware.smack.packet.Message;
+
+import cn.sx.decentworld.logSystem.LogUtils;
+
+/**
+ * @ClassName: CircleManager
+ * @Description: TODO (在这里用一句话描述类的作用)
+ * @author: Jackchen
+ * @date: 2016年5月17日 下午10:24:26
+ */
+public class CircleManager
+{
+    private static final String TAG = "CircleManager";
+    private static CircleManager instance = new CircleManager();
+    //新的作品圈
+    private boolean newWork = false;
+    //新的朋友圈
+    private boolean newMoment = false;
+    
+    
+    /**
+     * 获取实例
+     */
+    public static CircleManager getInstance()
+    {
+        return instance;
+    }
+    
+    public void newWork(String dwID,String workID)
+    {
+        //新的作品圈
+        
+    }
+    
+    public void newMoment(String dwID,String momentID)
+    {
+        //新的朋友圈
+        
+    }
+    
+    public void exitWork()
+    {
+        //退出作品圈
+    }
+    
+    public void exitMoment()
+    {
+        //退出朋友圈
+
+    }
+    
+    
+}

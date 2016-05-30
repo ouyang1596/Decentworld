@@ -1,0 +1,236 @@
+package cn.sx.decentworld.activity;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.MyChatRoom;
+import cn.sx.decentworld.bean.SubjectBean;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantIntent;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.dialog.TrueOrFalseDialogFragment;
+import cn.sx.decentworld.dialog.TrueOrFalseDialogFragment.OnTrueOrFalseClickListener;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ViewUtil;
+import cn.sx.decentworld.widget.CircularImageView;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_chat_room_my_subject_list)
+public class ChatRoomMySubjectListActivity extends BaseFragmentActivity {
+	@ViewById(R.id.lv_subject)
+	ListView lvSubject;
+	List<SubjectBean> subjects;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	private MyChatRoom mMyChatroom;
+	private int mPosition;
+	@Bean
+	ChatRoomInfoSettingAndGetting chatRoomInfoSettingAndGetting;
+	private Handler mHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			try {
+				JSONObject object = new JSONObject(msg.obj.toString());
+				JSONArray ja = object.getJSONArray("subjects");
+				subjects = (List<SubjectBean>) JsonUtils.json2BeanArray(ja.toString(), SubjectBean.class);
+				adapter.notifyDataSetChanged();
+			} catch (JSONException e) {
+				return;
+			}
+		};
+	};
+
+	@AfterViews
+	public void init() {
+		CGetIntent();
+		initView();
+		initAdapter();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		initRequest();
+	}
+
+	private void initView() {
+		ivBack.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				finish();
+			}
+		});
+	}
+
+	private SubjectAdapter adapter;
+
+	private void initAdapter() {
+		adapter = new SubjectAdapter();
+		lvSubject.setAdapter(adapter);
+	}
+
+	private void initRequest() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("roomID", mMyChatroom.roomID);
+		chatRoomInfoSettingAndGetting.getSubjectList(map, mHandler);
+	}
+
+	private void CGetIntent() {
+		mMyChatroom = (MyChatRoom) getIntent().getSerializableExtra(Constants.MY_CHATROOM);
+	}
+
+	class SubjectAdapter extends BaseAdapter {
+
+		@Override
+		public int getCount() {
+			return subjects == null ? 0 : subjects.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return subjects.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View con, ViewGroup arg2) {
+			ViewHolder vh;
+			if (null == con) {
+				con = View.inflate(mContext, R.layout.item_subject, null);
+				ViewUtil.scaleView(con);
+				vh = new ViewHolder();
+				vh.ivBg = (ImageView) con.findViewById(R.id.iv_bg);
+				vh.ivDetail = (CircularImageView) con.findViewById(R.id.iv_detail);
+				vh.ivChatRoomEnter = (ImageView) con.findViewById(R.id.iv_chatroom_enter);
+				vh.tvChatRoomName = (TextView) con.findViewById(R.id.tv_subject_name);
+				vh.tvSelfIntroduce = (TextView) con.findViewById(R.id.tv_self_introduce);
+				vh.tvOnLineCount = (TextView) con.findViewById(R.id.tv_online_count);
+				vh.tvChargeAmount = (TextView) con.findViewById(R.id.tv_chargerAmount);
+				vh.tvSelfNickName = (TextView) con.findViewById(R.id.tv_self_nickname);
+				vh.tvDeleteSubject = (TextView) con.findViewById(R.id.tv_delete_subject);
+				vh.tvDeleteSubject.setOnClickListener(mOnClickListener);
+				vh.tvEditSubject = (TextView) con.findViewById(R.id.tv_edit_subject);
+				vh.tvEditSubject.setOnClickListener(mOnClickListener);
+				con.setTag(vh);
+			} else {
+				vh = (ViewHolder) con.getTag();
+			}
+			SubjectBean subjectBean = subjects.get(position);
+			String roomBg = subjectBean.subjectBackground;
+			if (CommUtil.isNotBlank(roomBg)) {
+				ImageLoaderHelper.mImageLoader.displayImage(roomBg, vh.ivBg, ImageLoaderHelper.mOptions);
+			} else {
+				vh.ivBg.setImageResource(R.drawable.ic_launcher);
+			}
+			String ownerIcon = mMyChatroom.ownerIcon;
+			if (CommUtil.isNotBlank(ownerIcon)) {
+				ImageLoaderHelper.mImageLoader.displayImage(ownerIcon, vh.ivDetail, ImageLoaderHelper.mOptions);
+			} else {
+				vh.ivDetail.setImageResource(R.drawable.ic_launcher);
+			}
+			vh.tvSelfNickName.setText(mMyChatroom.ownerNickName);
+			vh.tvChatRoomName.setText(subjectBean.subjectName);
+			vh.tvSelfIntroduce.setText(mMyChatroom.ownerIntroduction);
+			vh.tvOnLineCount.setText(mMyChatroom.onLineNum + " 在线");
+			vh.tvChargeAmount.setText(mMyChatroom.chargeAmount + " 价格");
+			vh.tvDeleteSubject.setTag(Constants.ITEM_POSITION, position);
+			vh.tvDeleteSubject.setTag(Constants.ITEM_TAG, subjectBean);
+			vh.tvEditSubject.setTag(Constants.ITEM_POSITION, position);
+			vh.tvEditSubject.setTag(Constants.ITEM_TAG, subjectBean);
+			if (position == 0) {
+				vh.tvOnLineCount.setVisibility(View.VISIBLE);
+				vh.tvChargeAmount.setVisibility(View.VISIBLE);
+			} else {
+				vh.tvOnLineCount.setVisibility(View.GONE);
+				vh.tvChargeAmount.setVisibility(View.GONE);
+			}
+			return con;
+		}
+
+		private Handler mDeletHandler = new Handler() {
+			public void handleMessage(android.os.Message msg) {
+				subjects.remove(mPosition);
+				notifyDataSetChanged();
+			};
+		};
+
+		private OnClickListener mOnClickListener = new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				mPosition = (Integer) v.getTag(Constants.ITEM_POSITION);
+				SubjectBean subjectBean = (SubjectBean) v.getTag(Constants.ITEM_TAG);
+				switch (v.getId()) {
+				case R.id.tv_delete_subject:
+					TrueOrFalseDialogFragment trueOrFalseDialogFragment = new cn.sx.decentworld.dialog.TrueOrFalseDialogFragment();
+					trueOrFalseDialogFragment.setOnTrueOrFalseClickListener(mOnTrueOrFalseClickListener);
+					trueOrFalseDialogFragment.setTips("是否删除此话题");
+					trueOrFalseDialogFragment.setObj(subjectBean);
+					trueOrFalseDialogFragment.show(getSupportFragmentManager(), "trueOrFalseDialogFragment");
+					break;
+				case R.id.tv_edit_subject:
+					Intent intent = new Intent(ChatRoomMySubjectListActivity.this, ChatRoomEditMySubjectActivity_.class);
+					intent.putExtra(ConstantIntent.SUBJECTBEAN, subjectBean);
+					startActivity(intent);
+					break;
+				}
+			}
+		};
+		private OnTrueOrFalseClickListener mOnTrueOrFalseClickListener = new OnTrueOrFalseClickListener() {
+
+			@Override
+			public void onTrueOrFalseClick(TrueOrFalseDialogFragment dialog, View view) {
+				switch (view.getId()) {
+				case R.id.tv_cancel:
+					break;
+				case R.id.tv_ensure:
+					SubjectBean subjectBean = (SubjectBean) dialog.getObj();
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+					map.put("roomID", subjectBean.roomID);
+					map.put("subjectID", "" + subjectBean.id);
+					chatRoomInfoSettingAndGetting.deleteSubject(map, ConstantNet.API_DELETE_SUBJECT, mDeletHandler);
+					break;
+				}
+			}
+		};
+
+		public void setMyChatRoom(MyChatRoom myChatRoom) {
+			mMyChatroom = myChatRoom;
+		}
+
+		class ViewHolder {
+			ImageView ivBg, ivChatRoomEnter;
+			CircularImageView ivDetail;
+			TextView tvSelfIntroduce, tvChatRoomName, tvOnLineCount, tvChargeAmount, tvSelfNickName;
+			TextView tvDeleteSubject, tvEditSubject;
+		}
+	}
+}

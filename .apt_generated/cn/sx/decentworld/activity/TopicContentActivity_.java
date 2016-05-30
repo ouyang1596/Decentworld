@@ -37,12 +37,12 @@ public final class TopicContentActivity_
     }
 
     private void afterSetContentView_() {
-        tvOwnerName = ((TextView) findViewById(id.tv_owner_name));
-        ivOwnerIcon = ((ImageView) findViewById(id.iv_owner_icon));
         tvContent = ((TextView) findViewById(id.tv_content));
-        tvSelfIntroduce = ((TextView) findViewById(id.tv_self_introduce));
-        btnChatRoomEnter = ((Button) findViewById(id.btn_chatroom_enter));
         tvTitle = ((TextView) findViewById(id.tv_title));
+        tvOwnerName = ((TextView) findViewById(id.tv_owner_name));
+        btnChatRoomEnter = ((Button) findViewById(id.btn_chatroom_enter));
+        ivOwnerIcon = ((ImageView) findViewById(id.iv_owner_icon));
+        tvSelfIntroduce = ((TextView) findViewById(id.tv_self_introduce));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         init();
     }

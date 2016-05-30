@@ -1,0 +1,195 @@
+package cn.sx.decentworld.activity;
+
+import java.util.HashMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantIntent;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.MyImageGetter;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_topic_content)
+public class TopicContentActivity extends BaseFragmentActivity implements OnClickListener {
+	private static final String TAG = "TopicContentActivity";
+	@ViewById(R.id.tv_title)
+	TextView tvTitle;// 各个聊天室标题
+	@ViewById(R.id.tv_owner_name)
+	TextView tvOwnerName;
+	@ViewById(R.id.tv_self_introduce)
+	TextView tvSelfIntroduce;
+	@ViewById(R.id.tv_content)
+	TextView tvContent;
+	@ViewById(R.id.iv_owner_icon)
+	ImageView ivOwnerIcon;
+	@ViewById(R.id.btn_chatroom_enter)
+	Button btnChatRoomEnter;
+	private String roomID, nickName, selfIntroduce, content;
+
+	public static final int GET_CURRENT_SUBJECT = 1;
+	public static final int CHATROOM_ENTER = 2;
+	private static final int REQUEST_CODE_PIC = 200;
+	@Bean
+	ChatRoomInfoSettingAndGetting chatRoomInfoSettingAndGetting;
+	private Handler mHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			LogUtils.d(TAG, "handleMessage content " + msg.obj.toString());
+			try {
+				JSONObject object = new JSONObject(msg.obj.toString());
+				JSONObject jsonObject = object.getJSONObject("subject");
+				content = jsonObject.getString("subjectContent");
+				content = content.replace("\r\n", "<br/>");
+				if (CommUtil.isNotBlank(content)) {
+					Spanned spanned = Html.fromHtml(content, new MyImageGetter(mContext, tvContent), null);
+					tvContent.setText(spanned);
+					tvContent.setMovementMethod(LinkMovementMethod.getInstance());
+				}
+				tvTitle.setText(jsonObject.getString("subjectName"));
+			} catch (JSONException e) {
+
+			}
+		};
+	};
+
+	@AfterViews
+	public void init() {
+		TGetIntent();
+		initView();
+		getCurrentSubject();
+	}
+
+	private void TGetIntent() {
+		roomID = getIntent().getStringExtra("roomID");
+		nickName = getIntent().getStringExtra("nickName");
+		selfIntroduce = getIntent().getStringExtra(ConstantIntent.SELF_INTRODUCE);
+	}
+
+	private void initView() {
+		btnChatRoomEnter.setOnClickListener(this);
+		tvOwnerName.setText(nickName);
+		tvSelfIntroduce.setText(selfIntroduce);
+		ImageLoaderHelper.mImageLoader.displayImage(ImageUtils.getHostIconByDwID(DecentWorldApp.getInstance().getDwID()),
+				ivOwnerIcon, ImageLoaderHelper.mOptions);
+		LogUtils.d(TAG, "initView() URL " + ImageUtils.getIconByDwID(roomID, ImageUtils.ICON_SMALL));
+	}
+
+	private void getCurrentSubject() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("roomID", roomID);
+		chatRoomInfoSettingAndGetting.getCurrentSubject(map, mHandler);
+	}
+
+	private Handler mChatRoomEnterHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			Intent intent = new Intent(mContext, ChatRoomChatActivity_.class);
+			intent.putExtra("json_data", msg.obj.toString());
+			startActivity(intent);
+		};
+	};
+	private SendUrl sendUrl;
+
+	public void requestEnterChatRoom() {
+		showProgressDialog();
+		sendUrl = new SendUrl(mContext);
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", DecentWorldApp.getInstance().getDwID());
+		map.put("roomID", roomID);
+		map.put("nickName", nickName);
+		sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + "/joinChatRoom", Method.GET, new HttpCallBack() {
+
+			@Override
+			public void onSuccess(String response, ResultBean msg) {
+				LogUtils.d(TAG, "requestEnterChatRoom---" + msg.toString());
+				hideProgressDialog();
+				if (msg.getResultCode() == 2222) {
+					Message message = mChatRoomEnterHandler.obtainMessage();
+					message.obj = msg.getData().toString();
+					mChatRoomEnterHandler.sendMessage(message);
+				} else {
+					showToast(msg.getMsg());
+				}
+			}
+
+			@Override
+			public void onFailure(String e) {
+				LogUtils.e(TAG, "requestEnterChatRoom---error---" + e);
+				hideProgressDialog();
+				showToast(Constants.NET_WRONG);
+			}
+
+			private void showToast(final String data) {
+				runOnUiThread(new Runnable() {
+
+					@Override
+					public void run() {
+						ToastUtil.showToast(data);
+					}
+				});
+			}
+		});
+	}
+
+	private ProgressDialog mProDialog;
+
+	private void showProgressDialog() {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (null == mProDialog) {
+					mProDialog = ProgressDialog.show(mContext, null, "loading");
+				} else {
+					mProDialog.show();
+				}
+			}
+		});
+	}
+
+	private void hideProgressDialog() {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (null != mProDialog) {
+					mProDialog.hide();
+				}
+			}
+		});
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.btn_chatroom_enter:
+			requestEnterChatRoom();
+			break;
+		}
+	}
+}

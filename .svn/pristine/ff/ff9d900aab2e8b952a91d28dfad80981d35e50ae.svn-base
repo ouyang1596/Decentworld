@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="2dp" >
+
+        <TextView
+            android:id="@+id/tv_moment_reply_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="回复者"
+            android:textColor="@color/blue" />
+
+        <TextView
+            android:id="@+id/tv_moment_reply_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_moment_reply_name"
+            android:text=" 回复  " />
+
+        <TextView
+            android:id="@+id/tv_moment_reply_name2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_moment_reply_tag"
+            android:text="被回复者"
+            android:textColor="@color/blue" />
+
+        <TextView
+            android:id="@+id/tv_moment_reply_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="@dimen/item_moment_margin_right"
+            android:text=""
+            android:textColor="@color/two_black" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_moment_reply_content"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="内容" />
+
+</LinearLayout>

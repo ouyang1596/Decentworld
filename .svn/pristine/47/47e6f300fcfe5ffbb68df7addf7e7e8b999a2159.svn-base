@@ -1,0 +1,132 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.common;
+
+/**
+ * @ClassName: NotifyByEventBus.java
+ * @Description: 消息路由类；1.在该类中定义TAG，命名分为两部分，前缀和后缀，前缀缩写为NT，代表NOTIFY_TAG，后缀为自定义部分；
+ * @author: cj
+ * @date: 2015年10月5日 下午2:46:41
+ */
+public class NotifyByEventBus
+{
+    /**
+     * 用户身家
+     */
+    public static final String NT_UPDATE_WEALTH = "NT_UPDATE_WEALTH";// 更新身家
+    // 使用EventBus定义的变量
+    public static final String NT_UPDATE_MESSAGELIST = "NT_UPDATE_MESSAGELIST";// 通知更新消息表界面
+    public static final String NT_SHOW_FRIENDS_ADDED = "NT_SHOW_FRIENDS_ADDED";// 拦截消息到
+    public static final String NT_CHECK_RESULT = "NT_CHECK_RESULT";// 拦截消息到支持
+    public static final String NT_CHECK_BEAUTIFY = "NT_CHECK_BEAUTIFY";// 貌推送
+    public static final String NT_MATCH = "NT_MATCH";// 貌推送
+
+    public static final String NT_UPDATE_NEW_FRIEND_LIST = "NT_UPDATE_NEW_FRIEND_LIST";// 通知更新好友添加列表
+    public static final String NT_UPDATE_FILE_SEND_PROGRESS = "NT_UPDATE_FILE_SEND_PROGRESS";// 通知更新文件传输进度
+    public static final String NT_UPDATE_CHAT_LISTVIEW_RECEIVE_MSG = "NT_UPDATE_CHAT_LISTVIEW_RECEIVE_MSG";// 当处于chatActivity时，收到服务器发来的消息
+    public static final String NT_BEGIN_LISTEN = "NT_BEGIN_LISTEN";
+
+    public static final String NT_RESET_TXT = "NT_RESET_TXT";// 文字消息发送失败时，重新发送文字消息
+    public static final String NT_RESET_VOICE = "NT_RESET_VOICE";// 语音发送失败时，重新发送语音
+    public static final String NT_RESET_IMAGE = "NT_RESET_IMAGE";// 消息发送失败时，重新发送消息
+    public static final String NT_RESET_CARD = "NT_RESET_CARD";// 名片发送失败时，重新发送名片
+
+    public static final String NT_STRANGER_INFO = "NT_STRANGER_INFO";
+    public static final String NT_CONNECTION = "NT_CONNECTION";
+
+    public static final String NT_GOINTO_MAINACTIVITY = "NT_GOINTO_MAINACTIVITY";
+    public static final String NT_DELETE_FRIEND_CONVERSATION = "NT_DELETE_FRIEND_CONVERSATION";
+    public static final String NT_ADD_FRIEND_CONVERSATION = "NT_ADD_FRIEND_CONVERSATION";
+
+    /**
+     * 上下线
+     */
+    public static final String NT_CRUSH_OFF_LINE = "NT_CRUSH_OFF_LINE";// 被挤下线的通知
+    public static final String NT_RECONNECT = "NT_RECONNECT";
+    public static final String NT_OFF_LINE = "NT_OFF_LINE";
+    /**
+     * 接受聊天语音
+     * */
+    public static final String NT_RECEIVE_SINGLE_AUDIO = "NT_RECEIVE_SINGLE_AUDIO";
+    public static final String NT_RECEIVE_CHATROOM_AUDIO = "NT_RECEIVE_CHATROOM_AUDIO";
+    /**
+     * 聊天室
+     */
+    public static final String NT_CHAT_ROOM_JOIN = "NT_CHAT_ROOM_JOIN";// 聊天室成员上线通知
+    public static final String NT_CHAT_ROOM_LEAVE = "NT_CHAT_ROOM_LEAVE";// 聊天室成员下线通知
+    public static final String NT_CHAT_ROOM_TEXT = "NT_CHAT_ROOM_TEXT";// 聊天室文字通知
+    public static final String NT_CHAT_ROOM_IMAGE = "NT_CHAT_ROOM_IMAGE";// 聊天室图片通知
+    public static final String NT_CHAT_ROOM_VOICE = "NT_CHAT_ROOM_VOICE";// 聊天室语音通知
+
+    public static final String NT_CHAT_ROOM_MSG = "NT_CHAT_ROOM_MSG";// 聊天室消息（文字、语音、图片）通知
+
+    public static final String NT_CHECK_NETWORK = "NT_CHECK_NETWORK";// 检测网络
+
+    public static final String NT_REFRESH_CONTACT = "NT_REFRESH_CONTACT";// 刷新联系人列表
+
+    public static final String NT_WEALTH_SHORTAGE = "NT_WEALTH_SHORTAGE";// 身家不足，消息状态改为发送失败
+
+    public static final String NT_UPDATE_ROOM_HISTORY_MSG = "NT_UPDATE_ROOM_HISTORY_MSG";// 获取聊天历史消息记录并更新界面
+
+    public static final String NT_SYSTEM_PUSH_WORTH = "NT_SYSTEM_PUSH_WORTH";// 系统推送的对方身价改变
+    public static final String NT_STRANGER_TO_FRIEND = "NT_STRANGER_TO_FRIEND";// 从陌生人变为朋友
+
+    /**
+     * 会话列表
+     */
+    // 重新加载好友会话列表
+    public static final String NT_RE_LOAD_FRIEND_CONV = "NT_RE_LOAD_FRIEND_CONV";
+    // 重新加载陌生人会话列表
+    public static final String NT_RE_LOAD_STRANGER_CONV = "NT_RE_LOAD_STRANGER_CONV";
+
+    /**
+     * 
+     */
+    // 未读消息数
+    public static final String NT_UNREAD_CONVERSATION_COUNT = "NT_UNREAD_CONVERSATION_COUNT";
+    // 未读联系人数
+    public static final String NT_UNREAD_CONTACT_COUNT = "NT_UNREAD_CONTACT_COUNT";
+    // 未读作品圈数
+    public static final String NT_UNREAD_FIND_COUNT = "NT_UNREAD_FIND_COUNT";
+    // 编辑完资料后更新界面
+//    public static final String NT_EDIT_INFO_COMPLETE = "NT_EDIT_INFO_COMPLETE";
+    // 更新身家
+    public static final String NT_REFRESH_WEALTH = "NT_REFRESH_WEALTH";
+    // 绑定微信成功
+    public static final String NT_BAND_WX_SUCC = "NT_BAND_WX_SUCC";
+    // 在会话列表界面显示网络状态（与Openfire连接的状态）
+    public static final String NT_NETWORK_STATE_OF = "NT_NETWORK_STATE_OF";
+    // 微信授权完成，返回code
+    public static final String NT_RETURN_WX_CODE = "NT_RETURN_WX_CODE";
+    
+    //发送名片成功后收到回执
+    public static final String NT_SEND_CARD_ACK = "NT_SEND_CARD_ACK";
+    
+    //服务器将消息发送给对方后给出的回执
+    public static final String NT_SEND_SUCCESS_ACK = "NT_SEND_SUCCESS_ACK";
+    
+    //由状态机发出的更新消息列表的通知
+    public static final String NT_REFRESH_MSG_LIST = "NT_REFRESH_MSG_LIST";
+    
+    /**
+     * 朋友圈
+     */
+    //新的作品圈评论
+    public static final String NT_NEW_WORK_COMMENT = "NT_NEW_WORK_COMMENT";
+    //清除作品圈评论
+//    public static final String NT_CLEAR_WORK_COMMENT = "NT_CLEAR_WORK_COMMENT";
+    
+    //新的朋友圈评论
+    public static final String NT_NEW_MOMENT_COMMENT = "NT_NEW_MOMENT_COMMENT";
+    //清除朋友圈评论
+//    public static final String NT_CLEAR_MOMENT_COMMENT = "NT_CLEAR_MOMENT_COMMENT";
+
+    //新的作品圈
+    public static final String NT_NEW_WORK = "NT_NEW_WORK";
+    //新的朋友圈
+    public static final String NT_NEW_MOMENT = "NT_NEW_MOMENT";
+    
+    
+
+}

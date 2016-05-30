@@ -38,11 +38,11 @@ public final class EditCommon3Activity_
     }
 
     private void afterSetContentView_() {
-        lv_edit_common3_list = ((GridView) findViewById(id.lv_edit_common3_list));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
         etCommon3Content = ((EditText) findViewById(id.et_edit_common3_content));
+        lv_edit_common3_list = ((GridView) findViewById(id.lv_edit_common3_list));
         tvFinish = ((TextView) findViewById(id.tv_finish));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

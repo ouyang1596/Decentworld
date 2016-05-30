@@ -38,11 +38,11 @@ public final class EditCommon1Activity_
     }
 
     private void afterSetContentView_() {
-        etEditContent = ((EditText) findViewById(id.et_edit_common1_content));
-        tvFinish = ((TextView) findViewById(id.tv_finish));
-        gvCommon1 = ((GridView) findViewById(id.gv_edit_common1_list));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        tvFinish = ((TextView) findViewById(id.tv_finish));
         ivBack = ((ImageView) findViewById(id.iv_back));
+        gvCommon1 = ((GridView) findViewById(id.gv_edit_common1_list));
+        etEditContent = ((EditText) findViewById(id.et_edit_common1_content));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

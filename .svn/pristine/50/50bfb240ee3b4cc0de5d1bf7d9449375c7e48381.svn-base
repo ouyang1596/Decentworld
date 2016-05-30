@@ -1,0 +1,37 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity;
+
+import cn.sx.decentworld.logSystem.LogUtils;
+
+/**
+ * @ClassName: CommInfo
+ * @Description: 通用信息
+ * @author: Jackchen
+ * @date: 2016年5月4日 上午10:23:45
+ */
+public class CommInfo
+{
+    private static final String TAG = "CommInfo";
+    private static SelfUserInfo mSelfUserInfo;
+    
+    /**
+     * 初始化个人信息
+     */
+    public static void initSelfUserInfo(SelfUserInfo info)
+    {
+        LogUtils.d(TAG, "initSelfUserInfo()");
+        mSelfUserInfo = info;
+    }
+    
+    /**
+     * 获取个人信息
+     */
+    public static SelfUserInfo getSelfUserInfo()
+    {
+        return mSelfUserInfo;
+    }
+    
+    
+}

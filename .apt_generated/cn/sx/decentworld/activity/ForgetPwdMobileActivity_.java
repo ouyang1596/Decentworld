@@ -40,11 +40,11 @@ public final class ForgetPwdMobileActivity_
     }
 
     private void afterSetContentView_() {
+        btnOk = ((Button) findViewById(id.btn_OK));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
         tvNoReceive = ((TextView) findViewById(id.tv_no_receive_code));
-        ivback = ((ImageView) findViewById(id.iv_back));
         etMobile = ((ClearEditText) findViewById(id.et_mobile));
-        btnOk = ((Button) findViewById(id.btn_OK));
+        ivback = ((ImageView) findViewById(id.iv_back));
         etCode = ((ClearEditText) findViewById(id.et_code));
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((ResetPwdInfo_) resetPwdInfo).afterSetContentView_();

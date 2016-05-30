@@ -1,0 +1,149 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.handleMessage;
+
+import org.jivesoftware.smack.packet.Message;
+
+import cn.sx.decentworld.engine.ContactEngine;
+import cn.sx.decentworld.handleMessage.MessageSubject.Subject;
+import cn.sx.decentworld.logSystem.LogUtils;
+
+/**
+ * @ClassName: DispatchMessage
+ * @Description: 监听到消息后进行分发
+ * @author: Jackchen
+ * @date: 2016年5月12日 上午9:27:12
+ */
+public class DispatchMessage
+{
+    private static final String TAG = "DispatchMessage";
+    private static DispatchMessage instance = new DispatchMessage();
+
+    private DispatchMessage()
+    {
+        // 防止构造多个实例
+    }
+
+    /**
+     * 获取实例
+     */
+    public static DispatchMessage getInstance()
+    {
+        return instance;
+    }
+
+    /**
+     * 分发消息
+     */
+    public void dispatch(Message message)
+    {
+        LogUtils.v(TAG, "dispatch() "+message.toString());
+        String subject = message.getSubject();
+        if (subject.equals(Subject.CHAT_TEXT_SINGLE.getBody()))
+        {
+            //1单聊文字
+            HandleChat.getInstance().textSingle(message);
+        }
+        else if (subject.equals(Subject.CHAT_TEXT_MULTI.getBody()))
+        {
+            //2聊天室文字
+            HandleChat.getInstance().textMulti(message);
+        }
+        else if (subject.equals(Subject.CHAT_VOICE.getBody()))
+        {
+            //3语音
+            HandleChat.getInstance().voice(message);
+        }
+        else if (subject.equals(Subject.CHAT_IMAGE.getBody()))
+        {
+            //4图片
+            HandleChat.getInstance().image(message);
+        }
+        else if (subject.equals(Subject.CHAT_CARD_SINGLE.getBody()))
+        {
+            //5单聊名片
+            HandleChat.getInstance().cardSingle(message);
+        }
+        else if (subject.equals(Subject.FRIEND_ADD.getBody()))
+        {
+            //1添加朋友
+            HandleFriend.getInstance().add(message);
+        }
+        else if (subject.equals(Subject.FRIEND_ACCEPT.getBody()))
+        {
+            //2同意
+            HandleFriend.getInstance().accept(message);
+        }
+        else if (subject.equals(Subject.FRIEND_REFUSE.getBody()))
+        {
+            //3拒绝
+            HandleFriend.getInstance().refuse(message);
+        }
+        else if (subject.equals(Subject.FRIEND_DELETE.getBody()))
+        {
+            //4删除
+            HandleFriend.getInstance().delete(message);
+        }
+        else if (subject.equals(Subject.CHAT_ROOM_ENTER.getBody()))
+        {
+            //1进入聊天室
+            HandleChatRoom.getInstance().enter(message);
+        }
+        else if (subject.equals(Subject.CHAT_ROOM_LEAVE.getBody()))
+        {
+            //2离开聊天室
+            HandleChatRoom.getInstance().leave(message);
+        }
+        else if (subject.equals(Subject.ACK_WEALTH.getBody()))
+        {
+            //1身家回执
+            HandleAck.getInstance().wealth(message);
+        }
+        else if (subject.equals(Subject.ACK_CONFIRM.getBody()))
+        {
+            //2消息送达回执
+            HandleAck.getInstance().confirm(message);
+        }
+        else if (subject.equals(Subject.ACK_ERROR.getBody()))
+        {
+            //3身家不足回执
+            HandleAck.getInstance().error(message);
+        }
+        else if (subject.equals(Subject.MATCH.getBody()))
+        {
+            //1匹配成功
+            HandleMatch.getInstance().match(message);
+        }
+        else if (subject.equals(Subject.BROADCAST_BENEFIT.getBody()))
+        {
+            //1
+            HandleSystem.getInstance().newBenefit(message);
+        }
+        else if (subject.equals(Subject.BROADCAST_WORTH_CHANGED.getBody()))
+        {
+            //2
+            HandleSystem.getInstance().worthChanged(message);
+        }
+        else if (subject.equals(Subject.BROADCAST_CHECK.getBody()))
+        {
+            //3
+            HandleSystem.getInstance().check(message);
+        }
+        else if (subject.equals(Subject.CHECKRESULT.getBody()))
+        {
+            //4
+            HandleSystem.getInstance().checkResult(message);
+        }
+        else if (subject.equals(Subject.CommentNotice.getBody()))
+        {
+            //朋友圈评论提示
+            HandleMoment.getInstance().notice(message);
+        }
+        else if (subject.equals(Subject.WorkCommentNotice.getBody()))
+        {
+            //作品圈评论提示
+            HandleWork.getInstance().notice(message);
+        }
+    }
+}

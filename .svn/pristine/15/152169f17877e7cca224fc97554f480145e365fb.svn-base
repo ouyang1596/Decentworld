@@ -1,0 +1,158 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.engine.ProcessUserData;
+import cn.sx.decentworld.engine.UserDataEngine.CheckUserInfoVersionListener;
+import cn.sx.decentworld.engine.ConversationEngine;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.engine.UserDataEngine;
+import cn.sx.decentworld.engine.UserDataEngine.UserKeyListener;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.utils.NetworkUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: LoadNetdataActivity.java
+ * @Description: 初次登陆时加载数据
+ * @author: cj
+ * @date: 2016年1月30日 上午10:16:40
+ */
+@EActivity(R.layout.activity_load_net_data)
+public class LoadNetdataActivity extends BaseFragmentActivity
+{
+    /**
+     * 常量
+     */
+    public static final String TAG = "LoadNetdataActivity";
+    private static final int HANDLER_KEY_SUCCESS = 0;// 获取key成功
+    private static final int HANDLER_KEY_FAILURE = 1;// 获取key失败
+
+    /**
+     * 工具类
+     */
+    @ViewById(R.id.tv_load_net_data)
+    TextView tvLoadNetData;
+
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        LogUtils.v(TAG, "init");
+        if (NetworkUtils.isNetWorkConnected(this))
+        {
+            LogUtils.v(TAG, "有网络，从网络加载数据");
+            loadData();
+        }
+        else
+        {
+            LogUtils.v(TAG, "没有网络，加载历史数据，并且直接进入MainActivity");
+            completed();
+        }
+    }
+
+    /**
+     * 加载网络数据
+     * 
+     * @param isLoadData
+     */
+    private void loadData()
+    {
+        // 获取key，上传key
+        UserDataEngine userKey = UserDataEngine.getInstance();
+        userKey.getKey(LoadNetdataActivity.this, new UserKeyListener()
+        {
+            @Override
+            public void onSucceed()
+            {
+                /** 加载用户数据 **/
+                handler.sendEmptyMessage(HANDLER_KEY_SUCCESS);
+            }
+
+            @Override
+            public void onFailed(String casue)
+            {
+                LogUtils.e(TAG, "获取和上传用户的key失败，casue：" + casue);
+                handler.sendEmptyMessage(HANDLER_KEY_FAILURE);
+            }
+        });
+    }
+
+    /**
+     * 网络请求回调
+     */
+    Handler handler = new Handler()
+    {
+        public void handleMessage(Message msg)
+        {
+            switch (msg.what)
+            {
+                case HANDLER_KEY_SUCCESS:
+                    LogUtils.v(TAG, "handler...获取和上传用户的key成功");
+                    UserDataEngine.getInstance().checkUserInfoVersion(new CheckUserInfoVersionListener()
+                    {
+                        @Override
+                        public void onSuccess(String jsonStr)
+                        {
+                            LogUtils.v(TAG, "用户信息版本校验时...onSuccess" + jsonStr);
+                            if (CommUtil.isNotBlank(jsonStr))
+                            {
+                                new ProcessUserData().processLoginNetData(jsonStr);
+                            }
+                            completed();
+                        }
+
+                        @Override
+                        public void onFailure(String cause)
+                        {
+                            LogUtils.e(TAG, "用户信息版本校验时...onFailure" + cause);
+                            tvLoadNetData.setText("获取用户数据失败");
+                        }
+
+                        @Override
+                        public void onSameVersion(String info)
+                        {
+                            LogUtils.v(TAG, "用户信息版本校验时...onSameVersion" + info);
+                            completed();
+                        }
+                    });
+
+                    break;
+                case HANDLER_KEY_FAILURE:
+                    tvLoadNetData.setText("获取key失败");
+                    LogUtils.e(TAG, "获取和上传用户的key失败");
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    private void completed()
+    {
+        // 初始化个人信息到内存
+        UserInfoEngine.getInstance().initData();
+        // 初始化会话列表到内存
+        ConversationEngine.getInstance().initConversation();
+        LogUtils.v(TAG, TAG+"...completed");
+        Intent intent = new Intent(LoadNetdataActivity.this , MainActivity_.class);
+        startActivity(intent);
+        finish();
+    }
+
+}

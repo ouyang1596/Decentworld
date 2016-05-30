@@ -34,14 +34,14 @@ public final class RechargePayMethodUselessActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        rechargeComponent = RechargeComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        rechargeComponent = RechargeComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         ivBack = ((ImageView) findViewById(id.iv_back));
-        llAliPay = ((LinearLayout) findViewById(id.ll_ali_pay));
         llWX = ((LinearLayout) findViewById(id.ll_wx));
+        llAliPay = ((LinearLayout) findViewById(id.ll_ali_pay));
         {
             View view = findViewById(id.iv_back);
             if (view!= null) {
@@ -57,8 +57,8 @@ public final class RechargePayMethodUselessActivity_
                 );
             }
         }
-        ((RechargeComponent_) rechargeComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((RechargeComponent_) rechargeComponent).afterSetContentView_();
         init();
     }
 

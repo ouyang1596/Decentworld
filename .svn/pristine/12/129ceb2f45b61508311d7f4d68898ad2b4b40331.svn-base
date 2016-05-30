@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:visibility="visible"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/ll_msg_status_prompt_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/chat_margin_left"
+        android:layout_marginRight="@dimen/chat_margin_right"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:orientation="horizontal"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/tv_msg_status_prompt_content"
+            style="@style/chat_text_date_style"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="消息提示"
+            android:textColor="@color/one_black"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -36,9 +36,9 @@ public final class OccupationActivity_
     }
 
     private void afterSetContentView_() {
-        lvOccupation = ((ListView) findViewById(id.lv_occupation));
         etSchool = ((AutoCompleteTextView) findViewById(id.act_university));
         lvProfession = ((ListView) findViewById(id.lv_profession));
+        lvOccupation = ((ListView) findViewById(id.lv_occupation));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

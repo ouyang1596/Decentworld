@@ -29,8 +29,8 @@ public final class StrangerListFragment_
     }
 
     private void afterSetContentView_() {
-        lvNearStranger = ((PullToRefreshListView) findViewById(cn.sx.decentworld.R.id.lv_stranger_near));
         relLv = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rel_lv));
+        lvNearStranger = ((PullToRefreshListView) findViewById(cn.sx.decentworld.R.id.lv_stranger_near));
         init();
     }
 

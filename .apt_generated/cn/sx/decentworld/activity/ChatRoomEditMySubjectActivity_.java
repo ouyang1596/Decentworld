@@ -36,12 +36,12 @@ public final class ChatRoomEditMySubjectActivity_
     }
 
     private void afterSetContentView_() {
+        btnPhotos = ((Button) findViewById(id.btn_photo));
+        btnSave = ((Button) findViewById(id.btn_content_save));
         etSubjectName = ((EditText) findViewById(id.et_subject_name));
         etSubjectContent = ((EditText) findViewById(id.et_subject_content));
-        ivSubjectBackground = ((AutoSizeImageView) findViewById(id.iv_cover));
-        btnSave = ((Button) findViewById(id.btn_content_save));
-        btnPhotos = ((Button) findViewById(id.btn_photo));
         tvSend = ((TextView) findViewById(id.tv_send));
+        ivSubjectBackground = ((AutoSizeImageView) findViewById(id.iv_audio_cover));
         init();
     }
 

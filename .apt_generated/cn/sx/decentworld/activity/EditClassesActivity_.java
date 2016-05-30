@@ -37,10 +37,10 @@ public final class EditClassesActivity_
     }
 
     private void afterSetContentView_() {
-        btn_edit_classes_back = ((Button) findViewById(id.btn_edit_classes_back));
-        ll_edit_classes_root = ((LinearLayout) findViewById(id.ll_edit_classes_root));
         btn_edit_classes_complete = ((Button) findViewById(id.btn_edit_classes_complete));
+        btn_edit_classes_back = ((Button) findViewById(id.btn_edit_classes_back));
         et_edit_classes = ((EditText) findViewById(id.et_edit_classes));
+        ll_edit_classes_root = ((LinearLayout) findViewById(id.ll_edit_classes_root));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

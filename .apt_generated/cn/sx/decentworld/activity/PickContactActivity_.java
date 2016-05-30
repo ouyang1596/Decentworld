@@ -39,9 +39,9 @@ public final class PickContactActivity_
     }
 
     private void afterSetContentView_() {
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         lv_contact = ((ListView) findViewById(id.lv_contact));
         main_header_right = ((RelativeLayout) findViewById(id.main_header_right));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         ((TitleBar_) titleBar).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

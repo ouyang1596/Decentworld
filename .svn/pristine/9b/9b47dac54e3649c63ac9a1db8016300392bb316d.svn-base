@@ -1,0 +1,446 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import org.simple.eventbus.EventBus;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.UserInfoAdapter;
+import cn.sx.decentworld.bean.UserInfoField.FieldGroup;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.component.ChoceAndTakePictureComponent;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.CameraAlbumDialogFragment;
+import cn.sx.decentworld.dialog.CameraAlbumDialogFragment.OnCameraAlbumClickListener;
+import cn.sx.decentworld.engine.UserDataEngine;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.entity.SelfUserField;
+import cn.sx.decentworld.entity.dao.UserExtraInfoDao;
+import cn.sx.decentworld.entity.db.DisplayAuthority;
+import cn.sx.decentworld.entity.db.UserExtraInfo;
+import cn.sx.decentworld.entity.db.UserInfo;
+import cn.sx.decentworld.listener.NetCallback;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.widget.ListViewForScrollView;
+
+import com.alibaba.fastjson.JSON;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: EditUserInfoActivity.java
+ * @Description:编辑自己的详细资料
+ * @author: cj
+ * @date: 2015年10月9日 下午4:01:14
+ */
+@EActivity(R.layout.activity_edit_user_info)
+public class EditUserInfoActivity extends BaseFragmentActivity implements OnClickListener, OnCameraAlbumClickListener
+{
+    /**
+     * 常量
+     */
+    private static final String TAG = "EditUserInfoActivity";
+    // 加载图片时的请求码
+    private static final int REQUESTCODE_GET_ICON_1 = 1;
+    private static final int REQUESTCODE_GET_ICON_2 = 2;
+    private static final int REQUESTCODE_GET_ICON_3 = 3;
+    public static final int REQUESTCODE_EDIT_SIGN = 4;
+    public static final int REQUESTCODE_EDIT_REALNAME = 5;
+    public static final int REQUESTCODE_EDIT_NICKNAME = 6;
+    public static final int REQUESTCODE_EDIT_AGE = 7;
+    public static final int REQUESTCODE_EDIT_SEX = 8;
+    public static final int REQUESTCODE_EDIT_POSITION = 9;
+
+    public static final int REQUESTCODE_EDIT_SCHOOL = 10;
+    public static final int REQUESTCODE_EDIT_DEPARTMENT = 11;
+    public static final int REQUESTCODE_EDIT_CLASSES = 12;
+
+    public static final int REQUESTCODE_EDIT_OCCUPATION = 13;
+    public static final int REQUESTCODE_EDIT_CORPORATION = 14;
+    public static final int REQUESTCODE_EDIT_JOB = 15;
+
+    public static final int REQUESTCODE_EDIT_COMMON1 = 16;// 既可以自定义，也可以选择
+    public static final int REQUESTCODE_EDIT_COMMON2 = 17;// 只可以自定义
+    public static final int REQUESTCODE_EDIT_COMMON3 = 18;// 只可以选择
+
+    /**
+     * 工具类
+     */
+    @Bean
+    ToastComponent toast;
+    @Bean
+    ChoceAndTakePictureComponent choceAndTakePictureComponent;
+    private CameraAlbumDialogFragment cameraAlbumDialogFragment;
+
+    /**
+     * 界面资源
+     */
+    // 根布局
+    @ViewById(R.id.ll_edit_user_info_root)
+    LinearLayout ll_edit_user_info_root;
+    @ViewById(R.id.sl_edit_user_info)
+    ScrollView sl_edit_user_info;
+
+    @ViewById(R.id.iv_edit_user_info_icon_1)
+    ImageView mIvIcon1;
+    @ViewById(R.id.iv_edit_user_info_icon_2)
+    ImageView mIvIcon2;
+    @ViewById(R.id.iv_edit_user_info_icon_3)
+    ImageView mIvIcon3;
+
+    @ViewById(R.id.tv_finish)
+    TextView tvFinish;
+    @ViewById(R.id.iv_back)
+    ImageView ivBack;
+    @ViewById(R.id.lv_edit_user_info)
+    ListViewForScrollView mLvUserInfo;
+
+    /**
+     * 变量
+     */
+    // 用于保存用户详细信息
+    private String dwID = "";
+    private List<SelfUserField> mDatas;
+    private UserInfoAdapter mAdapter;
+    // 用于保存三张图片
+    private File[] fileIcons = new File[3];
+
+    // 用于将ScrollView滚动到最顶端
+    Handler handler = new Handler();
+    Runnable runnable = new Runnable()
+    {
+        public void run()
+        {
+            sl_edit_user_info.scrollTo(0, 0);
+        }
+    };
+
+    @AfterViews
+    void init()
+    {
+        EventBus.getDefault().register(this);
+        initListener();
+        dwID = DecentWorldApp.getInstance().getDwID();
+        tvFinish.setVisibility(View.VISIBLE);
+        tvFinish.setText("完成");
+        ivBack.setVisibility(View.VISIBLE);
+        handler.postDelayed(runnable, 80);
+
+        // 显示图片
+        UserExtraInfo extraInfo = UserExtraInfoDao.query(dwID);
+        if (extraInfo != null)
+        {
+            LogUtils.v(TAG, "额外三张照片路径为：extraInfo.getIcon=" + extraInfo.getIcon() + ",extraInfo.getIcon2=" + extraInfo.getIcon2() + ",extraInfo.getIcon3=" + extraInfo.getIcon3());
+            if (CommUtil.isNotBlank(extraInfo.getIcon()))
+                ImageLoaderHelper.mImageLoader.displayImage(extraInfo.getIcon(), mIvIcon1, ImageLoaderHelper.mOptions);
+            if (CommUtil.isNotBlank(extraInfo.getIcon2()))
+                ImageLoaderHelper.mImageLoader.displayImage(extraInfo.getIcon2(), mIvIcon2, ImageLoaderHelper.mOptions);
+            if (CommUtil.isNotBlank(extraInfo.getIcon3()))
+                ImageLoaderHelper.mImageLoader.displayImage(extraInfo.getIcon3(), mIvIcon3, ImageLoaderHelper.mOptions);
+        }
+
+        // 显示个人的所所有信息
+        mDatas = new ArrayList<SelfUserField>();
+        mAdapter = new UserInfoAdapter(this , mDatas , true);
+        mLvUserInfo.setAdapter(mAdapter);
+    }
+
+    private void initListener()
+    {
+        mIvIcon1.setOnClickListener(this);
+        mIvIcon2.setOnClickListener(this);
+        mIvIcon3.setOnClickListener(this);
+        ivBack.setOnClickListener(this);
+        tvFinish.setOnClickListener(this);
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.iv_edit_user_info_icon_1:
+                // 选择第一张照片
+                requestCode = REQUESTCODE_GET_ICON_1;
+                showCameraAlbumDialog();
+                break;
+            case R.id.iv_edit_user_info_icon_2:
+                // 选择第二张照片
+                requestCode = REQUESTCODE_GET_ICON_2;
+                showCameraAlbumDialog();
+                break;
+            case R.id.iv_edit_user_info_icon_3:
+                // 选择第三张照片
+                requestCode = REQUESTCODE_GET_ICON_3;
+                showCameraAlbumDialog();
+                break;
+            case R.id.iv_back:// 返回不保存数据
+                finish();
+            case R.id.tv_finish:
+                submit();
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 选择本地图片
+     */
+    public void selectLocalPic(int tag)
+    {
+        Intent intent = new Intent(mContext , TakePhotosAndpictureSingleActivity.class);
+        intent.putExtra(Constants.ASPECTX, 1);
+        intent.putExtra(Constants.ASPECTY, 1);
+        intent.putExtra(Constants.OUTPUTX, 400);
+        intent.putExtra(Constants.OUTPUTY, 400);
+        startActivityForResult(intent, tag);
+    };
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        LogUtils.v(TAG, "onActivityResult() params[requestCode=" + requestCode + ",resultCode=" + resultCode + "]");
+        super.onActivityResult(requestCode, resultCode, data);
+        if ((resultCode == RESULT_OK) && (data != null))
+        {
+            if ((requestCode == REQUESTCODE_GET_ICON_1) || (requestCode == REQUESTCODE_GET_ICON_2) || (requestCode == REQUESTCODE_GET_ICON_3))
+            {
+                UserExtraInfo extraInfo = UserExtraInfoDao.query(dwID);
+                if (extraInfo == null)
+                    extraInfo = new UserExtraInfo();
+                String filePath = data.getStringExtra("filePath");
+                File file = new File(filePath);
+                LogUtils.v(TAG, "onActivityResult() filePath:" + Constants.URI_FILE + file.getAbsolutePath());
+                if (requestCode == REQUESTCODE_GET_ICON_1)
+                {
+                    ImageLoaderHelper.clearCacheByUrl(extraInfo.getIcon());
+                    ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE + file.getAbsolutePath(), mIvIcon1, ImageLoaderHelper.mOptions);
+                    fileIcons[0] = file;
+                    UserDataEngine.getInstance().setUserIcon(fileIcons, 1, new SetIconListener());
+                }
+                else if (requestCode == REQUESTCODE_GET_ICON_2)
+                {
+                    ImageLoaderHelper.clearCacheByUrl(extraInfo.getIcon2());
+                    ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE + file.getAbsolutePath(), mIvIcon2, ImageLoaderHelper.mOptions);
+                    fileIcons[0] = file;
+                    UserDataEngine.getInstance().setUserIcon(fileIcons, 2, new SetIconListener());
+                }
+                else if (requestCode == REQUESTCODE_GET_ICON_3)
+                {
+                    ImageLoaderHelper.clearCacheByUrl(extraInfo.getIcon3());
+                    ImageLoaderHelper.mImageLoader.displayImage(Constants.URI_FILE + file.getAbsolutePath(), mIvIcon3, ImageLoaderHelper.mOptions);
+                    fileIcons[0] = file;
+                    UserDataEngine.getInstance().setUserIcon(fileIcons, 3, new SetIconListener());
+                }
+            }
+            else if (requestCode == REQUESTCODE_EDIT_SIGN || requestCode == REQUESTCODE_EDIT_REALNAME || requestCode == REQUESTCODE_EDIT_DEPARTMENT || requestCode == REQUESTCODE_EDIT_NICKNAME
+                    || requestCode == REQUESTCODE_EDIT_SCHOOL || requestCode == REQUESTCODE_EDIT_JOB || requestCode == REQUESTCODE_EDIT_CLASSES || requestCode == REQUESTCODE_EDIT_OCCUPATION
+                    || requestCode == REQUESTCODE_EDIT_CORPORATION || requestCode == REQUESTCODE_EDIT_COMMON1 || requestCode == REQUESTCODE_EDIT_COMMON2 || requestCode == REQUESTCODE_EDIT_COMMON3)
+            {
+                int position = data.getIntExtra("position", -1);
+                if (position != -1)
+                {
+                    String newData = data.getStringExtra("newData");
+                    refreshData(position, newData);
+                }
+            }
+            else if (requestCode == REQUESTCODE_EDIT_AGE || requestCode == REQUESTCODE_EDIT_SEX || requestCode == REQUESTCODE_EDIT_POSITION)
+            {
+                // 不能修改
+
+            }
+        }
+    }
+
+    /**
+     * 刷新数据
+     * 
+     * @param position
+     * @param date
+     */
+    private void refreshData(int position, String date)
+    {
+        LogUtils.v(TAG, "refreshData() position=" + position + ",newData=" + date);
+        toast.show(date);
+        SelfUserField selfUserField = mDatas.get(position);
+        LogUtils.v(TAG, "refreshData() before modify," + selfUserField.toString());
+        if (selfUserField != null)
+        {
+            selfUserField.setFieldValue(date);
+            selfUserField.setModify(true);
+        }
+        LogUtils.v(TAG, "refreshData() after modify," + selfUserField.toString());
+        if (mAdapter != null)
+            mAdapter.notifyDataSetChanged();
+    }
+
+    /**
+     * 将数据提交到服务器
+     */
+    private void submit()
+    {
+        // 获取修改的数据
+        List<SelfUserField> tempList = new ArrayList<SelfUserField>();
+        for (int i = 0; i < mDatas.size(); i++)
+        {
+            SelfUserField selfUserField = mDatas.get(i);
+            LogUtils.v(TAG, "submit() item:" + selfUserField.toString());
+            if (selfUserField.isModify())
+            {
+                LogUtils.w(TAG, "submit() item:" + selfUserField.toString());
+                tempList.add(mDatas.get(i));
+            }
+        }
+
+        // 提交数据到服务器
+        if (tempList != null && tempList.size() > 0)
+        {
+            UserDataEngine.getInstance().setUserInfo(tempList, new NetCallback()
+            {
+                @Override
+                public void onSuccess(String versionNum)
+                {
+                    LogUtils.v(TAG, "submit() onSuccess,versionNum=" + versionNum);
+                    // 修改成功，保存数据
+                    UserInfoEngine.getInstance().saveSelfUserInfo(versionNum);
+                    toast.show("修改成功");
+                    finish();
+                }
+
+                @Override
+                public void onFailure(String cause)
+                {
+                    // 修改失败，回复以前的数据
+                    LogUtils.v(TAG, "submit() onFailure,cause by:" + cause);
+                    toast.show(cause);
+                    finish();
+                }
+            });
+        }
+        else
+        {
+            LogUtils.v(TAG, "submit() 没有修改数据");
+            finish();
+        }
+    }
+
+    /**
+     * 显示拍照相册对话框
+     * */
+    private void showCameraAlbumDialog()
+    {
+        if (null == cameraAlbumDialogFragment)
+        {
+            cameraAlbumDialogFragment = new CameraAlbumDialogFragment();
+        }
+        cameraAlbumDialogFragment.setOnCameraAlbumClickListener(this);
+        cameraAlbumDialogFragment.show(getSupportFragmentManager(), "cameraAlbumDialogFragment");
+    }
+
+    @Override
+    protected void onDestroy()
+    {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        LogUtils.v(TAG, "onResume");
+        filterData();
+    }
+
+    /**
+     * 筛选数据,并刷新列表
+     */
+    private void filterData()
+    {
+        LogUtils.v(TAG, "filterData() ");
+        mDatas.clear();
+        List<SelfUserField> temp = UserInfoEngine.getInstance().getSelfUserInfo().getFields();
+        // 过滤数据
+        for (SelfUserField field : temp)
+        {
+            int group = field.getGroup();
+            int fieldCode = field.getFieldCode();
+
+            if (FieldGroup.isClientShow(group) && fieldCode != cn.sx.decentworld.bean.UserInfoField.Field.GR.getFieldCode()
+                    && fieldCode != cn.sx.decentworld.bean.UserInfoField.Field.LOCATION.getFieldCode())
+                mDatas.add(field);
+        }
+        // 排序
+        Collections.sort(mDatas);
+        if (mAdapter != null)
+            mAdapter.notifyDataSetChanged();
+    }
+
+    /** 上传头像回调 **/
+    class SetIconListener implements NetCallback
+    {
+        @Override
+        public void onSuccess(String msg)
+        {
+            toast.show(msg);
+        }
+
+        @Override
+        public void onFailure(String cause)
+        {
+            toast.show(cause);
+        }
+    }
+
+    private int requestCode;
+
+    @Override
+    public void onCameraAlbumClick(View view)
+    {
+        Intent intent;
+        switch (view.getId())
+        {
+            case R.id.tv_camera:
+                intent = new Intent(this , PictureClipActivity_.class);
+                intent.putExtra(Constants.CAMERA_ALBUM, 1);
+                intent.putExtra(Constants.ASPECTX, 1);
+                intent.putExtra(Constants.ASPECTY, 1);
+                intent.putExtra(Constants.OUTPUTX, 400);
+                intent.putExtra(Constants.OUTPUTY, 400);
+                startActivityForResult(intent, requestCode);
+                break;
+            case R.id.tv_album:
+                intent = new Intent(this , PictureClipActivity_.class);
+                intent.putExtra(Constants.CAMERA_ALBUM, 0);
+                intent.putExtra(Constants.ASPECTX, 1);
+                intent.putExtra(Constants.ASPECTY, 1);
+                intent.putExtra(Constants.OUTPUTX, 400);
+                intent.putExtra(Constants.OUTPUTY, 400);
+                startActivityForResult(intent, requestCode);
+                break;
+        }
+    }
+}

@@ -1,0 +1,729 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.utils;
+
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Resources;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.net.Uri;
+import android.provider.MediaStore.Images.ImageColumns;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.util.Base64;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.ImagePagerActivity;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.FilePath;
+import cn.sx.decentworld.logSystem.LogUtils;
+
+/**
+ * @ClassName: ImageUtils.java
+ * @Description: 图片工具 1.将一张图片裁剪为指定大小 2.
+ * @author: cj
+ * @date: 2015年10月13日 上午8:57:25
+ */
+public class ImageUtils {
+	private static final String TAG = "ImageUtils";
+
+	/**
+     * 
+     */
+	public ImageUtils() {
+		// TODO Auto-generated constructor stub
+	}
+
+	/**
+	 * 将一张本地图片裁剪为指定大小（图片为文件形式）
+	 * 
+	 * @param file
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Bitmap resizeBitmap(File file, int x, int y) {
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = false;
+		Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath(), options);
+		int bmpWidth = bitmap.getWidth();
+		int bmpHeight = bitmap.getHeight();
+		float scaleWidth = (float) x / bmpWidth; // 按固定大小缩放// sWidth写多大就多大
+		float scaleHeight = (float) y / bmpHeight; //
+		Matrix matrix = new Matrix();
+		matrix.postScale(scaleWidth, scaleHeight);// 产生缩放后的Bitmap对象
+		Bitmap resizeBitmap = Bitmap.createBitmap(bitmap, 0, 0, bmpWidth, bmpHeight, matrix, false);
+		bitmap.recycle();
+		return resizeBitmap;
+	}
+
+	/**
+	 * 将一张本地图片裁剪为指定大小
+	 * 
+	 * @param file
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public static Bitmap zoomBitmap(Bitmap bitmap, int x, int y) {
+		int bmpWidth = bitmap.getWidth();
+		int bmpHeight = bitmap.getHeight();
+		float scaleWidth = (float) x / bmpWidth; // 按固定大小缩放// sWidth写多大就多大
+		float scaleHeight = (float) y / bmpHeight; //
+		Matrix matrix = new Matrix();
+		matrix.postScale(scaleWidth, scaleHeight);// 产生缩放后的Bitmap对象
+		Bitmap resizeBitmap = Bitmap.createBitmap(bitmap, 0, 0, bmpWidth, bmpHeight, matrix, false);
+		bitmap.recycle();
+		return resizeBitmap;
+	}
+
+	/**
+	 * 将字节流转化成bitmap
+	 * 
+	 * @param bytes
+	 * @return
+	 */
+	public static Bitmap Bytes2Bimap(byte[] bytes) {
+		if (bytes.length != 0) {
+			return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * 将Bitmap转化成字节流
+	 * 
+	 * @param bitmap
+	 * @return
+	 */
+	public static byte[] Bitmap2Bytes(Bitmap bitmap) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);// CompressFormat.JPEG
+		return baos.toByteArray();
+	}
+
+	/**
+	 * 将byte[]转化成File
+	 * 
+	 * @param bitmap
+	 * @return
+	 */
+	public static File Bytes2File(byte[] bytes) {
+		File file = new File(FilePath.IMG_TEMP_JPG);
+		try {
+			FileOutputStream fos = new FileOutputStream(file);
+			fos.write(bytes);
+			fos.close();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return file;
+	}
+
+	/**
+	 * 将bitmap转化成File
+	 * 
+	 * @param bitmap
+	 * @return
+	 * @throws IOException
+	 */
+	public static File Bitmap2File(Bitmap bitmap) {
+		byte[] bytes = Bitmap2Bytes(bitmap);
+		File file = Bytes2File(bytes);
+		return file;
+	}
+
+	/**
+	 * 将本地图片缩放为 最长的边为300px
+	 * 
+	 * @param path
+	 *            本地文件路径
+	 * @return Bitmap图片
+	 */
+	public static Bitmap getLoacalBitmap(String path) {
+		int large = 300;
+		BitmapFactory.Options opts = new BitmapFactory.Options();
+		opts.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(path, opts);
+		int width = opts.outWidth;
+		int height = opts.outHeight;
+
+		if (width > height) {
+			// 如果是横向的
+			int h = opts.outHeight * large / opts.outWidth;
+			opts.inSampleSize = opts.outWidth / large;
+			opts.outWidth = large;
+			opts.outHeight = h;
+		} else {
+			// 如果是竖向的
+			try {
+				int w = opts.outWidth * large / opts.outHeight;
+				opts.inSampleSize = opts.outHeight / large;
+				opts.outHeight = large;
+				opts.outWidth = w;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				LogUtils.i(TAG, "getLoacalBitmap...获取本地图片异常，cause by:" + e);
+			}
+		}
+		opts.inJustDecodeBounds = false;
+		opts.inPreferredConfig = Bitmap.Config.ARGB_4444;
+		opts.inPurgeable = true;
+		opts.inInputShareable = true;
+		Bitmap bitmap = BitmapFactory.decodeFile(path, opts);
+		return bitmap;
+	}
+
+	/**
+	 * @param context
+	 * @param resId
+	 * @return
+	 */
+	public static Bitmap readBitMap(Context context, int resId) {
+		BitmapFactory.Options opt = new BitmapFactory.Options();
+		opt.inPreferredConfig = Bitmap.Config.RGB_565;
+		opt.inPurgeable = true;
+		opt.inInputShareable = true;
+		InputStream is = context.getResources().openRawResource(resId);
+		return BitmapFactory.decodeStream(is, null, opt);
+	}
+
+	/**
+	 * 将图片转换为灰度图像
+	 * 
+	 * @param bmpOriginal
+	 * @return
+	 */
+	public static Bitmap toGrayscale(Bitmap bmpOriginal) {
+		int width, height;
+		height = bmpOriginal.getHeight();
+		width = bmpOriginal.getWidth();
+		Bitmap bmpGrayscale = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+		Canvas c = new Canvas(bmpGrayscale);
+		Paint paint = new Paint();
+		ColorMatrix cm = new ColorMatrix();
+		cm.setSaturation(0);
+		ColorMatrixColorFilter f = new ColorMatrixColorFilter(cm);
+		paint.setColorFilter(f);
+		c.drawBitmap(bmpOriginal, 0, 0, paint);
+		return bmpGrayscale;
+	}
+
+	/**
+	 * 解析缩略图
+	 */
+	public static File AnalyticThumbnail(String image) {
+		LogUtils.i(TAG, "图片信息为：" + image);
+		byte[] bytes = Base64.decode(image, Base64.DEFAULT);
+		// 父路径名
+		// String origal_file_path = FilePath.HOME;
+		// File origal_file = new File(origal_file_path);
+		// if (!origal_file.exists()) {
+		// origal_file.mkdirs();
+		// }
+		File per_file = new File(FilePath.PATH_THUMBNAIL);
+		if (!per_file.exists()) {
+			per_file.mkdirs();
+		}
+		File file = new File(per_file, generateFileName() + ".jpg");
+		try {
+			file.createNewFile();
+		} catch (IOException e1) {
+			LogUtils.i(TAG, e1.getMessage());
+		}
+		// 2、创建OutputStream类，并为此实例化对象
+		OutputStream out;
+		try {
+			out = new FileOutputStream(file);
+			try {
+				out.write(bytes);
+				out.close();
+				android.os.Message msg = new android.os.Message();
+				msg.what = Constants.SUCC;
+				msg.obj = file.getAbsoluteFile();
+				// handler.sendMessage(msg);
+			} catch (IOException e) {
+				android.os.Message msg = new android.os.Message();
+				msg.what = Constants.FAILURE;
+				msg.obj = file.getAbsoluteFile();
+				// handler.sendMessage(msg);
+				e.printStackTrace();
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		return file;
+	}
+
+	/**
+	 * 随机产生名字
+	 * 
+	 * @return
+	 */
+	public static String generateFileName() {
+		return UUID.randomUUID().toString();
+	}
+
+	public static final int ICON_SMALL = 1;// 小头像
+	public static final int ICON_MAIN = 2;// 主头像
+	public static final int ICON_EXTRA_1 = 3;// 额外 头像1
+	public static final int ICON_EXTRA_2 = 4;// 额外 头像2
+
+	/**
+	 * 更具指定的dwID获取头像
+	 * 
+	 * @param dwID
+	 *            指定的用户的dwID
+	 * @param iconWhich
+	 *            图片的种类 ，传递的参数为
+	 *            ImageUtils.ICON_SMALL/ImageUtils.ICON_MAIN/ImageUtils
+	 *            .ICON_EXTRA_1/ImageUtils.ICON_EXTRA_2之一；
+	 *            eg.http://112.74.13.117/data/020823/icon/sicon.jpg
+	 * @return 图片的url
+	 */
+	public static String getIconByDwID(String dwID, int iconWhich) {
+		if (CommUtil.isBlank(dwID)) {
+			LogUtils.i(TAG, "dwID为空");
+			return "";
+		}
+
+		if (iconWhich != ICON_SMALL && iconWhich != ICON_MAIN && iconWhich != ICON_EXTRA_1 && iconWhich != ICON_EXTRA_2) {
+			LogUtils.i(TAG, "iconWhich参数设置不正确");
+			return "";
+		}
+		String path;
+		if (iconWhich == ICON_SMALL) {
+			path = Constants.PROTOCAL + Constants.IP + "/data/" + dwID + "/icon/" + "sicon.jpg";
+			return path;
+		} else if (iconWhich == ICON_MAIN) {
+			path = Constants.PROTOCAL + Constants.IP + "/data/" + dwID + "/icon/" + "icon.jpg";
+			return path;
+		} else if (iconWhich == ICON_EXTRA_1) {
+			path = Constants.PROTOCAL + Constants.IP + "/data/" + dwID + "/icon/" + "icon2.jpg";
+			return path;
+		} else if (iconWhich == ICON_EXTRA_2) {
+			path = Constants.PROTOCAL + Constants.IP + "/data/" + dwID + "/icon/" + "icon3.jpg";
+			return path;
+		} else {
+			LogUtils.i(TAG, "图片路径为空");
+			return "";
+		}
+	}
+
+	public static String getSubjectBackground(String roomId) {
+		return Constants.PROTOCAL + Constants.IP + "/data/chatroom/" + roomId + "/subject/subjectBackground.jpg";
+	}
+
+	public static String getHostIconByDwID(String dwID) {
+		return Constants.PROTOCAL + Constants.IP + "/data/" + dwID + "/icon/" + "sroomOwnerIcon.jpg";
+	}
+
+	public static String getExamineByDwID(String dwID, String index) {
+		return Constants.PROTOCAL + Constants.IP + "/data/" + dwID + "/icon/icon" + index + ".jpg";
+	}
+
+	// http://112.74.13.117/data/dwID号/checkIMG/check.jpg
+	public static String getMotherIconByDwID(String dwID) {
+		return Constants.PROTOCAL + Constants.IP + "/data/" + dwID + "/checkIMG/check.jpg";
+	}
+
+	/**
+	 * 根据图片字节数组，对图片可能进行二次采样，不致于加载过大图片出现内存溢出
+	 */
+	// public static Bitmap getBitmapByBytes(byte[] bytes){
+	//
+	// //对于图片的二次采样,主要得到图片的宽与高
+	// int width = 0;
+	// int height = 0;
+	// int sampleSize = 1; //默认缩放为1
+	// BitmapFactory.Options options = new BitmapFactory.Options();
+	// options.inJustDecodeBounds = true; //仅仅解码边缘区域
+	// //如果指定了inJustDecodeBounds，decodeByteArray将返回为空
+	// BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+	// //得到宽与高
+	// height = options.outHeight;
+	// width = options.outWidth;
+	//
+	// //图片实际的宽与高，根据默认最大大小值，得到图片实际的缩放比例
+	// while ((height / sampleSize > Cache.IMAGE_MAX_HEIGHT)
+	// || (width / sampleSize > Cache.IMAGE_MAX_WIDTH)) {
+	// sampleSize *= 2;
+	// }
+	//
+	// //不再只加载图片实际边缘
+	// options.inJustDecodeBounds = false;
+	// //并且制定缩放比例
+	// options.inSampleSize = sampleSize;
+	// return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+	// }
+	/** 保存Bitmap文件 */
+	public static String saveBitmap(String picPath, Bitmap bm) {
+		File f = new File(picPath);
+		try {
+			FileOutputStream out = new FileOutputStream(f);
+			bm.compress(Bitmap.CompressFormat.JPEG, 90, out);
+			out.flush();
+			out.close();
+			return picPath;
+		} catch (FileNotFoundException e) {
+			return null;
+		} catch (IOException e) {
+			return null;
+		}
+	}
+
+	public static Bitmap scaleImage(Bitmap bitmap, float width, float height) {
+		Matrix matrix = new Matrix();
+		matrix.postScale(width, height); // 长和宽放大缩小的比例
+		Bitmap resizeBmp = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+		return resizeBmp;
+	}
+
+	/** 图片二次采样 */
+	public static Bitmap scalePic(String filePath) {
+		Bitmap bitmap = null;
+		BitmapFactory.Options opts = new BitmapFactory.Options();
+		// 将inJustDecodeBounds设置为true只是获取图片的信息（包括宽高）并将其储存进Options里面，不返回实际的bitmap。
+		opts.inJustDecodeBounds = true;
+		BitmapFactory.decodeFile(filePath, opts);
+		opts.inSampleSize = computeSampleSize(opts, -1, 1280 * 1280);
+		opts.inJustDecodeBounds = false;
+		try {
+			bitmap = BitmapFactory.decodeFile(filePath, opts);
+		} catch (Exception e) {
+		}
+		return bitmap;
+	}
+
+	/** 计算文件大小 */
+	public static int fileLength(String absolutePath) {
+		LogUtils.e(TAG, "fileLength---absolutePath---" + absolutePath);
+		int len = 0;
+		FileInputStream fis = null;
+		try {
+			File file = new File(absolutePath);
+			fis = new FileInputStream(file);
+			len = fis.available();
+		} catch (IOException e) {
+			LogUtils.e(Constants.TAG, "fileLength---e---" + e.getLocalizedMessage());
+			return -1;
+		} finally {
+			closeInputStream(fis);
+		}
+		return len;
+	}
+
+	public static void closeInputStream(InputStream in) {
+		if (in != null) {
+			try {
+				in.close();
+			} catch (IOException e) {
+				//
+			}
+		}
+	}
+
+	/** 计算图片的压缩比例 */
+	public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+		int height = options.outHeight;
+		int width = options.outWidth;
+		int inSampleSize = 1;
+		if (height > reqHeight || width > reqWidth) {
+			int heightRatio = Math.round((float) height / (float) reqHeight);
+			int widthRatio = Math.round((float) width / (float) reqWidth);
+			// 选择长宽高较小的比例，成为压缩比例
+			inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+		}
+		return inSampleSize;
+	}
+
+	public static int computeSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {
+		int initialSize = computeInitialSampleSize(options, minSideLength, maxNumOfPixels);
+		int roundedSize;
+		if (initialSize <= 8) {
+			roundedSize = 1;
+			while (roundedSize < initialSize) {
+				roundedSize <<= 1;
+			}
+		} else {
+			roundedSize = (initialSize + 7) / 8 * 8;
+		}
+		return roundedSize;
+	}
+
+	private static int computeInitialSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {
+		// 图片的实际宽高
+		double w = options.outWidth;
+		double h = options.outHeight;
+		LogUtils.e(TAG, "computeInitialSampleSize---width---" + w + "height---" + h);
+		int lowerBound = (maxNumOfPixels == -1) ? 1 : (int) Math.ceil(Math.sqrt(w * h / maxNumOfPixels));
+		int upperBound = (minSideLength == -1) ? 128 : (int) Math.min(Math.floor(w / minSideLength),
+				Math.floor(h / minSideLength));
+		if (upperBound < lowerBound) {
+			// return the larger one when there is no overlapping zone.
+			return lowerBound;
+		}
+		if ((maxNumOfPixels == -1) && (minSideLength == -1)) {
+			return 1;
+		} else if (minSideLength == -1) {
+			return lowerBound;
+		} else {
+			return upperBound;
+		}
+	}
+
+	/**
+	 * 将文件转换成固定大小的图片
+	 * 
+	 * @param fileAbsolutePath
+	 * @return Bitmap
+	 */
+	private Bitmap getBitmap(String fileAbsolutePath) {
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = false;
+		Bitmap bitmap = BitmapFactory.decodeFile(fileAbsolutePath, options);
+		int bmpWidth = bitmap.getWidth();
+		int bmpHeight = bitmap.getHeight();
+		float scaleWidth = (float) 120 / bmpWidth; // 按固定大小缩放 sWidth
+													// 写多大就多大
+		float scaleHeight = (float) 120 / bmpHeight; //
+		Matrix matrix = new Matrix();
+		matrix.postScale(scaleWidth, scaleHeight);// 产生缩放后的Bitmap对象
+		Bitmap resizeBitmap = Bitmap.createBitmap(bitmap, 0, 0, bmpWidth, bmpHeight, matrix, false);
+		bitmap.recycle();
+		return resizeBitmap;
+	}
+
+	/** 解析uri获取图片绝对路径 */
+	public static String getRealFilePath(Context context, Uri uri) {
+		if (null == uri)
+			return null;
+		final String scheme = uri.getScheme();
+		String data = null;
+		if (scheme == null) {
+			data = uri.getPath();
+		} else if (ContentResolver.SCHEME_FILE.equals(scheme)) {
+			data = uri.getPath();
+		} else if (ContentResolver.SCHEME_CONTENT.equals(scheme)) {
+			Cursor cursor = context.getContentResolver().query(uri, new String[] { ImageColumns.DATA }, null, null, null);
+			if (null != cursor) {
+				if (cursor.moveToFirst()) {
+					int index = cursor.getColumnIndex(ImageColumns.DATA);
+					if (index > -1) {
+						data = cursor.getString(index);
+					}
+				}
+				cursor.close();
+			}
+		}
+
+		return data;
+	}
+
+	/**
+	 * 保存分享的图片
+	 * 
+	 * @param resources
+	 */
+	public static void saveBitmap(Resources resources) {
+		Bitmap bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_launcher);
+		File file = new File(FilePath.SHARE);
+		if (!file.exists()) {
+			file.mkdirs();
+		}
+		saveBitmap(FilePath.SHARE + "/share.png", bitmap);
+	}
+
+	/**
+	 * 从指定的文件路径获取到一张图片，并转化成Bitmap
+	 * 
+	 * @param bmPath
+	 */
+	public static Bitmap getBitmapFrom(String bmPath) {
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		// BitmapFactory.decodeFile(bmPath, options);
+		int inSampleSize = 2;
+		options.inJustDecodeBounds = false;
+		options.inSampleSize = inSampleSize;
+		Bitmap bitmap = BitmapFactory.decodeFile(bmPath, options);
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+		byte[] b = baos.toByteArray();
+		Bitmap img = BitmapFactory.decodeByteArray(b, 0, b.length);
+		return img;
+	}
+
+	/**
+	 * 在bitmap上写文字
+	 * */
+	public static Bitmap drawTextToBitmap(String text, Bitmap bmp) {
+		if (null == text) {
+			return bmp;
+		}
+		Bitmap newBitmap = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), Config.ARGB_8888);
+		Canvas canvas = new Canvas(newBitmap);
+		canvas.drawBitmap(bmp, 0, 0, null);
+		TextPaint textPaint = new TextPaint();
+		textPaint.setAntiAlias(true);
+		textPaint.setTextSize(22.0F);
+		textPaint.setColor(Color.parseColor("#ffffff"));
+		StaticLayout sl = new StaticLayout(text, textPaint, newBitmap.getWidth() - 6, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f,
+				false);
+		Paint paint = new Paint();
+		paint.setAntiAlias(true);
+		paint.setColor(Color.parseColor("#7f000000"));
+		Path path = new Path();
+		path.moveTo(0, bmp.getHeight() - sl.getHeight() - 5 - 5);
+		path.lineTo(0, bmp.getHeight());
+		path.lineTo(bmp.getWidth(), bmp.getHeight());
+		path.lineTo(bmp.getWidth(), bmp.getHeight() - sl.getHeight() - 5 - 5);
+		path.close();
+		canvas.drawPath(path, paint);
+		canvas.translate(6, bmp.getHeight() - sl.getHeight() - 5);
+		sl.draw(canvas);
+		return newBitmap;
+	}
+
+	// 图片来源
+	public static final int IMAGE_FROM_LOCAL = 1;
+	public static final int IMAGE_FROM_NET = 2;
+
+	/**
+	 * 启动查看大图的界面
+	 * 
+	 * @param context
+	 *            上下文环境
+	 * @param imagePaths
+	 *            图片路径数据
+	 * @param imageFrom
+	 *            图片路径数据
+	 * @param imageIndexFirst
+	 *            第一张图片的位置
+	 */
+	public static void browerBigImage(Context context, ArrayList<String> imagePaths, int imageFrom, int imageIndexFirst) {
+		Intent intent = new Intent(context, ImagePagerActivity.class);
+		intent.putExtra(ImagePagerActivity.IMAGE_PATHS, imagePaths);
+		intent.putExtra(ImagePagerActivity.IMAGE_FROM, imageFrom);
+		intent.putExtra(ImagePagerActivity.IMAGE_INDEX_FIRST, imageIndexFirst);
+		context.startActivity(intent);
+	}
+
+	// /////////////////////////////////////验证图片路径是否有效...begin////////////////////////////////////
+
+	/**
+	 * 验证url是否可用
+	 * 
+	 * @param urls
+	 *            传入需要验证的图片地址
+	 * @return 返回有效的图片地址；没有则为空；
+	 */
+	private int count = 0;
+
+	public void verifyUrl(final List<String> urls, final VerifyUrlResultListener listener) {
+		final ArrayList<String> tempUrls = new ArrayList<String>();
+		for (final String u : urls) {
+			Runnable runnable = new VerifyUrlThread(u, new VerifyUrlListener() {
+
+				@Override
+				public void onSuccess(String url) {
+					count++;
+					tempUrls.add(url);
+					if (count >= urls.size()) {
+						listener.onCompleted(tempUrls);
+					}
+				}
+
+				@Override
+				public void onFailure() {
+					count++;
+					if (count >= urls.size()) {
+						listener.onCompleted(tempUrls);
+					}
+				}
+			});
+			Thread thread = new Thread(runnable);
+			thread.setName("verify");
+			thread.start();
+		}
+	}
+
+	class VerifyUrlThread implements Runnable {
+		private VerifyUrlListener listener;
+		private String url;
+
+		/**
+         * 
+         */
+		public VerifyUrlThread(String url, VerifyUrlListener listener) {
+			this.listener = listener;
+			this.url = url;
+		}
+
+		@Override
+		public void run() {
+			try {
+				URL httpUrl = new URL(url);
+				InputStream inputStream = httpUrl.openStream();
+				listener.onSuccess(url);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+				listener.onFailure();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				listener.onFailure();
+			} catch (IOException e) {
+				e.printStackTrace();
+				listener.onFailure();
+			}
+		}
+
+	}
+
+	/**
+	 * 
+	 */
+	public interface VerifyUrlListener {
+		public void onSuccess(String url);
+
+		public void onFailure();
+	}
+
+	public interface VerifyUrlResultListener {
+		public void onCompleted(List<String> urls);
+
+	}
+
+}

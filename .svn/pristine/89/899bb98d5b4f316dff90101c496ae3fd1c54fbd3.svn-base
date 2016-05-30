@@ -1,0 +1,7 @@
+ALTER TABLE momentEntity ADD remoteVoiceBgUrl TEXT;
+ALTER TABLE momentEntity ADD localVoiceBgUrl TEXT;
+drop table userInfo;
+drop table displayAuthority;
+drop table anonymousAuth;
+drop table userExtraInfo;
+CREATE TABLE userExtraInfo (accountName TEXT, userID TEXT, acceptCheckPush INTEGER, accountType INTEGER, recomStoredBenefit REAL, strangerNotice INTEGER, Id INTEGER PRIMARY KEY AUTOINCREMENT, icon2 TEXT, friendNotice INTEGER, icon3 TEXT, acceptPush INTEGER, iconSmall TEXT, icon TEXT, autoTransfer INTEGER, recomTotalBenefit REAL, grTotalBenefit REAL);

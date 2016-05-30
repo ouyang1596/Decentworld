@@ -35,21 +35,6 @@ public final class PrivacySettingFragment_
         mTvPhoneNum = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_phone_number));
         mLlRoot = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_privacy_setting_root));
         {
-            View view = findViewById(cn.sx.decentworld.R.id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        PrivacySettingFragment_.this.setBackBtn();
-                    }
-
-                }
-                );
-            }
-        }
-        {
             View view = findViewById(cn.sx.decentworld.R.id.privacy_setting_modification_phone_number);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
@@ -73,6 +58,21 @@ public final class PrivacySettingFragment_
                     @Override
                     public void onClick(View view) {
                         PrivacySettingFragment_.this.bankCardModification(view);
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(cn.sx.decentworld.R.id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        PrivacySettingFragment_.this.setBackBtn();
                     }
 
                 }

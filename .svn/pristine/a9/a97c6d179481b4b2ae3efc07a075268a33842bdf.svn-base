@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/gray_e"
+    android:paddingBottom="6dp"
+    android:paddingLeft="16dp"
+    android:paddingTop="6dp" >
+
+    <ImageView
+        android:id="@+id/iv_blue_tag"
+        android:layout_width="10dp"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="10dp"
+        android:src="@drawable/tag_base_info" />
+
+    <TextView
+        android:id="@+id/tv_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@+id/iv_blue_tag"
+        android:text="实名"
+        android:textColor="@color/two_black" />
+
+    <TextView
+        android:id="@+id/tv_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="120dp"
+        android:text="欧阳"
+        android:textColor="@color/two_black" />
+
+</RelativeLayout>

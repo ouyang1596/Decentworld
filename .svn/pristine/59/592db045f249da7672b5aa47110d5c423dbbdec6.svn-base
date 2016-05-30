@@ -1,0 +1,77 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.PerInfoAdapter;
+import cn.sx.decentworld.bean.OtherUserInfoField;
+
+/**
+ * @ClassName: InfoFragment.java
+ * @Description:
+ * @author: yj
+ * @date: 2016年1月6日 下午3:28:18
+ */
+public class InfoFragment extends Fragment {
+	private ListView lvPerInfo;
+	private List<OtherUserInfoField> mInfos = new ArrayList<OtherUserInfoField>();
+	private PerInfoAdapter mPerInfoAdapter;
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		return inflater.inflate(R.layout.fragment_info, null);
+	}
+
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		initView();
+	}
+
+	private void initView() {
+		lvPerInfo = (ListView) getView().findViewById(R.id.lv_per_info);
+		mPerInfoAdapter = new PerInfoAdapter(getActivity(), mInfos);
+		View view = View.inflate(getActivity(), R.layout.item_chat_anonymous, null);
+		lvPerInfo.addFooterView(view);
+		lvPerInfo.setAdapter(mPerInfoAdapter);
+		lvPerInfo.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				if (position == mPerInfoAdapter.getCount()) {
+					if (null != mOnInfoClickListener) {
+						mOnInfoClickListener.OnInfoClick(position);
+					}
+				}
+			}
+		});
+	}
+
+	public void upData(List<OtherUserInfoField> infos) {
+		mInfos.clear();
+		mInfos.addAll(infos);
+		mPerInfoAdapter.notifyDataSetChanged();
+	}
+
+	public interface OnInfoClickListener {
+		void OnInfoClick(int position);
+	}
+
+	private OnInfoClickListener mOnInfoClickListener;
+
+	public void setOnInfoClickListener(OnInfoClickListener onPlfOnClickListener) {
+		mOnInfoClickListener = onPlfOnClickListener;
+	}
+}

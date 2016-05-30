@@ -36,9 +36,9 @@ public final class DoubtActivity_
     }
 
     private void afterSetContentView_() {
+        ivBack = ((ImageView) findViewById(id.iv_back));
         llDoubt = ((LinearLayout) findViewById(id.ll_doubt));
         llWan = ((LinearLayout) findViewById(id.ll_wan));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         ((RechargeComponent_) rechargeComponent).afterSetContentView_();
         init();
     }

@@ -36,21 +36,6 @@ public final class PictureChoiceActivity_
 
     private void afterSetContentView_() {
         {
-            View view = findViewById(id.main_header_left);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        PictureChoiceActivity_.this.main_header_left();
-                    }
-
-                }
-                );
-            }
-        }
-        {
             View view = findViewById(id.main_header_right);
             if (view!= null) {
                 view.setOnClickListener(new OnClickListener() {
@@ -59,6 +44,21 @@ public final class PictureChoiceActivity_
                     @Override
                     public void onClick(View view) {
                         PictureChoiceActivity_.this.main_header_right();
+                    }
+
+                }
+                );
+            }
+        }
+        {
+            View view = findViewById(id.main_header_left);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        PictureChoiceActivity_.this.main_header_left();
                     }
 
                 }

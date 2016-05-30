@@ -41,10 +41,10 @@ public final class ToastComponent_
         if (context_ instanceof Activity) {
             Activity activity = ((Activity) context_);
         }
+        context = context_;
         if (context_ instanceof Activity) {
             activity = ((Activity) context_);
         }
-        context = context_;
     }
 
     public static ToastComponent_ getInstance_(Context context) {

@@ -1,0 +1,156 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.stateMachine;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import cn.sx.decentworld.entity.db.DWMessage;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.stateMachine.type.EndFailureState;
+import cn.sx.decentworld.stateMachine.type.EndServerNoResponseState;
+import cn.sx.decentworld.stateMachine.type.EndSuccessState;
+import cn.sx.decentworld.stateMachine.type.QueryWealthAckState;
+import cn.sx.decentworld.stateMachine.type.SendFailResendState;
+import cn.sx.decentworld.stateMachine.type.StartSendState;
+import cn.sx.decentworld.stateMachine.type.WaitWealthAckState;
+
+/**
+ * @ClassName: MsgContext.java
+ * @Description:
+ * @author: cj
+ * @date: 2016年4月26日 上午9:55:04
+ */
+public class MsgContext
+{
+    private static final String TAG = "MsgContext";
+    // 将7种状态定义为单例
+    public static StartSendState startSendState = new StartSendState();
+    public static WaitWealthAckState waitWealthAckState = new WaitWealthAckState();
+    public static EndSuccessState endSuccessState = new EndSuccessState();
+    public static QueryWealthAckState queryWealthAckState = new QueryWealthAckState();
+    public static SendFailResendState sendFailResendState = new SendFailResendState();
+    public static EndFailureState endFailureState = new EndFailureState();
+    public static EndServerNoResponseState endServerNoResponseState = new EndServerNoResponseState();
+
+    // 保存将要处理的消息
+    private static Map<String, DWMessage> msgMap = new HashMap<String, DWMessage>();
+//    // 系统错误的次数
+//    private int sys_error_count = 0;
+//    // 网络错误的次数
+//    private int net_error_count = 0;
+    // 失败重发次数
+//    private int send_fail_resend_count = 0;
+    public static Map<String, int[]> countMap = new HashMap<String, int[]>();
+    
+
+    public static void addDWMessag(DWMessage dwMessage)
+    {
+        if (dwMessage == null)
+            return;
+        LogUtils.d(TAG, "addDWMessag() " + dwMessage.toString());
+        msgMap.put(dwMessage.getTxtMsgID(), dwMessage);
+        //系统错误，网络错误
+        countMap.put(dwMessage.getTxtMsgID(), new int[]{0,0,0});
+    }
+
+    public static void removeDWMessage(String packetID)
+    {
+        if (packetID == null)
+            return;
+        LogUtils.d(TAG, "removeDWMessage() params[packetID=" + packetID + "]");
+        msgMap.remove(packetID);
+        countMap.remove(packetID);
+    }
+
+    /**
+     * 获取指定packetID对应的消息
+     * 
+     * @param packetID
+     * @return
+     */
+    public static DWMessage getDWMessage(String packetID)
+    {
+        DWMessage dwMessage = null;
+        if (packetID == null)
+            LogUtils.e(TAG, "getDWMessage() params[packetID =" + packetID + "]");
+        else
+            dwMessage = msgMap.get(packetID);
+        return dwMessage;
+    }
+
+    /**
+     * 构造函数
+     */
+    public MsgContext()
+    {
+        LogUtils.d(TAG, "MsgContext() ");
+    }
+
+    private MsgState msgState;
+
+    public MsgState getMsgState()
+    {
+        return msgState;
+    }
+
+    public void setMsgState(MsgState msgState)
+    {
+        LogUtils.d(TAG, "setMsgState() ");
+        this.msgState = msgState;
+        // 把当前环境通知到各个状态
+        this.msgState.setMsgContext(this);
+    }
+
+    // 【1号状态】开始发送消息状态；
+    public void startSend(String packetID)
+    {
+        LogUtils.d(TAG, "startSend() ");
+        this.msgState.startSend(packetID);
+    }
+
+    // 【2号状态】等待服务器wealth回执状态，等待时间为 WAIT_WEALTH_TIME；
+    public void waitWealthAck(String packetID)
+    {
+        LogUtils.d(TAG, "waitWealthAck() ");
+        this.msgState.waitWealthAck(packetID);
+    }
+
+    // 【3号状态】规定 WAIT_WEALTH_TIME 内收到服务器的wealth回执，成功，结束状态机；
+    public void endSuccess(String packetID)
+    {
+        LogUtils.d(TAG, "endSuccess() ");
+        this.msgState.endSuccess(packetID);
+    }
+
+    // 【4号状态】规定 WAIT_WEALTH_TIME 内没有收到服务器的wealth回执，进入查询wealth回执的状态；
+    public void queryWealthAck(String packetID)
+    {
+        LogUtils.d(TAG, "queryWealthAck() ");
+        this.msgState.queryWealthAck(packetID);
+    }
+
+    // 【5号状态】查询结果为：服务器没有收到了1号消息，进入发送失败重发状态；
+    public void sendFailResend(String packetID)
+    {
+        LogUtils.d(TAG, "sendFailResend() ");
+        this.msgState.sendFailResend(packetID);
+    }
+
+    // 【6号状态】发送3次失败后结束状态机，标记为失败状态；
+    public void endFailure(String packetID)
+    {
+        LogUtils.d(TAG, "endFailure() ");
+        // /用户可手动点击进入1号状态
+        this.msgState.endFailure(packetID);
+    }
+
+    // 【7号状态】调用接口3次，服务器无响应后，进入服务器无响应状态；
+    public void endServerNoResponse(String packetID)
+    {
+        LogUtils.d(TAG, "endServerNoResponse() ");
+        // /用户可手动点击进入4号状态
+        this.msgState.endServerNoResponse(packetID);
+    }
+}

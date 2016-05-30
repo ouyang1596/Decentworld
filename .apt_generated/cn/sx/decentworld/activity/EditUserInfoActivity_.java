@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.ChoceAndTakePictureComponent_;
+import cn.sx.decentworld.component.KeyboardComponent_;
 import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.widget.ListViewForScrollView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -36,19 +38,25 @@ public final class EditUserInfoActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        mKeyboardComponent = KeyboardComponent_.getInstance_(this);
         choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvFinish = ((TextView) findViewById(id.tv_finish));
-        iv_edit_user_info_icon_3 = ((ImageView) findViewById(id.iv_edit_user_info_icon_3));
-        iv_edit_user_info_icon_1 = ((ImageView) findViewById(id.iv_edit_user_info_icon_1));
-        ll_edit_user_info_root = ((LinearLayout) findViewById(id.ll_edit_user_info_root));
+        mIvIcon6 = ((ImageView) findViewById(id.iv_edit_user_info_icon_6));
+        mIvIcon2 = ((ImageView) findViewById(id.iv_edit_user_info_icon_2));
         ivBack = ((ImageView) findViewById(id.iv_back));
+        mIvIcon3 = ((ImageView) findViewById(id.iv_edit_user_info_icon_3));
+        mIvIcon4 = ((ImageView) findViewById(id.iv_edit_user_info_icon_4));
+        mIvIcon1 = ((ImageView) findViewById(id.iv_edit_user_info_icon_1));
+        mLvUserInfo = ((ListViewForScrollView) findViewById(id.lv_edit_user_info));
+        ll_edit_user_info_root = ((LinearLayout) findViewById(id.ll_edit_user_info_root));
+        mIvIcon5 = ((ImageView) findViewById(id.iv_edit_user_info_icon_5));
+        etKeyBoard = ((EditText) findViewById(id.et_key_board));
         sl_edit_user_info = ((ScrollView) findViewById(id.sl_edit_user_info));
-        iv_edit_user_info_icon_2 = ((ImageView) findViewById(id.iv_edit_user_info_icon_2));
-        lv_edit_user_info = ((ListViewForScrollView) findViewById(id.lv_edit_user_info));
+        tvFinish = ((TextView) findViewById(id.tv_finish));
+        ((KeyboardComponent_) mKeyboardComponent).afterSetContentView_();
         ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

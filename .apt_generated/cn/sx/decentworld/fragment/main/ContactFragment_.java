@@ -34,16 +34,16 @@ public final class ContactFragment_
     }
 
     private void afterSetContentView_() {
-        ivRecommend = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_recommend));
-        ivInvite = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_invite));
-        llNewFriend = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_new_friend));
         fragment_chat_contact_lv = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.fragment_chat_contact_lv));
-        new_friends_ll_unread_msg_number = ((TextView) findViewById(cn.sx.decentworld.R.id.new_friends_ll_unread_msg_number));
+        llNewFriend = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_new_friend));
+        tvAddNewFriends = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_add_new_friends));
+        ivSearch = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_search));
         sclView = ((ContactScrollView) findViewById(cn.sx.decentworld.R.id.sclView));
         llContactList = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact_list));
         llContact = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_contact));
-        ivSearch = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_search));
-        tvAddNewFriends = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_add_new_friends));
+        ivInvite = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_invite));
+        ivRecommend = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_recommend));
+        new_friends_ll_unread_msg_number = ((TextView) findViewById(cn.sx.decentworld.R.id.new_friends_ll_unread_msg_number));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

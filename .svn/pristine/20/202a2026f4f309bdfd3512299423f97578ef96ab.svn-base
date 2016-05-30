@@ -1,0 +1,10 @@
+CREATE TABLE WorkBean (audioUrl TEXT, work_id INTEGER, imgUrl TEXT, content TEXT, time INTEGER, publisherName TEXT, reportnum INTEGER, money INTEGER, downnum INTEGER, dislikenum INTEGER, commentnum INTEGER, Id INTEGER PRIMARY KEY AUTOINCREMENT, dwID TEXT, status INTEGER, score INTEGER, contentType INTEGER, likenum INTEGER);
+CREATE TABLE LocationBean (longitude REAL, dwID TEXT, Id INTEGER PRIMARY KEY AUTOINCREMENT, latitude REAL);
+DROP TABLE commentEntity;
+CREATE TABLE commentEntity (Id INTEGER PRIMARY KEY AUTOINCREMENT, momentID INTEGER, publisherName TEXT, commentStatus INTEGER, anonymous INTEGER, publisherID TEXT, content TEXT, userID TEXT, time INTEGER, dwID TEXT, type INTEGER, commentID INTEGER, reply TEXT);
+DROP TABLE momentEntity;
+CREATE TABLE momentEntity (dislikeCount INTEGER, publishTime INTEGER, likeCount INTEGER, onlyshowtolist TEXT, reportCount INTEGER, downCount INTEGER, momentID INTEGER, blocklist TEXT, publisherID TEXT, commentCount INTEGER, contentType INTEGER, Id INTEGER PRIMARY KEY AUTOINCREMENT, momentStatus INTEGER, publisherName TEXT, localUrl TEXT, level INTEGER, content TEXT, userID TEXT, money REAL, remoteUrl TEXT);
+CREATE TABLE selfInfoEntity (versionNum TEXT, Id INTEGER PRIMARY KEY AUTOINCREMENT, userID TEXT, content TEXT);
+DROP TABLE userLogin;
+DROP TABLE editUserInfo;
+DROP TABLE UserDetailInfos;

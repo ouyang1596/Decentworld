@@ -1,0 +1,163 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.common;
+
+import android.content.Context;
+import android.drm.DrmStore.Playback;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.provider.MediaStore.Audio.PlaylistsColumns;
+import android.widget.ImageView;
+import android.widget.Toast;
+import cn.sx.decentworld.abstractclass.AbstractPlayListener;
+import cn.sx.decentworld.bean.DWException;
+import cn.sx.decentworld.bean.DWException.OnExceptionListener;
+
+/**
+ * @ClassName: MediaManager.java
+ * @Description:
+ * @author: yj
+ * @date: 2015年9月22日 下午4:28:41
+ */
+public class MediaManager
+{
+    public static MediaPlayer mMediaPlayer = new MediaPlayer();
+    private static DWException mDWException = new DWException();
+    private static Toast toast;
+
+    public static void startLocal(Context context, String filePath, OnCompletionListener onCompletionListener, OnExceptionListener onExceptionListener)
+    {
+        if (null == toast)
+        {
+            toast = Toast.makeText(context, "文件可能损坏,播放声音失败", Toast.LENGTH_LONG);
+        }
+        if (null == mMediaPlayer)
+        {
+            mMediaPlayer = new MediaPlayer();
+        }
+        mMediaPlayer.setOnCompletionListener(onCompletionListener);
+        mDWException.setOnExceptionListener(onExceptionListener);
+        try
+        {
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(filePath);
+            mMediaPlayer.prepare();
+            mMediaPlayer.start();
+        }
+        catch (Exception e)
+        {
+            toast.show();
+            mDWException.setException(e);
+        }
+    }
+
+    public static void startNetwork(Context context, String url, OnCompletionListener onCompletionListener, OnExceptionListener onExceptionListener)
+    {
+        if (null == toast)
+        {
+            toast = Toast.makeText(context, "文件可能损坏,播放声音失败", Toast.LENGTH_LONG);
+        }
+        if (null == mMediaPlayer)
+        {
+            mMediaPlayer = new MediaPlayer();
+        }
+        mMediaPlayer.setOnCompletionListener(onCompletionListener);
+        mDWException.setOnExceptionListener(onExceptionListener);
+        try
+        {
+            mMediaPlayer.reset();
+            mMediaPlayer.setDataSource(url);
+            mMediaPlayer.prepareAsync();
+            mMediaPlayer.setOnPreparedListener(new OnPreparedListener()
+            {
+
+                @Override
+                public void onPrepared(MediaPlayer arg0)
+                {
+                    mMediaPlayer.start();
+                }
+            });
+        }
+        catch (Exception e)
+        {
+            toast.show();
+            mDWException.setException(e);
+        }
+    }
+
+    /**
+     * 判断是否正在播放
+     */
+    public static boolean isPlaying()
+    {
+        if (mMediaPlayer != null)
+        {
+            return mMediaPlayer.isPlaying();
+        }
+        return false;
+    }
+
+    /**
+     * 停止播放
+     */
+    public static void stop()
+    {
+        if (mMediaPlayer != null)
+        {
+            if (mMediaPlayer.isPlaying())
+            {
+                mMediaPlayer.stop();
+            }
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+    }
+
+    // 当前播放的文件路径
+    public static String currentPlayPath = "";
+    public static int currentPlayPosition = -1;
+    public static ImageView currentPlayIvVoice;
+
+    /**
+     * 播放本地语音
+     */
+    public static void playLocal(String filePath, int position, ImageView ivVoice, AbstractPlayListener listener)
+    {
+        if (null == mMediaPlayer)
+            mMediaPlayer = new MediaPlayer();
+        // 如果正在播放，且将要播放的语音是否与当前的一致，那么暂停播放
+        if (mMediaPlayer.isPlaying() && CommUtil.isNotBlank(currentPlayPath) && currentPlayPath.equals(filePath))
+        {
+            mMediaPlayer.stop();
+            listener.stop(ivVoice);
+        }
+        else
+        {
+            if (mMediaPlayer.isPlaying())
+            {
+                mMediaPlayer.stop();
+                listener.stop(currentPlayIvVoice);
+            }
+            mMediaPlayer.setOnCompletionListener(listener);
+            try
+            {
+                mMediaPlayer.reset();
+                mMediaPlayer.setDataSource(filePath);
+                mMediaPlayer.prepare();
+                mMediaPlayer.start();
+                // 记录下当前的播放位置
+                currentPlayPath = filePath;
+                currentPlayPosition = position;
+                currentPlayIvVoice = ivVoice;
+                listener.play(position);
+            }
+            catch (Exception e)
+            {
+                mDWException.setException(e);
+            }
+        }
+    }
+
+}

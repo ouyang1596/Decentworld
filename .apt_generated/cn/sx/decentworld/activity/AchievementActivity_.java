@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.KeyboardComponent_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class AchievementActivity_
@@ -31,17 +32,19 @@ public final class AchievementActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        keyboardComponent = KeyboardComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvCareerSuccess = ((TextView) findViewById(id.tv_career_success));
         etShortIntroduce = ((EditText) findViewById(id.et_short_introduce));
-        tvBack = ((TextView) findViewById(id.tv_back));
+        tvCareerSuccess = ((TextView) findViewById(id.tv_career_success));
         tvCareerIsToStart = ((TextView) findViewById(id.tv_career_isto_success));
-        tvCareerStart = ((TextView) findViewById(id.tv_career_start));
+        tvEnsure = ((TextView) findViewById(id.tv_ensure));
+        tvBack = ((TextView) findViewById(id.tv_back));
         tvWan = ((TextView) findViewById(id.tv_wan));
         etDetailIntroduce = ((EditText) findViewById(id.et_introduce_detail));
-        tvEnsure = ((TextView) findViewById(id.tv_ensure));
+        tvCareerStart = ((TextView) findViewById(id.tv_career_start));
+        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         init();
     }
 

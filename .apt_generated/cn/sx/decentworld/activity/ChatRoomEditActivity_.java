@@ -40,9 +40,9 @@ public final class ChatRoomEditActivity_
     private void afterSetContentView_() {
         rgContentFee = ((RadioGroup) findViewById(id.rg_content));
         rbFeeScale = ((RadioButton) findViewById(id.rb_fee_scale));
-        rbContent = ((RadioButton) findViewById(id.rb_content));
         ivBack = ((ImageView) findViewById(id.iv_back));
         tvSend = ((TextView) findViewById(id.tv_send));
+        rbContent = ((RadioButton) findViewById(id.rb_content));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         init();
     }

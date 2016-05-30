@@ -1,0 +1,250 @@
+package cn.sx.decentworld.activity;
+
+import java.io.File;
+import java.util.HashMap;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.ProgressDialog;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.fragment.chatroom.ChatRoomAddThemeContentFragment;
+import cn.sx.decentworld.fragment.chatroom.ChatRoomAddThemeFeeScaleFragment;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.request.ChatRoomInfoSettingAndGetting;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ToastUtil;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_edit)
+public class ChatRoomEditActivity extends BaseFragmentActivity implements OnClickListener, OnCheckedChangeListener {
+	private static final String TAG = "ChatRoomEditActivity";
+	@ViewById(R.id.rg_content)
+	RadioGroup rgContentFee;
+	@ViewById(R.id.rb_content)
+	RadioButton rbContent;
+	@ViewById(R.id.rb_fee_scale)
+	RadioButton rbFeeScale;
+	@ViewById(R.id.tv_send)
+	TextView tvSend;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	private int subjectID;// 当前主题的id
+	private String coverPath;
+	private ChatRoomAddThemeContentFragment mChatRoomContentFragment;
+	private ChatRoomAddThemeFeeScaleFragment mChatRoomFeeScaleFragment;
+	private SendUrl mSendUrl;
+	private Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			finish();
+		};
+	};
+
+	@AfterViews
+	public void init() {
+		CGetIntent();
+		mSendUrl = new SendUrl(this);
+		mChatRoomContentFragment = new ChatRoomAddThemeContentFragment();
+		mChatRoomContentFragment.isNewOrEdit = 1;
+		mChatRoomFeeScaleFragment = new ChatRoomAddThemeFeeScaleFragment();
+		mChatRoomFeeScaleFragment.isNewOrEdit = 1;
+		getSupportFragmentManager().beginTransaction().add(R.id.fl_container_content_fee, mChatRoomContentFragment, "")
+				.add(R.id.fl_container_content_fee, mChatRoomFeeScaleFragment, "").hide(mChatRoomFeeScaleFragment).commit();
+		rgContentFee.setOnCheckedChangeListener(this);
+		tvSend.setOnClickListener(this);
+		ivBack.setOnClickListener(this);
+		// if (null == SubjectBean.queryByRoomIDAndIsNewOrEdit(roomID, 1)) {
+		getCurrentSubject();
+		// }
+	}
+
+	@Override
+	public void onCheckedChanged(RadioGroup group, int checkedId) {
+		switch (group.getCheckedRadioButtonId()) {
+		case R.id.rb_content:
+			getSupportFragmentManager().beginTransaction().hide(mChatRoomFeeScaleFragment).show(mChatRoomContentFragment)
+					.commit();
+			break;
+		case R.id.rb_fee_scale:
+			getSupportFragmentManager().beginTransaction().hide(mChatRoomContentFragment).show(mChatRoomFeeScaleFragment)
+					.commit();
+			break;
+		}
+	}
+
+	@Bean
+	ChatRoomInfoSettingAndGetting chatRoomInfoSettingAndGetting;
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.tv_send:
+			if (CommUtil.isBlank(mChatRoomContentFragment.getCover())) {
+				ToastUtil.showToast("请先上传一张图片");
+				return;
+			}
+			if (CommUtil.isBlank(mChatRoomContentFragment.getSubjectName())) {
+				ToastUtil.showToast("请先输入主题名");
+				return;
+			}
+			if (CommUtil.isBlank(mChatRoomContentFragment.getSubjectContent())) {
+				ToastUtil.showToast("请先输入主题内容");
+				return;
+			}
+			if (CommUtil.isBlank(mChatRoomFeeScaleFragment.getFee())) {
+				ToastUtil.showToast("请先输入收费标准");
+				return;
+			}
+			changeSubject();
+			break;
+		case R.id.iv_back:
+			finish();
+			break;
+		}
+	}
+
+	private void changeSubject() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("subjectName", mChatRoomContentFragment.getSubjectName());
+		map.put("roomID", roomID);
+		map.put("subjectID", "" + subjectID);
+		map.put("ownerID", DecentWorldApp.getInstance().getDwID());
+		map.put("subjectContent", mChatRoomContentFragment.getSubjectContent());
+		LogUtils.d(TAG, "changeSubject() subjectContent " + mChatRoomContentFragment.getSubjectContent());
+		File[] file = new File[1];
+		file[0] = new File(mChatRoomContentFragment.getCover());
+		showProgressDialog();
+		mSendUrl.httpRequestWithImage(map, file, Constants.CONTEXTPATH_OPENFIRE + Constants.API_UPDATA_SUBJECT,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String resultJSON, ResultBean resultBean) {
+						LogUtils.d(TAG, "changeSubject " + resultBean.toString());
+						hideProgressDialog();
+						if (resultBean.getResultCode() == 2222) {
+							showToast("请求成功");
+							mHandler.sendEmptyMessage(2222);
+						} else {
+							showToast(resultBean.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.e(TAG, "changeSubject error " + e);
+						hideProgressDialog();
+						showToast(Constants.NET_WRONG);
+					}
+				});
+	}
+
+	private Handler mGetCurrentHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			try {
+				JSONObject object = new JSONObject(msg.obj.toString());
+				String chargeAmount = object.getString("chargeAmount");
+				mChatRoomFeeScaleFragment.etFee.setText(chargeAmount);
+				JSONObject jsonData = object.getJSONObject("subject");
+				String roomID = jsonData.getString("roomId");
+				subjectID = jsonData.getInt("id");
+				coverPath = jsonData.getString("subjectBackground");
+				ImageLoaderHelper.mImageLoader.displayImage(coverPath, mChatRoomContentFragment.ivCover,
+						ImageLoaderHelper.mOptions);
+				String subjectName = jsonData.getString("subjectName");
+				mChatRoomContentFragment.etSubjectName.setText(subjectName);
+			} catch (JSONException e) {
+				LogUtils.d(TAG, "解析异常 " + e.getLocalizedMessage());
+			}
+		};
+	};
+
+	private void getCurrentSubject() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("roomID", roomID);
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + Constants.API_GET_CURRENT_SUBJECT, Method.GET,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String resultJSON, ResultBean resultBean) {
+						LogUtils.d(TAG, "getCurrentSubject " + resultBean.toString());
+						if (resultBean.getResultCode() == 2222)// 获取成功
+						{
+							Message message = mGetCurrentHandler.obtainMessage();
+							message.obj = resultBean.getData().toString();
+							message.what = 2222;
+							mGetCurrentHandler.sendMessage(message);
+						} else {
+							showToast(resultBean.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						LogUtils.e(TAG, "getCurrentSubject error " + e);
+						showToast(Constants.NET_WRONG);
+					}
+				});
+	}
+
+	private ProgressDialog mProDialog;
+
+	private void showProgressDialog() {
+		if (null == mProDialog) {
+			mProDialog = ProgressDialog.show(this, null, "loading");
+		} else {
+			mProDialog.show();
+		}
+	}
+
+	private void hideProgressDialog() {
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				if (null != mProDialog) {
+					mProDialog.hide();
+				}
+			}
+		});
+	}
+
+	private void showToast(final String data) {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				ToastUtil.showToast(data);
+			}
+		});
+	}
+
+	private String roomID;
+
+	private void CGetIntent() {
+		roomID = getIntent().getStringExtra(ChatRoomMeActivity.ROOMID);
+	}
+
+	public String getRoomID() {
+		return roomID;
+	}
+}

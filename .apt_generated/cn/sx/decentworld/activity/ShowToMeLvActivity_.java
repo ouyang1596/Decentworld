@@ -37,10 +37,10 @@ public final class ShowToMeLvActivity_
     }
 
     private void afterSetContentView_() {
-        tvName = ((TextView) findViewById(id.tv_showToMe_name));
         etValue = ((EditText) findViewById(id.et_showTome_value));
         ivBack = ((ImageView) findViewById(id.iv_back));
         tvCancel = ((TextView) findViewById(id.tv_cancel));
+        tvName = ((TextView) findViewById(id.tv_showToMe_name));
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         init();
     }

@@ -1,0 +1,156 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.dao;
+
+import java.util.List;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.entity.db.Conversation;
+import cn.sx.decentworld.entity.db.DWMessage;
+import cn.sx.decentworld.entity.db.DWMessage.ChatRelationship;
+import cn.sx.decentworld.entity.db.DWMessage.ChatType;
+import cn.sx.decentworld.entity.db.DWMessage.MessageType;
+import cn.sx.decentworld.logSystem.LogUtils;
+
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+
+/**
+ * @ClassName: DWMessageDao.java
+ * @Description: 消息数据库访问
+ * @author: cj
+ * @date: 2016年4月18日 上午9:56:53
+ */
+public class DWMessageDao
+{
+    /**
+     * 根据文本消息的packetID搜索唯一的DWMessage
+     * 
+     * @param packetID
+     * @return
+     */
+    public static DWMessage query(String packetID)
+    {
+        String sql = "userID = ? and txtMsgID = ?";
+        return new Select().from(DWMessage.class).where(sql, getUserID(), packetID).executeSingle();
+    }
+
+    /**
+     * 查找消息记录
+     */
+    public static DWMessage query(long mid)
+    {
+        String sql = "userID = ? and mid = ?";
+        return new Select().from(DWMessage.class).where(sql, getUserID(), mid).executeSingle();
+    }
+
+    public static List<DWMessage> queryList(Conversation conv)
+    {
+        String sql = "userID=? and chatRelationship=? and chatType=? and messageType!=?" + "and" + "((fromDwId=? and toDwId=?) or (fromDwId=? and toDwId=?))";
+        List<DWMessage> list = new Select().from(DWMessage.class)
+                .where(sql, conv.getUserID(), conv.getChatRelationship(), conv.getChatType(), MessageType.NOTIFY.getIndex(), conv.getUserID(), conv.getDwID(), conv.getDwID(), conv.getUserID())
+                .orderBy("mid desc").execute();
+        return list;
+    }
+
+    /**
+     * 查询指定聊天室的所有信息
+     * 
+     * @return
+     */
+    public static List<DWMessage> queryChatRoomMsg(String roomID)
+    {
+        String sql = "userID =? and chatType = ? and toDwId = ?";
+        return new Select().from(DWMessage.class).where(sql, getUserID(),ChatType.MULTI.getIndex(), roomID).orderBy("mid").execute();
+    }
+
+    // /////////////////////////////////////////私有方法///////////////////////////////////////////////////////
+
+
+    /**
+     * 删除指定ID号的聊天记录 otherID 对方ID
+     */
+    public static void delete(String otherID)
+    {
+        String sql1 = "userID = ? and fromDwId=? and toDwId= ?";
+        new Delete().from(DWMessage.class).where(sql1, getUserID(), getUserID(), otherID).execute();
+        String sql2 = "userID = ? and fromDwId=? and toDwId= ?";
+        new Delete().from(DWMessage.class).where(sql2, getUserID(), otherID, getUserID()).execute();
+    }
+
+    /**
+     * 退出聊天室删除聊天记录
+     * 
+     * @param roomID
+     */
+    public static void deleteChatRoomMsg(String roomID)
+    {
+        String sql = "userID = ? and toDwId= ?";
+        new Delete().from(DWMessage.class).where(sql,getUserID(), roomID).execute();
+    }
+
+    /**
+     * 获取当聊天室消息条数
+     * 
+     * @param roomID
+     * @return
+     */
+    public static int getRoomMsgCount(String roomID)
+    {
+        String sql = "userID = ? and toDwId= ?";
+        List<DWMessage> list1 = new Select().from(DWMessage.class).where(sql,getUserID(), roomID).execute();
+        return list1.size();
+    }
+
+    /**
+     * 为了获取数据库中的对应者最大mid，获取临时的消息列表
+     * 
+     * @param userDwID
+     * @return
+     */
+    public static List<DWMessage> getMsgForMid(String userDwID)
+    {
+        // 查找与对方聊天的最新mid
+        String sql = "((userID = ? and fromDwId=? and toDwId=? and chatType = ? and chatRelationship = ?)" + "or"
+                + "(userID = ? and fromDwId=? and toDwId=? and chatType = ? and chatRelationship = ?))";
+        List<DWMessage> temp = new Select().from(DWMessage.class)
+                .where(sql, getUserID(), getUserID(), userDwID, ChatType.SINGLE.getIndex(), ChatRelationship.FRIEND.getIndex(), getUserID(), userDwID, getUserID(), ChatType.SINGLE.getIndex(), ChatRelationship.FRIEND.getIndex())
+                .orderBy("mid asc").execute();
+        return temp;
+    }
+
+    /**
+     * 数据库中是否存在指定ID的消息
+     * 
+     * @param packetID
+     *            消息ID
+     */
+    public static boolean contains(String packetID)
+    {
+        String sql = "userID = ? and txtMsgID = ?";
+        DWMessage dwMessage = new Select().from(DWMessage.class).where(sql, getUserID(), packetID).executeSingle();
+        if (dwMessage != null)
+            return true;
+        return false;
+    }
+
+    public static void addedNewFriend(String otherID)
+    {
+        DWMessage dwMessage = new DWMessage(MessageType.NOTIFY.getIndex() , DWMessage.Direct.RECEIVE);
+        dwMessage.setFromDwId(otherID);
+        dwMessage.setBody("已经添加对方为好友，,扣费方式改变，以自己的身价为标准");
+        dwMessage.save();
+    }
+
+    // /////////////////////////////////////私有静态方法//////////////////////////////////////
+    /**
+     * 获取当前用户ID
+     */
+    private static String getUserID()
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        return userID;
+    }
+
+}

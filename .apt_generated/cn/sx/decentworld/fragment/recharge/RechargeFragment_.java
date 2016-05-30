@@ -22,8 +22,8 @@ public final class RechargeFragment_
     private View contentView_;
 
     private void init_(Bundle savedInstanceState) {
-        toast = ToastComponent_.getInstance_(getActivity());
         keyboardComponent = KeyboardComponent_.getInstance_(getActivity());
+        toast = ToastComponent_.getInstance_(getActivity());
     }
 
     @Override
@@ -35,8 +35,8 @@ public final class RechargeFragment_
     private void afterSetContentView_() {
         etMoney = ((EditText) findViewById(cn.sx.decentworld.R.id.et_money));
         btnEnsure = ((Button) findViewById(cn.sx.decentworld.R.id.btn_ensure));
-        ((ToastComponent_) toast).afterSetContentView_();
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
+        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

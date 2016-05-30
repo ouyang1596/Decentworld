@@ -1,0 +1,638 @@
+package cn.sx.decentworld.activity;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.jivesoftware.smack.ReconnectionManager;
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+import org.simple.eventbus.ThreadMode;
+
+import android.content.AsyncQueryHandler;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.WindowManager;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.abstractclass.AbstractOnPageChangeListener;
+import cn.sx.decentworld.adapter.ViewPagerAdapter;
+import cn.sx.decentworld.bean.LikeBean;
+import cn.sx.decentworld.bean.PromptBean;
+import cn.sx.decentworld.broadcast.NetStateBC;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.DWViewPager;
+import cn.sx.decentworld.common.FilePath;
+import cn.sx.decentworld.common.LocationProvider;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.MatchSuccessDialogFragment;
+import cn.sx.decentworld.dialog.MatchSuccessDialogFragment.OnMatchClickListener;
+import cn.sx.decentworld.engine.ConversationEngine;
+import cn.sx.decentworld.entity.LaunchChatEntity;
+import cn.sx.decentworld.entity.MsgAndInfo;
+import cn.sx.decentworld.entity.UserSessionInfo;
+import cn.sx.decentworld.entity.dao.ContactUserDao;
+import cn.sx.decentworld.entity.db.DWMessage;
+import cn.sx.decentworld.fragment.index.MainFragment;
+import cn.sx.decentworld.fragment.index.MainFragment_;
+import cn.sx.decentworld.fragment.index.NewsFragment;
+import cn.sx.decentworld.fragment.index.NewsFragment_;
+import cn.sx.decentworld.fragment.index.StrangerFragment;
+import cn.sx.decentworld.fragment.index.StrangerFragment_;
+import cn.sx.decentworld.listener.ConnectOpenFireListener;
+import cn.sx.decentworld.listener.NetChangeListener;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.service.LocationService;
+import cn.sx.decentworld.task.ConnectOpenFireTask;
+import cn.sx.decentworld.utils.ExitAppUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+import cn.sx.decentworld.utils.PromptUtils;
+import cn.sx.decentworld.utils.SettingSp;
+import cn.sx.decentworld.utils.SoundPoolUtils;
+import cn.sx.decentworld.utils.ThreadUtils;
+import cn.sx.decentworld.utils.UpgradeVersion;
+import cn.sx.decentworld.utils.VibratorUtil;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper;
+import cn.sx.decentworld.widget.CubeTransformer;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+
+/**
+ * @ClassName: MainActivity.java
+ * @Description: 包含三个立体界面的Activity
+ * @author: cj
+ * @date: 2016年1月16日 下午1:20:40
+ */
+@EActivity(R.layout.activity_main)
+public class MainActivity extends BaseFragmentActivity implements NetChangeListener, OnMatchClickListener {
+	private static final String TAG = "MainActivity";
+	public static final int STRANGER_INDEX = 0;
+	public static final int CHAT_INDEX = 1;
+	public static final int NEWS_INDEX = 2;
+	@ViewById(R.id.main_viewpager)
+	public static DWViewPager main_viewpager;
+	@ViewById(R.id.view_mask)
+	View viewMask;
+
+	@Bean
+	ToastComponent toast;
+	private List<Fragment> fragmentsList;
+
+	/** 聊天室的Fragment */
+	private NewsFragment news;
+	/** 陌生人的Fragment */
+	private StrangerFragment stranger;
+	/** 含有主界面四个模块的Fragment */
+	private MainFragment mainFragment;
+
+	private ViewPagerAdapter fragmentAdapter;
+	public String dwID = DecentWorldApp.getInstance().getDwID();
+	private long firstTime = 0;
+	// 网络状态广播
+	private NetStateBC netStateBC;
+
+	public void getWindowWidthAndHeight() {
+		WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
+		DecentWorldApp.getInstance().windowWidth = wm.getDefaultDisplay().getWidth();
+		DecentWorldApp.getInstance().windowHeight = wm.getDefaultDisplay().getHeight();
+	}
+
+	private void initPrompt() {
+		PromptBean promptBean = PromptBean.queryByDwID(DecentWorldApp.getInstance().getDwID());
+		if (null != promptBean) {
+			DecentWorldApp.isFirst = promptBean.isFirst;
+		} else {
+			promptBean = new PromptBean(DecentWorldApp.getInstance().getDwID());
+			promptBean.isFirst = 0;
+			promptBean.save();
+		}
+	}
+
+	/**
+	 * 初始化
+	 */
+	@AfterViews
+	public void init() {
+		getWindowWidthAndHeight();
+		initPrompt();
+		initConstant();
+		// 注册订阅事件
+		EventBus.getDefault().register(this);
+		/** 保存屏幕宽度 **/
+		Constants.screenWidth = getDisplayWidth();
+		/** 初始化三个旋转页面 **/
+		initFragment();
+		/** 开启定位服务 **/
+		startLocationService();
+		/** 检查最新版本号 **/
+		checkVersion();
+		registerNetStateBC();
+		asyncQueryHandler = new MyAsyncQueryHandler(getContentResolver());
+		queryDataBase();
+	}
+
+	private void initConstant() {
+		Constants.DIALOG_DW_ID = DecentWorldApp.getInstance().getDwID();
+		Constants.PROMPT = Constants.DIALOG_DW_ID + "PROMPT";
+		Constants.LIKE = Constants.DIALOG_DW_ID + "LIKE";
+		Constants.FRIEND = Constants.DIALOG_DW_ID + "FRIEND";
+		Constants.STRANGER = Constants.DIALOG_DW_ID + "STRANGER";
+		Constants.SHENGWAN = Constants.DIALOG_DW_ID + "SHENGWAN";
+		Constants.GO_DOUBT = Constants.DIALOG_DW_ID + "GO_DOUBT";
+		Constants.VOICE = Constants.DIALOG_DW_ID + "VOICE";
+		Constants.VOICE_STRANGER = Constants.DIALOG_DW_ID + "VOICE_STRANGER";
+		Constants.VOICE_FRIEND = Constants.DIALOG_DW_ID + "VOICE_FRIEND";
+		Constants.ZAN = Constants.DIALOG_DW_ID + "ZAN";
+		Constants.CAI = Constants.DIALOG_DW_ID + "CAI";
+		Constants.REPORT = Constants.DIALOG_DW_ID + "REPORT";
+		Constants.COMMENT = Constants.DIALOG_DW_ID + "COMMENT";
+	}
+
+	/**
+	 * 初始化主页各个fragment
+	 */
+	private void initFragment() {
+		// 初始化主页的3个Tab界面
+		news = new NewsFragment_();
+		stranger = new StrangerFragment_();
+		mainFragment = new MainFragment_();
+		fragmentsList = new ArrayList<Fragment>();
+		fragmentsList.add(stranger);
+		fragmentsList.add(mainFragment);
+		fragmentsList.add(news);
+		fragmentAdapter = new ViewPagerAdapter(getSupportFragmentManager(), fragmentsList);
+		// 三维切换动画
+		main_viewpager.setPageTransformer(true, new CubeTransformer());
+		// 填充viewPager
+		main_viewpager.setAdapter(fragmentAdapter);
+		// 设置当前显示的界面
+		main_viewpager.setCurrentItem(1);
+		// 设置viewpager预加载的界面个数
+		main_viewpager.setOffscreenPageLimit(1);
+		// 监听viewpager当前切换到哪个fragment
+		main_viewpager.setOnPageChangeListener(new AbstractOnPageChangeListener() {
+			@Override
+			public void onPageSelected(int pageIndex) {
+				super.onPageSelected(pageIndex);
+				if (DecentWorldApp.ifFixed) {
+					news.mChatroomAdapter.requestEnterChatRoom(DecentWorldApp.chatRoomInfo);
+				}
+			}
+		});
+		if (DecentWorldApp.isFirst != 0) {
+			viewMask.setVisibility(View.VISIBLE);
+			viewMask.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					v.setVisibility(View.GONE);
+				}
+			});
+		}
+	}
+
+	/**
+	 * 开启定位服务
+	 */
+	public void startLocationService() {
+		Intent intent = new Intent(this, LocationService.class);
+		startService(intent);
+	}
+
+	/**
+	 * 检查是否有新的版本
+	 */
+	private void checkVersion() {
+		/** 如果有网，则进行网络升级检查 **/
+		if (NetworkUtils.isNetWorkConnected(MainActivity.this)) {
+			/**
+			 * 检查是否满足更新的条件
+			 */
+			if (SettingSp.isUpdate(MainActivity.this)) {
+				new UpgradeVersion(MainActivity.this);
+			}
+		}
+	}
+
+	public View getViewMask() {
+		return viewMask;
+	}
+
+	/**
+	 * 向审核者推送去疑
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_CHECK_BEAUTIFY)
+	public void receiveCheckDoubt(String data) {
+		LogUtils.d(TAG, "receiveCheckDoubt() params[data=" + data + "]");
+		Intent intent = new Intent(this, ExamineActivity_.class);
+		intent.putExtra("check", data);
+		startActivity(intent);
+	}
+
+	/**
+	 * 获取手机屏幕的参数
+	 */
+	private int getDisplayWidth() {
+		DisplayMetrics metric = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(metric);
+		int width = metric.widthPixels; // 屏幕宽度（像素）
+		int height = metric.heightPixels;
+		return width;
+	}
+
+	@Override
+	protected void onCreate(Bundle arg0) {
+		super.onCreate(arg0);
+		LogUtils.v(TAG, "onCreate()");
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		LogUtils.v(TAG, "onStart()");
+	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		setIntent(intent);
+		LogUtils.v(TAG, "onNewIntent()");
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		LogUtils.v(TAG, "onResume()");
+		// 当创建聊天室成功之后，进入到聊天室列表的界面后刷新界面
+		if (getIntent().getIntExtra("creatRoomSuccess", -1) == Constants.CREATE_ROOM_SUCCESS) {
+			LogUtils.v(TAG, "onResume() 创建聊天室成功");
+			news.turnToTab(getIntent().getIntExtra("creatRoomSuccess", -1));
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		LogUtils.v(TAG, "onPause()");
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		LogUtils.v(TAG, "onStop()");
+	}
+
+	@Override
+	protected void onDestroy() {
+		LogUtils.v(TAG, "onDestroy()");
+		EventBus.getDefault().unregister(this);
+		LocationProvider.getInstance(this).stop();
+		unRegisterNetStateBC();
+		super.onDestroy();
+	}
+
+	/**
+	 * 返回主界面
+	 */
+	@Override
+	public void onBackPressed() {
+		LogUtils.v(TAG, "onBackPressed()");
+		if ((System.currentTimeMillis() - firstTime) > 2000) {
+			toast.show("再按一次退出");
+			firstTime = System.currentTimeMillis();
+		} else {
+			// LogUtils.i(TAG, "退出软件");
+			// super.onBackPressed();
+			// 模拟HOME键，返回到桌面
+			Intent intent = new Intent(Intent.ACTION_MAIN);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);// 注意
+			intent.addCategory(Intent.CATEGORY_HOME);
+			startActivity(intent);
+		}
+	}
+
+	/**
+	 * 被挤下线时代用以下代码
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_CRUSH_OFF_LINE, mode = ThreadMode.MAIN)
+	public void conflictEvent(String str) {
+		ExitAppUtils.getInstance().toMainActivity(getLocalClassName());
+		if (!MainActivity.this.isFinishing()) {
+			LogUtils.i(TAG, "conflictEvent(被挤下线)...当前用户为：" + DecentWorldApp.getInstance().getDwID());
+			PromptUtils promptUtils = new PromptUtils(MainActivity.this);
+			promptUtils.showOffLine("被挤下线", "您有账号异地登陆，被挤下线\n  请重新登录试试！");
+		}
+	}
+
+	/**
+	 * 接收单聊语音
+	 */
+	private HttpUtils httpUtils = new HttpUtils();
+
+	@Subscriber(tag = NotifyByEventBus.NT_RECEIVE_SINGLE_AUDIO)
+	public void receiveSingleAudio(MsgAndInfo msgAndInfo) {
+		final DWMessage dwMessage = msgAndInfo.getDwMessage();
+		final UserSessionInfo userSessionInfo = msgAndInfo.getUserSessionInfo();
+		String fileName = System.currentTimeMillis() + ".amr";
+
+		LogUtils.v(TAG, "receiveSingleAudio() " + msgAndInfo.toString() + "\nfileName=" + fileName);
+		httpUtils.download(dwMessage.getUri(), FilePath.AUDIO_PATH + fileName, new RequestCallBack<File>() {
+			@Override
+			public void onSuccess(ResponseInfo<File> responseInfo) {
+				LogUtils.v(TAG,
+						"receiveSingleAudio() download voice onSuccess" + "fileName--" + responseInfo.result.getAbsolutePath());
+				dwMessage.ifFromNet = 1;
+				dwMessage.setLocalUrl(responseInfo.result.getAbsolutePath());
+				dwMessage.save();
+				if (dwMessage.getChatType() != DWMessage.CHAT_TYPE_MULTI) {
+					ConversationEngine.getInstance().refreshConversation(new MsgAndInfo(dwMessage, userSessionInfo), "【发送消息】");
+					EventBus.getDefault().post(dwMessage, NotifyByEventBus.NT_UPDATE_CHAT_LISTVIEW_RECEIVE_MSG);
+				}
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg) {
+				LogUtils.e(TAG, "receiveSingleAudio() download voice onFailure,cause by:" + msg);
+			}
+		});
+	}
+
+	/**
+	 * 接收聊天室语音
+	 * 
+	 * @param dwMessage
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_RECEIVE_CHATROOM_AUDIO)
+	public void receiveChatRoomAudio(final DWMessage dwMessage) {
+		String fileName = System.currentTimeMillis() + ".mp3";
+		LogUtils.v(TAG, "receiveChatRoomAudio() params[=" + dwMessage.toString() + "," + "\nfileName=" + fileName + "]");
+		httpUtils.download(dwMessage.getUri(), FilePath.AUDIO_RECEIVE + fileName, new RequestCallBack<File>() {
+
+			@Override
+			public void onSuccess(ResponseInfo<File> responseInfo) {
+				LogUtils.d(TAG, "receiveChatRoomAudio() download voice onSuccess");
+				dwMessage.setLocalUrl(responseInfo.result.getAbsolutePath());
+				dwMessage.ifFromNet = 1;
+				EventBus.getDefault().post(dwMessage, NotifyByEventBus.NT_CHAT_ROOM_MSG);
+			}
+
+			@Override
+			public void onFailure(HttpException error, String msg) {
+				LogUtils.e(TAG, "receiveChatRoomAudio() download voice onFailure,cause by:" + msg);
+			}
+		});
+	}
+
+	@Subscriber(tag = NotifyByEventBus.NT_MATCH)
+	public void receiveMatch(String data) {
+		LogUtils.v(TAG, "receiveMatch() params[= " + data + "]");
+		SoundPoolUtils.play();
+		VibratorUtil.Vibrate(this, 300); // 震动300ms
+		startActivity(new Intent(this, MainActivity_.class));
+		new IntentAsyn(data).execute();
+	}
+
+	class IntentAsyn extends AsyncTask<Void, Void, Void> {
+		private String data;
+
+		public IntentAsyn(String data) {
+			this.data = data;
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			MatchSuccessDialogFragment matchSuccessDialogFragment = new MatchSuccessDialogFragment();
+			matchSuccessDialogFragment.setJsonData(data);
+			matchSuccessDialogFragment.setTips("点击喜欢你，你的一块大洋，已给他咯！现在去聊聊？");
+			matchSuccessDialogFragment.setOnMatchClickListener(MainActivity.this);
+			matchSuccessDialogFragment.show(getSupportFragmentManager().beginTransaction(), "matchSuccessDialogFragment");
+		}
+	}
+
+	// -------------- 获取联系人列表并上传到服务器---------------------
+	private AsyncQueryHandler asyncQueryHandler; // 异步查询数据库类对象
+
+	/**
+	 * 查询联系人数据库
+	 */
+	private void queryDataBase() {
+		Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI; // 联系人Uri；
+		// 查询的字段
+		String[] projection = { ContactsContract.CommonDataKinds.Phone._ID, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
+				ContactsContract.CommonDataKinds.Phone.DATA1, "sort_key", ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
+				ContactsContract.CommonDataKinds.Phone.PHOTO_ID, ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY };
+		// 按照sort_key升序查詢
+		asyncQueryHandler.startQuery(0, null, uri, projection, null, null, "sort_key COLLATE LOCALIZED asc");
+	}
+
+	private HashMap<String, String> mapPhoneNumber;
+	private StringBuilder sb;
+	private HashMap<String, String> mobileNameMap = new HashMap<String, String>();
+
+	private class MyAsyncQueryHandler extends AsyncQueryHandler {
+
+		public MyAsyncQueryHandler(ContentResolver cr) {
+			super(cr);
+		}
+
+		@Override
+		protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+			super.onQueryComplete(token, cookie, cursor);
+			mapPhoneNumber = new HashMap<String, String>();
+			sb = new StringBuilder();
+			sb.append("[");
+			if (cursor != null && cursor.getCount() > 0) {
+				cursor.moveToFirst(); // 游标移动到第一项
+				for (int i = 0; i < cursor.getCount(); i++) {
+					cursor.moveToPosition(i);
+					String name = cursor.getString(1);
+					String phoneNumber = cursor.getString(2);
+					if (!mapPhoneNumber.containsKey(phoneNumber)) {
+						mapPhoneNumber.put(phoneNumber, phoneNumber);
+						sb.append(phoneNumber + ",");
+						mobileNameMap.put(phoneNumber, name);
+					}
+				}
+				sb.deleteCharAt(sb.length() - 1);
+				sb.append("]");
+				LogUtils.i(TAG, "onQueryComplete sb " + sb.toString());
+				Intent intent = new Intent(mContext, ContactActivity_.class);
+				intent.putExtra("phoneNums", sb.toString());
+				intent.putExtra("mobileNameMap", mobileNameMap);
+				startActivity(intent);
+				// HashMap<String, String> map = new HashMap<String, String>();
+				// // map.put("phoneNums", data);
+				// map.put("phoneNums", sb.toString());
+				// getUserInfo.uploadContact(map, getContactHandle);
+				// LogUtils.i("bm", "phoneNumber---" + sb.toString());
+			} else {
+				// mobileNameMap.put("18824582749", "陈杰");
+				// mobileNameMap.put("13850558443", "志远");
+				// mobileNameMap.put("13666023482", "忠伟");
+				// Intent intent = new Intent(mContext, ContactActivity_.class);
+				// intent.putExtra("phoneNums", data);
+				// intent.putExtra("mobileNameMap", mobileNameMap);
+				// startActivity(intent);
+			}
+		}
+	}
+
+	@Override
+	public void onMatchClick(View view) {
+		switch (view.getId()) {
+		case R.id.tv_cancel:
+			break;
+		case R.id.tv_talk:
+			LikeBean likeBean = (LikeBean) view.getTag();
+			Intent intent = new Intent(this, ChatActivity_.class);
+			// intent.putExtra(ChatActivity.OTHER_ID, likeBean.id);
+			// intent.putExtra(ChatActivity.OTHER_NICKNAME,
+			// likeBean.showName);
+			// intent.putExtra(ChatActivity.CHAT_TYPE,
+			// DWMessage.CHAT_TYPE_SINGLE);
+			// intent.putExtra(ChatActivity.OTHER_WORTH,
+			// Float.valueOf(likeBean.worth));
+			// if (ContactUser.isContact(likeBean.id)) {
+			// // 朋友关系
+			// intent.putExtra(ChatActivity.CHAT_RELATIONSHIP,
+			// DWMessage.CHAT_RELATIONSHIP_FRIEND);
+			// } else {
+			// // 陌生人关系
+			// intent.putExtra(ChatActivity.CHAT_RELATIONSHIP,
+			// DWMessage.CHAT_RELATIONSHIP_STRANGER);
+			// }
+
+			LaunchChatEntity entity = new LaunchChatEntity(likeBean.id, likeBean.showName, Float.valueOf(likeBean.worth),
+					DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_FRIEND, Integer.valueOf(likeBean.userType));
+			if (!ContactUserDao.isContact(likeBean.id))
+				entity.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+			intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity);
+			startActivity(intent);
+			break;
+		}
+	}
+
+	// 处理网络变化时的重连/////////////////////////////////
+
+	/**
+	 * 注册网络变化的广播
+	 */
+	private void registerNetStateBC() {
+		LogUtils.v(TAG, "registerNetStateBC()");
+		if (netStateBC == null) {
+			netStateBC = new NetStateBC();
+			// 为网络变化加入回调监听
+			netStateBC.setOnNetChangeListener(this);
+			IntentFilter filter = new IntentFilter();
+			filter.addAction("android.net.conn.CONNECTIVITY_CHANGE");
+			filter.setPriority(1000);
+			registerReceiver(netStateBC, filter);
+		}
+	}
+
+	/**
+	 * 注销网络状态广播
+	 */
+	private void unRegisterNetStateBC() {
+		LogUtils.v(TAG, "unRegisterNetStateBC()");
+		if (netStateBC != null) {
+			unregisterReceiver(netStateBC);
+		}
+	}
+
+	/**
+	 * 网络连接后的回调监听
+	 */
+	@Override
+	public void onNetConnected() {
+		DecentWorldApp.hasNet = true;
+		LogUtils.v(TAG, "onNetConnected() 接收到网络已经连接的广播");
+		boolean exitOfReconnectThread = ThreadUtils.isExitOfReconnectThread();
+		if (exitOfReconnectThread) {
+			LogUtils.i(TAG, "onNetConnected() 重连线程存在");
+		} else {
+			LogUtils.i(TAG, "onNetConnected() 重连线程不存在");
+			if (NetworkUtils.isNetWorkConnected(this)) {
+				if (UserInfoHelper.isLogined(this)) {
+					String dwID = DecentWorldApp.getInstance().getDwID();
+					String password = DecentWorldApp.getInstance().getPassword();
+					LogUtils.v(TAG, "onNetConnected() dwID=" + dwID + ",password=" + password);
+					connectedOpenFire(dwID, password);
+				}
+			} else {
+				toast.show("请检查网络");
+			}
+		}
+		// 将重连次数重置
+		ReconnectionManager.hasNetwork = true;
+	}
+
+	/**
+	 * 网络断开后的回调监听
+	 */
+	@Override
+	public void onNetDisconnected() {
+		LogUtils.d(TAG, "onNetDisconnected() 接收到网络已经断开的广播");
+		toast.showLong("注意：网络已断开");
+		DecentWorldApp.hasNet = false;
+	}
+
+	/**
+	 * 一旦网络重新连接，必须执行XMPP连接服务
+	 * 
+	 * @param dwID
+	 * @param password
+	 */
+	private void connectedOpenFire(String dwID, String password) {
+		LogUtils.d(TAG, "connectedOpenFire() dwID=" + dwID + ",password=" + password);
+		ConnectOpenFireTask task = new ConnectOpenFireTask();
+		task.setOnConnectOpenFireListener(new ConnectOpenFireListener() {
+			@Override
+			public void onSuccess() {
+				LogUtils.i(TAG, "connectedOpenFire() MainActivity ConnectOpenFire SUCCESS");
+				toast.show("连接成功");
+			}
+
+			@Override
+			public void onFailure() {
+				toast.show("连接失败");
+			}
+		});
+		task.execute(dwID, password);
+	}
+}

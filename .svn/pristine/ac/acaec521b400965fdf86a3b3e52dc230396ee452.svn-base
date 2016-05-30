@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="@dimen/dig_width"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:background="@color/white" >
+
+        <TextView
+            android:id="@+id/tv_dig_delete_prompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:text="提示"
+            android:textColor="@color/one_black"
+            android:textSize="@dimen/text_size_20" />
+
+        <TextView
+            android:id="@+id/tv_dig_delete_doubt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/tv_dig_delete_prompt"
+            android:layout_below="@id/tv_dig_delete_prompt"
+            android:layout_marginTop="16dp"
+            android:text="确定删除吗？"
+            android:textColor="@color/one_black"
+            android:textSize="@dimen/text_size_16" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_dig_delete_doubt"
+            android:layout_marginBottom="20dp"
+            android:layout_marginTop="20dp" >
+
+            <TextView
+                android:id="@+id/tv_dig_delete_detele"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="20dp"
+                android:text="删除"
+                android:textColor="@color/green"
+                android:textSize="@dimen/text_size_16" />
+
+            <TextView
+                android:id="@+id/tv_dig_delete_cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="取消"
+                android:layout_marginRight="20dp"
+                android:layout_toLeftOf="@id/tv_dig_delete_detele"
+                android:textColor="@color/one_black"
+                android:textSize="@dimen/text_size_16" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+</LinearLayout>

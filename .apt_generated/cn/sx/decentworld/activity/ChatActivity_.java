@@ -42,36 +42,36 @@ public final class ChatActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        chatComponent = ChatComponent_.getInstance_(this);
-        choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
         KeyboardComponent = KeyboardComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        chatComponent = ChatComponent_.getInstance_(this);
+        choceAndTakePictureComponent = ChoceAndTakePictureComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        iv_chat_bg = ((ImageView) findViewById(id.activity_chat_bg));
+        edittext_layout = ((RelativeLayout) findViewById(id.edittext_layout));
+        mEditTextContent = ((PasteEditText) findViewById(id.et_sendmessage));
+        buttonPressToSpeak = ((RecorderButton) findViewById(id.btn_press_to_speak));
+        main_header_right_tv = ((TextView) findViewById(id.main_header_right_tv));
+        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
+        expressionViewpager = ((ViewPager) findViewById(id.vPager));
+        btn_set_mode_keyboard = ((Button) findViewById(id.btn_set_mode_keyboard));
+        btnContainer = ((LinearLayout) findViewById(id.ll_btn_container));
+        iv_emoticons_checked = ((ImageView) findViewById(id.iv_emoticons_checked));
+        btn_more = ((Button) findViewById(id.btn_more));
         mLvDWMessage = ((PullToRefreshListView) findViewById(id.list));
         iv_emoticons_normal = ((ImageView) findViewById(id.iv_emoticons_normal));
-        edittext_layout = ((RelativeLayout) findViewById(id.edittext_layout));
-        expressionViewpager = ((ViewPager) findViewById(id.vPager));
-        iv_emoticons_checked = ((ImageView) findViewById(id.iv_emoticons_checked));
-        mEditTextContent = ((PasteEditText) findViewById(id.et_sendmessage));
         main_header_right_btn = ((ImageView) findViewById(id.main_header_right_btn));
-        btnContainer = ((LinearLayout) findViewById(id.ll_btn_container));
-        btn_more = ((Button) findViewById(id.btn_more));
-        buttonPressToSpeak = ((RecorderButton) findViewById(id.btn_press_to_speak));
+        btn_send = ((Button) findViewById(id.btn_send));
         main_header_title = ((TextView) findViewById(id.tv_header_title));
+        more = ((LinearLayout) findViewById(id.more));
         btn_set_mode_voice = ((Button) findViewById(id.btn_set_mode_voice));
         emojiIconContainer = ((LinearLayout) findViewById(id.ll_face_container));
-        main_header_left = ((LinearLayout) findViewById(id.main_header_left));
-        iv_chat_bg = ((ImageView) findViewById(id.activity_chat_bg));
-        more = ((LinearLayout) findViewById(id.more));
-        btn_set_mode_keyboard = ((Button) findViewById(id.btn_set_mode_keyboard));
-        main_header_right_tv = ((TextView) findViewById(id.main_header_right_tv));
-        btn_send = ((Button) findViewById(id.btn_send));
-        ((ChatComponent_) chatComponent).afterSetContentView_();
-        ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
         ((KeyboardComponent_) KeyboardComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((ChatComponent_) chatComponent).afterSetContentView_();
+        ((ChoceAndTakePictureComponent_) choceAndTakePictureComponent).afterSetContentView_();
         init();
     }
 

@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.KeyboardComponent_;
 import cn.sx.decentworld.component.ToastComponent_;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
@@ -35,15 +36,17 @@ public final class MomentActivity_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
+        mKeyboardComponent = KeyboardComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        mFlPublicContainer = ((FrameLayout) findViewById(id.fl_moment_public_container));
-        mTvIsPublish = ((TextView) findViewById(id.tv_moment_publish));
-        mTvTitle = ((TextView) findViewById(id.tv_moment_title));
-        mIvBack = ((ImageView) findViewById(id.iv_moment_back));
+        mVMask = ((View) findViewById(id.view_mask));
         mPlvMomentList = ((PullToRefreshListView) findViewById(id.plv_moment));
+        mFlPublicContainer = ((FrameLayout) findViewById(id.fl_moment_public_container));
+        mIvBack = ((ImageView) findViewById(id.iv_moment_back));
+        mTvIsPublish = ((TextView) findViewById(id.tv_moment_publish));
         ((ToastComponent_) toast).afterSetContentView_();
+        ((KeyboardComponent_) mKeyboardComponent).afterSetContentView_();
         init();
     }
 

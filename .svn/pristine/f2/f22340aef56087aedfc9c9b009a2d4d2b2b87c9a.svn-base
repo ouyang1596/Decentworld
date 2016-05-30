@@ -1,0 +1,268 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.ModifyRealnameDialog;
+import cn.sx.decentworld.dialog.VerifyLoginPwdDialog;
+import cn.sx.decentworld.dialog.ModifyRealnameDialog.ModifyRealnameListener;
+import cn.sx.decentworld.dialog.VerifyLoginPwdDialog.VerifyLoginPwdListener;
+import cn.sx.decentworld.engine.BenefitEngine;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.entity.db.UserInfo;
+import cn.sx.decentworld.listener.NetCallback;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.res.BankInfo;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: SetBankCardActivity.java
+ * @Description:
+ * @author: cj
+ * @date: 2016年3月17日 下午2:50:43
+ */
+@EActivity(R.layout.activity_set_bank_card)
+public class SetBankCardActivity extends BaseFragmentActivity implements TextWatcher, OnClickListener
+{
+    /**
+     * 常量
+     */
+    private static final String TAG = "SetBankCardActivity";
+
+    /**
+     * 工具类
+     */
+    @Bean
+    ToastComponent toast;
+
+    /**
+     * 界面资源
+     */
+    @ViewById(R.id.et_set_bank_card_realname)
+    EditText etRealname;
+    @ViewById(R.id.et_set_bank_card_account)
+    EditText etAccount;
+    @ViewById(R.id.et_set_bank_card_name)
+    EditText mBankName;
+    @ViewById(R.id.iv_set_bank_card_edit)
+    ImageView ivEditRealname;
+    @ViewById(R.id.btn_set_bank_card_submit)
+    Button btnSubmit;
+    @ViewById(R.id.tv_set_bank_card_back)
+    TextView tvBack;
+
+    /**
+     * 变量
+     */
+    private String bankCard = "";
+    private String tempToken = "";
+
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        initVariables();
+    }
+
+    /**
+     * 初始化变量
+     */
+    private void initVariables()
+    {
+        etAccount.addTextChangedListener(this);
+        tvBack.setOnClickListener(this);
+        btnSubmit.setOnClickListener(this);
+        ivEditRealname.setOnClickListener(this);
+        // 初始化银行卡
+        bankCard = getIntent().getStringExtra("bankCard");
+        tempToken = getIntent().getStringExtra("tempToken");
+        if (CommUtil.isNotBlank(bankCard))
+        {
+            etAccount.setText(bankCard);
+            etAccount.setSelection(bankCard.length());
+            String name = BankInfo.getNameOfBank(bankCard, 0);
+            if (CommUtil.isNotBlank(name))
+            {
+                mBankName.setText(name);
+            }
+        }
+    }
+
+    /**
+     * 点击事件入口
+     */
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.tv_set_bank_card_back:
+                finish();
+                break;
+            case R.id.iv_set_bank_card_edit:
+                modifyReaname();
+                break;
+            case R.id.btn_set_bank_card_submit:
+                submit();
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 提交
+     */
+    void submit()
+    {
+        final String account = etAccount.getText().toString();
+        if (CommUtil.isBlank(account))
+        {
+            toast.show("账号不能为空");
+            return;
+        }
+        
+        final String bankName = mBankName.getText().toString();
+        if (CommUtil.isBlank(bankName))
+        {
+            toast.show("银行名不能为空");
+            return;
+        }
+
+        new BenefitEngine().setBankCard(account,bankName, tempToken, new NetCallback()
+        {
+            @Override
+            public void onSuccess(String msg)
+            {
+                LogUtils.d(TAG, Constants.TEST_TAG+"submit() onSuccess,"+msg);
+//                UserInfo userInfo = UserInfoEngine.getInstance().getUserInfo();
+//                userInfo.setBankCard(account);
+//                userInfo.save();
+                toast.show(msg);
+                finish();
+            }
+
+            @Override
+            public void onFailure(String cause)
+            {
+                LogUtils.i(TAG, cause);
+                toast.show(cause);
+            }
+        });
+
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count)
+    {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable s)
+    {
+        if (s.length() < 6)
+        {
+            mBankName.setText("");
+        }
+        else if (s.length() == 6)
+        {
+            // 查询银行卡对应的银行名
+            String result = s.toString();
+            // 结果显示在控件中
+            mBankName.setText(BankInfo.getNameOfBank(result, 0));
+        }
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        
+        LogUtils.i(TAG, Constants.TEST_TAG+"onResume()");
+//        String realname = UserInfoEngine.getInstance().getUserInfo().getRealName();
+//        etRealname.setText(realname);
+//        etRealname.setEnabled(false);
+    }
+
+    // /////////////////////////////////////修改实名//////////////////////////////////
+
+    /**
+     * 修改实名
+     */
+    private void modifyReaname()
+    {
+        VerifyLoginPwdDialog verifyLoginPwdDialog = new VerifyLoginPwdDialog();
+        verifyLoginPwdDialog.setListener(new VerifyLoginPwdListener()
+        {
+            @Override
+            public void onSuccess(String token)
+            {
+                LogUtils.i(TAG, "验证密码成功，返回的token=" + token);
+                setRealname(token);
+            }
+
+            @Override
+            public void onFailure(String cause)
+            {
+                LogUtils.i(TAG, "验证密码失败");
+            }
+        });
+        verifyLoginPwdDialog.show(getSupportFragmentManager(), "");
+    }
+
+    /**
+     * 设置实名
+     * @param token
+     */
+    private void setRealname(String token)
+    {
+        ModifyRealnameDialog dialog = new ModifyRealnameDialog();
+        dialog.setTempToken(token);
+        dialog.setListener(new ModifyRealnameListener()
+        {
+            @Override
+            public void onSuccess(String info)
+            {
+                // 修改实名成功
+                toast.show(info);
+                onResume();
+            }
+
+            @Override
+            public void onFailure(String cause)
+            {
+                // 修改实名失败
+                toast.show(cause);
+            }
+        });
+        dialog.show(getSupportFragmentManager(), "");
+    }
+
+}

@@ -35,18 +35,18 @@ public final class ShowToMeSchoolActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        keyboardComponent = KeyboardComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        keyboardComponent = KeyboardComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         aTvUniversity = ((AutoCompleteTextView) findViewById(id.act_university));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         tvCancel = ((TextView) findViewById(id.tv_cancel));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         llShowToMeSchool = ((LinearLayout) findViewById(id.ll_show_to_me_school));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         init();
     }
 

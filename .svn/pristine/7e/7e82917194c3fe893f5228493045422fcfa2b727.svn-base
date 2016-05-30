@@ -1,0 +1,218 @@
+package cn.sx.decentworld.activity;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.SearchAdapter;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.component.ui.SearchComponent;
+import cn.sx.decentworld.dialog.CommomPromptDialogFragment;
+import cn.sx.decentworld.dialog.CommomPromptDialogFragment.OnCommomPromptListener;
+import cn.sx.decentworld.entity.LaunchChatEntity;
+import cn.sx.decentworld.entity.SearchResult;
+import cn.sx.decentworld.entity.dao.ContactUserDao;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.FileUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.widget.ClearEditText;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+
+/**
+ * @ClassName: SearchActivity.java
+ * @Description: 搜索界面
+ * @author: yj
+ * @date: 2015年7月17日 上午10:58:08
+ */
+@EActivity(R.layout.activity_contact_search)
+public class SearchActivity extends BaseFragmentActivity implements OnClickListener, OnCommomPromptListener {
+	private static final String TAG = "SearchActivity";
+	@ViewById(R.id.cet_search)
+	ClearEditText cetSearch;
+	@ViewById(R.id.tv_cancel)
+	TextView tvCancel;
+	@ViewById(R.id.tv_search)
+	TextView tvSearch;
+	@ViewById(R.id.lv_search)
+	PullToRefreshListView lvSearch;
+	private int page;
+	@Bean
+	SearchComponent searchComponent;
+	private String mSearchType;// 0表示手机号1表示dwID号3表示普通搜索
+	// private int searchType = SearchResult.SEARCH_TYPE_PHONE;//
+	// 搜索类型,默认为按电话号码搜素
+	private List<SearchResult> data; // 搜索结果的list
+	private SearchAdapter searchAdapter;
+
+	@AfterViews
+	public void init() {
+		initAdapter();
+		// rgSearchTag.setOnCheckedChangeListener(this);
+		tvCancel.setOnClickListener(this);
+		tvSearch.setOnClickListener(this);
+	}
+
+	@SuppressWarnings("unchecked")
+	private void initAdapter() {
+		data = new ArrayList<SearchResult>();
+		searchAdapter = new SearchAdapter(SearchActivity.this, data);
+		lvSearch.setAdapter(searchAdapter);
+		lvSearch.setMode(Mode.BOTH);
+		lvSearch.setOnRefreshListener(new OnRefreshListener2() {
+
+			@Override
+			public void onPullDownToRefresh(PullToRefreshBase refreshView) {
+				data.clear();
+				page = 0;
+				searchPeople(page);
+			}
+
+			@Override
+			public void onPullUpToRefresh(PullToRefreshBase refreshView) {
+				page++;
+				searchPeople(page);
+			}
+		});
+		lvSearch.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				position = position - 1;
+				SearchResult item = searchAdapter.getItem(position);
+
+				if (ContactUserDao.isContact(item.dwID)) {
+					if (FileUtils.getPromptStatus(mContext, Constants.FRIEND) == CommomPromptDialogFragment.FRIEND) {
+						Intent intent = new Intent(mContext, ChatActivity_.class);
+						LaunchChatEntity entity = new LaunchChatEntity(item.dwID, item.name, Float.valueOf(item.worth),
+								DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_FRIEND, Integer.valueOf(item.userType));
+						intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity);
+						startActivity(intent);
+					} else {
+						showCommomDialog(item, CommomPromptDialogFragment.FRIEND, "你与他是朋友关系，他与你每说一句话，将按照他的身价向你付费。同理，注意你的身价哦！");
+					}
+				} else {
+					if (FileUtils.getPromptStatus(mContext, Constants.STRANGER) == CommomPromptDialogFragment.STRANGER) {
+						Intent intent = new Intent(mContext, ChatActivity_.class);
+						LaunchChatEntity entity = new LaunchChatEntity(item.dwID, item.name, Float.valueOf(item.worth),
+								DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_STRANGER, Integer.valueOf(item.userType));
+						intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity);
+						startActivity(intent);
+					} else {
+						showCommomDialog(item, CommomPromptDialogFragment.STRANGER,
+								"你与他是陌生人关系，每人前三句是不会得到费用的。之后他与你每说一句话，将按照你的身价向你付费。同理，注意他的身价哦！");
+					}
+				}
+
+			}
+		});
+	}
+
+	private CommomPromptDialogFragment mCommomPromptDialog;
+
+	private void showCommomDialog(SearchResult searchResult, int enter, String prompt) {
+		if (null == mCommomPromptDialog) {
+			mCommomPromptDialog = new CommomPromptDialogFragment();
+		}
+		mCommomPromptDialog.setEnter(enter);
+		mCommomPromptDialog.setObject(searchResult);
+		mCommomPromptDialog.setOnCommomPromptListener(this);
+		mCommomPromptDialog.setTips(prompt);
+		mCommomPromptDialog.show(getSupportFragmentManager(), "mCommomPromptDialog");
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.tv_cancel:
+			finish();
+			break;
+		case R.id.tv_search:
+			data.clear();
+			page = 0;
+			searchPeople(page);
+			break;
+		}
+	}
+
+	private void searchPeople(int page) {
+		if (cetSearch.length() <= 0) {
+			ToastUtil.showToast("请输入要搜索的内容");
+			return;
+		}
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("searchKey", cetSearch.getText().toString());
+		map.put("page", "" + page);
+		searchComponent.searchFriendBy(map, mSearchHandler);
+	}
+
+	private Handler mSearchHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			lvSearch.onRefreshComplete();
+			switch (msg.what) {
+			case 2222:
+				try {
+					JSONObject object = new JSONObject(msg.obj.toString());
+					mSearchType = object.getString("searchType");
+					JSONArray array = object.getJSONArray("result");
+					List<SearchResult> datas = (List<SearchResult>) JsonUtils
+							.json2BeanArray(array.toString(), SearchResult.class);
+					searchAdapter.setTag(Constants.SEARCH_TYPE, mSearchType);
+					searchAdapter.setTag(Constants.MATCH, cetSearch.getText().toString());
+					if (null != datas) {
+						data.addAll(datas);
+						searchAdapter.notifyDataSetChanged();
+					}
+				} catch (JSONException e) {
+					LogUtils.e(TAG, "error---" + e);
+				}
+				break;
+			default:
+				data.clear();
+				searchAdapter.notifyDataSetChanged();
+				break;
+			}
+		};
+	};
+
+	@Override
+	public void onCommomPromtClick(View view) {
+		SearchResult searchResult = (SearchResult) mCommomPromptDialog.getObject();
+		LaunchChatEntity entity = null;
+		Intent intent = new Intent(mContext, ChatActivity_.class);
+		switch (mCommomPromptDialog.getEnter()) {
+		case CommomPromptDialogFragment.STRANGER:
+			entity = new LaunchChatEntity(searchResult.dwID, searchResult.name, Float.valueOf(searchResult.worth),
+					DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_STRANGER, Integer.valueOf(searchResult.userType));
+			break;
+		case CommomPromptDialogFragment.FRIEND:
+			entity = new LaunchChatEntity(searchResult.dwID, searchResult.name, Float.valueOf(searchResult.worth),
+					DWMessage.CHAT_TYPE_SINGLE, DWMessage.CHAT_RELATIONSHIP_FRIEND, Integer.valueOf(searchResult.userType));
+			break;
+		}
+		intent.putExtra(ChatActivity.LAUNCH_CHAT_KEY, entity);
+		startActivity(intent);
+	}
+}

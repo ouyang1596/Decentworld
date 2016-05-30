@@ -1,0 +1,226 @@
+package cn.sx.decentworld.bean;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * @author Sammax
+ *
+ */
+public class UserInfoField implements Comparable<UserInfoField> {
+	/**
+	 * 用户ID
+	 */
+	private String dwID;
+	/**
+	 * 字段
+	 */
+	private Field field;
+	/**
+	 * 字段名称
+	 */
+	private String fieldName;
+	/**
+	 * 字段码
+	 */
+	private short fieldCode;
+	/**
+	 * 字段值
+	 */
+	private String fieldValue;
+	/**
+	 * 显示权限
+	 */
+	private boolean displayAuth;
+	/**
+	 * 匿名权限
+	 */
+	private boolean anonimousAuth;
+
+	public UserInfoField(String dwID, Field field, String fieldValue, boolean displayAuth, boolean anonimousAuth) {
+		super();
+		this.dwID = dwID;
+		this.field = field;
+		this.fieldCode = this.field.getFieldCode();
+		this.fieldName = this.field.getFieldName();
+		this.fieldValue = fieldValue;
+		this.displayAuth = displayAuth;
+		this.anonimousAuth = anonimousAuth;
+	}
+
+	public UserInfoField() {
+		super();
+	}
+
+	public Field getField() {
+		if (field == null) {
+			field = Field.getField(this.fieldCode);
+		}
+		return field;
+	}
+
+	public void setField(Field field) {
+		this.field = field;
+	}
+
+	public String getDwID() {
+		return dwID;
+	}
+
+	public void setDwID(String dwID) {
+		this.dwID = dwID;
+	}
+
+	public String getFieldName() {
+		return getField().getFieldName();
+	}
+
+	public void setFieldName(String fieldName) {
+		this.fieldName = fieldName;
+	}
+
+	public short getFieldCode() {
+		return field.getFieldCode();
+	}
+
+	public void setFieldCode(short fieldCode) {
+		this.fieldCode = fieldCode;
+	}
+
+	public String getFieldValue() {
+		return fieldValue;
+	}
+
+	public void setFieldValue(String fieldValue) {
+		this.fieldValue = fieldValue;
+	}
+
+	public boolean isDisplayAuth() {
+		return displayAuth;
+	}
+
+	public void setDisplayAuth(boolean displayAuth) {
+		this.displayAuth = displayAuth;
+	}
+
+	public boolean isAnonimousAuth() {
+		return anonimousAuth;
+	}
+
+	public void setAnonimousAuth(boolean anonimousAuth) {
+		this.anonimousAuth = anonimousAuth;
+	}
+
+	public enum Field {
+		ID(0, "大腕号", 9, FieldGroup.CONTACT), ACCOUNT(1, "账号", 51, FieldGroup.SECRET), ACCOUNT_TYPE(2, "账号类型", 52,
+				FieldGroup.SECRET), SALT(3, "密码盐", 43, FieldGroup.SYSTEM), PASSWORD(4, "密码", 53, FieldGroup.SECRET), REGISTER_TIME(
+				5, "注册时间", 44, FieldGroup.SYSTEM), SUPPORTER(6, "支持者", 45, FieldGroup.SYSTEM), CARD(7, "身份证", 17,
+				FieldGroup.BASEINFO), SIGN(8, "签名", 0, FieldGroup.SIGN), WORTH(9, "身价", 8, FieldGroup.BASEINFO), WEALTH(10, "身家",
+				7, FieldGroup.BASEINFO), LOCATION(11, "位置", 5, FieldGroup.BASEINFO), OCCUPATION(12, "行业", 10, FieldGroup.BASEINFO), POSITION(
+				13, "职位", 13, FieldGroup.BASEINFO), CORPORATION(14, "公司", 11, FieldGroup.BASEINFO), SCHOOL(15, "学校", 14,
+				FieldGroup.BASEINFO), GENDER(16, "性别", 4, FieldGroup.BASEINFO), DEPARTMENT(17, "部门", 12, FieldGroup.BASEINFO), CLASS(
+				18, "班级", 16, FieldGroup.BASEINFO), QQ(19, "QQ", 29, FieldGroup.CONTACT), WECHAT(20, "微信", 30, FieldGroup.CONTACT), BLOG(
+				21, "博客", 31, FieldGroup.CONTACT), HOMETOWN(22, "家乡", 18, FieldGroup.BASEINFO), RELIGION(23, "信仰", 27,
+				FieldGroup.BASEINFO), IDOL(24, "偶像", 28, FieldGroup.BASEINFO), SPECIALITY(25, "特长", 24, FieldGroup.BASEINFO), CAR(
+				26, "车", 25, FieldGroup.BASEINFO), BLOOD_TYPE(27, "血型", 23, FieldGroup.BASEINFO), NATION(28, "国家", 25,
+				FieldGroup.BASEINFO), HEIGHT(29, "身高", 20, FieldGroup.BASEINFO), MARITAL_STATUS(30, "婚姻", 19, FieldGroup.BASEINFO), EMAIL(
+				31, "邮箱", 33, FieldGroup.CONTACT), AGE(32, "年龄", 3, FieldGroup.BASEINFO), NICKNAME(33, "昵称", 2,
+				FieldGroup.BASEINFO), LIKE_SPORT(34, "喜欢的运动", 34, FieldGroup.LIKE), LIKE_MUSIC(35, "喜欢的音乐", 35, FieldGroup.LIKE), LIKE_MOVIE(
+				36, "喜欢的电影", 37, FieldGroup.LIKE), LIKE_BOOK(37, "喜欢的书", 38, FieldGroup.LIKE), FOOT_PRINT(38, "足迹", 39,
+				FieldGroup.LIKE), LIKE_CATE(39, "喜欢的美食", 36, FieldGroup.LIKE), CONSTELLATORY(40, "星座", 22, FieldGroup.BASEINFO), MOTTO(
+				41, "座右铭", 21, FieldGroup.BASEINFO), PHONENUM(42, "手机", 32, FieldGroup.CONTACT), REALNAME(43, "实名", 1,
+				FieldGroup.BASEINFO), IS_STUDENT(44, "学生", 48, FieldGroup.SYSTEM), IS_CHANGE(45, "修改状态", 49, FieldGroup.SYSTEM), USER_TYPE(
+				46, "用户类型", 6, FieldGroup.BASEINFO), LAST_ACTIVE_TIME(47, "最近活跃时间", 50, FieldGroup.SYSTEM), INTRODUCE(48, "人物志",
+				40, FieldGroup.INTRODUCE), SHORT_INTRODUCE(49, "简介", 41, FieldGroup.INTRODUCE), RECOMMENDER(50, "推荐人", 46,
+				FieldGroup.SYSTEM), GR(51, "贵人", 26, FieldGroup.BASEINFO), BANKCARD(52, "银行卡号", 54, FieldGroup.SECRET), BANKNAME(
+				53, "银行", 55, FieldGroup.SECRET), WITHDRAW_PASSWORD(54, "收益密码", 56, FieldGroup.SECRET), INFO_VERSION(55, "信息版本号",
+				47, FieldGroup.SYSTEM), SELF_VERSION(56, "个人信息版本", 42, FieldGroup.SYSTEM), MAJOR(57, "专业", 15,
+				FieldGroup.BASEINFO);
+
+		private short fieldCode;
+		private String fieldName;
+		private short orderNum;
+		private FieldGroup group;
+		private static Map<Short, Field> map = new HashMap<Short, Field>();
+		static {
+			for (Field field : Field.values()) {
+				map.put(field.getFieldCode(), field);
+			}
+		}
+
+		private Field(int code, String name, int orderNum, FieldGroup group) {
+			this.fieldCode = (short) code;
+			this.fieldName = name;
+			this.orderNum = (short) orderNum;
+			this.group = group;
+		}
+
+		public short getFieldCode() {
+			return fieldCode;
+		}
+
+		public String getFieldName() {
+			return fieldName;
+		}
+
+		public short getOrderNum() {
+			return orderNum;
+		}
+
+		public FieldGroup getGroup() {
+			return group;
+		}
+
+		public static Field getField(int code) {
+			return map.get((short) code);
+		}
+
+	}
+
+	public enum FieldGroup {
+		SIGN(0, "个性签名"), BASEINFO(1, "基本资料"), CONTACT(2, "社交信息"), LIKE(3, "我的爱好"), INTRODUCE(4, "人物志"), SYSTEM(5, "系统信息"), SECRET(
+				6, "私密信息");
+		private short groupCode;
+		private String groupName;
+		private static Map<Short, FieldGroup> map = new HashMap<Short, FieldGroup>();
+
+		static {
+			for (FieldGroup group : FieldGroup.values()) {
+				map.put(group.getGroupCode(), group);
+			}
+		}
+
+		private FieldGroup(int code, String name) {
+			this.groupCode = (short) code;
+			this.groupName = name;
+		}
+
+		public short getGroupCode() {
+			return groupCode;
+		}
+
+		public String getGroupName() {
+			return groupName;
+		}
+
+		public static FieldGroup getFieldGroup(int code) {
+			return map.get((short) code);
+		}
+	}
+
+	@Override
+	public int compareTo(UserInfoField o) {
+		if (o == null) {
+			throw new NullPointerException();
+		}
+		return o.getField().getOrderNum() - this.getField().getOrderNum();
+	}
+
+	public static void main(String[] args) {
+		System.out.println(Field.LOCATION.getFieldName() + Field.LOCATION.getFieldCode());
+		System.out.println(Field.OCCUPATION.getFieldName() + Field.OCCUPATION.getFieldCode());
+		System.out.println(Field.POSITION.getFieldName() + Field.POSITION.getFieldCode());
+		System.out.println(Field.CORPORATION.getFieldName() + Field.CORPORATION.getFieldCode());
+
+	}
+}

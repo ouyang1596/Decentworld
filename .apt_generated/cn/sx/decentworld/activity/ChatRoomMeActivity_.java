@@ -40,10 +40,10 @@ public final class ChatRoomMeActivity_
     private void afterSetContentView_() {
         tvEditSelfInfo = ((TextView) findViewById(id.tv_edit_self_info));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        ivHead = ((CircularImageView) findViewById(id.iv_head));
+        lvChatRooms = ((ListView) findViewById(id.lv_chatrooms));
         tvCreateChatRoom = ((TextView) findViewById(id.tv_create_chatroom));
         ivBack = ((ImageView) findViewById(id.iv_back));
-        lvChatRooms = ((ListView) findViewById(id.lv_chatrooms));
-        ivHead = ((CircularImageView) findViewById(id.iv_head));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         init();
     }

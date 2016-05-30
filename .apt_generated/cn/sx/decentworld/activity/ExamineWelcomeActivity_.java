@@ -40,23 +40,23 @@ public final class ExamineWelcomeActivity_
     }
 
     private void afterSetContentView_() {
-        tvDislike = ((TextView) findViewById(id.tv_dislike));
         sbDisLike = ((SeekBar) findViewById(id.sb_dislike));
-        tvGoDoubt = ((TextView) findViewById(id.tv_go_doubt));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        llDoubtFinish = ((LinearLayout) findViewById(id.ll_doubt_finish));
-        gvSupporters = ((GridViewForScrollView) findViewById(id.gv_supporters));
-        tvFailureReason = ((TextView) findViewById(id.tv_failure_reason));
-        tvTryAgainBuy = ((TextView) findViewById(id.tv_try_again_buy));
-        tvComplain = ((TextView) findViewById(id.tv_complain));
-        viewMask = ((View) findViewById(id.view_mask));
-        llCeshi = ((LinearLayout) findViewById(id.ll_ceshi));
         sclView = ((ScrollView) findViewById(id.sclView));
-        tvSupport = ((TextView) findViewById(id.tv_support));
+        llCeshi = ((LinearLayout) findViewById(id.ll_ceshi));
+        tvDislike = ((TextView) findViewById(id.tv_dislike));
+        viewMask = ((View) findViewById(id.view_mask));
         llGv = ((LinearLayout) findViewById(id.ll_gv));
         sbNotReal = ((SeekBar) findViewById(id.sb_not_real));
-        tvNotReal = ((TextView) findViewById(id.tv_not_real));
+        llDoubtFinish = ((LinearLayout) findViewById(id.ll_doubt_finish));
+        tvComplain = ((TextView) findViewById(id.tv_complain));
+        tvGoDoubt = ((TextView) findViewById(id.tv_go_doubt));
+        tvSupport = ((TextView) findViewById(id.tv_support));
+        tvTryAgainBuy = ((TextView) findViewById(id.tv_try_again_buy));
         sbSupport = ((SeekBar) findViewById(id.sb_support));
+        tvFailureReason = ((TextView) findViewById(id.tv_failure_reason));
+        gvSupporters = ((GridViewForScrollView) findViewById(id.gv_supporters));
+        tvNotReal = ((TextView) findViewById(id.tv_not_real));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((RechargeComponent_) rechargeComponent).afterSetContentView_();
         init();
     }

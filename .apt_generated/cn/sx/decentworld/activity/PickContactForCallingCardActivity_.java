@@ -41,10 +41,10 @@ public final class PickContactForCallingCardActivity_
 
     private void afterSetContentView_() {
         tvCancel = ((TextView) findViewById(id.tv_cancel));
+        lvContact = ((ListView) findViewById(id.lv_contact));
+        lvSearch = ((PullToRefreshListView) findViewById(id.lv_search));
         cetSearch = ((ClearEditText) findViewById(id.cet_search));
         tvSearch = ((TextView) findViewById(id.tv_search));
-        lvSearch = ((PullToRefreshListView) findViewById(id.lv_search));
-        lvContact = ((ListView) findViewById(id.lv_contact));
         ((ToastComponent_) toast).afterSetContentView_();
         ((SearchComponent_) searchComponent).afterSetContentView_();
         init();

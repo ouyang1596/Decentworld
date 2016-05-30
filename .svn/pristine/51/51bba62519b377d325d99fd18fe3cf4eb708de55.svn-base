@@ -1,0 +1,80 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.dao;
+
+import java.util.List;
+
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.entity.db.ConversationList;
+
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+
+/**
+ * @ClassName: DWMessageDao.java
+ * @Description: 消息数据库访问
+ * @author: cj
+ * @date: 2016年4月18日 上午9:56:53
+ */
+public class DWMessageDao
+{
+    /**
+     * 构造函数
+     */
+    public DWMessageDao()
+    {
+
+    }
+
+    // /////////////////////////////////////////静态方法///////////////////////////////////////////////////////
+    
+    /**
+     * 根据文本消息的packetID搜索唯一的DWMessage
+     * @param packetID
+     * @return
+     */
+    public static DWMessage queryItem(String packetID)
+    {
+        return new Select().from(DWMessage.class).where("txtMsgID = ?", packetID).executeSingle();
+    }
+
+    public static DWMessage queryItem(long mid)
+    {
+        return new Select().from(DWMessage.class).where("mid = ?", mid).executeSingle();
+    }
+    
+    
+    /**
+     * 退出聊天室删除聊天记录
+     * @param roomID
+     */
+    public static void deleteChatRoomMsg(String roomID)
+    {
+        new Delete().from(DWMessage.class).where("toDwId = ?", roomID).execute();
+    }
+    
+    /**
+     * 查询指定聊天室的所有信息
+     * 
+     * @return
+     */
+    public static List<DWMessage> queryChatRoomMsg(String roomID)
+    {
+        String sql = "chatType = ? and toDwId = ?";
+        return new Select().from(DWMessage.class).where(sql,DWMessage.CHAT_TYPE_MULTI,roomID).orderBy("mid").execute();
+    }
+    
+    
+    public static List<DWMessage> queryList(ConversationList conv)
+    {
+        String sql = "userID=? and chatRelationship=? and chatType=? and messageType!=?" + "and" + "((fromDwId=? and toDwId=?) or (fromDwId=? and toDwId=?))";
+        List<DWMessage> list = new Select().from(DWMessage.class)
+                .where(sql, conv.getUserID(), conv.getChatRelationship(), conv.getChatType(), DWMessage.NOTIFY, conv.getUserID(), conv.getDwID(), conv.getDwID(), conv.getUserID())
+                .orderBy("mid desc").execute();
+        return list;
+    }
+
+    // /////////////////////////////////////////私有方法///////////////////////////////////////////////////////
+
+}

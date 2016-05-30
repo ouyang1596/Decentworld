@@ -42,10 +42,10 @@ public final class ModifyPhoneNumActivity_
     }
 
     private void afterSetContentView_() {
-        mEtIdentifyingCode = ((EditText) findViewById(id.et_identifying_code));
-        mTvSendCode = ((TextView) findViewById(id.tv_send));
-        mEtPhoneNum = ((EditText) findViewById(id.et_modification_phone_num_one_number));
         mBtnNext = ((Button) findViewById(id.btn_modification_phone_num_one_next));
+        mTvSendCode = ((TextView) findViewById(id.tv_send));
+        mEtIdentifyingCode = ((EditText) findViewById(id.et_identifying_code));
+        mEtPhoneNum = ((EditText) findViewById(id.et_modification_phone_num_one_number));
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {

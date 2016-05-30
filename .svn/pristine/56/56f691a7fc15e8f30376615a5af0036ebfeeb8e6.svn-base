@@ -1,0 +1,506 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity.discover;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.BaseFragmentActivity;
+import cn.sx.decentworld.adapter.MomentAdapter;
+import cn.sx.decentworld.adapter.MomentAdapter.ClickChildItemCallback;
+import cn.sx.decentworld.adapter.MomentAdapter.ViewHolder;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.component.KeyboardComponent;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.dialog.InputNumberDialog;
+import cn.sx.decentworld.dialog.InputNumberDialog.InputNumberListener;
+import cn.sx.decentworld.dialog.ReminderDialog;
+import cn.sx.decentworld.dialog.ReminderDialog.ReminderListener;
+import cn.sx.decentworld.engine.MomentEngine;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.entity.db.MomentEntity;
+import cn.sx.decentworld.entity.db.MomentEntity.MomentType;
+import cn.sx.decentworld.fragment.PublishFragment;
+import cn.sx.decentworld.fragment.PublishFragment.OnPublishChangeListener;
+import cn.sx.decentworld.listener.GetMomentEntityListener;
+import cn.sx.decentworld.listener.PublishMomentCallback;
+import cn.sx.decentworld.logSystem.LogUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+import com.handmark.pulltorefresh.library.PullToRefreshBase;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.Mode;
+import com.handmark.pulltorefresh.library.PullToRefreshBase.OnRefreshListener2;
+import com.handmark.pulltorefresh.library.PullToRefreshListView;
+import com.nui.multiphotopicker.model.ImageItem;
+
+/**
+ * @ClassName: WorksCircleActivity.java
+ * @Description: 朋友圈界面
+ * @author: cj
+ * @date: 2016年2月22日 下午3:42:08
+ */
+@EActivity(R.layout.activity_moment)
+public class MomentActivity extends BaseFragmentActivity implements OnRefreshListener2, OnPublishChangeListener, OnClickListener {
+	private static final String TAG = "MomentActivity";
+
+	/** 请求码 **/
+	public enum REQUEST_CODE {
+		DOWN_REFRESH(1, "下拉刷新"), UP_REFRESH(2, "上拉刷新"), PUBLISH(3, "发布"), REPORT(4, "举报");
+
+		private int index;
+		private String info;
+
+		private REQUEST_CODE(int index, String info) {
+			this.index = index;
+			this.info = info;
+		}
+
+		public int getIndex() {
+			return index;
+		}
+
+		public String getInfo() {
+			return info;
+		}
+	};
+
+	/** 控件对应的级别 **/
+	public enum WIDGET_LEVEL {
+		FAMILY(3, "亲友"), FRIEND(2, "朋友"), SPECIAL(1, "特"), ALL(0, "所有人");
+		private String info;
+		private int index;
+
+		private WIDGET_LEVEL(int index, String info) {
+			this.index = index;
+			this.info = info;
+		}
+
+		public String getInfo() {
+			return info;
+		}
+
+		public int getIndex() {
+			return index;
+		}
+	};
+
+	/**
+	 * 工具类
+	 */
+
+	@Bean
+	ToastComponent toast;
+	@Bean
+	KeyboardComponent mKeyboardComponent;
+
+	/**
+	 * 界面资源
+	 */
+	// 返回
+	@ViewById(R.id.iv_moment_back)
+	ImageView mIvBack;
+	// 标题栏
+	@ViewById(R.id.tv_moment_title)
+	TextView mTvTitle;
+	// 是否处于发布状态
+	@ViewById(R.id.tv_moment_publish)
+	TextView mTvIsPublish;
+	// 朋友圈列表
+	@ViewById(R.id.plv_moment)
+	PullToRefreshListView mPlvMomentList;
+	// 发布容器
+	@ViewById(R.id.fl_moment_public_container)
+	FrameLayout mFlPublicContainer;
+
+	/**
+	 * 变量
+	 */
+	// 用户ID
+	private String userID;
+	// 朋友圈业务控制类
+	private MomentEngine mMomentEngine;
+	// 朋友圈列表数据和
+	private List<MomentEntity> mMomentListData;
+	// 朋友圈显示的适配器
+	private MomentAdapter mMomentAdapter;
+	// 发布朋友圈控件
+	private PublishFragment mPublishFragment;
+	//
+	private int height;
+	// 保存最新一条作品圈远程ID
+	private long momentID = 0;
+	// 不给谁看的列表
+	private ArrayList<String> blocklist = new ArrayList<String>();
+	// 只给谁看的列表
+	private ArrayList<String> onlyshowtolist = new ArrayList<String>();
+	// 将要发布的朋友圈实例
+	private MomentEntity entity;
+
+	/**
+	 * 入口
+	 */
+	@AfterViews
+	void init() {
+		initVariables();
+		initViews();
+		initDatas();
+	}
+
+	/**
+	 * 初始化变量
+	 */
+	private void initVariables() {
+		// 获取屏幕的宽度
+		WindowManager wm = getWindowManager();
+		height = wm.getDefaultDisplay().getHeight();
+		mIvBack.setOnClickListener(this);
+		mTvTitle.setOnClickListener(this);
+		mTvIsPublish.setOnClickListener(this);
+		userID = DecentWorldApp.getInstance().getDwID();
+		mMomentListData = new ArrayList<MomentEntity>();
+		mMomentAdapter = new MomentAdapter(this, mMomentListData, new ImpClickChildItemCallback());
+	}
+
+	/**
+	 * 初始化界面
+	 */
+	private void initViews() {
+		View headerView = View.inflate(this, R.layout.header_moment, null);
+		mPlvMomentList.getRefreshableView().addHeaderView(headerView);
+		mPlvMomentList.setAdapter(mMomentAdapter);
+		mPlvMomentList.setMode(Mode.BOTH);
+		mPlvMomentList.setOnRefreshListener(this);
+		mPublishFragment = new PublishFragment();
+		mPublishFragment.setOnPublishChangeListener(this);
+		getSupportFragmentManager().beginTransaction().add(R.id.fl_moment_public_container, mPublishFragment).commit();
+	}
+
+	/**
+	 * 初始化数据
+	 */
+	private void initDatas() {
+		LogUtils.v(TAG, "initDatas()");
+		mMomentEngine = new MomentEngine();
+		// 初始化数据
+		mMomentEngine.initData(new GetMomentEntityListener() {
+			@Override
+			public void onSuccess(List<MomentEntity> list) {
+				if (list.size() > 0) {
+					mMomentListData.addAll(list);
+					Collections.sort(mMomentListData);
+					mMomentAdapter.notifyDataSetChanged();
+					momentID = mMomentListData.get(0).getMomentID();
+				}
+			}
+
+			@Override
+			public void onFailure(String cause) {
+				toast.show(cause);
+			}
+		});
+	}
+
+	/**
+	 * 点击事件
+	 */
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		// 显示或隐藏发布界面
+		case R.id.tv_moment_publish:
+			if (mTvIsPublish.getText().equals("发布")) {
+				getSupportFragmentManager().beginTransaction().show(mPublishFragment).commit();
+				mTvIsPublish.setText("隐藏");
+			} else {
+				getSupportFragmentManager().beginTransaction().hide(mPublishFragment).commit();
+				mTvIsPublish.setText("发布");
+			}
+			break;
+		case R.id.tv_moment_title:
+			new MomentEngine().clearCacheData();
+			mMomentListData.clear();
+			mMomentAdapter.notifyDataSetChanged();
+			break;
+		case R.id.iv_moment_back:
+			finish();
+			break;
+		default:
+			break;
+		}
+	}
+
+	// ////////////////////////////////////默认...begin/////////////////////////////////
+	/**
+	 * 高度变化
+	 */
+	@Override
+	public void onHeightChnage(int height) {
+		LogUtils.i(TAG, "onHeightChnage() params[height=" + height + "]");
+		LayoutParams layoutParams = mPlvMomentList.getLayoutParams();
+		layoutParams.height = this.height - height - 50;
+		mPlvMomentList.setLayoutParams(layoutParams);
+	}
+
+	/**
+	 * 获取屏幕高度
+	 * */
+	public int getHeight() {
+		return height;
+	}
+
+	// ////////////////////////////////////默认...end/////////////////////////////////
+
+	/**
+	 * 下拉刷新
+	 */
+	@Override
+	public void onPullDownToRefresh(PullToRefreshBase refreshView) {
+		LogUtils.v(TAG, "onPullDownToRefresh() ");
+		mMomentEngine.downRefresh(momentID, 0, new GetMomentEntityListener() {
+			@Override
+			public void onSuccess(List<MomentEntity> list) {
+				if (list.size() > 0) {
+					// 将解析得到的数据添加到内存中
+					mMomentListData.addAll(0, list);
+					// 排序
+					Collections.sort(mMomentListData);
+					// 刷新界面
+					mMomentAdapter.notifyDataSetChanged();
+				} else {
+					toast.show("已经是最新数据");
+				}
+				mPlvMomentList.onRefreshComplete();
+			}
+
+			@Override
+			public void onFailure(String cause) {
+				toast.show(cause);
+				mPlvMomentList.onRefreshComplete();
+			}
+		});
+	}
+
+	/**
+	 * 上拉刷新
+	 */
+	@Override
+	public void onPullUpToRefresh(PullToRefreshBase refreshView) {
+		LogUtils.v(TAG, "onPullUpToRefresh()");
+		mMomentEngine.upRefresh(momentID, "");
+		// 刷新完毕
+		mPlvMomentList.onRefreshComplete();
+	}
+
+	/**
+	 * 发布朋友圈
+	 */
+	@Override
+	public void onPublishChange(final int choose) {
+		LogUtils.v(TAG, "onPublishChange() params[choose=" + choose + "]");
+		if (choose == WIDGET_LEVEL.ALL.getIndex()) {
+			// 需要缴费,将发布到作品圈
+			InputNumberDialog dialog = new InputNumberDialog();
+			dialog.setTitle("发布作品圈，需要缴费");
+			dialog.setHint("请输入金额(不小于5大洋)");
+			dialog.setMinNum(5);
+			dialog.setListener(new InputNumberListener() {
+				@Override
+				public void confirm(int info) {
+					publish(choose, info);
+				}
+			});
+			dialog.show(getSupportFragmentManager(), "publish");
+		} else if (choose == WIDGET_LEVEL.SPECIAL.getIndex()) {
+			// 选取联系人
+			ReminderDialog dialog = new ReminderDialog();
+			dialog.setInfo("选择联系人");
+			dialog.setListener(new ReminderListener() {
+				@Override
+				public void confirm() {
+					publish(choose, 0);
+				}
+			});
+			dialog.show(getSupportFragmentManager(), "selectContact");
+		} else {
+			// 发布到亲人或陌生人
+			publish(choose, 0);
+		}
+	}
+
+	/**
+	 * 发布朋友圈
+	 * 
+	 * @param choose
+	 * @param money
+	 */
+	private void publish(int choose, float money) {
+		entity = new MomentEntity();
+		// 根据权限获取要显示的名字
+		String publisherName = UserInfoEngine.getInstance().getShowName();
+		entity.setPublisherName(publisherName);
+		// 发布者ID
+		entity.setPublisherID(DecentWorldApp.getInstance().getDwID());
+		// 朋友圈发布的时间
+		long time = System.currentTimeMillis();
+		entity.setPublishTime(time);
+		// 朋友圈发布的级别
+		if (choose == WIDGET_LEVEL.ALL.getIndex()) {
+			entity.setLevel(MomentEntity.MomentLevel.ALL.getIndex());
+		} else if (choose == WIDGET_LEVEL.SPECIAL.getIndex() || choose == WIDGET_LEVEL.FRIEND.getIndex()) {
+			entity.setLevel(MomentEntity.MomentLevel.FRIEND.getIndex());
+		} else if (choose == WIDGET_LEVEL.FAMILY.getIndex()) {
+			entity.setLevel(MomentEntity.MomentLevel.FAMILY.getIndex());
+		}
+		// 判断消息类型
+		// 语音
+		String voiceFilePath = mPublishFragment.getVoiceFilePath();
+		if (CommUtil.isNotBlank(voiceFilePath)) {
+			entity.setContentType(MomentType.VOICE.getIndex());
+			entity.setLocalUrl(voiceFilePath);
+		}
+
+		// 图片
+		List<ImageItem> imageItems = mPublishFragment.getImageItems();
+		if (imageItems != null && imageItems.size() > 0) {
+			entity.setContentType(MomentType.IMAGE.getIndex());
+			String imagePath = "";
+			for (int i = 0; i < imageItems.size(); i++) {
+				if (!imageItems.get(i).equals("0"))
+					imagePath += imageItems.get(i).sourcePath + ";";
+			}
+			entity.setLocalUrl(imagePath);
+		}
+
+		// 文字
+		String txtContent = mPublishFragment.getText();
+		if (CommUtil.isNotBlank(txtContent)) {
+			entity.setContent(txtContent);
+		}
+		entity.setMoney(money);
+		entity.setMomentStatus(MomentEntity.MomentStatus.UNFINISHED.getIndex());
+		// 发布到网上
+		mMomentEngine.publish(entity, blocklist, onlyshowtolist, new PublishMomentCallback() {
+			@Override
+			public void onFailure(String cause) {
+				toast.show(cause);
+				Collections.sort(mMomentListData);
+				mMomentAdapter.notifyDataSetChanged();
+			}
+
+			@Override
+			public void onSuccess(MomentEntity entity, String info) {
+				toast.show(info);
+				MomentActivity.this.momentID = entity.getMomentID();
+				Collections.sort(mMomentListData);
+				mMomentAdapter.notifyDataSetChanged();
+			}
+		});
+		// 将数据添加到内存
+		mMomentListData.add(entity);
+		mMomentAdapter.notifyDataSetChanged();
+		mPlvMomentList.scrollTo(0, 0);
+		// 清除控件
+		resetPublishWidget(MomentType.getByIndex(entity.getContentType()));
+	}
+
+	/**
+	 * 重置控件
+	 */
+	private void resetPublishWidget(MomentType momentType) {
+		switch (momentType) {
+		case TXT:
+			break;
+		case VOICE:
+			if (CommUtil.isNotBlank(mPublishFragment.mVoiceFilePath)) {
+				File file = new File(mPublishFragment.mVoiceFilePath);
+				file.delete();
+				mPublishFragment.mVoiceFilePath = null;
+			}
+			mPublishFragment.llVoice.setVisibility(View.GONE);
+			break;
+		case IMAGE:
+			mPublishFragment.mImageItems.clear();
+			mPublishFragment.mImageAdapter.notifyDataSetChanged();
+			break;
+		default:
+			break;
+		}
+		mPublishFragment.clearText();
+		mKeyboardComponent.closeKeyboard(mPublishFragment.etText);
+	}
+
+	@Override
+	public void comment(String content) {
+		LogUtils.v(TAG, "comment() params[content=" + content + "]");
+	}
+
+	/**
+	 * @Description: 点击举报、赞、踩、评论、删除
+	 */
+	class ImpClickChildItemCallback implements ClickChildItemCallback {
+		@Override
+		public void onComment() {
+			LogUtils.v(TAG, "ImpClickChildItemCallback.class onComment()");
+			if (mPublishFragment.relPublish.getVisibility() == View.VISIBLE) {
+				mPublishFragment.relComment.setVisibility(View.VISIBLE);
+				mPublishFragment.relPublish.setVisibility(View.GONE);
+			} else {
+				mPublishFragment.relComment.setVisibility(View.GONE);
+				mPublishFragment.relPublish.setVisibility(View.VISIBLE);
+			}
+		}
+
+		@Override
+		public void onReport() {
+			LogUtils.v(TAG, "ImpClickChildItemCallback.class onReport()");
+		}
+
+		@Override
+		public void onDisLike() {
+			LogUtils.v(TAG, "ImpClickChildItemCallback.class onDisLike()");
+		}
+
+		@Override
+		public void onDelete() {
+			LogUtils.v(TAG, "ImpClickChildItemCallback.class onDelete()");
+		}
+
+		@Override
+		public void onLike(int position, MomentEntity entity, ViewHolder holder) {
+			LogUtils.v(TAG, "ImpClickChildItemCallback.class onLike()");
+		}
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		LogUtils.v(TAG, "onActivityResult() params[requestCode=" + requestCode + ",resultCode=" + resultCode + "]");
+		if (resultCode == RESULT_OK) {
+			if (requestCode == REQUEST_CODE.REPORT.getIndex()) {
+				// 举报
+				String info = data.getStringExtra("info");
+				int position = data.getIntExtra("positino", -1);
+				if (mMomentAdapter != null && position != -1) {
+					mMomentAdapter.report(position, info);
+				}
+			}
+		}
+	}
+
+}

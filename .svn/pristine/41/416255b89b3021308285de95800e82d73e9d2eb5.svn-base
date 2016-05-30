@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white" >
+
+        <RelativeLayout
+            android:id="@+id/ll_friends_circle_tag_1"
+            android:layout_width="41dp"
+            android:layout_height="41dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="7dp" >
+
+            <ImageView
+                android:id="@+id/iv_moment_icon"
+                android:layout_width="41dp"
+                android:layout_height="41dp"
+                android:layout_centerInParent="true" />
+
+            <TextView
+                android:id="@+id/tv_moment_publish_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0" />
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/tv_moment_publisherName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="10dp"
+            android:layout_toRightOf="@id/ll_friends_circle_tag_1"
+            android:text="我的昵称"
+            android:textSize="@dimen/text_size_13" />
+
+        <TextView
+            android:id="@+id/tv_moment_publishTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_moment_publisherName"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="6dp"
+            android:layout_toRightOf="@id/ll_friends_circle_tag_1"
+            android:text="昨天  12:05"
+            android:textColor="#9b9b9b"
+            android:textSize="@dimen/text_size_12" />
+
+        <TextView
+            android:id="@+id/tv_moment_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="21dp"
+            android:text="删除"
+            android:textColor="#4A90E2"
+            android:textSize="@dimen/text_size_12" />
+
+        <TextView
+            android:id="@+id/tv_moment_content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/ll_friends_circle_tag_1"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginTop="10dp"
+            android:ellipsize="end"
+            android:lines="2"
+            android:text=""
+            android:textSize="@dimen/text_size_15" />
+
+        <RelativeLayout
+            android:id="@+id/rl_friends_circle_file_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tv_moment_content"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" >
+
+            <LinearLayout
+                android:id="@+id/ll_moment_voice_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="visible" >
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="语音路径为：" />
+
+                <TextView
+                    android:id="@+id/tv_moment_voice_path"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="..." />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+                    <Button
+                        android:id="@+id/btn_moment_voice_paly"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:focusable="false"
+                        android:layout_height="wrap_content"
+                        android:text="播放" />
+
+                    <ImageView
+                        android:id="@+id/iv_moment_voice_anim"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="@dimen/ac_margin_right_2"
+                        android:background="@drawable/chatfrom_voice_playing" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_moment_img_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <cn.sx.decentworld.widget.ExpandGridView
+                    android:id="@+id/gv_moment_imgs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="4dp"
+                    android:background="@android:color/transparent"
+                    android:horizontalSpacing="4dp"
+                    android:listSelector="#00000000"
+                    android:numColumns="3"
+                    android:verticalSpacing="10dp" >
+                </cn.sx.decentworld.widget.ExpandGridView>
+            </LinearLayout>
+        </RelativeLayout>
+
+        <ImageView
+            android:id="@+id/iv_friends_circle_line"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@id/rl_friends_circle_file_container"
+            android:layout_marginTop="8dp"
+            android:background="#9b9b9b" />
+
+        <LinearLayout
+            android:id="@+id/ll_moment_btn_container"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:layout_below="@id/iv_friends_circle_line"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:id="@+id/ll_moment_report"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="18dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/item_work_warming" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="举报" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:background="#9b9b9b" />
+
+            <LinearLayout
+                android:id="@+id/ll_moment_like"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="18dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/item_work_warming"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:text="赞"
+                    android:textSize="@dimen/text_size_15" />
+
+                <TextView
+                    android:id="@+id/tv_moment_like"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="0" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:background="#9b9b9b" />
+
+            <LinearLayout
+                android:id="@+id/ll_moment_dislike"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="18dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/item_work_warming"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:text="踩"
+                    android:textSize="@dimen/text_size_15" />
+
+                <TextView
+                    android:id="@+id/tv_moment_dislike"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="0" />
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="2dp"
+                android:layout_marginTop="2dp"
+                android:background="#9b9b9b" />
+
+            <LinearLayout
+                android:id="@+id/ll_moment_comment"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="18dp"
+                    android:layout_marginLeft="10dp"
+                    android:src="@drawable/item_work_warming" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:text="评论" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_moment_comment_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/ll_moment_btn_container"
+            android:orientation="vertical" >
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/two_black" />
+
+            <TextView
+                android:id="@+id/tv_moment_comment_show"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="隐藏评论"
+                android:textSize="@dimen/text_size_18" />
+
+            <cn.sx.decentworld.widget.ListViewForScrollView
+                android:id="@+id/lv_moment_comment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/ac_margin_left_1"
+                android:layout_marginRight="@dimen/ac_margin_right_1" >
+            </cn.sx.decentworld.widget.ListViewForScrollView>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/iv_item_work_shadow"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_below="@id/ll_moment_comment_container"
+            android:background="@drawable/item_work_line_shadow" />
+    </RelativeLayout>
+
+</LinearLayout>

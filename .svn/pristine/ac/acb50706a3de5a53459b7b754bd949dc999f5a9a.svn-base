@@ -1,0 +1,56 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.stateMachine;
+
+import android.graphics.Bitmap;
+
+/**
+ * @ClassName: StateConfig.java
+ * @Description: 状态配置参数
+ * @author: cj
+ * @date: 2016年4月27日 下午4:10:31
+ */
+public class StateConfig
+{
+    // 等待服务器wealth回执的时间
+    public static final int WAIT_WEALTH_TIME = 10 * 1000;
+
+    // 发送消息后延迟一段时间后调用Http接口
+    // private static final int DELAY_TIME_AFTER_SEND = 5*1000;
+
+    // 发送消息后延迟一段时间后调用Http接口
+    public static final int SYS_ERROR_DELAY_TIME = 3 * 1000;
+    public static final int NET_ERROR_DELAY_TIME = 3 * 1000;
+
+    // 执行设置的次数后如果还没有结束，则强制结束，将消息发送设置为失败
+    public static final int SYS_ERROR_DEFAULT_COUNT = 3;
+    public static final int NET_ERROR_DEFAULT_COUNT = 3;
+
+    /** **/
+    public enum QueryWealthResult
+    {
+        SUCCESS_WEALTH(0, "1号消息发送成功，请求得到wealth回执"), SUCCESS_ERROR(1, "1号消息发送成功，身家不足"), FAILURE(2, "1号消息未发出"), FAILURE_SYS_ERROR(3, "服务器错误，本次请求无效"), FAILURE_SYS_ERROR_OVER_3(
+                4, "服务器错误超过三次，本次请求无效"), FAILURE_NET_ERROR(5, "网络错误，本次请求无效"), FAILURE_NET_ERROR_OVER_3(6, "网络错误，本次请求无效");
+        private int index;
+        private String info;
+
+        private QueryWealthResult(int index, String info)
+        {
+            this.index = index;
+            this.info = info;
+        }
+
+        public int getIndex()
+        {
+            return index;
+        }
+
+        public String getInfo()
+        {
+            return info;
+        }
+
+    }
+
+}

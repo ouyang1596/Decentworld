@@ -40,11 +40,11 @@ public final class RechargeAliPayWXActivity_
     }
 
     private void afterSetContentView_() {
-        llpayMethod = ((LinearLayout) findViewById(id.ll_pay_method));
         btnEunsre = ((Button) findViewById(id.btn_ensure));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         etMoney = ((EditText) findViewById(id.et_money));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        llpayMethod = ((LinearLayout) findViewById(id.ll_pay_method));
         {
             View view = findViewById(id.iv_back);
             if (view!= null) {

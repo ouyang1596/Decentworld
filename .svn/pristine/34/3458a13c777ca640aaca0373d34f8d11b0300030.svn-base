@@ -1,0 +1,12 @@
+ALTER TABLE momentEntity ADD remoteVoiceBgUrl TEXT;
+ALTER TABLE momentEntity ADD localVoiceBgUrl TEXT;
+drop table userInfo;
+drop table displayAuthority;
+drop table anonymousAuth;
+drop table userExtraInfo;
+CREATE TABLE selfExtraInfo (recomTotalBenefit REAL, grTotalBenefit REAL, autoTransfer INTEGER, iconSmall TEXT, icon TEXT, icon3 TEXT, acceptPush INTEGER, strangerNotice INTEGER, icon2 TEXT, friendNotice INTEGER, Id INTEGER PRIMARY KEY AUTOINCREMENT, accountType INTEGER, recomStoredBenefit REAL, newWorkComment TEXT, acceptCheckPush INTEGER, newMomentPublisherID TEXT, userID TEXT, newWorkPublisherID TEXT, accountName TEXT, newMomentComment TEXT);
+drop table conversationList;
+CREATE TABLE conversation (content TEXT, userID TEXT, time INTEGER, title TEXT, unRemind INTEGER, setToTop INTEGER, worth TEXT, chatRelationship INTEGER, Id INTEGER PRIMARY KEY AUTOINCREMENT, icon TEXT, dwID TEXT, chatType INTEGER, count INTEGER, msgstate INTEGER, unReadCount INTEGER, messageType INTEGER, userType INTEGER);
+drop table selfInfoEntity;
+CREATE TABLE selfInfo (versionNum TEXT, Id INTEGER PRIMARY KEY AUTOINCREMENT, userID TEXT, content TEXT);
+

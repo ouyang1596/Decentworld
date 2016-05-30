@@ -19,7 +19,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.network.request.GetStrangerInfo_;
 import cn.sx.decentworld.widget.HackyViewPager;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -39,34 +38,33 @@ public final class NearCardDetailActivity_
 
     private void init_(Bundle savedInstanceState) {
         getStrangerInfo = GetStrangerInfo_.getInstance_(this);
-        toast = ToastComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        ivRealNameOrNickName = ((ImageView) findViewById(id.iv_realname_nickname));
-        tvPerAge = ((TextView) findViewById(id.tv_per_age));
-        ivLike = ((ImageView) findViewById(id.iv_per_like));
-        ivAddFriend = ((ImageView) findViewById(id.iv_add_friend));
-        llTalkToStranger = ((LinearLayout) findViewById(id.ll_talk_stranger));
-        tvPerJob = ((TextView) findViewById(id.tv_per_job));
-        tvFinish = ((TextView) findViewById(id.tv_finish));
-        tvWealth = ((TextView) findViewById(id.tv_per_wealth));
-        ivDisLike = ((ImageView) findViewById(id.iv_per_dislike));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        mRgPerData = ((RadioGroup) findViewById(id.rg_per_data));
-        tvPerSign = ((TextView) findViewById(id.tv_per_sign));
         relTitleRoot = ((RelativeLayout) findViewById(id.rel_top_title_root));
-        tvOccupation = ((TextView) findViewById(id.tv_occupation));
-        tvPerName = ((TextView) findViewById(id.tv_per_name));
         pScrollView = ((PullToRefreshScrollView) findViewById(id.pScrollView));
+        ivAddFriend = ((ImageView) findViewById(id.iv_add_friend));
+        mRgPerData = ((RadioGroup) findViewById(id.rg_per_data));
+        mPager = ((HackyViewPager) findViewById(id.vp_near_card_detail_pager));
+        ivDoubt = ((ImageView) findViewById(id.iv_doubt));
+        tvPerJob = ((TextView) findViewById(id.tv_per_job));
+        tvPerDistance = ((TextView) findViewById(id.tv_per_distance));
+        tvWealth = ((TextView) findViewById(id.tv_per_wealth));
+        tvOccupation = ((TextView) findViewById(id.tv_occupation));
+        tvFinish = ((TextView) findViewById(id.tv_finish));
+        ivDisLike = ((ImageView) findViewById(id.iv_per_dislike));
+        tvPerName = ((TextView) findViewById(id.tv_per_name));
+        ivRealNameOrNickName = ((ImageView) findViewById(id.iv_realname_nickname));
         tvPerShortIntroduce = ((TextView) findViewById(id.tv_per_short_introduce));
         ivPerSex = ((ImageView) findViewById(id.iv_per_sex));
-        tvPerDistance = ((TextView) findViewById(id.tv_per_distance));
+        llTalkToStranger = ((LinearLayout) findViewById(id.ll_talk_stranger));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         tvPerWorth = ((TextView) findViewById(id.tv_per_worth));
-        ivDoubt = ((ImageView) findViewById(id.iv_doubt));
-        mPager = ((HackyViewPager) findViewById(id.vp_near_card_detail_pager));
+        ivLike = ((ImageView) findViewById(id.iv_per_like));
+        tvPerSign = ((TextView) findViewById(id.tv_per_sign));
+        tvPerAge = ((TextView) findViewById(id.tv_per_age));
+        tvEnjoy = ((TextView) findViewById(id.tv_enjoy));
         ((GetStrangerInfo_) getStrangerInfo).afterSetContentView_();
-        ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
 

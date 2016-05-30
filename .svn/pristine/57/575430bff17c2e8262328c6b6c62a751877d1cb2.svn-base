@@ -1,0 +1,199 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.engine;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.DisplayAuthority;
+import cn.sx.decentworld.bean.UserExtraInfo;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.entity.dao.ContactUserDao;
+import cn.sx.decentworld.entity.db.ContactUser;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.utils.JsonUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+
+/**
+ * @ClassName: ProcessUserData.java
+ * @Description: 登录加载数据后，处理用户从网络获取的数据;
+ * @author: cj
+ * @date: 2016年3月9日 下午7:22:01
+ */
+public class ProcessUserData
+{
+    private static final String TAG = "ProcessUserData";
+    private static UserInfo userInfo = null;
+    private String userID;
+    
+    /**
+     * 
+     */
+    public ProcessUserData()
+    {
+        this.userID = DecentWorldApp.getInstance().getDwID();
+    }
+    
+    /**
+     * 处理从网络获取的数据，包括联系人、权限、用户、高级设置信息
+     * @param jsonStr 服务器返回的结果
+     */
+    public void processLoginNetData(String jsonStr)
+    {
+        // 解析数据
+        JSONObject object = JSON.parseObject(jsonStr);
+        String auth = object.getString("auth");
+        ResultBean settting = JsonUtils.json2Bean(auth, ResultBean.class);
+        processSettting(settting);
+
+        // 用户权限
+        String displayAuth = object.getString("displayAuth");
+        ResultBean authBean = JsonUtils.json2Bean(displayAuth, ResultBean.class);
+        processAuth(authBean);
+        // 联系人信息
+        String friendList = object.getString("friendList");
+        ResultBean friendListBean = JsonUtils.json2Bean(friendList, ResultBean.class);
+        processContactList(friendListBean);
+        // 用户信息
+        String userInfo = object.getString("userInfo");
+        ResultBean userInfoBean = JsonUtils.json2Bean(userInfo, ResultBean.class);
+        processUserInfo(userInfoBean);
+    }
+    
+    /**
+     * 解析高级设置中的权限
+     */
+    private void processSettting(ResultBean bean)
+    {
+        UserExtraInfo extraInfo = UserExtraInfo.queryBy(userID);
+        if(extraInfo == null)
+            extraInfo = new UserExtraInfo();
+        String result = bean.getData().toString();
+        JSONObject jsonSetting = JSON.parseObject(result);
+        JSONObject setttingInfo = jsonSetting.getJSONObject("auth");
+        
+        try
+        {
+            boolean acceptPush = setttingInfo.getBooleanValue("acceptPush");
+            boolean acceptCheckPush = setttingInfo.getBooleanValue("acceptCheckPush");
+            boolean friendNotice = setttingInfo.getBooleanValue("friendNotice");
+            boolean strangerNotice = setttingInfo.getBooleanValue("strangerNotice");
+            
+            extraInfo.setAcceptPush(acceptPush);
+            extraInfo.setAcceptCheckPush(acceptCheckPush);
+            extraInfo.setFriendNotice(friendNotice);
+            extraInfo.setStrangerNotice(strangerNotice);
+            extraInfo.save();
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "parse_setting_auth...cause by:"+e.toString(),true);
+        }
+    }
+
+    /**
+     * 用户权限
+     */
+    private void processAuth(ResultBean bean)
+    {
+        String result = bean.getData().toString();
+        LogUtils.v(TAG, "开始解析用户权限信息");
+        try
+        {
+            JSONObject jsonAuth = JSON.parseObject(result);
+            JSONObject authInfo = jsonAuth.getJSONObject("displayAuth");
+            DisplayAuthority displayAuth = DisplayAuthority.queryByDwID(userID);
+
+            if (displayAuth != null)
+            {
+                displayAuth.delete();
+            }
+            if (authInfo == null)
+            {
+                LogUtils.e(TAG, "用户验证权限为null");
+                return;
+            }
+            DisplayAuthority displayAuthority = JsonUtils.json2Bean(authInfo.toString(), DisplayAuthority.class);
+            displayAuthority.save();
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "解析用户权限信息失败,cause by:" + e);
+        }
+    }
+
+    /**
+     * 联系人信息
+     */
+    private void processContactList(ResultBean bean)
+    {
+        // 清空数据库
+        ContactUserDao.deleteAll();
+        String result = bean.getData().toString();
+        LogUtils.v(TAG, "开始解析联系人信息");
+        try
+        {
+            JSONObject jsonObject = JSON.parseObject(result);
+            JSONArray array = jsonObject.getJSONArray("result");
+            if (array.size() > 0)
+            {
+
+                String userID = DecentWorldApp.getInstance().getDwID();
+                for (int i = 0; i < array.size(); i++)
+                {
+                    ContactUser temp = new ContactUser();
+                    JSONObject object = array.getJSONObject(i);
+                    temp.setUserID(userID);
+                    temp.setFriendID(object.getString("id"));
+                    temp.setShowName(object.getString("showName"));
+                    temp.setGender(object.getString("gender"));
+                    temp.setOccupation(object.getString("occupation"));
+                    temp.setUserType(object.getIntValue("userType"));
+                    temp.setWorth(object.getFloatValue("worth"));
+                    temp.save();
+                }
+            }
+            else
+            {
+                LogUtils.w(TAG, "获取联系人列表为空");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            LogUtils.i(TAG, "解析联系人列表失败,cause by:" + e);
+        }
+    }
+
+    /**
+     * 用户信息
+     */
+    private void processUserInfo(ResultBean bean)
+    {
+        String result = bean.getData().toString();
+        LogUtils.v(TAG, "开始解析用户信息");
+        try
+        {
+            JSONObject json = JSON.parseObject(result);
+            JSONObject info = json.getJSONObject("userInfo");
+            userInfo = UserInfo.queryByDwID(userID);
+            if (userInfo != null)
+            {
+                userInfo.delete();
+            }
+            userInfo = JsonUtils.json2Bean(info.toString(), UserInfo.class);
+            userInfo.setUserId(userID);
+            // 将个人信息保存到数据库中
+            userInfo.save();
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "解析用户信息失败,cause by:" + e);
+        }
+    }
+    
+
+}

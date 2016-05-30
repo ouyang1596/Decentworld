@@ -1,0 +1,265 @@
+package cn.sx.decentworld.common;
+
+/**
+ * @ClassName: Constants
+ * @Description: 网络请求常量类
+ * @author oyyj
+ * @date 2014-12-27 上午10:51:16
+ */
+public class ConstantNet {
+	// 网络请求失败
+	public static final int NET_REQUEST_FAILURE = 0;
+	// 网络请求成功
+	public static final int NET_REQUEST_SUCCESS = 1;
+	// 上传图片并获得图片的url,data:为map,key为上传时图片的fieldname，value为保存的url
+	public static final String UPLOAD_IMAGE = "/uploadImgs";
+	// 获得腕审核状态
+	public static final String API_WAN_CHECH_STATE = "/check/getStarCheckStatus";
+	// 去疑资料为假时，再次进行去疑时，交钱需要调用的接口
+	public static final String API_DOUBT_PAY_RETRY = "/check/payRetry";
+	// 去疑不通过直接买通
+	public static final String API_DOUBT_NO_PASS_BUY = "/check/guarantee";
+	// 去疑真实不喜欢免费再试一次
+	public static final String API_DOUBT_NO_PASS_RETRY_FREE = "/check/freeRetry";
+	// 升腕不通过直接买通成为普通用户
+	public static final String API_WAN_NO_PASS_BUY = "/check/starFailedGuarantee";
+	// 重置用户审核状态
+	public static final String API_WAN_RESET_CHECH_STATE = "/check/resetStarCheckStatus";
+	// 开始腕审核流程
+	public static final String API_WAN_START_CHECK = "/check/startStarCheck";
+	// 上传腕资料
+	public static final String API_WAN_UPLOAD_MATERIAL = "/check/starMaterialUpload";
+	// 登录时openfire前，从服务器获取DwID
+	public static final String API_LOGIN_GET_DWID = "/user/getUserId";
+	// 发送验证码
+	public static final String API_SEND_CODE = "/register/sendCode";
+	// 核对验证码
+	public static final String API_CHECK_CODE = "/register/checkCode";
+	// 注册提交数据
+	public static final String API_REGISTER = "/register/register";
+	// 上传简介
+	public static final String API_UPDATE_INTRODUCE = "/user/updateIntroduce";
+	// 获取简介
+	public static final String API_GET_INTRODUCE = "/user/getIntroduce";
+	// 去疑上传身份证号码和母照片
+	public static final String API_UPLOAD_CARD = "/check/uploadCard";
+
+	/**
+	 * 网络安全模块
+	 */
+	// 获得公钥
+	public static final String API_GET_KEY = "/security/getKey";
+	// 上传公钥
+	public static final String API_UPLOAD_KEY = "/security/uploadKey";
+
+	/**
+	 * 添加朋友
+	 */
+	// 发送添加朋友申请
+	public static final String API_ADD_FRIEND = "/friend/addFriend";
+	// 添加系统推荐的人为好友
+	public static final String API_ADD_FRIEND_CONTACT = "/friend/addFriendWithRemark";
+	// 删除
+	public static final String API_DELETE_FRIEND = "/friend/deleteFriend";
+	// 同意加为好友
+	public static final String API_ACCEPT_FRIEND = "/friend/acceptFriend";
+	// 拒绝加为好友
+	public static final String API_REFUSE_FRIEND = "/friend/refuseFriend";
+	// 拒绝加为好友
+	public static final String API_SET_REMARK = "/user/setRemark";
+	// 获取添加朋友的历史记录列表
+	public static final String API_NEW_FRIEND_LIST = "/friend/getFriendStatus";
+
+	/**
+	 * 收益大模块
+	 */
+	// 设置收益独立密码
+	public static final String API_DRAW_CASH_SET_PWD = "/set/withdrawPWD";
+	// 验证用户是否曾经设置过提现密码
+	public static final String API_HAS_INCOME_PWD = "/security/init";
+	// 验证
+	public static final String API_CHECK_BENEFIT_PWD = "/security/checkpwd";
+	// 重置收益独立密码
+	public static final String API_RESET_INCOME_PWD = "/set/rpwdbyold";
+
+	/**
+	 * 推荐模块
+	 */
+	// 验证即将被推荐的人是否有效
+	public static final String API_VALIDATE_RECOMMEND = "/user/validateRecommend";
+	// 获取已经推荐的人的列表
+	public static final String API_RECOMMEND_UNAVALIABLE = "/user/getRecommendNotAvaliableList";
+	// 获得推荐收益列表
+	public static final String API_RECOMMEND_BENEFIT_LIST = "/user/getRecommendList";
+
+	/**
+	 * 现金收益模块
+	 */
+	// 推荐别人获得的收益列表详情
+	public static final String API_RECOMMEND_BENEFIT_DETAIL = "/user/getRecommendDetails";
+	// 自动转账的开关状态
+	public static final String API_AUTOTRANFER_AUTHORITY = "/auth/getAutoAuthority";
+	// 设置现金收益提现账号
+	public static final String API_SET_ACCOUNT = "/user/setAccount";
+	// 设置自动转账权限
+	public static final String API_SET_AUTO_TRANSFER = "/auth/setAutoTransfer";
+	// 提取推荐收益
+	public static final String API_DRAW_RECOMMEND_BENEFIT = "/transfer/withdrawBenefit";
+	// 获得现金收益账户信息(微信或支付宝)
+	public static final String API_GET_CASH_BEBEFIT_ACCOUNT = "/user/getAccountInfo";
+
+	/**
+	 * 贵人模块
+	 */
+	// 获得谁是我的贵人
+	public static final String API_MY_GR = "/user/getMyGR";
+	// 设置我的贵人
+	public static final String API_SET_GR_TO_ME = "/user/setGR";
+	// 获取贵人详情
+	public static final String API_GET_GR_BENEFIT_HISTORY = "/history/getGRBenefitHistory";
+	// 获取我是谁的贵人的列表
+	public static final String API_GET_GR_LIST_TO_OTHER = "/user/getMyProteges";
+
+	/**
+	 * 虚拟币模块
+	 */
+	// 虚拟币兑现时，设置银行账户
+	public static final String API_DRAW_CASH_SET_ACCOUNT = "/set/bankCard";
+	// 虚拟币兑现
+	public static final String API_DRAW_CASH = "/transfer/withdrawWealth";
+
+	/**
+	 * 会话模块
+	 */
+	// 获取朋友相关的会话列表
+	public static final String API_FRIEND_CONVERSATION = "/user/getFriendContacters";
+	// 获取陌生人相关的会话列表
+	public static final String API_STRANGER_CONVERSATION = "/user/getStrangerContacters";
+	// 获取会话列表
+	public static final String API_GET_CONVERSATION_LIST_V11 = "/user/getContacters";
+
+	/**
+	 * 上传报告模块
+	 */
+	// 上传异常报告
+	public static final String API_EXCEPTION_REPORT_UPLOAD = "/exception/upload";
+	// 上传日志报告(未填写)
+	public static final String API_LOG_REPORT_UPLOAD = "/exception/upload";
+
+	/**
+	 * 修改实名模块
+	 */
+	// 验证登录密码
+	public static final String API_VERIFY_LOGIN_PWD = "/security/checkLogin";
+	// 修改实名
+	public static final String API_MODIFY_REALNAME = "/set/realName";
+
+	/**
+	 * 个人信息管理模块
+	 */
+	// 获取用户个人信息
+	public static final String API_RETRIEVE_INFO_V1 = "/user/retrieveInfo";
+	// 获取用户设置的权限
+	public static final String API_USER_AUTH_V1 = "/user/getUserAuth";
+	// 获取好友列表
+	public static final String API_GET_FRIEND_LIST_V1 = "/user/getFriendList";
+	// 登录时一次性获取数据(V1)
+	public static final String API_LOAD_ALL_DATA_V1 = "/user/loginInfo";
+	// 登录时一次性获取数据(V6)
+	public static final String API_LOAD_ALL_DATA_V6 = "/user/checkSelf";
+	// 获取身家
+	public static final String API_GET_WEALTH = "/user/getWealth";
+	// 获取身价
+	public static final String API_GET_WORTH = "/user/getWorth";
+	// 设置身价
+	public static final String API_SET_WORTH = "/user/setWorth";
+	// 设置用户信息[v1-v11]
+	public static final String API_SET_USER_INFO = "/set/updateUserInfo";
+	// 设置用户权限信息[v1-v11]
+	public static final String API_SET_USER_INFO_AUTH = "/user/setAuthority";
+	// 修改当前用户信息[v12]
+	public static final String API_SET_USER_INFO_V12 = "/set/userFields";
+	// 设置用户三张图像
+	public static final String API_SET_USER_ICON = "/set/updateImage";
+
+	/**
+	 * 设置模块
+	 */
+	// 设置“高级设置权限”
+	public static final String API_SETTING_SET_ADVANCE_AUTH = "/auth/setAuthority";
+	// 获取“高级设置权限”
+	public static final String API_SETTING_GET_ADVANCE_AUTH = "/auth/getAuthority";
+
+	/**
+	 * 聊天模块
+	 */
+	// 获取单聊历史记录
+	public static final String API_SINGLE_HISTORY_MSG = "/chatHistory/getSingleChatHistory";
+
+	/**
+	 * 聊天室模块
+	 */
+	// 聊天室删除主题
+	public static final String API_DELETE_SUBJECT = "/deleteSubjectList";
+	// 获取聊天室列表
+	public static final String API_GET_CHATROOM_LIST = "/getChatRoomList";
+	//首次进入聊天室，自动从服务器拿取历史记录
+	public static final String API_AUTO_GET_HISTORY_MSG = "/getLastChatRoomHistory";
+	//手动刷新从服务器拿取历史记录
+	public static final String API_MANUAL_GET_HISTORY_MSG = "/chatHistory/getChatRoomHistory";
+	
+
+	/**
+	 * 朋友圈模块
+	 */
+	// 朋友圈下拉刷新
+	public static final String API_MOMENT_DOWN_REFRESH = "/moment/refresh";
+	// 朋友圈上拉刷新（加载历史记录）
+	public static final String API_MOMENT_HISTORY = "/moment/getMoments";
+	// 朋友圈上拉刷新(一般在用户更换设备时，重新拉取以往时间线)
+	public static final String API_MOMENT_GET_TIMELINE = "/moment/userTimeLine";
+	// 发布朋友圈
+	public static final String API_MOMENT_PUBLISH = "/moment/publish";
+	// 朋友圈发表评论
+	public static final String API_MOMENT_COMMENT = "/moment/comment";
+	// 朋友圈订阅
+	public static final String API_MOMENT_SUBSCRIBE = "/moment/subscribe";
+	// 朋友圈取消订阅
+	public static final String API_MOMENT_REMOVE_SUBSCRIBE = "/moment/removeSubscribe";
+
+	/**
+	 * 作品圈模块
+	 */
+	// 获取作品圈列表
+	public static final String API_WORK_REFRESH = "/work/refresh";
+
+	/**
+	 * 客服模块
+	 */
+	// 获取客服列表
+	public static final String API_GET_CS_LIST = "/user/getCSList";
+
+	public static final String API_HISTORY_WORTH = "/user/checkWorthChangeHistory";
+
+	/** 隐私设置 **/
+	public static final String API_SET_PHONENUM = "/user/setPhoneNum";
+	public static final String API_RESET_PASSWORD = "/user/resetpwd";
+	// 购买股权
+	public static final String API_BUY_SHARE = "/charge/buyShare";
+	// 获取股权购买状态
+	public static final String API_GET_SHARESTATUS = "/charge/getShareStatus";
+	// 获得当前股价
+	public static final String API_GET_SHAREPRICE = "/charge/getSharePrice";
+	// 注册时验证昵称是否重复
+	public static final String API_CHECK_NICKNAME = "/register/checkNickName";
+	// 作品圈评论
+	public static final String API_WORK_COMMENT = "/work/comment";
+	
+	/*
+	 * 消息同步
+	 */
+	//查询服务器是否收到1号消息
+    public static final String API_SYNC_RECV1 = "/sync/recv";
+    //将3号消息同步到本地
+    public static final String API_SYNC_MSG_3 = "/sync/message";
+}

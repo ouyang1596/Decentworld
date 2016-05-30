@@ -125,7 +125,9 @@ public class ImageFetcher {
 			long endTime = System.currentTimeMillis();
 			Log.d(ImageFetcher.class.getName(), "use time: " + (endTime - startTime) + " ms");
 		} finally {
-			cur.close();
+			if (null != cur) {
+				cur.close();
+			}
 		}
 	}
 
@@ -139,7 +141,9 @@ public class ImageFetcher {
 			cursor = mContext.getContentResolver().query(Thumbnails.EXTERNAL_CONTENT_URI, projection, null, null, null);
 			getThumbnailColumnData(cursor);
 		} finally {
-			cursor.close();
+			if (null != cursor) {
+				cursor.close();
+			}
 		}
 	}
 

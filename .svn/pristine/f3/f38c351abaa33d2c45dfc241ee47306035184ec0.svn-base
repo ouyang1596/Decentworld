@@ -1,0 +1,360 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.engine;
+
+import java.util.List;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.UserInfoField.Field;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.entity.SelfUserField;
+import cn.sx.decentworld.entity.SelfUserInfo;
+import cn.sx.decentworld.entity.dao.SelfInfoDao;
+import cn.sx.decentworld.entity.db.SelfInfoEntity;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper;
+
+import com.alibaba.fastjson.JSON;
+
+/**
+ * @ClassName: UserInfoEngine.java
+ * @Description: 个人信息管理模块（加载、修改、上传）、其它业务信息不能放到这个类中
+ * @author: cj
+ * @date: 2016年3月15日 下午3:31:03
+ */
+public class UserInfoEngine
+{
+    private static final String TAG = "UserInfoEngine";
+    private static UserInfoEngine instance;
+    // 用户ID
+    private String userID = DecentWorldApp.getInstance().getDwID();
+    // 当前用户信息
+    private SelfUserInfo mSelfUserInfo;
+    private SelfInfoEntity entity;
+
+    /**
+     * 获取实例
+     * 
+     * @return
+     */
+    public static UserInfoEngine getInstance()
+    {
+        if (instance == null)
+        {
+            synchronized (UserInfoEngine.class)
+            {
+                if (instance == null)
+                {
+                    instance = new UserInfoEngine();
+                }
+            }
+        }
+        return instance;
+    }
+
+    // ////////////////////////////////////////////初始化数据//////////////////////////////////////////
+    /**
+     * 初始化个人信息
+     */
+    public void initSelfUserInfo()
+    {
+        LogUtils.d(TAG, "initSelfUserInfo()");
+        entity = SelfInfoDao.query(userID);
+        if (entity != null)
+        {
+            String content = entity.getContent();
+            mSelfUserInfo = JSON.parseObject(content, SelfUserInfo.class);
+            LogUtils.needModifyTag(TAG + "initSelfUserInfo() 指点的字段不能转化为json");
+            List<SelfUserField> fields = mSelfUserInfo.getFields();
+            for (SelfUserField field : fields)
+                field.setModify(false);
+        }
+        else
+        {
+            LogUtils.e(TAG, "initSelfUserInfo() 重数据库中查询SelfInfoEntity==null,userID" + userID);
+        }
+        LogUtils.v(TAG, "initSelfUserInfo() 重数据库中查询SelfInfoEntity==null,userID" + userID);
+    }
+
+    /**
+     * 当用户手动退出软件后，调用该函数清理内存中的数据
+     */
+    public void clear()
+    {
+        if (instance != null)
+        {
+            instance = null;
+        }
+    }
+
+    // ////////////////////////////////////////对方公开的方法////////////////////////////////
+
+    /**
+     * 保存个人信息到数据库
+     */
+    public void saveSelfUserInfo(String versionNum)
+    {
+        // 用户信息版本号
+        UserInfoHelper.setAllUserInfoVersion(versionNum);
+        // 修改版本号
+        getSelfUserInfo().setVersionNum(versionNum);
+        if (entity != null)
+        {
+            entity.setVersionNum(versionNum);
+            String content = JSON.toJSONString(mSelfUserInfo);
+            entity.setContent(content);
+            entity.save();
+        }
+    }
+
+    /**
+     * 获取个人信息
+     */
+    public SelfUserInfo getSelfUserInfo()
+    {
+        return mSelfUserInfo;
+    }
+
+    /**
+     * 获取用户类型
+     */
+    public int getUserTypeInt()
+    {
+        String userType = "";
+        SelfUserField userTypeField = getSelfUserInfo().getSelfUserField(Field.USER_TYPE);
+        if (userTypeField != null)
+        {
+            String fieldValue = userTypeField.getFieldValue();
+            if (CommUtil.isBlank(fieldValue))
+            {
+                userType = fieldValue;
+            }
+        }
+        if (CommUtil.isBlank(userType))
+            return 0;
+        else
+            return Integer.valueOf(userType);
+    }
+
+    /**
+     * 获取用户类型
+     */
+    public String getUserTypeString()
+    {
+        String userType = "";
+        SelfUserField userTypeField = getSelfUserInfo().getSelfUserField(Field.USER_TYPE);
+        if (userTypeField != null)
+        {
+            String fieldValue = userTypeField.getFieldValue();
+            if (CommUtil.isBlank(fieldValue))
+            {
+                userType = fieldValue;
+            }
+        }
+        return userType;
+    }
+
+    /**
+     * 获取显示的名字，按优先级顺序显示，实名、昵称
+     * 
+     * @return 名字
+     */
+    public String getShowName()
+    {
+        /** 显示实名 **/
+        SelfUserField realNameField = getSelfUserInfo().getSelfUserField(Field.REALNAME);
+        if (realNameField != null)
+        {
+            boolean displayAuth = realNameField.isDisplayAuth();
+            if (displayAuth)
+            {
+                String fieldValue = realNameField.getFieldValue();
+                if (CommUtil.isNotBlank(fieldValue))
+                {
+                    return fieldValue;
+                }
+            }
+        }
+
+        /** 显示昵称 **/
+        SelfUserField nickNameField = getSelfUserInfo().getSelfUserField(Field.NICKNAME);
+        if (nickNameField != null)
+        {
+            boolean displayAuth = nickNameField.isDisplayAuth();
+            if (displayAuth)
+            {
+                String fieldValue = nickNameField.getFieldValue();
+                if (CommUtil.isNotBlank(fieldValue))
+                {
+                    LogUtils.v(TAG, "getShowName() showNickName=" + fieldValue);
+                    return fieldValue;
+                }
+            }
+        }
+        LogUtils.v(TAG, "getShowName() the name is empty");
+        return "";
+    }
+
+    /**
+     * 获取实名
+     */
+    public String getRealName()
+    {
+        String realName = "";
+        SelfUserField realNameField = getSelfUserInfo().getSelfUserField(Field.REALNAME);
+        if (realNameField != null)
+        {
+            String fieldValue = realNameField.getFieldValue();
+            if (CommUtil.isBlank(fieldValue))
+            {
+                realName = fieldValue;
+            }
+        }
+        return realName;
+    }
+
+    /**
+     * 获取银行卡
+     */
+    public String getBankCard()
+    {
+        String bankCard = "";
+        SelfUserField bankCardField = getSelfUserInfo().getSelfUserField(Field.BANKCARD);
+        if (bankCardField != null)
+        {
+            String fieldValue = bankCardField.getFieldValue();
+            if (CommUtil.isBlank(fieldValue))
+            {
+                bankCard = fieldValue;
+            }
+        }
+        return bankCard;
+    }
+
+    /**
+     * 获取座右铭
+     */
+    public String getMotto()
+    {
+        String motto = "";
+        SelfUserField mottoField = getSelfUserInfo().getSelfUserField(Field.MOTTO);
+        if (mottoField != null)
+        {
+            String fieldValue = mottoField.getFieldValue();
+            if (CommUtil.isBlank(fieldValue))
+            {
+                motto = fieldValue;
+            }
+        }
+        return motto;
+    }
+
+    /**
+     * 保存一句话简介
+     */
+    public void saveIntroduce(String introduce, String versionNum)
+    {
+        LogUtils.d(TAG, "setIntroduce() params[introduce=" + introduce + ",versionNum=" + versionNum + "]");
+        SelfUserField introduceField = getSelfUserInfo().getSelfUserField(Field.INTRODUCE);
+        if (introduceField != null)
+        {
+            introduceField.setFieldValue(introduce);
+        }
+        if (entity != null)
+        {
+            if (!versionNum.equals("-1"))
+                entity.setVersionNum(versionNum);
+            String content = JSON.toJSONString(mSelfUserInfo);
+            entity.setContent(content);
+            entity.save();
+        }
+    }
+
+    /**
+     * 改变实名后
+     */
+    public void afterRealnameChanged(String realname, float wealth, String versionNum)
+    {
+        UserInfoEngine.getInstance().modifyRealname(realname);
+        UserInfoEngine.getInstance().notifyWealthChanged(wealth);
+        UserInfoEngine.getInstance().saveSelfUserInfo(versionNum);
+    }
+
+    /**
+     * 通知身价改变，改变内存中的数据，同时保存到数据库
+     * 
+     * @param worth
+     */
+    public void notifyWorthChanged(float worth)
+    {
+        if (worth != -1)
+        {
+            SelfUserField selfUserField = mSelfUserInfo.getSelfUserField(Field.WORTH);
+            if (selfUserField != null)
+            {
+                selfUserField.setFieldValue(String.valueOf(worth));
+            }
+
+            if (entity != null)
+            {
+                String content = JSON.toJSONString(mSelfUserInfo);
+                entity.setContent(content);
+                entity.save();
+            }
+            LogUtils.v(TAG, "notifyWorthChanged() params[worth=" + worth + ",info=" + "modify finished]");
+        }
+        else
+        {
+            LogUtils.v(TAG, "notifyWorthChanged() params[worth=" + worth + ",info=" + "not modify]");
+        }
+    }
+
+    /**
+     * 通知身家改变，改变内存中的数据，同时保存到数据库
+     */
+    public void notifyWealthChanged(float wealth)
+    {
+        if (wealth >= 0)
+        {
+            SelfUserField selfUserField = mSelfUserInfo.getSelfUserField(Field.WEALTH);
+            if (selfUserField != null)
+            {
+                selfUserField.setFieldValue(String.valueOf(wealth));
+            }
+
+            if (entity != null)
+            {
+                String content = JSON.toJSONString(mSelfUserInfo);
+                entity.setContent(content);
+                entity.save();
+            }
+            LogUtils.v(TAG, "notifyWealthChanged() params[wealth=" + wealth + ",info=" + "modify finished]");
+        }
+        else
+        {
+            LogUtils.v(TAG, "notifyWealthChanged() params[wealth=" + wealth + ",info=" + "not modify]");
+        }
+    }
+
+    // ////////////////////////////////////////私有方法////////////////////////////////
+    private UserInfoEngine()
+    {
+        // 防止构造多个实例
+    }
+
+    /**
+     * 修改实名
+     */
+    private void modifyRealname(String realname)
+    {
+        if (CommUtil.isNotBlank(realname))
+        {
+            SelfUserField realnameField = getSelfUserInfo().getSelfUserField(Field.REALNAME);
+            if (realnameField != null)
+            {
+                realnameField.setFieldValue(realname);
+            }
+        }
+    }
+}

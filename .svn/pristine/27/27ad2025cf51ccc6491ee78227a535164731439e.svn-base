@@ -1,0 +1,101 @@
+【消息提示形式】
+1.消息Entity增加两个字段 currentStatus，nextStatus;
+2.消息类型：free(绿) nomal（黄） overflow（红）;
+
+
+【提示内容(一)】
+1，陌生人对话：前三句免费，之后按照对方身价付费；
+与（他）对话，前三句免费。
+现在开始每句话要按照对方的身价向对方付费了，
+同样对方三句话过后，每句你也会收到与你身价相同的收益
+
+2，朋友对话：按照自己的身价向对方付费；
+
+知道吗!朋友之间的对话是以对方的身价为标准获得收益的。
+
+3，除了在主页面的两个放大镜以对方手机号搜索的方式外，任何方式添加朋友的动作，都要同时扣取10个大洋；“你又不认识他，你加他，系统会推送一条信息给他，所以可能会打扰到他。为此，你将被扣取十块钱；除非，你们本来就认识，那么到主页面放大镜输入他的手机号码吧”您的添加可能会造成对方压力，所以您将被扣取十块大洋！除非在主页面放大镜通过手机号搜索添加，则不会扣费。
+（已完成）
+
+4，无论陌生人还是朋友，A给B说了三句，B都没回，A继续说,继续扣费，但是B就收不到了。B什么时候开始回话之后，什么时候开始收到A的扣费。
+
+“格格巫”已经连续与你说了三句话，如果你继续不回应，公平起见将不会在这个对话中获得收益（以后将不重复提示）
+
+亲，他一直没有回复你，收益将贡献出来给运营商。
+
+
+【提示内容(二)】
+1.陌生人对话：
+1)刚进入聊天界面：
+  与他（她）对话，前三句免费，同样对方三句话过后，
+  每句你也会收到与你身价相同的收益；
+2）自己说过三句话之后：
+  现在开始你说的每句话要按照对方的身价向对方付费了；
+3）对方说过三句话之后：
+  现在开始对方每说一句话，你就会收到与自己身价等值的费用；
+4）自己连续说了三句话之后：
+  亲，他一直没有回复你，收益将贡献出来给运营商。
+5）对方连续说了三句话之后：
+ “XXX”已经连续与你说了三句话，如果你继续不回应，公平起见将不会在这个对话中获得收益（以后将不重复提示）
+
+2.朋友圈之前对话：
+1）新加的朋友界面：
+  知道吗!朋友之间的对话是以对方的身价为标准获得收益的。
+2）自己连续说了三句话之后：
+  亲，他一直没有回复你，收益将贡献出来给运营商。
+3）对方连续说了三句话之后：
+ “XXX”已经连续与你说了三句话，如果你继续不回应，公平起见将不会在这个对话中获得收益（以后将不重复提示）
+
+
+3.搜索：
+除了在主页面的两个放大镜以对方手机号搜索的方式外，任何方式添加朋友的动作，都要同时扣取10个大洋；“你又不认识他，你加他，系统会推送一条信息给他，所以可能会打扰到他。为此，你将被扣取十块钱；除非，你们本来就认识，那么到主页面放大镜输入他的手机号码吧”您的添加可能会造成对方压力，所以您将被扣取十块大洋！除非在主页面放大镜通过手机号搜索添加，则不会扣费。
+（已完成）
+
+
+
+
+
+
+
+getFistPageMsg(userID, otherID, -1，   chatType);
+getNextPageMsg(userID, otherID, minID, chatType);
+
+
+ String sql = "(userID = ? and fromDwId=? and toDwId=? and chatType = ?)" + "or" + "(userID = ? and fromDwId=? and toDwId=? and chatType= ?)";
+List<DWMessage> temp = new Select().from(DWMessage.class).where(sql, dwID, dwID, toID, chatType, dwID, toID, dwID, chatType).limit(ConstantConfig.COUNT_SINGLE_PAGE).orderBy("mid desc").execute();// ASC，添加消息id后，排序字段换成消息id
+
+
+String sql = "((userID = ? and fromDwId=? and toDwId=? and chatType = ?)" + "or" + "(userID = ? and fromDwId=? and toDwId=? and chatType = ?))" + "and mid<?";
+
+List<DWMessage> temp = new Select().from(DWMessage.class).where(sql, dwID, dwID, toID, chatType, dwID, toID, dwID, chatType, minMsgID).limit(ConstantConfig.COUNT_SINGLE_PAGE).orderBy("mid desc").execute();// ASC，添加消息id后，排序字段换成消息id
+
+
+
+getUserHistoryMsg(String dwID, String toID, long firstIndex, int chatType)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

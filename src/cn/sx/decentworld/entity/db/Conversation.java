@@ -1,0 +1,573 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.db;
+
+import java.util.List;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.entity.db.DWMessage.ChatRelationship;
+import cn.sx.decentworld.entity.db.DWMessage.ChatType;
+import cn.sx.decentworld.entity.db.DWMessage.MessageType;
+import cn.sx.decentworld.logSystem.LogUtils;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+import com.activeandroid.query.Update;
+import com.alibaba.fastjson.annotation.JSONField;
+
+/**
+ * 
+ * @ClassName: ConversationList.java
+ * @Description: 会话列表
+ * @author: cj
+ * @date: 2016年4月23日 下午3:20:33
+ */
+@Table(name = "conversation")
+public class Conversation extends Model implements Comparable<Conversation>
+{
+    // 消息是否置顶,1代表不置顶,0代表置顶，默认为不置顶
+    public static final int SET_TOP_YES = 0;
+    public static final int SET_TOP_NO = 1;
+    
+    //对方ID
+    @Column(name = "dwID")
+    private String dwID;
+    /**
+     * 图标
+     */
+    @Column(name = "icon")
+    private String icon;
+    /**
+     * 标题
+     */
+    @Column(name = "title")
+    private String title;
+    /**
+     * 内容
+     */
+    @Column(name = "content")
+    private String content;
+    /**
+     * 时间
+     */
+    @Column(name = "time")
+    private long time;
+
+    /**
+     * 消息条数
+     */
+    @Column(name = "count")
+    private int count;
+    /**
+     * 未读的消息条数
+     */
+    @Column(name = "unReadCount")
+    private int unReadCount;
+    /**
+     * 消息状态，0代表异常,1代表正常
+     */
+    @Column(name = "msgstate")
+    private int msgstate;
+    /**
+     * 是否免打扰，1代表正常，0代表屏蔽
+     */
+    @Column(name = "unRemind")
+    private int unRemind;
+    /**
+     * 消息类型,默认为文字类型
+     */
+    @Column(name = "messageType")
+    private int messageType = MessageType.TEXT.getIndex();
+    /**
+     * 是否对话置顶，默认为不置顶
+     */
+    @Column(name = "setToTop")
+    private int setToTop = SET_TOP_NO;
+    /**
+     * 聊天类型，默认为朋友单聊类型
+     */
+    @Column(name = "chatType")
+    private int chatType = ChatType.SINGLE.getIndex();
+    
+    /**
+     * 聊天关系，默认为朋友
+     */
+    @Column(name = "chatRelationship")
+    private int chatRelationship = ChatRelationship.FRIEND.getIndex();
+
+    /**
+     * 身价
+     */
+    @Column(name = "worth")
+    private String worth;
+
+    /**
+     * 用户dwID
+     */
+    @JSONField(serialize = false)
+    @Column(name = "userID")
+    private String userID;
+
+    
+    /** 用户类型 **/
+    @Column(name = "userType")
+    public int userType;
+
+    /**
+	 * 
+	 */
+    public Conversation()
+    {
+
+    }
+    
+    /**
+     * 从服务器获取好友相关会话列表时用的构造函数
+     */
+    public Conversation(String otherID,String icon, String title, String content, long time)
+    {
+        this.userID = DecentWorldApp.getInstance().getDwID();
+        this.dwID = otherID;
+        this.icon = icon;
+        this.title = title;
+        this.content = content;
+        this.time = time;
+        this.count = 0;
+        this.unReadCount = 0;
+        this.msgstate = 0;
+        this.unRemind = 0;
+        this.worth = "0";
+    }
+
+
+    /**
+     * 生成会话列表时的构造函数
+     */
+
+    public Conversation(String otherID, String icon, String title, String content,int unReadCount)
+    {
+        this(otherID, icon, title, content, System.currentTimeMillis());
+        this.unReadCount = unReadCount;
+    }
+
+
+    /**
+     * @return the icon
+     */
+    public String getIcon()
+    {
+        return icon;
+    }
+
+    /**
+     * @param icon
+     *            the icon to set
+     */
+    public void setIcon(String icon)
+    {
+        this.icon = icon;
+    }
+
+    /**
+     * @return the title
+     */
+    public String getTitle()
+    {
+        return title;
+    }
+
+    /**
+     * @param title
+     *            the title to set
+     */
+    public void setTitle(String title)
+    {
+        this.title = title;
+    }
+
+    /**
+     * @return the content
+     */
+    public String getContent()
+    {
+        return content;
+    }
+
+    /**
+     * @param content
+     *            the content to set
+     */
+    public void setContent(String content)
+    {
+        this.content = content;
+    }
+
+    /**
+     * @return the time
+     */
+    public long getTime()
+    {
+        return time;
+    }
+
+    /**
+     * @param time
+     *            the time to set
+     */
+    public void setTime(long time)
+    {
+        this.time = time;
+    }
+
+    /**
+     * @return the dwID
+     */
+    public String getDwID()
+    {
+        return dwID;
+    }
+
+    /**
+     * @param dwID
+     *            the dwID to set
+     */
+    public void setDwID(String dwID)
+    {
+        this.dwID = dwID;
+    }
+
+    /**
+     * @return the count
+     */
+    public int getCount()
+    {
+        return count;
+    }
+
+    /**
+     * @param count
+     *            the count to set
+     */
+    public void setCount(int count)
+    {
+        this.count = count;
+    }
+
+    /**
+     * @return the unReadCount
+     */
+    public int getUnReadCount()
+    {
+        return unReadCount;
+    }
+
+    /**
+     * @param unReadCount
+     *            the unReadCount to set
+     */
+    public void setUnReadCount(int unReadCount)
+    {
+        this.unReadCount = unReadCount;
+    }
+
+    /**
+     * @return the msg_state
+     */
+    public int getMsgstate()
+    {
+        return msgstate;
+    }
+
+    /**
+     * @param msg_state
+     *            the msg_state to set
+     */
+    public void setMsgstate(int msg_state)
+    {
+        this.msgstate = msg_state;
+    }
+
+    /**
+     * @return the chat_unremind
+     */
+    public int getUnRemind()
+    {
+        return unRemind;
+    }
+
+    /**
+     * @param chat_unremind
+     *            the chat_unremind to set
+     */
+    public void setUnRemind(int chat_unremind)
+    {
+        this.unRemind = chat_unremind;
+    }
+
+    /**
+     * @return the messageType
+     */
+    public int getMessageType()
+    {
+        return messageType;
+    }
+
+    /**
+     * @param messageType
+     *            the messageType to set
+     */
+    public void setMessageType(int messageType)
+    {
+        this.messageType = messageType;
+    }
+
+    /**
+     * @return the chat_type
+     */
+    public int getChatType()
+    {
+        return chatType;
+    }
+
+    /**
+     * @param chat_type
+     *            the chat_type to set
+     */
+    public void setChatType(int chat_type)
+    {
+        this.chatType = chat_type;
+    }
+
+    /**
+     * @return the chatRelationship
+     */
+    public int getChatRelationship()
+    {
+        return chatRelationship;
+
+    }
+
+    /**
+     * @param chatRelationship
+     *            the chatRelationship to set
+     */
+    public void setChatRelationship(int chatRelationship)
+    {
+        this.chatRelationship = chatRelationship;
+    }
+
+    /**
+     * @return the worth
+     */
+    public String getWorth()
+    {
+        return worth;
+    }
+
+    /**
+     * @param worth
+     *            the worth to set
+     */
+    public void setWorth(String worth)
+    {
+        this.worth = worth;
+    }
+
+    /**
+     * @return the userID
+     */
+    public String getUserID()
+    {
+        return userID;
+    }
+
+    /**
+     * @param userID
+     *            the userID to set
+     */
+    public void setUserID(String userID)
+    {
+        this.userID = userID;
+    }
+
+    /**
+     * @return the setToTop
+     */
+    public int getSetToTop()
+    {
+        return setToTop;
+    }
+
+    /**
+     * @param setToTop
+     *            the setToTop to set
+     */
+    public void setSetToTop(int setToTop)
+    {
+        this.setToTop = setToTop;
+    }
+    
+    
+    
+
+    /**
+     * @return the userType
+     */
+    public int getUserType()
+    {
+        return userType;
+    }
+
+    /**
+     * @param userType the userType to set
+     */
+    public void setUserType(int userType)
+    {
+        this.userType = userType;
+    }
+
+    /**
+     * 删除消息列表
+     */
+    public static void deleteAll()
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=?";
+        new Delete().from(Conversation.class).where(sql, userID).execute();
+    }
+
+    /**
+     * 查询指定dwID | chatType | chatRelationship 查询匹配的记录并返回结果
+     * 
+     * @param strangerID
+     * @return
+     */
+    public static Conversation queryByDwID(String otherID, int chatType, int chatRelationship)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and dwID=? and chatType = ? and chatRelationship=?";
+        return new Select().from(Conversation.class).where(sql, userID, otherID, chatType, chatRelationship).executeSingle();
+    }
+
+    /**
+     * 查询指定dwID | chatRelationship 查询匹配的记录并返回结果
+     * 
+     * @param strangerID
+     * @return
+     */
+    public static List<Conversation> queryByDwID(String otherID, int chatRelationship)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and dwID=? and chatRelationship=?";
+        return new Select().from(Conversation.class).where(sql, userID, otherID, chatRelationship).execute();
+    }
+
+    /**
+     * 查询所有记录
+     * 
+     * @return
+     */
+    public static List<Conversation> queryAll()
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=?";
+        return new Select().from(Conversation.class).where(sql, userID).orderBy("time desc").execute();
+    }
+
+    /**
+     * 改UnRealCount=0
+     */
+    public void updateUnReadCount()
+    {
+        LogUtils.i("MessageList", "updateUnReadCount");
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=?";
+        new Update(Conversation.class).set("unReadCount=0").where("userID=? and dwID=? and chatType=?", userID, this.dwID, this.chatType).execute();
+    }
+
+    /**
+     * 删除指定dwID号的消息
+     * 
+     * @param strangerID
+     */
+    public static void deleteByDwID(String otherID)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and dwID=?";
+        new Delete().from(Conversation.class).where(sql, userID, otherID).execute();
+    }
+
+    /**
+     * 更新消息
+     */
+    public void receiveMessage(DWMessage msg)
+    {
+        this.count++;
+        if (dwID != null && !dwID.equals(DecentWorldApp.getInstance().getDwID()))
+        {
+            this.unReadCount++;
+        }
+        String body = "";
+        int msgType = msg.getMessageType();
+        if (msgType == MessageType.TEXT.getIndex())
+        {
+            body = msg.getBody();
+        }
+        this.messageType = msgType;
+        this.content = body;
+        this.time = System.currentTimeMillis();
+    }
+
+    /**
+     * 删除指定dwID号的会话,用于加、删好友后的会话移动
+     * 
+     * @param dwID
+     * @param friendID
+     */
+    public static void deleteConversation(String dwID, int chatRelationship)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and dwID =? and chatRelationship=? and chatType=?";
+        new Delete().from(Conversation.class).where(sql, userID, dwID, chatRelationship, ChatType.SINGLE.getIndex()).execute();
+    }
+
+    /**
+     * 排序
+     */
+    @Override
+    public int compareTo(Conversation another)
+    {
+        // 从大到小排序
+        int order = 0;
+        if(another.getTime() - this.getTime()>0)
+        {
+            return 1;
+        }else if(another.getTime() - this.getTime()<0)
+        {
+            return -1;
+        }
+        else
+        {
+            return 0;
+        }
+
+//        return (int) (Long.valueOf(another.getTime()) - Long.valueOf(this.getTime()));
+//        return (int) (another.getTime() - this.getTime());
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return "ConversationList [dwID=" + dwID + ", icon=" + icon + ", title=" + title + ", content=" + content + ", time=" + time + ", count=" + count + ", unReadCount=" + unReadCount
+                + ", msgstate=" + msgstate + ", unRemind=" + unRemind + ", messageType=" + messageType + ", setToTop=" + setToTop + ", chatType=" + chatType + ", chatRelationship=" + chatRelationship
+                + ", worth=" + worth + ", userID=" + userID + ", userType=" + userType + "]";
+    }
+    
+}

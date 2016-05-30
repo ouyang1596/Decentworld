@@ -1,0 +1,376 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import org.simple.eventbus.EventBus;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+
+import android.os.Handler;
+import android.provider.ContactsContract.CommonDataKinds.Event;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.engine.ChatSingleEngine.GetHistoryMsgCallback;
+import cn.sx.decentworld.entity.dao.DWMessageDao;
+import cn.sx.decentworld.entity.db.DWMessage;
+import cn.sx.decentworld.entity.db.DWMessage.Direct;
+import cn.sx.decentworld.entity.db.DWMessage.MessageType;
+import cn.sx.decentworld.entity.db.DWMessage.SendStatus;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.manager.ChatManager;
+import cn.sx.decentworld.manager.SelfInfoManager;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+/**
+ * @ClassName: MessageCache
+ * @Description: 消息缓存
+ * @author: Jackchen
+ * @date: 2016年5月24日 下午6:06:20
+ */
+public class MessageCache
+{
+    private static final String TAG = "MessageCache";
+    private List<DWMessage> msgList;
+    private String otherID;
+    private int chatType;
+
+    /**
+     * 构造函数
+     */
+    public MessageCache(String otherID, int chatType)
+    {
+        this.otherID = otherID;
+        this.chatType = chatType;
+        this.msgList = new ArrayList<DWMessage>();
+    }
+
+    /**
+     * 从内存加载数据（可能为空）
+     */
+    public List<DWMessage> loadFromMemory()
+    {
+        LogUtils.v(TAG, "loadFromMemory() ");
+        if (msgList == null)
+            msgList = new ArrayList<DWMessage>();
+        return msgList;
+    }
+
+    /**
+     * 从本地数据库获取数据
+     * 
+     * @return 是否获取到数据
+     */
+    public boolean loadFromLocal()
+    {
+        LogUtils.v(TAG, "loadFromLocal() ");
+        List<DWMessage> firstPageMsg;
+        if (msgList.size() <= 0)
+        {
+            firstPageMsg = DWMessageDao.getFirstPageMsg(otherID, chatType);
+        }
+        else
+        {
+            Collections.sort(msgList);
+            long minID = msgList.get(0).getMid();
+            firstPageMsg = DWMessageDao.getNextPageMsg(otherID, chatType, minID);
+        }
+        if (firstPageMsg != null && firstPageMsg.size() > 0 && msgList != null)
+        {
+            msgList.addAll(firstPageMsg);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 从网络获取数据
+     */
+    public void loadFromNet()
+    {
+        LogUtils.v(TAG, "loadFromNet() ");
+        // 调取接口从网络获取
+        long minID = -1;
+        if (msgList.size() > 0)
+        {
+            Collections.sort(msgList);
+            minID = msgList.get(0).getMid();
+        }
+        // 获取成功或将解析的消息到内存中，并保存
+        String dwID = DecentWorldApp.getInstance().getDwID();
+        getUserHistoryMsg(dwID, otherID, minID, chatType);
+        // 通知界面刷新
+    }
+
+    /**
+     * 下拉刷新
+     */
+    public void onPullDownToRefresh()
+    {
+        LogUtils.v(TAG, "onPullDownToRefresh()");
+        if (loadFromLocal())
+            notifyPullDownFinished("onPullDownToRefresh");
+        else
+            loadFromNet();
+    }
+
+    /**
+     * 接收到一条消息
+     */
+    public void addMsg(DWMessage dwMessage)
+    {
+        LogUtils.v(TAG, "addMsg() " + dwMessage.toString());
+        // 保存到数据
+        dwMessage.save();
+        // 加到内存中
+        msgList.add(dwMessage);
+        // 通知界面刷新
+        notifyRefreshList("addMsg");
+        if (dwMessage.getDirect() == Direct.RECEIVE.ordinal())
+        {
+            // 更新身家到内存中
+            float wealth = Float.valueOf(dwMessage.getWealth());
+            SelfInfoManager.getInstance().notifyWealthChanged(wealth);
+            // 更新maxID
+            ChatManager.getInstance().setMaxID(dwMessage.getMid());
+        }
+    }
+
+    /**
+     * 收到2号消息回执后，更新对应的消息
+     */
+    public void recWealth(String packetID, long maxID, String currentStatus, String nextStatus)
+    {
+        LogUtils.v(TAG, "recWealth() params[packetID=" + packetID + ",maxID=" + maxID + ",nextStatus=" + nextStatus + ",currentStatus=" + currentStatus + "]");
+        DWMessage dwMessage = getDWMessage(packetID);
+        if (dwMessage != null)
+        {
+            dwMessage.setSendSuccess(DWMessage.SendStatus.SUCCESS_FINISH.getIndex());
+            dwMessage.setMid(maxID);
+            dwMessage.setCurrentStatus(currentStatus);
+            dwMessage.setNextStatus(nextStatus);
+            dwMessage.save();
+            notifyRefreshList("recWealth");
+        }
+        LogUtils.w(TAG, "recWealth() 内存中无packetID=" + packetID + "的消息");
+    }
+
+    /**
+     * 收到2号消息回执后，身家不足
+     */
+    public void recLackWealth(String packetID)
+    {
+        LogUtils.v(TAG, "recLackWealth() params[packetID=" + packetID + "]");
+        // toast.show("身家不足");
+        ToastUtil.showToast("身家不足");
+        DWMessage dwMessage = getDWMessage(packetID);
+        if (dwMessage != null)
+        {
+            dwMessage.setSendSuccess(DWMessage.SendStatus.FAILURE_LACK_WEALTH.getIndex());
+            dwMessage.save();
+            notifyRefreshList("recLackWealth");
+        }
+        else
+        {
+            LogUtils.w(TAG, "recLackWealth() 内存中无packetID=" + packetID + "的消息");
+        }
+    }
+
+    /**
+     * 获取单聊聊天记录
+     * 
+     * @param dwID
+     *            当前用户ID
+     * @param toID
+     *            对方ID
+     * @param firstIndex
+     *            消息的最小ID
+     * @param chatType
+     *            聊天类型
+     */
+    private void getUserHistoryMsg(String dwID, String toID, long firstIndex, int chatType)
+    {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("dwID", dwID);
+        map.put("toID", toID);
+        map.put("firstIndex", String.valueOf(firstIndex));
+        map.put("chatType", String.valueOf(chatType));
+        LogUtils.v(TAG, "getUserHistoryMsg...begin:" + JSON.toJSONString(map));
+        SendUrl sendUrl = new SendUrl(DecentWorldApp.getGlobalContext());
+        sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_SINGLE_HISTORY_MSG, Method.POST, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String response, ResultBean msg)
+            {
+                LogUtils.v(TAG, "getUserHistoryMsg...response=" + response);
+                if (msg.getResultCode() == 2222)
+                {
+                    handleResult(true, msg.getData().toString());
+                }
+                if (msg.getResultCode() == 3333)
+                {
+                    handleResult(false, msg.getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.w(TAG, "getUserHistoryMsg...onFailure,cause by:" + e);
+                handleResult(false, "网络错误");
+            }
+        });
+    }
+
+    /**
+     * 解析从网络获取的结果
+     */
+    private void handleResult(boolean isSuccess, String result)
+    {
+        // 判断是否获取成功
+        if (!isSuccess)
+        {
+            // 发送通知，从网络获取数据完毕，结果是失败
+            notifyPullDownFinished("失败");
+            return;
+        }
+
+        // 解析结果
+        LogUtils.d(TAG, "获取用户单聊历史记录成功");
+        JSONObject jsonObject = JSON.parseObject(result);
+        JSONArray array = jsonObject.getJSONArray("chatList");
+        if (array == null || array.size() <= 0)
+        {
+            notifyPullDownFinished("无结果");
+            return;
+        }
+
+        //
+        DWMessage dwMessage;
+        for (int i = 0; i < array.size(); i++)
+        {
+            JSONObject ob = array.getJSONObject(i);
+            int messageType = ob.getIntValue("messageType");
+            int direct = ob.getIntValue("direct");
+            String connectorID = ob.getString("connectorID");
+            String sendTime = ob.getString("sendTime");
+            String dwID = ob.getString("dwID");
+            long id = ob.getLongValue("id");
+            int chatType = ob.getIntValue("chatType");
+            if (direct == DWMessage.Direct.RECEIVE.ordinal())
+            {
+                dwMessage = new DWMessage(messageType , Direct.RECEIVE);
+                dwMessage.setFromDwId(connectorID);
+                dwMessage.setTo(dwID);
+            }
+            else
+            {
+                dwMessage = new DWMessage(messageType , Direct.SEND);
+                dwMessage.setTo(connectorID);
+                dwMessage.setFromDwId(dwID);
+            }
+            dwMessage.setTime(sendTime);
+            dwMessage.setMid(id);
+            dwMessage.setChatType(chatType);
+            dwMessage.setSendSuccess(SendStatus.SUCCESS.getIndex());
+            if (messageType == MessageType.TEXT.getIndex())
+            {
+                // 文字消息
+                dwMessage.setBody(ob.getString("message"));
+            }
+            else if (messageType == MessageType.VOICE.getIndex())
+            {
+                // 语音消息
+                String data = ob.getString("message");
+                JSONObject object = JSON.parseObject(data);
+                String uri = object.getString("uri");
+                int length = Integer.valueOf(object.getString("length"));
+                dwMessage.setUri(uri);
+                dwMessage.ifFromNet = 0;
+                dwMessage.setRemoteUrl(uri);
+                dwMessage.setVoiceTime(length);
+            }
+            else if (messageType == MessageType.IMAGE.getIndex())
+            {
+                // 图片消息
+                String data = ob.getString("message");
+                JSONObject object = JSON.parseObject(data);
+                String uri = object.getString("uri");
+                String img = object.getString("img");
+                File file = ImageUtils.AnalyticThumbnail(img);
+                dwMessage.setUri(file.getAbsolutePath());
+                dwMessage.setRemoteUrl(uri);
+            }
+            else if (messageType == MessageType.CARD.getIndex())
+            {
+                // 名片消息
+                String data = ob.getString("message");
+                LogUtils.i(TAG, "messageType=3," + "body=" + ob.toJSONString());
+                JSONObject object = JSON.parseObject(data);
+                String forwardName = object.getString("nickName");
+                String forwardDwId = object.getString("dwID");
+                dwMessage.setForwardDwId(forwardDwId);
+                dwMessage.setForwardName(forwardName);
+            }
+            dwMessage.setIsRead(DWMessage.ReadStatus.YES.getIndex());
+            dwMessage.save();
+            msgList.add(dwMessage);
+        }
+        notifyPullDownFinished("从网络获取单聊历史记录成功");
+    }
+
+    /**
+     * 数据操作完毕，通知下拉刷新完毕
+     * 
+     * @param 提示信息
+     */
+    private void notifyPullDownFinished(String info)
+    {
+        LogUtils.v(TAG, "notifyPullDownFinished() params[info=" + info + "]");
+        EventBus.getDefault().post(otherID + chatType, NotifyByEventBus.NT_CHAT_ACTIVITY_PULL_DOWN_FINISH);
+    }
+
+    /**
+     * 数据操作完毕，通知聊天界面刷新
+     * 
+     * @param 提示信息
+     */
+    private void notifyRefreshList(String info)
+    {
+        LogUtils.v(TAG, "notifyRefreshList() params[info=" + info + "]");
+        EventBus.getDefault().post(otherID + chatType, NotifyByEventBus.NT_CHAT_ACTIVITY_REFRESH);
+    }
+
+    /**
+     * 从列表中找出指定packetID的消息
+     */
+    private DWMessage getDWMessage(String packetID)
+    {
+        DWMessage dwMessage = null;
+        for (int i = msgList.size() - 1; i >= 0; i--)
+        {
+            if (msgList.get(i).getTxtMsgID().equals(packetID))
+            {
+                dwMessage = msgList.get(i);
+                return dwMessage;
+            }
+        }
+        return dwMessage;
+    }
+
+}

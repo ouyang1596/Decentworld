@@ -1,0 +1,58 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.config;
+
+/**
+ * @ClassName: ConstantConfig
+ * @Description: 常量配置
+ * @author: Jackchen
+ * @date: 2016年5月13日 下午6:30:54
+ */
+public class ConstantConfig
+{
+    private static final String TAG = "ConstantConfig";
+   
+    /**
+     * 支付方式
+     */
+    public enum PayMethod
+    {
+        ALIPAY(0,"ALIPAY","支付宝"),WXPAY(1,"WXPAY","微信"),NO(2,"NO","没有设置");
+        private int index;//编号
+        private String content;//服务器保存的字符串
+        private String info;//意义
+        private PayMethod(int index,String content,String info)
+        {
+            this.index = index;
+            this.content = content;
+            this.info = info;
+        }
+        public String getInfo()
+        {
+            return info;
+        }
+        public int getIndex()
+        {
+            return index;
+        }
+        public String getContent()
+        {
+            return content;
+        }
+    }
+    
+    public static final int SECOND = 1000;
+    public static final int MINUTE = 1000*60;
+    // 调用接口从服务器拿取3号消息的间隔时间(1min)
+    public static final long INTERVAL_TIME_GET_THREE_MSG = MINUTE * 5;
+    //聊天界面显示消息的时间间隔(5min)
+    public static final long INTERVAL_TIME_CHAT_MSG = MINUTE * 5;
+    //单聊每一页的消息条数，默认为十条
+    public static final int COUNT_SINGLE_PAGE = 10;
+    // 更换key的时间间隔（15min）
+    public static final long INTERVAL_TIME_KEY_UPDATE = MINUTE * 15;
+    
+    
+    
+}

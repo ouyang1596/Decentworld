@@ -1,0 +1,289 @@
+package cn.sx.decentworld.adapter;
+
+import java.util.List;
+
+import android.content.Context;
+import android.support.v4.app.FragmentManager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.NewFriend;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.dialog.AddFriendDialog;
+import cn.sx.decentworld.engine.ContactEngine;
+import cn.sx.decentworld.engine.ContactEngine.AcceptCallback;
+import cn.sx.decentworld.engine.ContactEngine.RefuseCallback;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+
+/**
+ * 
+ * @ClassName: NewFriendLVAdapter.java
+ * @Description:
+ * @author: dyq
+ * @date: 2015年9月15日 下午3:27:12
+ */
+public class NewFriendLVAdapter extends BaseAdapter
+{
+    public static final String TAG = "NewFriendLVAdapter";
+    private Context context;
+    private LayoutInflater inflater;
+    private List<NewFriend> users;
+    private FragmentManager fragmentManager;
+    private String my_dwid = DecentWorldApp.getInstance().getDwID();
+
+    public NewFriendLVAdapter(Context context, List<NewFriend> users, FragmentManager fragmentManager)
+    {
+        this.context = context;
+        this.users = users;
+        this.inflater = LayoutInflater.from(context);
+        this.fragmentManager = fragmentManager;
+    }
+
+    @Override
+    public int getCount()
+    {
+        return users.size();
+    }
+
+    @Override
+    public NewFriend getItem(int position)
+    {
+        return users.get(position);
+    }
+
+    @Override
+    public long getItemId(int position)
+    {
+        return position;
+    }
+
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent)
+    {
+        ViewHolder holder = null;
+        if (convertView == null)
+        {
+            holder = new ViewHolder();
+            convertView = inflater.inflate(R.layout.lv_newfriend_item, parent, false);
+            holder.avatar = (ImageView) convertView.findViewById(R.id.iv_newfriend);
+            holder.name = (TextView) convertView.findViewById(R.id.tv_new_friend_name);
+            holder.info = (TextView) convertView.findViewById(R.id.tv_new_fiend_info);
+            holder.tv_had_added = (TextView) convertView.findViewById(R.id.tv_had_added);
+            holder.tv_had_refused = (TextView) convertView.findViewById(R.id.tv_had_refused);
+            holder.bt_to_add = (Button) convertView.findViewById(R.id.bt_to_add);
+            holder.bt_to_refuse = (Button) convertView.findViewById(R.id.bt_to_refuse);
+            holder.tv_had_apply = (TextView) convertView.findViewById(R.id.tv_had_apply);
+            holder.tv_add_success = (TextView) convertView.findViewById(R.id.tv_add_success);
+            holder.tv_add_fail = (TextView) convertView.findViewById(R.id.tv_add_fail);
+            convertView.setTag(holder);
+        }
+        else
+        {
+            holder = (ViewHolder) convertView.getTag();
+        }
+        // 设置已显示过
+        final NewFriend ff = getItem(position);
+        ff.setIsShown(1);
+        ff.save();
+
+        // 被添加
+        if (ff.getMessageType() == NewFriend.message_be_add)
+        {
+            holder.bt_to_add.setVisibility(View.VISIBLE);
+            holder.bt_to_refuse.setVisibility(View.VISIBLE);
+            holder.tv_had_added.setVisibility(View.INVISIBLE);
+            holder.tv_had_refused.setVisibility(View.INVISIBLE);
+            holder.tv_had_apply.setVisibility(View.INVISIBLE);
+            holder.tv_add_success.setVisibility(View.INVISIBLE);
+            holder.tv_add_fail.setVisibility(View.INVISIBLE);
+
+            /**
+             * 已过期
+             */
+            if (users.get(position).getOutOfDate() == 1)
+            {
+                holder.bt_to_add.setOnClickListener(new OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        AddFriendDialog dialog = new AddFriendDialog();
+                        dialog.show(fragmentManager, "dialog");
+                    }
+                });
+                holder.bt_to_refuse.setOnClickListener(new OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        AddFriendDialog dialog = new AddFriendDialog();
+                        dialog.show(fragmentManager, "dialog");
+                    }
+                });
+            }
+            /**
+             * 未过期
+             */
+            else
+            {
+                holder.bt_to_add.setOnClickListener(new OnItemClick(ff.getOtherID()));
+                holder.bt_to_refuse.setOnClickListener(new OnItemClick(ff.getOtherID()));
+            }
+        }
+        // 主动添加后
+        else if (ff.getMessageType() == NewFriend.message_had_apply)
+        {
+            holder.bt_to_add.setVisibility(View.INVISIBLE);
+            holder.bt_to_refuse.setVisibility(View.INVISIBLE);
+            holder.tv_had_apply.setVisibility(View.VISIBLE);
+
+            holder.tv_had_added.setVisibility(View.INVISIBLE);
+            holder.tv_had_refused.setVisibility(View.INVISIBLE);
+            holder.tv_add_success.setVisibility(View.INVISIBLE);
+            holder.tv_add_fail.setVisibility(View.INVISIBLE);
+        }
+        // 已经添加
+        else if (ff.getMessageType() == NewFriend.message_had_add)
+        {
+            holder.bt_to_add.setVisibility(View.INVISIBLE);
+            holder.bt_to_refuse.setVisibility(View.INVISIBLE);
+            holder.tv_had_added.setVisibility(View.VISIBLE);
+
+            holder.tv_had_refused.setVisibility(View.INVISIBLE);
+            holder.tv_had_apply.setVisibility(View.INVISIBLE);
+            holder.tv_add_success.setVisibility(View.INVISIBLE);
+            holder.tv_add_fail.setVisibility(View.INVISIBLE);
+        }
+        // 被拒绝
+        else if (ff.getMessageType() == NewFriend.message_had_refused)
+        {
+            holder.bt_to_add.setVisibility(View.INVISIBLE);
+            holder.bt_to_refuse.setVisibility(View.INVISIBLE);
+            holder.tv_had_refused.setVisibility(View.VISIBLE);
+
+            holder.tv_had_added.setVisibility(View.INVISIBLE);
+            holder.tv_had_apply.setVisibility(View.INVISIBLE);
+            holder.tv_add_success.setVisibility(View.INVISIBLE);
+            holder.tv_add_fail.setVisibility(View.INVISIBLE);
+        }
+        // 添加成功
+        else if (ff.getMessageType() == NewFriend.message_add_success)
+        {
+            holder.bt_to_add.setVisibility(View.INVISIBLE);
+            holder.bt_to_refuse.setVisibility(View.INVISIBLE);
+            holder.tv_add_success.setVisibility(View.VISIBLE);
+
+            holder.tv_had_added.setVisibility(View.INVISIBLE);
+            holder.tv_had_refused.setVisibility(View.INVISIBLE);
+            holder.tv_had_apply.setVisibility(View.INVISIBLE);
+            holder.tv_add_fail.setVisibility(View.INVISIBLE);
+        }
+        // 添加失败
+        else if (ff.getMessageType() == NewFriend.message_add_fail)
+        {
+            holder.bt_to_add.setVisibility(View.INVISIBLE);
+            holder.bt_to_refuse.setVisibility(View.INVISIBLE);
+            holder.tv_add_fail.setVisibility(View.VISIBLE);
+
+            holder.tv_had_added.setVisibility(View.INVISIBLE);
+            holder.tv_had_refused.setVisibility(View.INVISIBLE);
+            holder.tv_had_apply.setVisibility(View.INVISIBLE);
+            holder.tv_add_success.setVisibility(View.INVISIBLE);
+        }
+        String icon = ImageUtils.getIconByDwID(ff.getOtherID(), ImageUtils.ICON_SMALL);
+        if (CommUtil.isNotBlank(icon))
+        {
+            ImageLoaderHelper.mImageLoader.displayImage(icon, holder.avatar, ImageLoaderHelper.mOptions);
+        }
+        holder.name.setText(ff.getUsername());
+        holder.info.setText(ff.getAddReason());
+        return convertView;
+    }
+
+    private class ViewHolder
+    {
+        ImageView avatar;
+        TextView name;
+        TextView info;
+        Button bt_to_add;
+        Button bt_to_refuse;
+        TextView tv_had_added;
+        TextView tv_had_refused;
+        TextView tv_had_apply;
+        TextView tv_add_success;
+        TextView tv_add_fail;
+    }
+
+    /**
+     * 拒绝和同意点击事件
+     */
+    class OnItemClick implements OnClickListener
+    {
+        private String otherID;
+
+        /**
+         * 
+         */
+        public OnItemClick(String otherID)
+        {
+            this.otherID = otherID;
+        }
+
+        @Override
+        public void onClick(View v)
+        {
+            switch (v.getId())
+            {
+                case R.id.bt_to_add:
+                    ContactEngine.getInstance().accept(otherID, new AcceptCallback()
+                    {
+                        @Override
+                        public void onSuccess(String info)
+                        {
+                            Toast.makeText(context, info, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(String cause)
+                        {
+                            Toast.makeText(context, cause, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    break;
+                case R.id.bt_to_refuse:
+                    ContactEngine.getInstance().refuse(otherID, new RefuseCallback()
+                    {
+                        @Override
+                        public void onSuccess(String info)
+                        {
+                            Toast.makeText(context, info, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(String cause)
+                        {
+                            Toast.makeText(context, cause, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                    break;
+
+                default:
+                    break;
+            }
+
+        }
+
+    }
+
+}

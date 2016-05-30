@@ -1,0 +1,34 @@
+package cn.sx.decentworld.activity;
+
+import android.widget.ListView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.UserInfo;
+import cn.sx.decentworld.bean.UserInfoField.Field;
+import cn.sx.decentworld.logSystem.LogUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+
+@EActivity(R.layout.activity_ceshi)
+public class CeshiActivity extends BaseFragmentActivity {
+	public static final String TAG = "CeshiActivity";
+	String data = "{\"resultCode\":2222,\"msg\":\"\",\"data\":{\"info\":{\"dwID\":\"905583\",\"versionNum\":\"5\",\"infos\":[{\"fieldName\":\"大腕号\",\"fieldValue\":\"隐藏\",\"fieldCode\":0,\"groupCode\":0,\"orderNum\":9},{\"fieldName\":\"身份证\",\"fieldValue\":\"隐藏\",\"fieldCode\":7,\"groupCode\":0,\"orderNum\":17},{\"fieldName\":\"签名\",\"fieldValue\":\"?????????\",\"fieldCode\":8,\"groupCode\":0,\"orderNum\":0},{\"fieldName\":\"身价\",\"fieldValue\":\"100.0\",\"fieldCode\":9,\"groupCode\":0,\"orderNum\":8},{\"fieldName\":\"位置\",\"fieldValue\":\"114.0643539428711 22.540485382080078\",\"fieldCode\":11,\"groupCode\":0,\"orderNum\":5},{\"fieldName\":\"行业\",\"fieldValue\":\"???? ??\",\"fieldCode\":12,\"groupCode\":0,\"orderNum\":10},{\"fieldName\":\"职位\",\"fieldValue\":\"\",\"fieldCode\":13,\"groupCode\":0,\"orderNum\":13},{\"fieldName\":\"公司\",\"fieldValue\":\"\",\"fieldCode\":14,\"groupCode\":0,\"orderNum\":11},{\"fieldName\":\"学校\",\"fieldValue\":\"\",\"fieldCode\":15,\"groupCode\":0,\"orderNum\":14},{\"fieldName\":\"性别\",\"fieldValue\":\"?\",\"fieldCode\":16,\"groupCode\":0,\"orderNum\":4},{\"fieldName\":\"部门\",\"fieldValue\":\"\",\"fieldCode\":17,\"groupCode\":0,\"orderNum\":12},{\"fieldName\":\"班级\",\"fieldValue\":\"\",\"fieldCode\":18,\"groupCode\":0,\"orderNum\":16},{\"fieldName\":\"QQ\",\"fieldValue\":\"隐藏\",\"fieldCode\":19,\"groupCode\":0,\"orderNum\":29},{\"fieldName\":\"微信\",\"fieldValue\":\"隐藏\",\"fieldCode\":20,\"groupCode\":0,\"orderNum\":30},{\"fieldName\":\"博客\",\"fieldValue\":\"隐藏\",\"fieldCode\":21,\"groupCode\":0,\"orderNum\":31},{\"fieldName\":\"家乡\",\"fieldValue\":\"\",\"fieldCode\":22,\"groupCode\":0,\"orderNum\":18},{\"fieldName\":\"信仰\",\"fieldValue\":\"\",\"fieldCode\":23,\"groupCode\":0,\"orderNum\":27},{\"fieldName\":\"偶像\",\"fieldValue\":\"?????,\",\"fieldCode\":24,\"groupCode\":0,\"orderNum\":28},{\"fieldName\":\"特长\",\"fieldValue\":\"??\",\"fieldCode\":25,\"groupCode\":0,\"orderNum\":24},{\"fieldName\":\"车\",\"fieldValue\":\"\",\"fieldCode\":26,\"groupCode\":0,\"orderNum\":25},{\"fieldName\":\"血型\",\"fieldValue\":\"\",\"fieldCode\":27,\"groupCode\":0,\"orderNum\":23},{\"fieldName\":\"国家\",\"fieldValue\":\"\",\"fieldCode\":28,\"groupCode\":0,\"orderNum\":25},{\"fieldName\":\"邮箱\",\"fieldValue\":\"\",\"fieldCode\":31,\"groupCode\":0,\"orderNum\":33},{\"fieldName\":\"年龄\",\"fieldValue\":\"23\",\"fieldCode\":32,\"groupCode\":0,\"orderNum\":3},{\"fieldName\":\"昵称\",\"fieldValue\":\"??\",\"fieldCode\":33,\"groupCode\":0,\"orderNum\":2},{\"fieldName\":\"喜欢的运动\",\"fieldValue\":\"\",\"fieldCode\":34,\"groupCode\":0,\"orderNum\":34},{\"fieldName\":\"喜欢的音乐\",\"fieldValue\":\"\",\"fieldCode\":35,\"groupCode\":0,\"orderNum\":35},{\"fieldName\":\"喜欢的电影\",\"fieldValue\":\"???????\",\"fieldCode\":36,\"groupCode\":0,\"orderNum\":37},{\"fieldName\":\"喜欢的书\",\"fieldValue\":\"\",\"fieldCode\":37,\"groupCode\":0,\"orderNum\":38},{\"fieldName\":\"足迹\",\"fieldValue\":\"\",\"fieldCode\":38,\"groupCode\":0,\"orderNum\":39},{\"fieldName\":\"喜欢的美食\",\"fieldValue\":\"\",\"fieldCode\":39,\"groupCode\":0,\"orderNum\":36},{\"fieldName\":\"星座\",\"fieldValue\":\"\",\"fieldCode\":40,\"groupCode\":0,\"orderNum\":22},{\"fieldName\":\"座右铭\",\"fieldValue\":\"???????????????\",\"fieldCode\":41,\"groupCode\":0,\"orderNum\":21},{\"fieldName\":\"手机\",\"fieldValue\":\"15217382716\",\"fieldCode\":42,\"groupCode\":0,\"orderNum\":32},{\"fieldName\":\"用户类型\",\"fieldValue\":\"0\",\"fieldCode\":46,\"groupCode\":0,\"orderNum\":6},{\"fieldName\":\"人物志\",\"fieldValue\":\"??\",\"fieldCode\":48,\"groupCode\":0,\"orderNum\":40},{\"fieldName\":\"简介\",\"fieldValue\":\"???\",\"fieldCode\":49,\"groupCode\":0,\"orderNum\":41},{\"fieldName\":\"身家\",\"fieldValue\":\"2900\",\"fieldCode\":10,\"groupCode\":0,\"orderNum\":7}]}}}";
+	private ListView lv;
+
+	@AfterViews
+	void init() {
+
+	}
+
+	private void parserJson() {
+		com.alibaba.fastjson.JSONObject json = JSON.parseObject(data);
+		String infoString = json.getJSONObject("data").getString("info");
+		UserInfo info = JSON.parseObject(infoString, UserInfo.class);
+		LogUtils.d(TAG, "dwID:" + info.getDwID());
+		LogUtils.d(TAG, "version:" + info.getVersionNum());
+		LogUtils.d(TAG, "wealth field name:" + info.getFieldName(Field.WEALTH));
+		LogUtils.d(TAG, "wealth field value:" + info.getFieldValue(Field.WEALTH));
+		LogUtils.d(TAG, "wealth group name:" + info.getGroupName(Field.WEALTH));
+	}
+}

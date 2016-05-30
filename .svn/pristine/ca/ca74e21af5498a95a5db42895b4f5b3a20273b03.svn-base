@@ -1,0 +1,49 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+/**
+ * @ClassName: CommentBean.java
+ * @author: yj
+ * @date: 2016年3月7日 下午3:32:09
+ */
+public class CommentBean {
+	public static final int NORMAL = 0;//评论
+	public static final int LIKE = 1;//赞
+	public static final int SUPERDISLIKE = 3;//踩
+	public static final int REPORT = 4;//举报
+
+	/**
+	 * 作品Id
+	 */
+	public long workID;
+
+	/**
+	 * 朋友圈发布者ID
+	 */
+	public String publisherID;
+	/**
+	 * 评论者名字
+	 */
+	public String publisherName;
+
+	/**
+	 * 评论人的ID
+	 */
+	public String dwID;
+
+	/**
+	 * 回复人的ID，当无回复人时，该值可为空
+	 */
+	public String reply;
+	/**
+	 * 评论类型,包括普通文字评论(0)，赞(1)，踩(3),举报(4)
+	 */
+	public int type;
+
+	/**
+	 * 评论内容，当为文字评论时该值不可为空
+	 */
+	public String content;
+}

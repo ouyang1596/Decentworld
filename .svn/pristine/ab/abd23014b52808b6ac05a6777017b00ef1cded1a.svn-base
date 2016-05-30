@@ -1,0 +1,201 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.dialog;
+
+import java.util.HashMap;
+
+import android.app.Dialog;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.DialogFragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.UserInfoField.Field;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.entity.db.UserInfo;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+
+/**
+ * @ClassName: ModifyRealnameDialog.java
+ * @Description: 修改实名对话框
+ * @author: cj
+ * @date: 2016年3月24日 上午10:53:40
+ */
+public class ModifyRealnameDialog extends DialogFragment implements OnClickListener
+{
+    private static final String TAG = "ModifyRealnameDialog";
+    private EditText etRealname;
+    private Button btnSubmit;
+    private ModifyRealnameListener listener;
+    private String tempToken;
+
+    /**
+     * 设置临时token
+     * 
+     * @param token
+     */
+    public void setTempToken(String tempToken)
+    {
+        this.tempToken = tempToken;
+    }
+
+    /**
+     * 设置监听
+     * 
+     * @param listener
+     */
+    public void setListener(ModifyRealnameListener listener)
+    {
+        this.listener = listener;
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState)
+    {
+        Dialog dialog = new Dialog(getActivity() , R.style.ShouchangDialog);
+        return dialog;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
+    {
+        View view = inflater.inflate(R.layout.dialog_modify_realname, container, false);
+        etRealname = (EditText) view.findViewById(R.id.et_modify_realname);
+        btnSubmit = (Button) view.findViewById(R.id.btn_belong_dialog_submit);
+        btnSubmit.setOnClickListener(this);
+        return view;
+    }
+
+    @Override
+    public void onClick(View v)
+    {
+        switch (v.getId())
+        {
+            case R.id.btn_belong_dialog_submit:
+                String realName = etRealname.getText().toString();
+                if (CommUtil.isBlank(realName))
+                {
+                    Toast.makeText(getActivity(), "请填写实名", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                modifyRealname(realName);
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * 修改实名
+     * 
+     * @param realName
+     */
+    private void modifyRealname(final String realName)
+    {
+        final Handler handler = new Handler()
+        {
+            public void handleMessage(android.os.Message msg)
+            {
+                if (msg.what == 1)
+                {
+                    listener.onSuccess(msg.obj.toString());
+                    dismiss();
+                }
+                else
+                {
+                    listener.onFailure(msg.obj.toString());
+                    dismiss();
+                }
+            };
+        };
+
+        String dwID = DecentWorldApp.getInstance().getDwID();
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("dwID", dwID);
+        map.put("realName", realName);
+        map.put("tempToken", tempToken);
+        LogUtils.v(TAG, "modifyRealname() params:" + JSON.toJSONString(map));
+        SendUrl sendUrl = new SendUrl(getActivity());
+        sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_MODIFY_REALNAME, Method.GET, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String resultJSON, ResultBean resultBean)
+            {
+                LogUtils.v(TAG, "modifyRealname() onSuccess,resultJSON:" + resultJSON);
+                if (resultBean.getResultCode() == 2222)
+                {
+                    LogUtils.v(TAG, "modifyRealname() success");
+                    // 解析服务器返回的数据
+                    JSONObject jsonStr = JSON.parseObject(resultBean.getData().toString());
+                    String versionNum = jsonStr.getString("versionNum");
+                    float wealth = jsonStr.getFloatValue("wealth");
+                    // 修改内存和数据库中的数据
+                    UserInfoEngine.getInstance().notifyWealthChanged(wealth);
+                    UserInfoEngine.getInstance().saveSelfUserInfo(versionNum);
+                    // 通知
+                    Message message = Message.obtain();
+                    message.what = 1;
+                    message.obj = "修改成功";
+                    handler.sendMessage(message);
+                }
+                else if(resultBean.getResultCode() == 3333)
+                {
+                    //身家不足
+                    LogUtils.v(TAG, "modifyRealname() failure,cause by:" + resultBean.getMsg());
+                    Message message = Message.obtain();
+                    message.what = 0;
+                    message.obj = resultBean.getMsg();
+                    handler.sendMessage(message);
+                }
+                else
+                {
+                    LogUtils.w(TAG, "modifyRealname() failure,未知返回码，resultJSON：" + resultJSON);
+                    Message message = Message.obtain();
+                    message.what = 0;
+                    message.obj = resultBean.getMsg();
+                    handler.sendMessage(message);
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.e(TAG, "modifyRealname() onFailure,cause by:" + e);
+                Message message = Message.obtain();
+                message.what = 0;
+                message.obj = Constants.NET_WRONG;
+                handler.sendMessage(message);
+            }
+        });
+    }
+
+    /**
+     * 回调监听
+     */
+    public interface ModifyRealnameListener
+    {
+        public void onSuccess(String info);
+
+        public void onFailure(String cause);
+    }
+
+}

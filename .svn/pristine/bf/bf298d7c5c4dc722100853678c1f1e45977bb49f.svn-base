@@ -1,0 +1,53 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.stateMachine;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.jivesoftware.smack.packet.Packet;
+
+import android.os.Handler;
+import cn.sx.decentworld.bean.DWMessage;
+
+/**
+ * @ClassName: Send.java
+ * @Description: 
+ * @author: cj
+ * @date: 2016年4月25日 下午9:36:01
+ */
+public class Send
+{
+    //发送消息后延迟一段时间后调用Http接口
+    private static final int delayTime = 5*1000;
+    //保存将要处理的消息
+    private static Map<String,DWMessage> msgMap = new HashMap<String, DWMessage>();
+    
+    /**
+     * 发送一条消息
+     */
+    public Send(DWMessage dwMessage)
+    {
+        msgMap.put(dwMessage.getTxtMsgID(), dwMessage);
+        Thread thread = new Thread(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep(delayTime);
+                }
+                catch (InterruptedException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+        thread.start();
+    }
+ 
+    
+
+}

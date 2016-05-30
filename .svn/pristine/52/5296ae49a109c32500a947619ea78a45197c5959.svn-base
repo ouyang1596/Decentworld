@@ -1,0 +1,445 @@
+/**
+ * Copyright (C) 2013-2014 EaseMob Technologies. All rights reserved.
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package cn.sx.decentworld.activity;
+
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+
+import org.jivesoftware.smack.XMPPException;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.abstractclass.AbstractTextWatcher;
+import cn.sx.decentworld.common.ConstantIntent;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.component.KeyboardComponent;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.connect.XmppHelper;
+import cn.sx.decentworld.engine.UserDataEngine;
+import cn.sx.decentworld.engine.UserDataEngine.GetUserIDListener;
+import cn.sx.decentworld.listener.LoginListener;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.utils.AES;
+import cn.sx.decentworld.utils.DataConvertUtils;
+import cn.sx.decentworld.utils.TimeUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper.LoginType;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+import com.nui.multiphotopicker.model.ImageItem;
+import com.nui.multiphotopicker.util.IntentConstants;
+import com.tencent.mm.sdk.modelmsg.SendAuth;
+import com.tencent.mm.sdk.openapi.IWXAPI;
+import com.tencent.mm.sdk.openapi.WXAPIFactory;
+
+/**
+ * 登陆页面
+ */
+@EActivity(R.layout.activity_login)
+public class LoginActivity extends BaseFragmentActivity implements OnClickListener {
+	/**
+	 * 常量
+	 */
+	private static final String TAG = "LoginActivity";
+	private static final String AREADY_LOGIN = "已经登录过";
+	private static final String ACCOUNT_ERROR = "账号或密码错误";
+	public static final int toNextDialog = 1;
+	public static final int REQUEST_CODE_SETNICK = 1;
+	/**
+	 * 界面资源
+	 */
+	@ViewById(R.id.et_mobile)
+	EditText etMobile;
+	@ViewById(R.id.et_password)
+	EditText etPassword;
+	@ViewById(R.id.btn_login)
+	Button btnLogin;
+	@ViewById(R.id.fl_login)
+	LinearLayout flLogin;
+	@ViewById(R.id.iv_forget_password)
+	ImageView ivForgetPwd;
+	@ViewById(R.id.iv_register)
+	ImageView ivRegister;
+	@ViewById(R.id.tv_ceshi)
+	TextView tvCeshi;
+	@ViewById(R.id.iv_weixin_authorize)
+	ImageView ivWeixinAuthorize;
+
+	/**
+	 * 工具类
+	 */
+	@Bean
+	ToastComponent toast;
+	@Bean
+	KeyboardComponent keyboardComponent;
+
+	/**
+	 * 变量
+	 */
+	private String mobile, password;
+	private static Float retryTimes;
+	private boolean progressShow;
+	private ProgressDialog mProgressDialog;
+	private IWXAPI wxReq;
+	private SendUrl mSendUrl;
+
+	/**
+	 * 入口
+	 */
+	@AfterViews
+	public void init() {
+		EventBus.getDefault().register(this);
+		mSendUrl = new SendUrl(this);
+		initListener();
+		etMobile.addTextChangedListener(new AbstractTextWatcher() {
+			@Override
+			public void onTextChanged(CharSequence str, int start, int before, int count) {
+				DataConvertUtils.formatPhone(str.toString(), etMobile);
+			}
+		});
+		wxReq = WXAPIFactory.createWXAPI(this, Constants.APP_ID);
+	}
+
+
+	/**
+	 * 初始化监听
+	 */
+	private void initListener() {
+		btnLogin.setOnClickListener(this);
+		ivForgetPwd.setOnClickListener(this);
+		ivRegister.setOnClickListener(this);
+		flLogin.setOnClickListener(this);
+        tvCeshi.setOnClickListener(this);
+        ivWeixinAuthorize.setOnClickListener(this);
+	}
+
+	/**
+	 * 点击事件
+	 */
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.btn_login:
+			// 删除日志文件夹中的所有日志文件
+			LogUtils.deleteLogFile();
+			String phoneNum = etMobile.getText().toString().replaceAll(" ", "");
+			if (phoneNum.length() <= 0) {
+				toast.show("请先输入手机号");
+				return;
+			}
+			if (phoneNum.length() != 11) {
+				toast.show("输入的手机号格式不正确");
+				return;
+			}
+			mobile = phoneNum;
+			if (etPassword.length() <= 0) {
+				toast.show("请输入密码");
+				return;
+			}
+			// 对明文密码进行AES加密
+			password = AES.encode(etPassword.getText().toString());
+			UserInfoHelper.saveLoginType(LoginType.PHONE_NUM.getType());
+			getUserdwID(mobile);
+			break;
+		case R.id.iv_register:
+			startActivity(new Intent(LoginActivity.this, RegisterMobileActivity_.class));
+			break;
+		case R.id.iv_forget_password:
+			startActivity(new Intent(mContext, ForgetPwdMobileActivity_.class));
+			break;
+		case R.id.fl_login:
+			closeKeyBoard();
+			break;
+		case R.id.iv_weixin_authorize:
+			UserInfoHelper.saveLoginType(1);
+			DecentWorldApp.WX_AUTHORIZE_STATE = 0;
+			SendAuth.Req req = new SendAuth.Req();
+			req.scope = "snsapi_userinfo";
+			req.state = "dw";
+			wxReq.sendReq(req);
+			break;
+		case R.id.tv_ceshi:
+		    test();
+		    break;
+		}
+	}
+
+	/**
+	 * 测试代码
+	 */
+	private void test()
+    {
+	    Intent intent = new Intent(mContext, CeshiActivity_.class);
+        intent.putExtra(
+                "json_data",
+                "{\"chargeAmount\":1.0,\"curNum\":\"1\",\"occupantList\":[],\"owner\":{\"dwID\":\"905583\",\"userNickName\":\"味精\",\"worth\":1.0},\"ownerID\":\"905583\",\"ownerIcon\":\"http://112.74.13.117/data/905583/icon/sicon.jpg\",\"role\":\"moderator\",\"roomBackground\":\"http://112.74.13.117/data/chatroom/938914/subject/subjectBackground.jpg\",\"roomID\":\"938914\",\"roomNotice\":\"\",\"roomOwnerNickName\":\"味精\",\"roomWealth\":\"0.0\",\"subjectName\":\"滴滴答答\"}");
+        startActivity(intent);
+    }
+
+
+    /**
+	 * 获取用户ID
+	 */
+	private void getUserdwID(String phoneNum) {
+		// 显示进度
+		if (mProgressDialog == null)
+			mProgressDialog = ProgressDialog.show(LoginActivity.this, null, "Loading");
+		else
+			mProgressDialog.show();
+		// 获取用户ID
+		UserDataEngine.getInstance().getUserID(phoneNum, new GetUserIDListener() {
+			@Override
+			public void onSuccess(String userID, String token) {
+				if (mProgressDialog != null)
+					mProgressDialog.dismiss();
+				login(userID, password);
+			}
+
+			@Override
+			public void onFailure(String cause) {
+				if (mProgressDialog != null)
+					mProgressDialog.dismiss();
+				toast.show(cause);
+			}
+		});
+	}
+
+	@Subscriber(tag = NotifyByEventBus.NT_WX_LOGIN)
+	public void wxLogin(String data) {
+		LogUtils.d(TAG, "wxLogin " + data);
+		try {
+			JSONObject object = new JSONObject(data);
+			String password = object.getString("password");
+			String dwID = object.getString("dwID");
+			login(dwID, password);
+		} catch (JSONException e) {
+			LogUtils.d(TAG, "wxLogin " + e.getLocalizedMessage());
+		}
+
+	}
+
+	/**
+	 * 登录openfire
+	 */
+	private void login(final String dwID, final String password) {
+		LogUtils.v(TAG, "login() params[dwID=" + dwID + ",password=" + password + "]");
+		progressShow = true;
+		final ProgressDialog pd = new ProgressDialog(LoginActivity.this);
+		pd.setCanceledOnTouchOutside(false);
+		pd.setOnCancelListener(new OnCancelListener() {
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				progressShow = false;
+			}
+		});
+		pd.setMessage(getString(R.string.Is_landing));
+		pd.show();
+		// 登录
+		XmppHelper.firstLogin(dwID, password, new LoginListener() {
+			@Override
+			public void onLoginSuccess() {
+				LogUtils.v(TAG, "login() " + dwID + " 登录成功");
+				// 保存用户信息
+				UserInfoHelper.saveLoginInfo(dwID, password);
+				dismissDlg();
+				// 进入数据加载页面
+				Intent intent = new Intent(LoginActivity.this, LoadDataActivity_.class);
+				startActivity(intent);
+				finish();
+			}
+
+			@Override
+			public void onLoginFailure(Exception exception) {
+				LogUtils.e(TAG, "login() " + dwID + "  登录失败");
+				// 将连接置为空
+				XmppHelper.setConnNull();
+				processLoginException(exception);
+				dismissDlg();
+			}
+
+			// 销毁进度条对话框
+			private void dismissDlg() {
+				if (pd != null && pd.isShowing()) {
+					pd.dismiss();
+				}
+			}
+		});
+	}
+
+	/**
+	 * 处理登录异常
+	 */
+	protected void processLoginException(Exception e) {
+		/** 异常判断 **/
+		if (e instanceof IllegalStateException) {
+			if (e.toString().contains("Already logged")) {
+				LogUtils.e(TAG, "processLoginException...已经登录过服务器，不需要重复登录,cause by:" + e.toString());
+				mUpdateUIHandler.sendEmptyMessage(1);
+			}
+		} else if (e instanceof XMPPException) {
+			if (e.toString().contains("SASL authentication failed")) {
+				LogUtils.e(TAG, "processLoginException...登录验证失败,cause by:" + e.toString());
+			}
+			mUpdateUIHandler.sendEmptyMessage(2);
+		}
+	}
+
+	/**
+	 * 关闭软键盘
+	 */
+	private void closeKeyBoard() {
+		keyboardComponent.closeKeyboard(etMobile);
+	}
+
+	/**
+	 * 处理界面
+	 */
+	Handler mUpdateUIHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case 1:
+				Toast.makeText(LoginActivity.this, AREADY_LOGIN, Toast.LENGTH_SHORT).show();
+				break;
+			case 2:
+				// 账号或密码错误
+				Toast.makeText(LoginActivity.this, ACCOUNT_ERROR, Toast.LENGTH_SHORT).show();
+				break;
+			default:
+				break;
+			}
+		};
+	};
+
+	/**
+	 * 测试代码
+	 */
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		List<ImageItem> incomingDataList = (List<ImageItem>) data.getSerializableExtra(IntentConstants.EXTRA_IMAGE_LIST);
+		File file = new File(incomingDataList.get(0).sourcePath);
+		LogUtils.i(TAG, "onActivityResult...time--" + TimeUtils.getFormatTime(file.lastModified(), "yyyy-MM-dd-HH-mm:ss:ms"));
+	}
+
+	private Handler mGetIdByWxCodeHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			try {
+				JSONObject object = new JSONObject(msg.obj.toString());
+				int resultCode = object.getInt("resultCode");
+				String mesg = object.getString("msg");
+				JSONObject data = object.getJSONObject("data");
+				JSONObject result = data.getJSONObject("result");
+				String dwID = result.getString("dwID");
+				boolean registered = result.getBoolean("registered");
+				if (2222 == resultCode) {
+					Intent intent = new Intent(LoginActivity.this, WeixinLoginPasswordActivity.class);
+					intent.putExtra(ConstantIntent.WX_REGISTERED, registered);
+					intent.putExtra(Constants.DW_ID, dwID);
+					startActivity(intent);
+				} else {
+					ToastUtil.showToast(mesg);
+				}
+			} catch (JSONException e) {
+				LogUtils.d(TAG, "mGetIdByWxCodeHandler error " + e.getLocalizedMessage());
+			}
+		};
+	};
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		String code = intent.getStringExtra(ConstantIntent.WX_CODE);
+		LogUtils.d(TAG, "code " + code);
+		getIdByWxCode(code);
+	}
+
+	private void getIdByWxCode(String code) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("wxCode", code);
+		showProgressDialog();
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_GET_ID_BY_WXCODE, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String resultJSON, ResultBean resultBean) {
+						hideProgressDialog();
+						LogUtils.d(TAG, "getIdByWxCode " + resultJSON);
+						Message message = mGetIdByWxCodeHandler.obtainMessage();
+						message.obj = resultJSON;
+						mGetIdByWxCodeHandler.sendMessage(message);
+					}
+
+					@Override
+					public void onFailure(String e) {
+						hideProgressDialog();
+						LogUtils.e(TAG, "getIdByWxCode error " + e);
+					}
+				});
+	}
+
+	private ProgressDialog mProDialog;
+
+	private void showProgressDialog() {
+		if (null == mProDialog) {
+			mProDialog = ProgressDialog.show(this, null, "loading");
+		} else {
+			mProDialog.show();
+		}
+	}
+
+	private void hideProgressDialog() {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				if (null != mProDialog) {
+					mProDialog.hide();
+				}
+			}
+		});
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		EventBus.getDefault().unregister(this);
+	}
+}

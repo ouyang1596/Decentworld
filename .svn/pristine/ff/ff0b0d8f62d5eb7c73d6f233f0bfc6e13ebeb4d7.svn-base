@@ -1,0 +1,363 @@
+package cn.sx.decentworld.activity;
+
+import java.util.HashMap;
+import java.util.List;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.adapter.SupporterAndCSAdapter;
+import cn.sx.decentworld.bean.CheckResultBean;
+import cn.sx.decentworld.bean.SingleCheckResultBean;
+import cn.sx.decentworld.bean.SupporterAndCSBean;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantIntent;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.component.ui.RechargeComponent;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.widget.GridViewForScrollView;
+
+import com.android.volley.Request.Method;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_examine_welcome)
+public class ExamineWelcomeActivity extends BaseFragmentActivity implements OnClickListener, OnItemClickListener {
+	private CheckResultBean checkResultBean;
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	@ViewById(R.id.sb_dislike)
+	SeekBar sbDisLike;
+	@ViewById(R.id.sb_not_real)
+	SeekBar sbNotReal;
+	@ViewById(R.id.sb_support)
+	SeekBar sbSupport;
+	@ViewById(R.id.tv_support)
+	TextView tvSupport;
+	@ViewById(R.id.tv_not_real)
+	TextView tvNotReal;
+	@ViewById(R.id.tv_dislike)
+	TextView tvDislike;
+	@ViewById(R.id.tv_try_again_buy)
+	TextView tvTryAgainBuy;
+	@ViewById(R.id.tv_complain)
+	TextView tvComplain;
+	@ViewById(R.id.ll_doubt_finish)
+	LinearLayout llDoubtFinish;
+	@ViewById(R.id.sclView)
+	ScrollView sclView;
+	@ViewById(R.id.tv_failure_reason)
+	TextView tvFailureReason;
+	@ViewById(R.id.tv_go_doubt)
+	TextView tvGoDoubt;
+	@ViewById(R.id.view_mask)
+	View viewMask;
+	@ViewById(R.id.ll_gv)
+	LinearLayout llGv;
+	@ViewById(R.id.ll_ceshi)
+	LinearLayout llCeshi;
+	@ViewById(R.id.gv_supporters)
+	GridViewForScrollView gvSupporters;
+	@Bean
+	RechargeComponent rechargeComponent;
+	private List<SupporterAndCSBean> supporters;
+	private SupporterAndCSAdapter adapter;
+	private int tryAgainOrBuy;// 0再试一次 1直接买通
+	private int complainTryAgain;// 0再试一次 1进行申诉
+	private SendUrl mSendUrl;
+	private Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			try {
+				JSONObject object = new JSONObject(msg.obj.toString());
+				String wealth = object.getString("wealth");
+				if (CommUtil.isNotBlank(wealth)) {
+					Float w = Float.valueOf(wealth);
+					UserInfoEngine.getInstance().notifyWealthChanged(w);
+				}
+			} catch (JSONException e) {
+			}
+			// if (0 == tryAgainOrBuy) {
+			//
+			// } else if (1 == tryAgainOrBuy) {
+			//
+			// }
+			ToastUtil.showToast("成功");
+			finish();
+		};
+	};
+
+	@AfterViews
+	public void init() {
+		EventBus.getDefault().register(this);
+		EGetIntent();
+		initView();
+	}
+
+	private void EGetIntent() {
+		checkResultBean = (CheckResultBean) getIntent().getSerializableExtra(ConstantIntent.ACTIVITY_DOUBT_CHECK_RESULT_BEAN);
+		LogUtils.i("bm", checkResultBean.toString());
+	}
+
+	private void initView() {
+		getViewWidthAndHeight();
+		mSendUrl = new SendUrl(mContext);
+		tvTryAgainBuy.setOnClickListener(this);
+		tvComplain.setOnClickListener(this);
+		ivBack.setOnClickListener(this);
+		tvNotReal.setText("" + checkResultBean.fakeAmount + "/" + checkResultBean.fakeStandard);
+		tvSupport.setText("" + checkResultBean.passAmount + "/" + checkResultBean.passStandard);
+		tvDislike.setText("" + checkResultBean.unpassAmount + "/" + checkResultBean.unpassStandard);
+		sbNotReal.setEnabled(false);
+		sbSupport.setEnabled(false);
+		sbDisLike.setEnabled(false);
+		sbNotReal.setMax(checkResultBean.fakeStandard);
+		sbSupport.setMax(checkResultBean.passStandard);
+		sbDisLike.setMax(checkResultBean.unpassStandard);
+		sbNotReal.setProgress(checkResultBean.fakeAmount);
+		sbSupport.setProgress(checkResultBean.passAmount);
+		sbDisLike.setProgress(checkResultBean.unpassAmount);
+		supporters = checkResultBean.supporters;
+		if (null != supporters) {
+			// for (int i = 0; i < 30; i++) {
+			// SupporterAndCSBean bean = new SupporterAndCSBean();
+			// bean.showName = "ceshi";
+			// bean.id = "769015";
+			// supporters.add(bean);
+			// }
+			adapter = new SupporterAndCSAdapter(mContext, supporters);
+			gvSupporters.setAdapter(adapter);
+			gvSupporters.setOnItemClickListener(this);
+		}
+		isFinished(checkResultBean.status);
+	}
+
+	private void getViewWidthAndHeight() {
+		llCeshi.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+
+			@Override
+			public void onGlobalLayout() {
+				LogUtils.i("bm", "llCeshiWidth--" + llCeshi.getWidth() + "--llCeshiHeight--" + llCeshi.getHeight());
+				llCeshi.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				llGv.setPadding(0, llCeshi.getHeight(), 0, 0);
+				gvSupporters.setFocusable(false);
+				sclView.smoothScrollTo(0, 0);
+				gvSupporters.setFocusable(true);
+			}
+		});
+	}
+
+	/**
+	 * 向被审核者推送去疑
+	 */
+	@Subscriber(tag = NotifyByEventBus.NT_CHECK_RESULT)
+	public void receiveCheckResult(String data) {
+		SingleCheckResultBean bean = JsonUtils.json2Bean(data, SingleCheckResultBean.class);
+		tvNotReal.setText("" + bean.fakeAmount + "/" + checkResultBean.fakeStandard);
+		tvSupport.setText("" + bean.passAmount + "/" + checkResultBean.passStandard);
+		tvDislike.setText("" + bean.unpassAmount + "/" + checkResultBean.unpassStandard);
+		sbNotReal.setProgress(bean.fakeAmount);
+		sbSupport.setProgress(bean.passAmount);
+		sbDisLike.setProgress(bean.unpassAmount);
+		if (null != bean.supporter) {
+			supporters.add(bean.supporter);
+			adapter.notifyDataSetChanged();
+		}
+		// isFinished 1身份为假 3身份证为真未通过
+		isFinished(bean.isFinished);
+	}
+
+	private void isFinished(int isFinished) {
+		if (1 == isFinished) {
+			// view.setVisibility(View.VISIBLE);
+			llDoubtFinish.setVisibility(View.VISIBLE);
+			tvTryAgainBuy.setVisibility(View.VISIBLE);
+			tvTryAgainBuy.setText("再次去疑");
+			tryAgainOrBuy = 0;
+			tvComplain.setVisibility(View.VISIBLE);
+			complainTryAgain = 1;
+			tvComplain.setText("冤枉申诉");
+			getViewWidthAndHeight();
+			viewMask.setVisibility(View.VISIBLE);
+			tvGoDoubt.setVisibility(View.VISIBLE);
+			tvFailureReason.setVisibility(View.VISIBLE);
+			tvFailureReason.setText("异性投票者认为您的资料不真实");
+		} else if (3 == isFinished || checkResultBean.leftTime <= 0) {
+			// view.setVisibility(View.VISIBLE);
+			llDoubtFinish.setVisibility(View.VISIBLE);
+			tvTryAgainBuy.setVisibility(View.VISIBLE);
+			tvTryAgainBuy.setText("花钱去疑？");
+			tryAgainOrBuy = 1;
+			complainTryAgain = 0;
+			tvComplain.setText("再试一次");
+			tvComplain.setVisibility(View.VISIBLE);
+			getViewWidthAndHeight();
+			viewMask.setVisibility(View.VISIBLE);
+			tvGoDoubt.setVisibility(View.VISIBLE);
+			if (3 != isFinished && checkResultBean.leftTime <= 0) {
+				tvGoDoubt.setText("您的去疑时间已超过一天");
+				tvTryAgainBuy.setVisibility(View.GONE);
+			} else {
+				tvTryAgainBuy.setVisibility(View.VISIBLE);
+				tvGoDoubt.setText("去疑失败");
+			}
+			tvFailureReason.setVisibility(View.VISIBLE);
+			tvFailureReason.setText("您的资料真实，但没得异性投票者吸引");
+		} else {
+			llDoubtFinish.setVisibility(View.GONE);
+		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		EventBus.getDefault().unregister(this);
+	}
+
+	@Override
+	public void onClick(View v) {
+		Intent intent;
+		switch (v.getId()) {
+		case R.id.iv_back:
+			finish();
+			break;
+		case R.id.tv_try_again_buy:
+			// intent = new Intent(this, RechargePayMethodActivity_.class);
+			// intent.putExtra(ConstantIntent.FRAGMENT_DIALOG_DOUBT_WAN,
+			// tryAgainOrBuy);
+			// startActivity(intent);
+			if (0 == tryAgainOrBuy) {
+				getDoubtWanCharge(ConstantNet.API_DOUBT_PAY_RETRY, mHandler);
+			} else if (1 == tryAgainOrBuy) {
+				getDoubtWanCharge(ConstantNet.API_DOUBT_NO_PASS_BUY, mHandler);
+			}
+			break;
+		case R.id.tv_complain:
+			if (complainTryAgain == 1) {
+				intent = new Intent(this, CustomerServiceActivity_.class);
+				startActivity(intent);
+			} else {
+				HashMap<String, String> map = new HashMap<String, String>();
+				map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+				mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_DOUBT_NO_PASS_RETRY_FREE,
+						Method.POST, new HttpCallBack() {
+
+							@Override
+							public void onSuccess(String response, ResultBean msg) {
+								if (2222 == msg.getResultCode()) {
+									ToastUtil.showToast("请求成功");
+									getDoubtCheckResultThread();
+								} else {
+									ToastUtil.showToast("请求失败");
+								}
+							}
+
+							@Override
+							public void onFailure(String e) {
+								ToastUtil.showToast(Constants.NET_WRONG);
+							}
+						});
+			}
+			break;
+		}
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+		SupporterAndCSBean item = adapter.getItem(position);
+		Intent intent = new Intent(this, NearCardDetailActivity_.class);
+		intent.putExtra(Constants.DW_ID, item.id);
+		startActivity(intent);
+	}
+
+	public void getDoubtCheckResult() {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put(Constants.DW_ID, DecentWorldApp.getInstance().getDwID());
+		mSendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + Constants.API_GET_CHECK_STATUS, Method.POST,
+				new HttpCallBack() {
+
+					@Override
+					public void onSuccess(String response, ResultBean msg) {
+						if (2222 == msg.getResultCode()) {
+							LogUtils.i("bm", "getCheckResult--" + msg.getData().toString());
+							Message message = mDoubtHandler.obtainMessage();
+							message.obj = msg.getData().toString();
+							mDoubtHandler.sendMessage(message);
+						} else {
+							ToastUtil.showToast(msg.getMsg());
+						}
+					}
+
+					@Override
+					public void onFailure(String e) {
+						ToastUtil.showToast(Constants.NET_WRONG);
+					}
+				});
+	}
+
+	private void getDoubtCheckResultThread() {
+		runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				getDoubtCheckResult();
+			}
+		});
+	}
+
+	private Handler mDoubtHandler = new Handler() {
+		public void handleMessage(android.os.Message msg) {
+			CheckResultBean bean = JsonUtils.json2Bean(msg.obj.toString(), CheckResultBean.class);
+			LogUtils.i("bm", "bean---" + bean.toString());
+			Intent intent;
+			switch (bean.status) {
+			case 4:
+				intent = new Intent(ExamineWelcomeActivity.this, DoubtCancelDoubtActivity_.class);
+				intent.putExtra(ConstantIntent.ACTIVITY_DOUBT_CONDITION, bean.condition);
+				startActivity(intent);
+				finish();
+				break;
+			case 5:
+				intent = new Intent(ExamineWelcomeActivity.this, DoubtCancelDoubtActivity_.class);
+				intent.putExtra(ConstantIntent.ACTIVITY_DOUBT_STATUS, bean.status);
+				intent.putExtra(ConstantIntent.ACTIVITY_DOUBT_CONDITION, bean.condition);
+				startActivity(intent);
+				finish();
+				break;
+			}
+		};
+	};
+
+	private void getDoubtWanCharge(String api, Handler handler) {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("dwID", DecentWorldApp.getInstance().getDwID());
+		// map.put("channel", "" + channel);//以前需要支付扣钱的时候调用
+		rechargeComponent.getDoubtWanCharge(map, api, handler);
+	}
+}

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_e"
+    android:orientation="vertical" >
+
+    <include layout="@layout/top_title" />
+
+    <RelativeLayout
+        android:id="@+id/rl_find_works_circle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/find_item_selector"
+        android:clickable="true"
+        android:layout_gravity="center_vertical"
+        android:focusable="true" >
+
+        <ImageView
+            android:id="@+id/fragment_chat_chat_iv1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/work_circle" />
+
+        <TextView
+            android:id="@+id/tv_find_tag_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@id/fragment_chat_chat_iv1"
+            android:text="@string/works_circle"
+            android:textColor="@color/chat_find_text_color"
+            android:textSize="@dimen/text_size_16" />
+        
+        <TextView
+            android:id="@+id/tv_find_work_unread_msg_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_find_tag_1"
+            android:background="@drawable/unread_count_bg"
+            android:gravity="center"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:layout_centerVertical="true"
+            android:visibility="invisible" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_find_friends_circle"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/find_item_selector"
+        android:clickable="true"
+        android:focusable="true" >
+
+        <ImageView
+            android:id="@+id/fragment_chat_chat_iv1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/group_interested" />
+
+        <TextView
+              android:id="@+id/tv_find_tag_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@+id/fragment_chat_chat_iv1"
+            android:text="@string/friends_circle"
+            android:textColor="@color/chat_find_text_color"
+            android:textSize="@dimen/text_size_16" />
+        
+         <TextView
+            android:id="@+id/tv_find_moment_unread_msg_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_find_tag_2"
+            android:background="@drawable/unread_count_bg"
+            android:gravity="center"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/white"
+            android:textSize="12sp"
+            android:layout_centerVertical="true"
+            android:visibility="invisible" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/rl_find_interest_group"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/find_item_selector"
+        android:clickable="true"
+        android:focusable="true"
+        android:visibility="invisible" >
+
+        <ImageView
+            android:id="@+id/fragment_chat_chat_iv2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="25dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/group_interested" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+            android:layout_toRightOf="@+id/fragment_chat_chat_iv2"
+            android:text="@string/string_group_interested"
+            android:textColor="@color/chat_find_text_color"
+            android:textSize="@dimen/text_size_15" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+</LinearLayout>

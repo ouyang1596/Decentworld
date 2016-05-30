@@ -27,11 +27,11 @@ public final class TitleBar_
         if (!(context_ instanceof Activity)) {
             return ;
         }
-        main_header_right_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.main_header_right_tv));
-        main_header_right_btn = ((ImageView) findViewById(cn.sx.decentworld.R.id.main_header_right_btn));
-        main_header_left = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.main_header_left));
-        main_header_title = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
         main_header_left_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.main_header_left_tv));
+        main_header_right_btn = ((ImageView) findViewById(cn.sx.decentworld.R.id.main_header_right_btn));
+        main_header_title = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
+        main_header_right_tv = ((TextView) findViewById(cn.sx.decentworld.R.id.main_header_right_tv));
+        main_header_left = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.main_header_left));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }
@@ -50,10 +50,10 @@ public final class TitleBar_
         if (context_ instanceof Activity) {
             Activity activity = ((Activity) context_);
         }
-        context = context_;
         if (context_ instanceof Activity) {
             activity = ((Activity) context_);
         }
+        context = context_;
         toast = ToastComponent_.getInstance_(context_);
     }
 

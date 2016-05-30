@@ -1,0 +1,338 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.manager;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.engine.MomentEngine;
+import cn.sx.decentworld.entity.dao.CommentDao;
+import cn.sx.decentworld.entity.dao.MomentDao;
+import cn.sx.decentworld.entity.dao.MomentExtraDao;
+import cn.sx.decentworld.entity.db.CommentEntity;
+import cn.sx.decentworld.entity.db.MomentEntity;
+import cn.sx.decentworld.entity.db.MomentExtraEntity;
+import cn.sx.decentworld.logSystem.LogUtils;
+
+/**
+ * @ClassName: MomentManager
+ * @Description: 朋友圈管理者； 1）从数据库加载数据到内存； 2）当有数据更新时，更新内存中的数据，同时保存到数据库中；
+ * @author: Jackchen
+ * @date: 2016年5月10日 上午10:17:46
+ */
+public class MomentManager
+{
+    private static final String TAG = "MomentManager";
+    // 朋友圈管理类对象
+    private static MomentManager instance;
+    // 朋友圈额外信息实体对象
+    private MomentExtraEntity momentExtraEntity;
+    // 朋友圈最大ID
+    private long momentIndex = -1;
+    // 评论最大ID
+    private long commentIndex = -1;
+    // 保存数据
+    private Map<Long, MomentEntity> mMomentMap;
+    private List<MomentEntity> mMomentList;
+
+    /**
+     * 私有构造函数
+     */
+    private MomentManager()
+    {
+        LogUtils.v(TAG, "MomentManager() ");
+        MomentExtraEntity query = MomentExtraDao.query();
+        if (query == null)
+        {
+            LogUtils.v(TAG, "MomentManager() new MomentExtraEntity()");
+            query = new MomentExtraEntity(DecentWorldApp.getInstance().getDwID() , -1 , -1);
+            query.save();
+        }
+        momentExtraEntity = query;
+        momentIndex = momentExtraEntity.getMomentIndex();
+        commentIndex = momentExtraEntity.getCommentIndex();
+
+        mMomentMap = new HashMap<Long, MomentEntity>();
+        mMomentList = new ArrayList<MomentEntity>();
+        initData();
+    }
+
+    /**
+     * 加载数据库中的数据
+     */
+    private void initData()
+    {
+        LogUtils.v(TAG, "initData()");
+        List<MomentEntity> allData = MomentDao.getAllData();
+        if (allData != null && allData.size() > 0)
+        {
+            for (MomentEntity entity : allData)
+            {
+                mMomentList.add(entity);
+                mMomentMap.put(entity.getMomentID(), entity);
+                List<CommentEntity> list = new CommentDao().queryList(entity.getMomentID());
+                if (list != null && list.size() > 0)
+                    entity.setCommentList(list);
+            }
+        }
+        Collections.sort(mMomentList);
+    }
+
+    /**
+     * 获取实例
+     */
+    public static MomentManager getInstance()
+    {
+        String info = "已经初始化了";
+        if (instance == null)
+        {
+            synchronized (MomentManager.class)
+            {
+                if (instance == null)
+                {
+                    info = "第一次初始化";   
+                    instance = new MomentManager();
+                }
+            }
+        }
+        LogUtils.v(TAG, "getInstance() "+info);
+        return instance;
+    }
+
+    /**
+     * 更新索引
+     */
+    public long[] getIndex()
+    {
+        long[] index = new long[2];
+        index[0] = this.momentIndex;
+        index[1] = this.commentIndex;
+        LogUtils.v(TAG, "getIndex() " + "index[0]="+index[0]+",index[1]"+index[1]);
+        return index;
+    }
+    
+    /**
+     * 获取朋友圈最新ID
+     */
+    public long getMinMomentIndex()
+    {
+        long minMomentIndex = 0;
+        if(mMomentList!=null && mMomentList.size()>0)
+        {
+            Collections.sort(mMomentList);
+            MomentEntity momentEntity = mMomentList.get(mMomentList.size()-1);
+            minMomentIndex = momentEntity.getMomentID();
+        }
+        LogUtils.i(TAG, "getMinMomentIndex() minMomentIndex="+minMomentIndex);
+        return minMomentIndex;
+    }
+
+    /**
+     * 保存索引
+     */
+    public void saveIndex(long momentIndex, long commentIndex)
+    {
+        LogUtils.v(TAG, "saveIndex() params[momentIndex=" + momentIndex + ",commentIndex=" + commentIndex + "]");
+        // 将索引保存到内存；
+        this.momentIndex = momentIndex;
+        this.commentIndex = commentIndex;
+        // 将索引保存到数据库
+        momentExtraEntity.setMomentIndex(momentIndex);
+        momentExtraEntity.setCommentIndex(commentIndex);
+        momentExtraEntity.save();
+    }
+    
+    /**
+     * 保存朋友圈索引
+     */
+    public void saveMomentIndex(long momentIndex)
+    {
+        LogUtils.v(TAG, "saveMomentIndex() params[momentIndex=" + momentIndex +"]");
+        // 将索引保存到内存；
+        this.momentIndex = momentIndex;
+        // 将索引保存到数据库
+        momentExtraEntity.setMomentIndex(momentIndex);
+        momentExtraEntity.save();
+    }
+    
+    /**
+     * 保存朋友圈评论索引
+     */
+    public void saveCommentIndex(long commentIndex)
+    {
+        LogUtils.v(TAG, "saveCommentIndex() params[commentIndex=" + commentIndex + "]");
+        // 将索引保存到内存；
+        this.commentIndex = commentIndex;
+        // 将索引保存到数据库
+        momentExtraEntity.setCommentIndex(commentIndex);
+        momentExtraEntity.save();
+    }
+
+    /**
+     * 删除朋友圈
+     */
+    public void deleteMoment(String momentIndex)
+    {
+        //业务逻辑
+        //1.删除内存中的数据
+        //2.删除数据库中的数据
+        LogUtils.d(TAG, "deleteComment() 业务逻辑未完成");
+    }
+
+    /**
+     * 删除朋友圈
+     */
+    public void deleteMoment(List<String> momentIndexList)
+    {
+        //业务逻辑
+        //1.删除内存中的数据
+        //2.删除数据库中的数据
+        LogUtils.d(TAG, "deleteComment() 业务逻辑未完成");
+    }
+
+    /**
+     * 删除朋友圈评论
+     */
+    public void deleteComment(String commentIndex)
+    {
+        //业务逻辑
+        //1.删除内存中的数据
+        //2.删除数据库中的数据
+        LogUtils.d(TAG, "deleteComment() 业务逻辑未完成");
+    }
+
+    /**
+     * 删除朋友圈评论
+     */
+    public void deleteComment(List<String> commentIndexList)
+    {
+        //业务逻辑
+        //1.删除内存中的数据
+        //2.删除数据库中的数据
+        LogUtils.d(TAG, "deleteComment() 业务逻辑未完成");
+    }
+
+    /**
+     * 添加朋友圈
+     */
+    public void addMoment(MomentEntity entity)
+    {
+        LogUtils.v(TAG, "addMoment() "+entity.toString());
+        if (entity == null)
+            return;
+        entity.save();
+        mMomentList.add(entity);
+        mMomentMap.put(entity.getMomentID(), entity);
+        Collections.sort(mMomentList);
+    }
+
+    /**
+     * 添加朋友圈
+     */
+    public void addMoment(List<MomentEntity> momentEntities)
+    {
+        LogUtils.v(TAG, "addMoment() "+momentEntities.toString());
+        if (momentEntities == null || momentEntities.size() <= 0)
+            return;
+        for (MomentEntity entity : momentEntities)
+        {
+            entity.save();
+            mMomentList.add(entity);
+            mMomentMap.put(entity.getMomentID(), entity);
+        }
+        Collections.sort(mMomentList);
+    }
+
+    /**
+     * 添加朋友圈评论
+     */
+    public void addComment(CommentEntity commentEntity)
+    {
+        if (commentEntity == null)
+            return;
+        commentEntity.save();
+        MomentEntity momentEntity = mMomentMap.get(commentEntity.getMomentID());
+        if(momentEntity!=null)
+        {
+            List<CommentEntity> commentList = momentEntity.getCommentList();
+            commentList.add(commentEntity);
+            Collections.sort(commentList);
+        }
+    }
+
+    /**
+     * 添加朋友圈评论
+     */
+    public void addComment(List<CommentEntity> commentEntities)
+    {
+        if (commentEntities == null || commentEntities.size() <= 0)
+            return;
+        for(CommentEntity commentEntity:commentEntities)
+        {
+            commentEntity.save();
+            MomentEntity momentEntity = mMomentMap.get(commentEntity.getMomentID());
+            if(momentEntity!=null)
+            {
+                List<CommentEntity> commentList = momentEntity.getCommentList();
+                commentList.add(commentEntity);
+                Collections.sort(commentList);
+            }
+        }
+    }
+
+    /**
+     * 获取作品圈
+     */
+    public List<MomentEntity> getMoment()
+    {
+        Collections.sort(mMomentList);
+        return mMomentList;
+    }
+    
+    
+    /**
+     * 保存作品圈传递过来的朋友圈
+     */
+    public void saveMomentFromWork(long momentIndex,String momentJSonStr)
+    {
+        LogUtils.v(TAG, "saveMomentFromWork() params[momentIndex="+momentIndex+",momentJSonStr="+momentJSonStr+"] ");
+        JSONObject moment = JSON.parseObject(momentJSonStr);
+        MomentEntity entity = new MomentEngine().parseMomentEntity(moment);
+        LogUtils.v(TAG, ""+entity.toString());
+        saveMomentIndex(momentIndex);
+        addMoment(entity);
+    }
+    
+    /**
+     * 删除指定ID的朋友圈和评论
+     */
+    public void afterDeleteContact(String otherID)
+    {
+        LogUtils.v(TAG, "delete() params[otherID="+otherID+"]");
+        //删除内存中的数据（List/Map）
+        if(mMomentList!=null && mMomentList.size()>0)
+        {
+            Iterator<MomentEntity> iterator = mMomentList.iterator();
+            while(iterator.hasNext())
+            {
+                MomentEntity next = iterator.next();
+                if(otherID.equals(next.getPublisherID()))
+                {
+                    mMomentMap.remove(next.getMomentID());
+                    iterator.remove();
+                }
+            }
+        }
+        //删除数据库中的数据
+        MomentDao.delete(otherID);
+    }
+}

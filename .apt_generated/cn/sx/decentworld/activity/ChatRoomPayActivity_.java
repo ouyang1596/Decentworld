@@ -36,8 +36,8 @@ public final class ChatRoomPayActivity_
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_back));
         btnOK = ((Button) findViewById(id.btn_OK));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         init();
     }

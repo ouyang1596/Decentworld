@@ -1,0 +1,389 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.db;
+
+import cn.sx.decentworld.DecentWorldApp;
+
+import com.activeandroid.Model;
+import com.activeandroid.annotation.Column;
+import com.activeandroid.annotation.Table;
+import com.alibaba.fastjson.annotation.JSONField;
+
+/**
+ * @ClassName: CommentEntity.java
+ * @Description: 评论实体
+ * @author: cj
+ * @date: 2016年2月26日 下午3:33:47
+ */
+@Table(name = "commentEntity")
+public class CommentEntity extends Model implements Comparable<CommentEntity>
+{
+    /**
+     * 朋友圈的发表状态
+     */
+    public enum CommentStatus
+    {
+        UNFINISHED("评论中", 0), SUCCESSED("评论成功", 1), FAILURED("评论失败", 2);
+        private String name;
+        private int index;
+
+        private CommentStatus(String name, int index)
+        {
+            this.name = name;
+            this.index = index;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public int getIndex()
+        {
+            return index;
+        }
+
+    };
+
+    /**
+     * 评论的类型，包括普通文字评论，赞，踩，扣
+     */
+    public enum CommentType
+    {
+        NOMAL(0, "普通评论"), LIKE(1, "喜欢"), DISLIKE(2, "不喜欢"), SUPERDISLIKE(3, "踩"), REPORT(4, "举报");
+        private int index;
+        private String info;
+
+        private CommentType(int index, String info)
+        {
+            this.index = index;
+            this.info = info;
+        }
+
+        public int getIndex()
+        {
+            return index;
+        }
+
+        public String getInfo()
+        {
+            return info;
+        }
+
+    }
+
+    // 用户ID
+    @JSONField(serialize = false)
+    @Column(name = "userID")
+    private String userID;
+
+    // 发表评论的状态:未完成（0）、成功（1）、失败（2）
+    @JSONField(serialize = false)
+    @Column(name = "commentStatus")
+    private int commentStatus;
+
+    // 评论者的ID
+    @Column(name = "dwID")
+    private String dwID;
+
+    // 评论的ID
+    @Column(name = "commentID")
+    private long commentID;
+
+    // 评论对应的朋友圈的ID
+    @Column(name = "momentID")
+    private long momentID;
+
+    // 朋友圈发布者ID
+    @Column(name = "publisherID")
+    private String publisherID;
+
+    // 发布者的名字
+    @Column(name = "publisherName")
+    private String publisherName;
+
+    // 回复人的dwID，如果是匿名回复，则传32位字符，当无回复人时，该值可为空
+    @Column(name = "reply")
+    private String reply;
+
+    // 评论类型,包括普通文字评论，赞，踩，扣
+    @Column(name = "type")
+    private int type;
+
+    // 评论内容，当为文字评论时该值不可为空
+    @Column(name = "content")
+    private String content;
+
+    // 评论时间
+    @Column(name = "time")
+    private long time;
+    
+    // 是否匿名
+    @Column(name = "anonymous")
+    private boolean anonymous;
+
+    /**
+     * 
+     */
+    public CommentEntity()
+    {
+        this.userID = DecentWorldApp.getInstance().getDwID();
+        this.commentStatus = CommentStatus.UNFINISHED.getIndex();
+        this.dwID = DecentWorldApp.getInstance().getDwID();
+        this.momentID = 0;
+        this.commentID = 0;
+        this.publisherID = "";
+        this.publisherName = "";
+        this.reply = DecentWorldApp.getInstance().getDwID();
+        this.type = CommentType.NOMAL.getIndex();
+        this.content = "";
+        this.time = System.currentTimeMillis();
+        this.anonymous = false;
+    }
+
+    /**
+     * 
+     * @param momentID
+     *            当前作品圈ID
+     * @param publisherID
+     *            作品圈发布者ID
+     * @param publisherName
+     *            作品圈发布者名字
+     * @param replyID
+     *            回复人ID
+     * @param commentType
+     *            评论类型
+     * @param content
+     *            评论内容
+     */
+    public CommentEntity(long momentID, String publisherID, String publisherName, int commentType, String content)
+    {
+        this();
+        this.momentID = momentID;
+        this.publisherID = publisherID;
+        this.publisherName = publisherName;
+        this.type = commentType;
+        this.content = content;
+    }
+
+    /**
+     * @return the userID
+     */
+    public String getUserID()
+    {
+        return userID;
+    }
+
+    /**
+     * @param userID
+     *            the userID to set
+     */
+    public void setUserID(String userID)
+    {
+        this.userID = userID;
+    }
+
+    /**
+     * @return the commentID
+     */
+    public long getCommentID()
+    {
+        return commentID;
+    }
+
+    /**
+     * @param commentID
+     *            the commentID to set
+     */
+    public void setCommentID(long commentID)
+    {
+        this.commentID = commentID;
+    }
+
+    /**
+     * @return the publisherID
+     */
+    public String getPublisherID()
+    {
+        return publisherID;
+    }
+
+    /**
+     * @param publisherID
+     *            the publisherID to set
+     */
+    public void setPublisherID(String publisherID)
+    {
+        this.publisherID = publisherID;
+    }
+
+    /**
+     * @return the dwID
+     */
+    public String getDwID()
+    {
+        return dwID;
+    }
+
+    /**
+     * @param dwID
+     *            the dwID to set
+     */
+    public void setDwID(String dwID)
+    {
+        this.dwID = dwID;
+    }
+
+    /**
+     * @return the reply
+     */
+    public String getReply()
+    {
+        return reply;
+    }
+
+    /**
+     * @param reply
+     *            the reply to set
+     */
+    public void setReply(String reply)
+    {
+        this.reply = reply;
+    }
+
+    /**
+     * @return the type
+     */
+    public int getType()
+    {
+        return type;
+    }
+
+    /**
+     * @param type
+     *            the type to set
+     */
+    public void setType(int type)
+    {
+        this.type = type;
+    }
+
+    /**
+     * @return the content
+     */
+    public String getContent()
+    {
+        return content;
+    }
+
+    /**
+     * @param content
+     *            the content to set
+     */
+    public void setContent(String content)
+    {
+        this.content = content;
+    }
+
+    /**
+     * @return the time
+     */
+    public long getTime()
+    {
+        return time;
+    }
+
+    /**
+     * @param time
+     *            the time to set
+     */
+    public void setTime(long time)
+    {
+        this.time = time;
+    }
+
+    /**
+     * @return the momentID
+     */
+    public long getMomentID()
+    {
+        return momentID;
+    }
+
+    /**
+     * @param momentID
+     *            the momentID to set
+     */
+    public void setMomentID(long momentID)
+    {
+        this.momentID = momentID;
+    }
+
+    /**
+     * @return the publisherName
+     */
+    public String getPublisherName()
+    {
+        return publisherName;
+    }
+
+    /**
+     * @param publisherName
+     *            the publisherName to set
+     */
+    public void setPublisherName(String publisherName)
+    {
+        this.publisherName = publisherName;
+    }
+
+    /**
+     * @return the commentStatus
+     */
+    public int getCommentStatus()
+    {
+        return commentStatus;
+    }
+
+    /**
+     * @param commentStatus
+     *            the commentStatus to set
+     */
+    public void setCommentStatus(int commentStatus)
+    {
+        this.commentStatus = commentStatus;
+    }
+    
+    
+
+    /**
+     * @return the anonymous
+     */
+    public boolean isAnonymous()
+    {
+        return anonymous;
+    }
+
+    /**
+     * @param anonymous the anonymous to set
+     */
+    public void setAnonymous(boolean anonymous)
+    {
+        this.anonymous = anonymous;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "CommentEntity [userID=" + userID + ", commentStatus=" + commentStatus + ", dwID=" + dwID + ", commentID=" + commentID + ", momentID=" + momentID + ", publisherID=" + publisherID
+                + ", publisherName=" + publisherName + ", reply=" + reply + ", type=" + type + ", content=" + content + ", time=" + time + ", anonymous=" + anonymous + "]";
+    }
+
+    @Override
+    public int compareTo(CommentEntity another)
+    {
+        return (int)(another.getCommentID() - this.getCommentID());
+    }
+
+  
+}

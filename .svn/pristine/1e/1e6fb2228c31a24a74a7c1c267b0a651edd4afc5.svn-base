@@ -1,0 +1,118 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.stateMachine.type;
+
+import org.simple.eventbus.EventBus;
+
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.stateMachine.MsgContext;
+import cn.sx.decentworld.stateMachine.MsgState;
+import cn.sx.decentworld.stateMachine.param.RefreshParam;
+
+/**
+ * @ClassName: StartSendState.java
+ * @Description: 【6号状态】
+ * @author: cj
+ * @date: 2016年4月27日 下午3:50:58
+ */
+public class SendFailResendState extends MsgState
+{
+    private static final String TAG = "SendFailResendState";
+    // 失败重发次数
+    private int send_fail_resend_count = 0;
+
+    /**
+     * 开始发送消息
+     */
+    @Override
+    public void startSend(String packetID)
+    {
+        LogUtils.d(TAG, "startSend() params[packetID=" + packetID + ",info=do nothing" + "]");
+        // TODO nothing
+
+    }
+
+    /**
+     * 等待wealth回执
+     */
+    @Override
+    public void waitWealthAck(String packetID)
+    {
+        LogUtils.d(TAG, "waitWealthAck() params[packetID=" + packetID + ",info=do nothing" + "]");
+        // TODO nothing
+
+    }
+
+    /**
+     * 等待时间内接收到wealth回执
+     */
+    @Override
+    public void endSuccess(String packetID)
+    {
+        LogUtils.d(TAG, "endSuccess() params[packetID=" + packetID + ",info=do nothing" + "]");
+        // TODO nothing
+
+    }
+
+    /**
+     * 等待时间内没有收到服务器wealth回执，查询
+     */
+    @Override
+    public void queryWealthAck(String packetID)
+    {
+        LogUtils.d(TAG, "queryWealthAck() params[packetID=" + packetID + ",info=do nothing" + "]");
+        // TODO nothing
+
+    }
+
+    /**
+     * 查询结果是服务器没有收到1号消息
+     */
+    @Override
+    public void sendFailResend(String packetID)
+    {
+        send_fail_resend_count++;
+        LogUtils.d(TAG, "sendFailResend() params[packetID=" + packetID + ",send_fail_resend_count=" + send_fail_resend_count + "]");
+        if (send_fail_resend_count > 3)
+        {
+            // 重发超过三次
+            LogUtils.d(TAG, "sendFailResend() params[packetID=" + packetID + ",send failure]");
+            // 进入【6号状态】
+            super.msgContext.setMsgState(MsgContext.endFailureState);
+            super.msgContext.endFailure(packetID);
+        }
+        else
+        {
+            // resend
+            LogUtils.d(TAG, "sendFailResend() params[packetID=" + packetID + ",resend]");
+            // 进入【1号状态】
+            super.msgContext.setMsgState(MsgContext.startSendState);
+            super.msgContext.startSend(packetID);
+        }
+    }
+
+    /**
+     * 发送失败，用户可手动重发
+     */
+    @Override
+    public void endFailure(String packetID)
+    {
+        LogUtils.d(TAG, "endFailure() params[packetID=" + packetID + ",info=do nothing" + "]");
+        // TODO nothing
+
+    }
+
+    /**
+     * 服务器无响应，用户可手动重发
+     */
+    @Override
+    public void endServerNoResponse(String packetID)
+    {
+        LogUtils.d(TAG, "endServerNoResponse() params[packetID=" + packetID + ",info=do nothing" + "]");
+        // TODO nothing
+    }
+
+}

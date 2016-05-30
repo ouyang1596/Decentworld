@@ -25,8 +25,8 @@ public final class MeFragment_
     private View contentView_;
 
     private void init_(Bundle savedInstanceState) {
-        getUserInfo = GetUserInfo_.getInstance_(getActivity());
         toast = ToastComponent_.getInstance_(getActivity());
+        getUserInfo = GetUserInfo_.getInstance_(getActivity());
     }
 
     @Override
@@ -36,29 +36,29 @@ public final class MeFragment_
     }
 
     private void afterSetContentView_() {
-        iv_me_recharge = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me_recharge));
+        tv_me_occupation = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_occupation));
         iv_me_setting = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me_setting));
-        tv_me_short_introduce = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_short_introduce));
-        mTvWorth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_worth));
-        mLlWealthContainer = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_me_wealth));
-        tv_me_name = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_name));
-        tv_me_age = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_age));
-        tv_me_innate = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_innate));
-        tv_me_sign = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_sign));
-        cScroll = ((CustomScrollView) findViewById(cn.sx.decentworld.R.id.sv_chat_me));
-        ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll));
-        iv_me_name_type = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me_name_type));
-        ivGender = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me_gender));
         mPager = ((HackyViewPager) findViewById(cn.sx.decentworld.R.id.vp_me_icon));
-        tv_me_achievement = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_achievement));
-        mTvWealth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_wealth));
-        tv_me_distance = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_distance));
-        tv_me_work = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_work));
+        mTvWorth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_worth));
         tv_me_gender = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_gender));
         mIvUserType = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me_doubt));
-        tv_me_occupation = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_occupation));
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
+        tv_me_name = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_name));
+        ivGender = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me_gender));
+        tv_me_work = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_work));
+        iv_me_recharge = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me_recharge));
+        mLlWealthContainer = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_me_wealth));
+        ll = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll));
+        tv_me_innate = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_innate));
+        tv_me_age = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_age));
+        cScroll = ((CustomScrollView) findViewById(cn.sx.decentworld.R.id.sv_chat_me));
+        mTvWealth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_wealth));
+        tv_me_distance = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_distance));
+        tv_me_short_introduce = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_short_introduce));
+        tv_me_achievement = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_achievement));
+        tv_me_sign = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_me_sign));
+        iv_me_name_type = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me_name_type));
         ((ToastComponent_) toast).afterSetContentView_();
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

@@ -1,0 +1,50 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.task;
+
+import org.jivesoftware.smack.packet.Message;
+import org.simple.eventbus.EventBus;
+
+import android.content.Context;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.engine.ConversationEngine;
+import cn.sx.decentworld.entity.MsgAndInfo;
+import cn.sx.decentworld.entity.UserSessionInfo;
+import cn.sx.decentworld.entity.db.DWMessage;
+import cn.sx.decentworld.handleMessage.DispatchMessage;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.manager.MsgNotifyManager;
+import cn.sx.decentworld.network.utils.JsonUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
+/**
+ * @ClassName: ProcessMessageThread.java
+ * @Description:
+ * @author: cj
+ * @date: 2015年11月28日 上午11:48:00
+ */
+public class ProcessMessageThread extends DWPacketHandler
+{
+    public static final String TAG = "ProcessMessageThread";
+
+    public ProcessMessageThread(Message msg, Context context)
+    {
+        super(msg, context);
+    }
+
+    public ProcessMessageThread()
+    {
+
+    }
+
+    @Override
+    public void run()
+    {
+        Message message = (Message) packet;
+        LogUtils.v(TAG, "run()"+message.toString());
+        DispatchMessage.getInstance().dispatch(message);
+    }
+}

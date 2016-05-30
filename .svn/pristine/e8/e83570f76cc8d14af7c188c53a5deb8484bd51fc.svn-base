@@ -1,0 +1,307 @@
+package cn.sx.decentworld.logSystem;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import com.autonavi.amap.mapcore.FileUtil;
+import com.mob.tools.network.FilePart;
+
+import android.os.Environment;
+import android.util.Log;
+import cn.bmob.v3.datatype.BmobFile;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UploadFileListener;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.FilePath;
+import cn.sx.decentworld.logSystem.dao.LogDao;
+import cn.sx.decentworld.logSystem.entity.LogFileEntity;
+import cn.sx.decentworld.utils.TimeUtils;
+
+/**
+ * 
+ * @author Jansin Miao 2013年4月8日 开发阶段将下面LOG_LEVEL 设置为6这样所有的log都能显示，
+ *         在发布的时候我们将LOG_LEVEL 设置为0.这样log就非常方便管理了
+ */
+public class LogUtils
+{
+    public static int LOG_LEVEL = 6;
+    public static int ERROR = 1;
+    public static int WARN = 2;
+    public static int INFO = 3;
+    public static int DEBUG = 4;
+    public static int VERBOS = 5;
+    public static final String TAG = "dw ";
+    // 是否打印时间
+    private static boolean isShowTime = true;
+    // 日志文件的路径
+    private static String filePath = FilePath.HOME_LOG_REPORT_TO_BMOB;
+
+    /**
+     * 
+     * @param tag
+     *            类名
+     * @param msg
+     *            要输出的一般
+     */
+    public static void v(String tag, String msg)
+    {
+        if (LOG_LEVEL > VERBOS)
+        {
+            Log.v(TAG + tag, getTime() + msg);
+            writeLog("verbose", tag, msg);
+        }
+    }
+
+    /**
+     * 
+     * @param tag
+     *            类名
+     * @param msg
+     *            要输出的调试信息
+     */
+    public static void d(String tag, String msg)
+    {
+        d(tag, msg, false);
+    }
+
+    /**
+     * 上传debug信息到服务器
+     * 
+     * @param tag
+     * @param msg
+     */
+    public static void d(String tag, String msg, boolean upload)
+    {
+        if (LOG_LEVEL > DEBUG)
+        {
+            Log.d(TAG + tag, getTime() + msg);
+            writeLog("debug", tag, msg);
+        }
+        if (upload)
+            LogDao.saveDLog(tag, msg + "[" + getTime() + "]");
+    }
+
+    /**
+     * 
+     * @param tag
+     *            类名
+     * @param msg
+     *            要输出的提示信息
+     */
+
+    public static void i(String tag, String msg)
+    {
+        if (LOG_LEVEL > INFO)
+        {
+            Log.i(TAG + tag, getTime() + msg);
+            writeLog("info", tag, msg);
+        }
+    }
+
+    /**
+     * 
+     * @param tag
+     *            类名
+     * @param msg
+     *            要输出的警告信息
+     */
+    public static void w(String tag, String msg)
+    {
+        w(tag, msg, false);
+    }
+
+    /**
+     * 上传warm信息到服务器
+     * 
+     * @param tag
+     * @param msg
+     */
+    public static void w(String tag, String msg, boolean upload)
+    {
+        if (LOG_LEVEL > WARN)
+        {
+            Log.w(TAG + tag, getTime() + msg);
+            writeLog("warm", tag, msg);
+        }
+        if (upload)
+            LogDao.saveWLog(tag, msg + "[" + getTime() + "]");
+    }
+
+    /**
+     * 
+     * @param tag
+     *            类名
+     * @param msg
+     *            要输出的错误信息（软件存在的错误、异常等信息）
+     */
+    public static void e(String tag, String msg)
+    {
+        e(tag, msg, false);
+    }
+
+    /**
+     * 上传error信息到服务器
+     * 
+     * @param tag
+     * @param msg
+     */
+    public static void e(String tag, String msg, boolean upload)
+    {
+        if (LOG_LEVEL > ERROR)
+        {
+            Log.e(TAG + tag, getTime() + msg);
+            writeLog("error", tag, msg);
+        }
+        if (upload)
+            LogDao.saveELog(tag, msg + "[" + getTime() + "]");
+    }
+
+    /**
+     * 上传日志文件到服务器
+     */
+    public static void uploadLogFile()
+    {
+        Log.d(TAG, "uploadLogFile");
+        String currentTime = TimeUtils.getCurrentTime(TimeUtils.yyyy_MM_dd0HH11mm11ss);
+        addExtraInfo(currentTime);
+        final File file = new File(filePath);
+        File[] listFiles = null;
+        if (file != null)
+        {
+            listFiles = file.listFiles();
+        }
+
+        if (listFiles != null && listFiles.length > 0)
+        {
+            File oldFile = listFiles[0];
+            String newFileName = DecentWorldApp.getInstance().getDwID() + "_" + currentTime + ".txt";
+            File newFile = new File(filePath , newFileName);
+            boolean renameTo = oldFile.renameTo(newFile);
+            if (renameTo)
+            {
+                BmobFile bmobFile = new BmobFile(newFile);
+                bmobFile.upload(DecentWorldApp.getGlobalContext(), new UploadFileListener()
+                {
+                    @Override
+                    public void onSuccess()
+                    {
+                        LogUtils.d(TAG, "uploadLogFile...onSuccess");
+                        if (file != null)
+                        {
+                            FileUtil.deleteFile(file);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(int arg0, String arg1)
+                    {
+                        LogUtils.e(TAG, "uploadLogFile...onFailure");
+                    }
+                });
+            }
+            else
+            {
+                Log.e(TAG, "uploadLogFile...logFile rename failure");
+            }
+        }
+    }
+
+    /**
+     * 删除log文件
+     */
+    public static void deleteLogFile()
+    {
+        Log.i(TAG, "deleteLogFile");
+        String filePath = FilePath.HOME_LOG_REPORT_TO_BMOB;
+        File file = new File(filePath);
+        FileUtil.deleteFile(file);
+    }
+
+    // //////////////////////////////////////私有方法///////////////////////////////////////
+    /**
+     * 获取系统当前时间
+     * 
+     * @return 返回yyyy_MM_dd0HH11mm11ss格式的时间
+     */
+    private static String getTime()
+    {
+        String time = "";
+        if (isShowTime)
+        {
+            SimpleDateFormat formatBuilder = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            String t = formatBuilder.format(new Date());
+            time = "[" + t + "]";
+        }
+        return time;
+    }
+
+    /**
+     * 写日志到文件
+     * 
+     * @param tag
+     * @param info
+     */
+    private static void writeLog(String type, String tag, String msg)
+    {
+        createLogDir();
+        String filePath = FilePath.HOME_LOG_REPORT_TO_BMOB;
+        String fileName = "dwLog" + ".txt";
+        String content = "【" + type + "】" + "---------------------" + getTime() + "\n" + tag + "\t" + msg + "\n\n";
+        FileOutputStream fos = null;
+        try
+        {
+            fos = new FileOutputStream(filePath + fileName , true);
+            fos.write(content.getBytes("UTF-8"));
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            if (fos != null)
+            {
+                try
+                {
+                    fos.close();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * 如果没有路径，则创建
+     */
+    private static void createLogDir()
+    {
+        Log.i(TAG, "createLogDir");
+        String filePath = FilePath.HOME_LOG_REPORT_TO_BMOB;
+        File file = new File(filePath);
+        if (!file.exists())
+        {
+            file.mkdirs();
+        }
+    }
+
+    /**
+     * 给将要上传的文件添加识别实现
+     */
+    private static void addExtraInfo(String time)
+    {
+        Log.i(TAG, "addExtraInfo");
+        i(TAG, "\n\n\n日志文件结束...end\nuserID:" + DecentWorldApp.getInstance().getDwID() + "\ntime:" + time);
+    }
+}

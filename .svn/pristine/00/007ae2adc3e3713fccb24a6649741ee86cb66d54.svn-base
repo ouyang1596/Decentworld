@@ -1,0 +1,247 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.main;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.discover.MomentActivity_;
+import cn.sx.decentworld.activity.discover.WorksCircleActivity_;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.manager.SelfExtraInfoManager;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: FindFragment.java
+ * @Description:
+ * @author: cj
+ * @date: 2016年1月11日 上午11:17:09
+ */
+@EFragment(R.layout.fragment_main_find)
+public class FindFragment extends BaseFragment implements OnClickListener
+{
+    /**
+     * 常量
+     */
+    private static final String TAG = "FindFragment";
+
+    /**
+     * 工具类
+     */
+    @Bean
+    ToastComponent toast;
+
+    /**
+     * 界面资源
+     */
+    // 标题
+    @ViewById(R.id.tv_header_title)
+    TextView tvTitle;
+    // 作品圈
+    @ViewById(R.id.rl_find_works_circle)
+    RelativeLayout rl_find_works_circle;
+    // 朋友圈
+    @ViewById(R.id.rl_find_friends_circle)
+    RelativeLayout rl_find_friends_circle;
+    // 兴趣组
+    @ViewById(R.id.rl_find_interest_group)
+    RelativeLayout rl_find_interest_group;
+
+    // 作品圈未读消息数
+    @ViewById(R.id.tv_find_work_unread_msg_count)
+    TextView mTvWorkUnreadCount;
+    // 朋友圈未读消息数
+    @ViewById(R.id.tv_find_moment_unread_msg_count)
+    TextView mTvMomentUnreadCount;
+    // 新的作品圈发布者头像
+    @ViewById(R.id.iv_find_work_icon)
+    ImageView mIvWorkIcon;
+    // 新的朋友圈发布者头像
+    @ViewById(R.id.iv_find_moment_icon)
+    ImageView mIvMomentIcon;
+
+    /**
+     * 变量
+     */
+    @AfterViews
+    void init()
+    {
+        EventBus.getDefault().register(this);
+        initVar();
+        initListener();
+    }
+
+    /**
+     * 初始化变量
+     */
+    private void initVar()
+    {
+        tvTitle.setText(getResources().getString(R.string.main_bottom_find));
+    }
+
+    /**
+     * 初始化监听
+     */
+    private void initListener()
+    {
+        rl_find_works_circle.setOnClickListener(this);
+        rl_find_friends_circle.setOnClickListener(this);
+        rl_find_interest_group.setOnClickListener(this);
+    }
+
+    @Override
+    protected void lazyLoad()
+    {
+        LogUtils.i(TAG, "lazyLoad");
+    }
+
+    @Override
+    public void turnToTab(int tab)
+    {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * 点击事件
+     */
+    @Override
+    public void onClick(View v)
+    {
+        Intent intent;
+        switch (v.getId())
+        {
+            case R.id.rl_find_works_circle:
+                // 作品圈
+                intent = new Intent(getActivity() , WorksCircleActivity_.class);
+                startActivity(intent);
+                break;
+            case R.id.rl_find_friends_circle:
+                // 朋友圈
+                intent = new Intent(getActivity() , MomentActivity_.class);
+                startActivity(intent);
+                break;
+            case R.id.rl_find_interest_group:
+                // 兴趣组
+                toast.show(Constants.DEVELOPING_NOTIFY);
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        refreshWorkCommentCount("come from onResume()");
+        refreshMomentCommentCount("come from onResume()");
+        refreshNewWorkPublisher("come from onResume()");
+        refreshNewMomentPublisher("come from onResume()");
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
+
+    /**
+     * 刷新作品圈新的评论的数量
+     */
+    @Subscriber(tag = NotifyByEventBus.NT_NEW_WORK_COMMENT)
+    public void refreshWorkCommentCount(String info)
+    {
+        LogUtils.v(TAG, "refreshWorkCommentCount() params[info=" + info + "]");
+        int count = SelfExtraInfoManager.getInstance().getWorkCommentCount();
+        if (count > 0)
+        {
+            mTvWorkUnreadCount.setVisibility(View.VISIBLE);
+            mTvWorkUnreadCount.setText("" + count);
+        }
+        else
+        {
+            mTvWorkUnreadCount.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 刷新朋友圈新的评论的数量
+     */
+    @Subscriber(tag = NotifyByEventBus.NT_NEW_MOMENT_COMMENT)
+    public void refreshMomentCommentCount(String info)
+    {
+        LogUtils.v(TAG, "refreshMomentCommentCount() params[info=" + info + "]");
+        int count1 = SelfExtraInfoManager.getInstance().getMomentCommentCount();
+        if (count1 > 0)
+        {
+            mTvMomentUnreadCount.setVisibility(View.VISIBLE);
+            mTvMomentUnreadCount.setText("" + count1);
+        }
+        else
+        {
+            mTvMomentUnreadCount.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 
+     */
+    @Subscriber(tag = NotifyByEventBus.NT_NEW_WORK)
+    public void refreshNewWorkPublisher(String info)
+    {
+        LogUtils.v(TAG, "refreshNewWorkPublisher() params[info=" + info + "]");
+        String newMomentPublisherID = SelfExtraInfoManager.getInstance().getNewMomentPublisherID();
+
+        if (CommUtil.isNotBlank(newMomentPublisherID))
+        {
+            mIvWorkIcon.setVisibility(View.VISIBLE);
+            String url = ImageUtils.getIconByDwID(newMomentPublisherID, ImageUtils.ICON_SMALL);
+            ImageLoaderHelper.mImageLoader.displayImage(url, mIvWorkIcon);
+        }
+        else
+        {
+            mIvWorkIcon.setVisibility(View.GONE);
+        }
+    }
+
+    /**
+     * 
+     */
+    @Subscriber(tag = NotifyByEventBus.NT_NEW_MOMENT)
+    public void refreshNewMomentPublisher(String info)
+    {
+        LogUtils.v(TAG, "refreshNewMomentPublisher() params[info=" + info + "]");
+        String newWorkPublisherID = SelfExtraInfoManager.getInstance().getNewWorkPublisherID();
+        if (CommUtil.isNotBlank(newWorkPublisherID))
+        {
+            mIvMomentIcon.setVisibility(View.VISIBLE);
+            String url = ImageUtils.getIconByDwID(newWorkPublisherID, ImageUtils.ICON_SMALL);
+            ImageLoaderHelper.mImageLoader.displayImage(url, mIvWorkIcon);
+        }
+        else
+        {
+            mIvMomentIcon.setVisibility(View.GONE);
+        }
+    }
+
+}

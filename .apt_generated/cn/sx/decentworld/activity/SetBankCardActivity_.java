@@ -38,12 +38,12 @@ public final class SetBankCardActivity_
     }
 
     private void afterSetContentView_() {
-        ivEditRealname = ((ImageView) findViewById(id.iv_set_bank_card_edit));
         etAccount = ((EditText) findViewById(id.et_set_bank_card_account));
+        btnSubmit = ((Button) findViewById(id.btn_set_bank_card_submit));
+        ivEditRealname = ((ImageView) findViewById(id.iv_set_bank_card_edit));
         etRealname = ((EditText) findViewById(id.et_set_bank_card_realname));
         tvBack = ((TextView) findViewById(id.tv_set_bank_card_back));
         mBankName = ((EditText) findViewById(id.et_set_bank_card_name));
-        btnSubmit = ((Button) findViewById(id.btn_set_bank_card_submit));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

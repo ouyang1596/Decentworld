@@ -15,6 +15,7 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.KeyboardComponent_;
 import cn.sx.decentworld.component.ui.SearchComponent_;
 import cn.sx.decentworld.widget.ClearEditText;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -33,14 +34,16 @@ public final class SearchActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
+        keyboardComponent = KeyboardComponent_.getInstance_(this);
         searchComponent = SearchComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tvCancel = ((TextView) findViewById(id.tv_cancel));
-        tvSearch = ((TextView) findViewById(id.tv_search));
         cetSearch = ((ClearEditText) findViewById(id.cet_search));
+        tvSearch = ((TextView) findViewById(id.tv_search));
+        tvCancel = ((TextView) findViewById(id.tv_cancel));
         lvSearch = ((PullToRefreshListView) findViewById(id.lv_search));
+        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((SearchComponent_) searchComponent).afterSetContentView_();
         init();
     }

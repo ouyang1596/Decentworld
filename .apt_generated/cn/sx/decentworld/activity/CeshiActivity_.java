@@ -12,11 +12,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.widget.AutoSizeImageView;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
 
 public final class CeshiActivity_
@@ -35,9 +31,6 @@ public final class CeshiActivity_
     }
 
     private void afterSetContentView_() {
-        iv = ((AutoSizeImageView) findViewById(id.iv_contact_avatar));
-        ivDoubt = ((ImageView) findViewById(id.iv_doubt));
-        rel = ((RelativeLayout) findViewById(id.rel_ceshi));
         init();
     }
 

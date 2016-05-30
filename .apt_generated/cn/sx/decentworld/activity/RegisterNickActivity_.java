@@ -42,13 +42,13 @@ public final class RegisterNickActivity_
     }
 
     private void afterSetContentView_() {
-        llRegisterNick = ((LinearLayout) findViewById(id.root_activity_register_nick));
         etNickName = ((EditText) findViewById(id.et_nickname));
-        ivBack = ((ImageView) findViewById(id.iv_back));
-        btnOk = ((Button) findViewById(id.btn_OK));
         rgSex = ((RadioGroup) findViewById(id.rg_sex));
-        tvTitle = ((TextView) findViewById(id.tv_header_title));
         tvOccupation = ((TextView) findViewById(id.tv_occupation_shortIntroduce));
+        llRegisterNick = ((LinearLayout) findViewById(id.ll_nickname));
+        tvTitle = ((TextView) findViewById(id.tv_header_title));
+        btnOk = ((Button) findViewById(id.btn_OK));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((RegisterComponent_) registerComponent).afterSetContentView_();
         init();

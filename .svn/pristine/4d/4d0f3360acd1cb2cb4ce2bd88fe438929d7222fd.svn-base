@@ -1,0 +1,525 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.engine;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.entity.dao.MomentDao;
+import cn.sx.decentworld.entity.db.CommentEntity;
+import cn.sx.decentworld.entity.db.DWMessage;
+import cn.sx.decentworld.entity.db.MomentEntity;
+import cn.sx.decentworld.entity.db.MomentEntity.MomentLevel;
+import cn.sx.decentworld.listener.CommentCallback;
+import cn.sx.decentworld.listener.GetMomentEntityListener;
+import cn.sx.decentworld.listener.NetCallback;
+import cn.sx.decentworld.listener.PublishMomentCallback;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+
+/**
+ * @ClassName: MomentEngine.java
+ * @Description: 作品圈的业务逻辑
+ * @author: cj
+ * @date: 2016年2月26日 下午6:17:20
+ */
+public class MomentEngine
+{
+    private static final String TAG = "MomentEngine";
+    private SendUrl sendUrl;
+    private String userID;
+
+    /**
+     * 构造函数
+     */
+    public MomentEngine()
+    {
+        sendUrl = new SendUrl();
+        userID = DecentWorldApp.getInstance().getDwID();
+    }
+
+    /**
+     * 进入朋友圈时初始化数据
+     * 
+     * @return
+     */
+    public void initData(GetMomentEntityListener listener)
+    {
+        List<MomentEntity> allData = new MomentDao().getAllData();
+        if (allData != null && allData.size() > 0)
+        {
+            for (MomentEntity entity : allData)
+            {
+                List<CommentEntity> list = new ArrayList<CommentEntity>();
+                CommentEntity temp;
+                for (int i = 0; i < 5; i++)
+                {
+                    temp = new CommentEntity();
+                    temp.setReply("Jackhen" + i);
+                    temp.setContent("评论内容" + i);
+                    list.add(temp);
+                }
+                entity.setCommentList(list);
+            }
+            listener.onSuccess(allData);
+        }
+        else
+        {
+            if (NetworkUtils.isNetWorkConnected(DecentWorldApp.getGlobalContext()))
+            {
+                // 从网络获取数据
+                downRefreshE(0, 0, listener);
+            }
+        }
+    }
+
+    /**
+     * 清除作品圈的缓存数据
+     */
+    public boolean clearCacheData()
+    {
+        return new MomentDao().cleanAllData();
+    }
+
+    /**
+     * 下拉刷新
+     * 
+     * @param remoteID
+     *            为客户端已储存的最大的朋友圈的ID，即已储存的最新的朋友圈ID,如果没有则传默认值0；
+     * @param commentIndex
+     *            为客户端已储存的最大的评论的ID，即已储存的最新的评论ID,如果没有则传默认值 0；
+     * @param listener
+     *            回调监听
+     */
+    public void downRefresh(long remoteID, long commentIndex, GetMomentEntityListener listener)
+    {
+        downRefreshE(remoteID, commentIndex, listener);
+    }
+
+    /**
+     * 上拉拉刷新
+     * 
+     * @param index
+     *            为客户端已储存的最大的朋友圈的ID，即已储存的最新的朋友圈ID
+     * @param publisher
+     *            发布者ID
+     */
+    public void upRefresh(long index, String publisherID)
+    {
+        // 写业务逻辑
+        LogUtils.w(TAG, "upRefresh() params[index=" + index + ",publisherID=" + publisherID + "]" + " info=" + "需要写业务逻辑");
+
+    }
+
+    /**
+     * 发布朋友圈
+     * 
+     * @param entity
+     *            朋友圈实体
+     * @param files
+     *            文件（音频和图片）
+     * @param blocklist
+     *            不让谁看
+     * @param onlyshowtolist
+     *            提醒谁看
+     * @param listener
+     *            回调监听
+     */
+    public void publish(MomentEntity entity, ArrayList<String> blocklist, ArrayList<String> onlyshowtolist, PublishMomentCallback listener)
+    {
+        publishE(entity, blocklist, onlyshowtolist, listener);
+    }
+
+    /**
+     * 评论
+     * 
+     * @param commentEntity
+     * @param listener
+     */
+    public void comment(CommentEntity commentEntity, CommentCallback listener)
+    {
+        commentE(commentEntity, listener);
+    }
+
+    // //////////////////////////////////////////////私有方法///////////////////////////////////////////
+    /**
+     * 发送通知
+     * 
+     * @param handler
+     * @param what
+     * @param info
+     */
+    private void sendHandlerMsg(Handler handler, int what, Object info)
+    {
+        Message message = Message.obtain();
+        message.what = what;
+        message.obj = info;
+        handler.sendMessage(message);
+    }
+
+    private void downRefreshE(long remoteID, long commentIndex, final GetMomentEntityListener listener)
+    {
+        final Handler handler = new Handler()
+        {
+            public void handleMessage(Message msg)
+            {
+                switch (msg.what)
+                {
+                    case -1:
+                        // 获取错误，网络错误
+                        listener.onFailure(msg.obj.toString());
+                        break;
+                    case 0:
+                        // 获取成功
+                        String result = msg.obj.toString();
+                        handleDownloadResult(result, listener);
+                        break;
+                    case 1:
+                        // 获取失败，其它原因
+                        listener.onFailure(msg.obj.toString());
+                        break;
+                    default:
+                        break;
+                }
+            };
+        };
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("dwID", userID);
+        map.put("index", String.valueOf(remoteID));
+        map.put("commentIndex", String.valueOf(commentIndex));
+        LogUtils.v(TAG, "downRefreshE() params:" + JSON.toJSONString(map));
+        sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_MOMENT_DOWN_REFRESH, Method.GET, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String resultJSON, ResultBean resultBean)
+            {
+                LogUtils.v(TAG, "downRefreshE() onSuccess,resultJSON:" + resultJSON);
+                if (resultBean.getResultCode() == 2222)
+                {
+                    LogUtils.v(TAG, "downRefreshE() success");
+                    sendHandlerMsg(handler, 0, resultBean.getData().toString());
+                }
+                else if (resultBean.getResultCode() == 3333)
+                {
+                    LogUtils.w(TAG, "downRefreshE() failure");
+                    sendHandlerMsg(handler, 1, "下拉刷新失败");
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.e(TAG, "downRefreshE() onFailure,cause by:" + e);
+                sendHandlerMsg(handler, -1, Constants.NET_WRONG);
+            }
+        });
+    }
+
+    /**
+     * 处理下拉刷新返回的结果
+     * 
+     * @param resultJson
+     *            从服务器请求的数据
+     * @return 当size = 0时，表示没有数据
+     */
+    private void handleDownloadResult(String resultJson, GetMomentEntityListener listener)
+    {
+        LogUtils.v(TAG, "handleDownloadResult params[resultJson=" + resultJson + "]");
+        ArrayList<MomentEntity> momentEntities = new ArrayList<MomentEntity>();
+        JSONObject object = JSON.parseObject(resultJson);
+        // 判断是否为最新数据
+        String momentsJson = object.getString("moments");
+        String commentsJson = object.getString("comments");
+        if (CommUtil.isBlank(momentsJson) && CommUtil.isBlank(commentsJson))
+        {
+            LogUtils.i(TAG, "已经是最新数据");
+            listener.onSuccess(momentEntities);
+            return;
+        }
+        // 解析作品圈实体
+        if (CommUtil.isNotBlank(momentsJson))
+        {
+            JSONArray momentsArray = JSON.parseArray(momentsJson);
+            MomentEntity momentEntity;
+            if (momentsArray != null && momentsArray.size() > 0)
+            {
+                for (int i = 0; i < momentsArray.size(); i++)
+                {
+                    momentEntity = new MomentEntity();
+                    JSONObject moment = momentsArray.getJSONObject(i);
+                    momentEntity.setMomentID(moment.getLongValue("id"));
+                    momentEntity.setContentType(moment.getIntValue("contentType"));
+                    momentEntity.setLevel(moment.getIntValue("level"));
+
+                    momentEntity.setPublishTime(moment.getLongValue("date"));
+                    momentEntity.setPublisherID(moment.getString("dwID"));
+                    momentEntity.setPublisherName(moment.getString("publisherName"));
+                    momentEntity.setContent(moment.getString("content"));
+
+                    momentEntity.setCommentCount(moment.getIntValue("comment"));
+                    momentEntity.setDislikeCount(moment.getIntValue("dislike"));
+                    momentEntity.setDownCount(moment.getIntValue("down"));
+                    momentEntity.setLikeCount(moment.getIntValue("like"));
+
+                    if (momentEntity.getContentType() == MomentEntity.MomentType.TXT.getIndex())
+                    {
+                        momentEntity.setRemoteUrl("");
+                    }
+                    else if (momentEntity.getContentType() == MomentEntity.MomentType.VOICE.getIndex())
+                    {
+                        momentEntity.setRemoteUrl(moment.getString("audioUrl"));
+                    }
+                    else if (momentEntity.getContentType() == MomentEntity.MomentType.IMAGE.getIndex())
+                    {
+                        momentEntity.setRemoteUrl(moment.getString("imgUrl"));
+                    }
+                    momentEntity.setMomentStatus(MomentEntity.MomentStatus.SUCCESSED.getIndex());
+                    momentEntity.save();
+                    momentEntities.add(0, momentEntity);
+                }
+            }
+        }
+
+        // 解析作品圈评论实体
+        if (CommUtil.isNotBlank(momentsJson))
+        {
+            // 解析数据
+
+        }
+        listener.onSuccess(momentEntities);
+    }
+
+    /**
+     * 
+     * @param entity
+     *            朋友圈实体
+     * @param files
+     *            文件：语音（最多一个）、图片（最多9张）
+     * @param blocklist
+     *            不让谁看
+     * @param onlyshowtolist
+     *            提醒谁看
+     * @param listener
+     *            回调监听
+     */
+    private void publishE(final MomentEntity entity, ArrayList<String> blocklist, ArrayList<String> onlyshowtolist, final PublishMomentCallback listener)
+    {
+        LogUtils.v(TAG, "publishE() " + entity.toString());
+        final Handler handler = new Handler()
+        {
+            public void handleMessage(Message msg)
+            {
+                switch (msg.what)
+                {
+                    case -1:
+                        // 获取错误，网络错误
+                        listener.onFailure(msg.obj.toString());
+                        break;
+                    case 0:
+                        // 获取成功
+                        ResultBean resultBean = (ResultBean) msg.obj;
+                        // 将发布成功的朋友圈的ID保存
+                        JSONObject jsonObject = JSON.parseObject(resultBean.getData().toString());
+                        long momentID = jsonObject.getLongValue("momentID");
+                        entity.setMomentID(momentID);
+                        entity.setMomentStatus(MomentEntity.MomentStatus.SUCCESSED.getIndex());
+                        entity.save();
+                        // 提示信息
+                        String info = resultBean.getMsg();
+                        listener.onSuccess(entity, info);
+                        break;
+                    case 1:
+                        // 获取失败，其它原因
+                        listener.onFailure(msg.obj.toString());
+                        break;
+                    default:
+                        break;
+                }
+            };
+        };
+        HashMap<String, String> map = new HashMap<String, String>();
+        // 用户ID
+        map.put("dwID", userID);
+        // 发布者显示的名字（实名、昵称）
+        map.put("publisherName", entity.getPublisherName());
+        // 文字内容
+        map.put("content", entity.getContent());
+        // 类型：文字（0）、语音（1）、图片（2）
+        map.put("type", entity.getContentType() + "");
+        // 发布级别：所有（0）、朋友（1）、亲友（2）
+        map.put("level", entity.getLevel() + "");
+        // 创建文件
+        File[] files;
+        if (entity.getContentType() == DWMessage.VOICE)
+        {
+            files = new File[1];
+            files[0] = new File(entity.getLocalUrl());
+        }
+        else if (entity.getContentType() == DWMessage.IMAGE)
+        {
+            String[] imagePaths = entity.getLocalUrl().split(";");
+            files = new File[imagePaths.length];
+            for (int i = 0; i < imagePaths.length; i++)
+            {
+                files[i] = new File(imagePaths[i]);
+            }
+        }
+        else
+        {
+            files = new File[0];
+        }
+        LogUtils.v(TAG, "publishE() params:" + JSON.toJSONString(map));
+        // 网络请求
+        sendUrl.httpRequestWithPublish(map, files, blocklist, onlyshowtolist, Constants.CONTEXTPATH + ConstantNet.API_MOMENT_PUBLISH, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String resultJSON, ResultBean resultBean)
+            {
+                LogUtils.v(TAG, "publishE() onSuccess,resultJSON:" + resultJSON);
+                if (resultBean.getResultCode() == 2222)
+                {
+                    // 发布成功
+                    LogUtils.v(TAG, "publishE() success," + resultBean.getData());
+                    sendHandlerMsg(handler, 0, resultBean);
+                }
+                else if (resultBean.getResultCode() == 3333)
+                {
+                    LogUtils.v(TAG, "publishE() failure,resultBean.getMsg=" + resultBean.getMsg());
+                    entity.setMomentStatus(MomentEntity.MomentStatus.FAILURED.getIndex());
+                    entity.save();
+                    sendHandlerMsg(handler, 1, resultBean.getMsg());
+                }
+                else
+                {
+                    LogUtils.v(TAG, "publishE() failure,resultBean.getMsg=" + resultBean.getMsg());
+                    entity.setMomentStatus(MomentEntity.MomentStatus.FAILURED.getIndex());
+                    entity.save();
+                    sendHandlerMsg(handler, 1, "发送朋友圈失败");
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.e(TAG, "publishE() onFailure,cause by:" + e);
+                entity.setMomentStatus(MomentEntity.MomentStatus.FAILURED.getIndex());
+                entity.save();
+                sendHandlerMsg(handler, -1, Constants.NET_WRONG);
+            }
+        });
+    }
+
+    /**
+     * 评论
+     * @param commentEntity
+     * @param listener
+     */
+    private void commentE(final CommentEntity commentEntity, final CommentCallback listener)
+    {
+        final Handler handler = new Handler()
+        {
+            public void handleMessage(Message msg)
+            {
+                switch (msg.what)
+                {
+                    case -1:
+                        // 获取错误，网络错误
+                        commentEntity.save();
+                        listener.onFailure(msg.obj.toString(), commentEntity);
+                        break;
+                    case 0:
+                        // 评论成功
+                        long commentID = Long.valueOf(msg.obj.toString());
+                        commentEntity.setCommentID(commentID);
+                        commentEntity.save();
+                        listener.onSuccess("成功", commentEntity);
+                        break;
+                    case 1:
+                        // 获取失败，其它原因
+                        commentEntity.save();
+                        listener.onFailure(msg.obj.toString(), commentEntity);
+                        break;
+                    default:
+                        break;
+                }
+            };
+        };
+        String comment = JsonUtils.bean2json(commentEntity);
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("dwID", userID);
+        map.put("comment", comment);
+        LogUtils.v(TAG, "commentE() params:" + JSON.toJSONString(map));
+        // 网络请求
+        sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_MOMENT_COMMENT, Method.GET, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String resultJSON, ResultBean resultBean)
+            {
+                LogUtils.v(TAG, "commentE() resultJSON：" + resultJSON);
+                if(resultBean.getResultCode() == 2222)
+                {
+                    LogUtils.v(TAG, "commentE() success");
+                    // 将发布成功的评论的ID保存
+                    JSONObject jsonObject = JSON.parseObject(resultBean.getData().toString());
+                    long commentID = jsonObject.getLongValue("commentID");
+                    sendHandlerMsg(handler, 0, commentID);
+                    
+                }else if(resultBean.getResultCode() == 3333)
+                {
+                    LogUtils.w(TAG, "commentE() failure,resultBean.getMsg=" + resultBean.getMsg());
+                    sendHandlerMsg(handler, 1, resultBean.getMsg());
+                }
+                else if(resultBean.getResultCode() == 4444)
+                {
+                    LogUtils.v(TAG, "commentE() success,对方身家不足");
+                    // 将发布成功的评论的ID保存
+                    JSONObject jsonObject = JSON.parseObject(resultBean.getData().toString());
+                    long commentID = jsonObject.getLongValue("commentID");
+                    sendHandlerMsg(handler, 0, commentID);
+                }
+                else if(resultBean.getResultCode() == 5555)
+                {
+                    LogUtils.v(TAG, "commentE() success,自己身家不足");
+                    // 将发布成功的评论的ID保存
+                    JSONObject jsonObject = JSON.parseObject(resultBean.getData().toString());
+                    long commentID = jsonObject.getLongValue("commentID");
+                    sendHandlerMsg(handler, 0, commentID);
+                }
+                else
+                {
+                    LogUtils.w(TAG, "commentE() failure,未知返回码，resultBean.getMsg=" + resultBean.getMsg());
+                    sendHandlerMsg(handler, 1, "失败");
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.e(TAG, "commentE() onFailure,cause by:" + e);
+                sendHandlerMsg(handler, -1, Constants.NET_WRONG);
+            }
+        });
+    }
+}

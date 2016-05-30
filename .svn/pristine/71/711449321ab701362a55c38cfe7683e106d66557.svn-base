@@ -1,0 +1,56 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.dao;
+
+import java.util.List;
+
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.entity.db.MomentEntity;
+
+/**
+ * @ClassName: MomentDao.java
+ * @Description: 朋友圈数据访问
+ * @author: cj
+ * @date: 2016年4月11日 上午10:54:24
+ */
+public class MomentDao
+{
+    private static final int count = 10;
+    
+    /**
+     * 构造函数
+     */
+    public MomentDao()
+    {
+
+    }
+    
+    /**
+     * 获取当前用户所有的朋友圈数据
+     * @return
+     */
+    public List<MomentEntity> getAllData()
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID = ?";
+        List<MomentEntity> execute = new Select().from(MomentEntity.class).where(sql, userID).limit(count).orderBy("momentID desc").execute();
+        return execute;
+    }
+    
+    /**
+     * 清除当前用户的所有朋友圈数据
+     * @return
+     */
+    public boolean cleanAllData()
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID = ?";
+        new Delete().from(MomentEntity.class).where(sql, userID).execute();
+        return true;
+    }
+
+}

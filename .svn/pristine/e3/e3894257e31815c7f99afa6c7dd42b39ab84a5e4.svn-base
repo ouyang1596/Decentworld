@@ -1,0 +1,69 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.task;
+
+import android.os.AsyncTask;
+import cn.sx.decentworld.common.XmppHelper;
+import cn.sx.decentworld.listener.ConnectOpenFireListener;
+import cn.sx.decentworld.logSystem.LogUtils;
+
+/**
+ * 
+ * @ClassName: ConnectOpenFireTask.java
+ * @Description: 传入 dwID 和 password，登录openfire，登录成功后回调，并向服务器发送上线通知，登录失败后回调失败结果；
+ * @author: cj
+ * @date: 2016年3月5日 下午1:45:30
+ */
+public class ConnectOpenFireTask extends AsyncTask<String, Void, Integer>
+{
+    private static final String TAG = "ConnectOpenFireTask";
+    public static final int FAILURE = -1;
+    public static final int SUCCESS = 0;
+
+    // 监听
+    private ConnectOpenFireListener mConnectedOpenFireListener;
+
+    /**
+     * 设置监听
+     * @param listener
+     */
+    public void setOnConnectOpenFireListener(ConnectOpenFireListener listener)
+    {
+        this.mConnectedOpenFireListener = listener;
+    }
+
+    /**
+     * 后台登录
+     */
+    @Override
+    protected Integer doInBackground(String... params)
+    {
+        return XmppHelper.openFireLogin(params[0],params[1]);
+    }
+
+    @Override
+    protected void onPostExecute(Integer result)
+    {
+        super.onPostExecute(result);
+        // 回调连接成功或者失败的监听接口
+        if (result == SUCCESS)
+        {
+            if (null != mConnectedOpenFireListener)
+            {
+                mConnectedOpenFireListener.onSuccess();
+                //重连成功后发送上线的通知
+                XmppHelper.sendPresence();
+                LogUtils.i(TAG, "onPostExecute...连接openfire成功");
+            }
+        }
+        else if (result == FAILURE)
+        {
+            if (null != mConnectedOpenFireListener)
+            {
+                mConnectedOpenFireListener.onFailure();
+                LogUtils.i(TAG, "onPostExecute...连接openfire失败");
+            }
+        }
+    }
+}

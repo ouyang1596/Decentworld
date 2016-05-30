@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R.layout;
@@ -31,10 +32,14 @@ public final class FindFragment_
     }
 
     private void afterSetContentView_() {
+        mTvMomentUnreadCount = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_find_moment_unread_msg_count));
         rl_find_works_circle = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_find_works_circle));
+        mIvWorkIcon = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_find_work_icon));
+        mTvWorkUnreadCount = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_find_work_unread_msg_count));
         rl_find_friends_circle = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_find_friends_circle));
         tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
         rl_find_interest_group = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_find_interest_group));
+        mIvMomentIcon = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_find_moment_icon));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

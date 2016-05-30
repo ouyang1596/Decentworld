@@ -1,0 +1,350 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.util.List;
+
+import android.content.Context;
+import android.content.Intent;
+import android.support.v4.app.FragmentActivity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.EditClassesActivity_;
+import cn.sx.decentworld.activity.EditCommon1Activity_;
+import cn.sx.decentworld.activity.EditCommon2Activity_;
+import cn.sx.decentworld.activity.EditCommon3Activity_;
+import cn.sx.decentworld.activity.EditCorporationActivity_;
+import cn.sx.decentworld.activity.EditDepartmentActivity_;
+import cn.sx.decentworld.activity.EditIsMarriedActivity_;
+import cn.sx.decentworld.activity.EditJobActivity_;
+import cn.sx.decentworld.activity.EditNicknameActivity_;
+import cn.sx.decentworld.activity.EditOccupationActivity_;
+import cn.sx.decentworld.activity.EditPhoneActivity_;
+import cn.sx.decentworld.activity.EditRealnameActivity_;
+import cn.sx.decentworld.activity.EditSchoolActivity_;
+import cn.sx.decentworld.activity.EditSignActivity_;
+import cn.sx.decentworld.activity.EditUserInfoActivity;
+import cn.sx.decentworld.bean.UserInfoField.Field;
+import cn.sx.decentworld.bean.UserInfoField.FieldGroup;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.entity.SelfUserField;
+import cn.sx.decentworld.entity.db.ContactUser;
+import cn.sx.decentworld.entity.db.ContactUser.UserType;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.manager.SelfInfoManager;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper.LoginType;
+
+/**
+ * @ClassName: UserInfoItemAdapter.java
+ * @Description: 个人信息适配器
+ * @author: cj
+ * @date: 2015年10月11日 上午10:19:55
+ */
+public class UserInfoAdapter extends BaseAdapter {
+	private static final String TAG = "UserInfoAdapter";
+	private Context context;
+	private LayoutInflater inflater;
+	private List<SelfUserField> mDatas;
+	private boolean isEdit = false;
+
+	public UserInfoAdapter(Context context, List<SelfUserField> mDatas) {
+		this.context = context;
+		this.mDatas = mDatas;
+		this.inflater = LayoutInflater.from(context);
+	}
+
+	public UserInfoAdapter(Context context, List<SelfUserField> mDatas, boolean isEdit) {
+		this.context = context;
+		this.mDatas = mDatas;
+		this.inflater = LayoutInflater.from(context);
+		this.isEdit = isEdit;
+	}
+
+	@Override
+	public int getCount() {
+		return mDatas == null ? 0 : mDatas.size();
+	}
+
+	@Override
+	public Object getItem(int position) {
+		return mDatas.get(position);
+	}
+
+	@Override
+	public long getItemId(int position) {
+		return position;
+	}
+
+	@Override
+	public View getView(final int position, View convertView, ViewGroup parent) {
+		ViewHolder holder = null;
+		if (convertView == null) {
+			holder = new ViewHolder();
+			convertView = inflater.inflate(R.layout.activity_edit_user_info_item, null);
+			holder.llTitleContainer = (LinearLayout) convertView.findViewById(R.id.ll_item_edit_user_info_title);
+			holder.ivIcon = (ImageView) convertView.findViewById(R.id.iv_item_edit_user_info_title_icon);
+			holder.tvTitle = (TextView) convertView.findViewById(R.id.tv_item_edit_user_info_title_value);
+			holder.rlContentContainer = (RelativeLayout) convertView.findViewById(R.id.rl_item_edit_user_info_content);
+			holder.ivSwitch = (ImageView) convertView.findViewById(R.id.iv_item_edit_user_info_content_switch);
+			holder.tvName = (TextView) convertView.findViewById(R.id.tv_item_edit_user_info_content_name);
+			holder.tvValue = (TextView) convertView.findViewById(R.id.tv_item_edit_user_info_content_value);
+			holder.ivMore = (ImageView) convertView.findViewById(R.id.iv_item_edit_user_info_content_more);
+			convertView.setTag(holder);
+		} else {
+			holder = (ViewHolder) convertView.getTag();
+		}
+
+		final SelfUserField infoItem = mDatas.get(position);
+		int group = infoItem.getGroup();
+		String groupName = FieldGroup.getFieldGroup(group).getGroupName();
+		boolean isDisplay = infoItem.isDisplayAuth();
+
+		int fieldCode2 = infoItem.getFieldCode();
+		String value = infoItem.getFieldValue();
+		String name = infoItem.getFieldName();
+
+		// 非编辑状态
+		if (position == 0) {
+			holder.llTitleContainer.setVisibility(View.VISIBLE);
+		} else {
+			SelfUserField selfUserField = mDatas.get(position - 1);
+			int group2 = selfUserField.getGroup();
+			if (group == group2)
+				holder.llTitleContainer.setVisibility(View.GONE);
+			else
+				holder.llTitleContainer.setVisibility(View.VISIBLE);
+		}
+		holder.tvTitle.setText(groupName);
+		holder.tvName.setText(name);
+
+		// 一些情况必须处理后才能显示（位置、用户类型）
+		if (fieldCode2 == Field.LOCATION.getFieldCode())
+			holder.tvValue.setText(value);
+		else if (fieldCode2 == Field.USER_TYPE.getFieldCode())
+			holder.tvValue.setText(ContactUser.UserType.getText(Integer.valueOf(value)));
+		else
+			holder.tvValue.setText(value);
+
+		// 如果是编辑页面，则出现more图标，Item可以点击
+		if (isEdit) {
+			int fieldCode = mDatas.get(position).getFieldCode();
+			// 开关的显示与隐藏
+			if ((fieldCode == Field.NICKNAME.getFieldCode()) || (fieldCode == Field.USER_TYPE.getFieldCode())
+					|| (fieldCode == Field.WORTH.getFieldCode())) {
+				// 不能修改权限
+				holder.ivSwitch.setVisibility(View.INVISIBLE);
+			} else {
+				// 可以修改权限
+				holder.ivSwitch.setVisibility(View.VISIBLE);
+				if (isDisplay)
+					holder.ivSwitch.setImageResource(R.drawable.switch_rectangle_open);
+				else
+					holder.ivSwitch.setImageResource(R.drawable.switch_rectangle_close);
+				holder.ivSwitch.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						LogUtils.v(TAG, "点击了开关");
+						ImageView iv = (ImageView) v;
+						SelfUserField selfUserField = mDatas.get(position);
+						if (selfUserField != null) {
+							if (selfUserField.isDisplayAuth()) {
+								iv.setImageResource(R.drawable.switch_rectangle_close);
+								selfUserField.setDisplayAuth(false);
+								selfUserField.setModify(true);
+							} else {
+								iv.setImageResource(R.drawable.switch_rectangle_open);
+								selfUserField.setDisplayAuth(true);
+								selfUserField.setModify(true);
+							}
+						}
+					}
+				});
+			}
+			// 更多
+			if ((fieldCode == Field.ID.getFieldCode())
+					|| (fieldCode == Field.USER_TYPE.getFieldCode())
+					|| (fieldCode == Field.GENDER.getFieldCode())
+					|| (fieldCode == Field.WEALTH.getFieldCode())
+					|| (fieldCode == Field.WORTH.getFieldCode())
+					|| (fieldCode == Field.AGE.getFieldCode() && SelfInfoManager.getInstance().getUserTypeInt() != UserType.IMPEACH
+							.getIndex())) {
+				holder.ivMore.setVisibility(View.INVISIBLE);
+			} else {
+				// 不显示
+				if ((fieldCode == Field.PHONENUM.getFieldCode())
+						&& (UserInfoHelper.getLoginType() == LoginType.PHONE_NUM.getType())) {
+					holder.ivMore.setVisibility(View.INVISIBLE);
+				} else {
+					holder.ivMore.setVisibility(View.VISIBLE);
+					holder.rlContentContainer.setOnClickListener(new OnClickListener() {
+						@Override
+						public void onClick(View v) {
+							int fieldCode = mDatas.get(position).getFieldCode();
+							String fieldName = mDatas.get(position).getFieldName();
+							String fieldValue = mDatas.get(position).getFieldValue();
+							LogUtils.v(TAG, "position=" + position + ",SelfUserField=" + mDatas.get(position).toString());
+							if (fieldCode == Field.SIGN.getFieldCode()) {
+								Intent intent = new Intent(context, EditSignActivity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("title", fieldName);
+								intent.putExtra("oldData", fieldValue);
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_SIGN);
+							} else if (fieldCode == Field.REALNAME.getFieldCode()) {
+								Intent intent = new Intent(context, EditRealnameActivity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_REALNAME);
+							} else if (fieldCode == Field.NICKNAME.getFieldCode()) {
+								Intent intent = new Intent(context, EditNicknameActivity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_NICKNAME);
+							} else if (fieldCode == Field.SCHOOL.getFieldCode()) {
+								Intent intent = new Intent(context, EditSchoolActivity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_SCHOOL);
+							} else if (fieldCode == Field.DEPARTMENT.getFieldCode()) {
+								Intent intent = new Intent(context, EditDepartmentActivity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_DEPARTMENT);
+							} else if (fieldCode == Field.CLASS.getFieldCode()) {
+								Intent intent = new Intent(context, EditClassesActivity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_CLASSES);
+							} else if (fieldCode == Field.OCCUPATION.getFieldCode()) {
+								Intent intent = new Intent(context, EditOccupationActivity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_OCCUPATION);
+							} else if (fieldCode == Field.CORPORATION.getFieldCode()) {
+								Intent intent = new Intent(context, EditCorporationActivity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_CORPORATION);
+							} else if (fieldCode == Field.POSITION.getFieldCode()) {
+								Intent intent = new Intent(context, EditJobActivity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_JOB);
+							}
+							// 既可以自定义，也可以选择
+							else if ((fieldCode == Field.RELIGION.getFieldCode())
+									|| (fieldCode == Field.SPECIALITY.getFieldCode()) || (fieldCode == Field.IDOL.getFieldCode())
+									|| (fieldCode == Field.FOOT_PRINT.getFieldCode())
+									|| (fieldCode == Field.LIKE_BOOK.getFieldCode())
+									|| (fieldCode == Field.LIKE_MUSIC.getFieldCode())
+									|| (fieldCode == Field.LIKE_MOVIE.getFieldCode())
+									|| (fieldCode == Field.LIKE_SPORT.getFieldCode())
+									|| (fieldCode == Field.LIKE_CATE.getFieldCode())) {
+								Intent intent = new Intent(context, EditCommon1Activity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("title", mDatas.get(position).getFieldName());
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_COMMON1);
+							}
+							// 只可以自定义
+							else if ((fieldCode == Field.HOMETOWN.getFieldCode()) || fieldCode == Field.PHONENUM.getFieldCode()
+									|| (fieldCode == Field.EMAIL.getFieldCode()) || (fieldCode == Field.QQ.getFieldCode())
+									|| fieldCode == Field.WECHAT.getFieldCode() || (fieldCode == Field.BLOG.getFieldCode())
+									|| (fieldCode == Field.CAR.getFieldCode()) || fieldCode == Field.MOTTO.getFieldCode()
+									|| fieldCode == Field.AGE.getFieldCode() || fieldCode == Field.MAJOR.getFieldCode()
+									|| fieldCode == Field.HEIGHT.getFieldCode() || fieldCode == Field.PHONENUM.getFieldCode()) {
+								if ((fieldCode == Field.PHONENUM.getFieldCode())) {
+									if (UserInfoHelper.getLoginType() == LoginType.WX.getType()) {
+										Intent intent = new Intent(context, EditPhoneActivity_.class);
+										intent.putExtra("position", position);
+										intent.putExtra("title", mDatas.get(position).getFieldName());
+										intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+										((FragmentActivity) context).startActivityForResult(intent,
+												EditUserInfoActivity.REQUESTCODE_EDIT_PHONENUM);
+									}
+								} else {
+									Intent intent = new Intent(context, EditCommon2Activity_.class);
+									intent.putExtra("position", position);
+									intent.putExtra("title", mDatas.get(position).getFieldName());
+									intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+									((FragmentActivity) context).startActivityForResult(intent,
+											EditUserInfoActivity.REQUESTCODE_EDIT_COMMON2);
+								}
+							}
+							// 只可以选择
+							else if ((fieldCode == Field.NATION.getFieldCode()) || (fieldCode == Field.BLOOD_TYPE.getFieldCode())
+									|| (fieldCode == Field.CONSTELLATORY.getFieldCode())) {
+								Intent intent = new Intent(context, EditCommon3Activity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("title", mDatas.get(position).getFieldName());
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_COMMON3);
+							} else if (fieldCode == Field.MARITAL_STATUS.getFieldCode()) {
+								// 修改婚姻状况
+								Intent intent = new Intent(context, EditIsMarriedActivity_.class);
+								intent.putExtra("position", position);
+								intent.putExtra("title", mDatas.get(position).getFieldName());
+								intent.putExtra("oldData", mDatas.get(position).getFieldValue());
+								((FragmentActivity) context).startActivityForResult(intent,
+										EditUserInfoActivity.REQUESTCODE_EDIT_COMMON3);
+							}
+						}
+					});
+				}
+			}
+		} else {
+			// 如果是不是编辑页面，只是信息展示界面，则隐藏more图标，Item不可以点击
+			holder.ivSwitch.setVisibility(View.GONE);
+			holder.ivMore.setVisibility(View.GONE);
+		}
+		return convertView;
+	}
+
+	class ViewHolder {
+		LinearLayout llTitleContainer;// 标题容器
+		ImageView ivIcon;// 标题图标
+		TextView tvTitle;// 标题文字
+		RelativeLayout rlContentContainer;//
+		ImageView ivSwitch;// 开关
+		TextView tvName;// 名字
+		TextView tvValue;// 值
+		ImageView ivMore;// 更多
+	}
+
+	/**
+	 * 判断是否可以修改手机号码
+	 */
+	public boolean isPhoneNumModify(SelfUserField selfUserField) {
+		LogUtils.d(TAG, "isPhoneNumModify() " + selfUserField.toString());
+		int fieldCode = selfUserField.getFieldCode();
+		int loginType = UserInfoHelper.getLoginType();
+		LogUtils.d(TAG, "isPhoneNumModify() loginType" + loginType);
+		if ((fieldCode == Field.PHONENUM.getFieldCode()) && (loginType == LoginType.WX.getType())) {
+			LogUtils.d(TAG, "isPhoneNumModify() return true");
+			return true;
+		}
+		LogUtils.d(TAG, "isPhoneNumModify() return false");
+		return false;
+	}
+}

@@ -30,10 +30,10 @@ public final class AdvanceSettingFragment_
 
     private void afterSetContentView_() {
         ll_advance_setting_root = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_advance_setting_root));
-        iv_advance_setting_push_system = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_setting_push_system));
-        iv_advance_ifClose_voice_friend = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_ifClose_voice_friend));
         iv_advance_ifClose_voice_stranger = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_ifClose_voice_stranger));
+        iv_advance_setting_push_system = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_setting_push_system));
         iv_advance_setting_acceptCheckPush = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_setting_acceptCheckPush));
+        iv_advance_ifClose_voice_friend = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_advance_ifClose_voice_friend));
         init();
     }
 

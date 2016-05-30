@@ -38,9 +38,9 @@ public final class ChatSettingSetBgActivity_
     }
 
     private void afterSetContentView_() {
+        chat_setting_set_bg_fromlocal = ((RelativeLayout) findViewById(id.chat_setting_set_bg_fromlocal));
         chat_setting_set_bg_take_picture = ((RelativeLayout) findViewById(id.chat_setting_set_bg_take_picture));
         chat_setting_set_bg_choice_picture = ((RelativeLayout) findViewById(id.chat_setting_set_bg_choice_picture));
-        chat_setting_set_bg_fromlocal = ((RelativeLayout) findViewById(id.chat_setting_set_bg_fromlocal));
         main_header_left = ((LinearLayout) findViewById(id.main_header_left));
         ((ChoceAndTakePictureComponent_) picture).afterSetContentView_();
         ((TitleBar_) titleBar).afterSetContentView_();

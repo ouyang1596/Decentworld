@@ -1,0 +1,51 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.handleMessage;
+
+/**
+ * @ClassName: Subject
+ * @Description: TODO (在这里用一句话描述类的作用)
+ * @author: Jackchen
+ * @date: 2016年5月12日 上午9:36:34
+ */
+public class MessageSubject
+{
+    private static final String TAG = "Subject";
+
+    public enum Subject
+    {
+        CHAT_TEXT_SINGLE(0, "chat", "文字消息"), CHAT_TEXT_MULTI(1, "roomMSG", "聊天室文字消息"), CHAT_VOICE(2, "audio", "语音消息"), CHAT_IMAGE(3, "picture", "图片消息"), CHAT_CARD_SINGLE(4, "card", "名片消息"), FRIEND_ADD(
+                5, "add_friend_reason", "申请加为好友"), FRIEND_ACCEPT(6, "accept_Friend", "同意加为好友"), FRIEND_REFUSE(7, "refuse_Friend", "拒绝加为好友"), FRIEND_DELETE(8, "delete_Friend", "删除好友"), CHAT_ROOM_ENTER(
+                9, "room_presence", "进入聊天室"), CHAT_ROOM_LEAVE(10, "room_leave", "离开聊天室"), ACK_WEALTH(11, "wealth", "身家回执(2号消息)"), ACK_ERROR(12, "error", "身家不足回执"), ACK_CONFIRM(13, "confirm",
+                "已送达通知(5号消息)"), MATCH(14, "match", "匹配成功"), BROADCAST_BENEFIT(15, "broadcast_benefit", "有新的收益"), BROADCAST_WORTH_CHANGED(16, "broadcast_worth", "身价改变通知"), BROADCAST_CHECK(17,
+                "broadcast_check", "向审核者推送去疑"), CHECKRESULT(18, "CheckResult", "向被审核者推送去疑")
+                , CommentNotice(19, "CommentNotice", "朋友圈评论提示") , WorkCommentNotice(20, "WorkCommentNotice", "作品圈评论提示")
+                ,MomentNotice(21, "MomentNotice", "朋友圈推送");
+        private int index;
+        private String body;
+        private String info;
+        private Subject(int index, String body, String info)
+        {
+            this.index = index;
+            this.body = body;
+            this.info = info;
+        }
+
+        public int getIndex()
+        {
+            return index;
+        }
+
+        public String getBody()
+        {
+            return body;
+        }
+
+        public String getInfo()
+        {
+            return info;
+        }
+
+    }
+}

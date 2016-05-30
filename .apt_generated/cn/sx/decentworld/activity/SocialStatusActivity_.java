@@ -35,9 +35,9 @@ public final class SocialStatusActivity_
     }
 
     private void afterSetContentView_() {
-        ivBack = ((ImageView) findViewById(id.iv_back));
         btnOk = ((Button) findViewById(id.btn_OK));
         etSocialStatus = ((EditText) findViewById(id.et_social_status));
+        ivBack = ((ImageView) findViewById(id.iv_back));
         init();
     }
 

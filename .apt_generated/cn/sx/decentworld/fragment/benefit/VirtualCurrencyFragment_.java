@@ -31,12 +31,12 @@ public final class VirtualCurrencyFragment_
     }
 
     private void afterSetContentView_() {
-        mDrawWealth = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_vc_draw));
+        tvBankCard = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_band_bankCard));
         tvSetBankCard = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_band_card));
         mTvBigWealth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_cash_benefit_not_draw));
-        mTvWorth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_worth));
-        tvBankCard = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_band_bankCard));
+        mDrawWealth = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_vc_draw));
         mTvWealth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_wealth));
+        mTvWorth = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_vc_worth));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

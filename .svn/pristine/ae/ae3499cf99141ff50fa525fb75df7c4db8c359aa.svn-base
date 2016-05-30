@@ -1,0 +1,70 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.manager;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.entity.dao.UserExtraInfoDao;
+import cn.sx.decentworld.entity.db.UserExtraInfo;
+
+/**
+ * @ClassName: UserExtraInfoManager
+ * @Description: TODO (在这里用一句话描述类的作用)
+ * @author: Jackchen
+ * @date: 2016年5月18日 上午9:38:46
+ */
+public class UserExtraInfoManager
+{
+    private static final String TAG = "UserExtraInfoManager";
+    private static UserExtraInfoManager instance;
+    private UserExtraInfo userExtraInfo;
+
+    public static UserExtraInfoManager getInstance()
+    {
+        if (instance == null)
+        {
+            synchronized (UserExtraInfoManager.class)
+            {
+                if (instance == null)
+                    instance = new UserExtraInfoManager();
+            }
+        }
+        return instance;
+    }
+    
+    /**
+     * 获取实体
+     */
+    public UserExtraInfo getEntity()
+    {
+        return userExtraInfo;
+    }
+    
+    
+    
+    
+    
+    
+    
+
+    // /////////////////////////////////////////私有方法////////////////////////////////////
+    /**
+     * 私有构造函数
+     */
+    private UserExtraInfoManager()
+    {
+        init();
+    }
+
+    /**
+     * 从数据库加载记录
+     */
+    private void init()
+    {
+        UserExtraInfo query = UserExtraInfoDao.query(DecentWorldApp.getInstance().getDwID());
+        if (query != null)
+            userExtraInfo = query;
+        else
+            userExtraInfo = new UserExtraInfo();
+    }
+}

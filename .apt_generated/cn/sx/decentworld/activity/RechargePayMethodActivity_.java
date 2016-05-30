@@ -40,10 +40,10 @@ public final class RechargePayMethodActivity_
 
     private void afterSetContentView_() {
         llWX = ((ImageView) findViewById(id.iv_recharge_wx));
-        llAliPay = ((ImageView) findViewById(id.iv_recharge_alipay));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
-        tvMoney = ((TextView) findViewById(id.tv_money));
         ivBack = ((ImageView) findViewById(id.iv_back));
+        llAliPay = ((ImageView) findViewById(id.iv_recharge_alipay));
+        tvMoney = ((TextView) findViewById(id.tv_money));
         {
             View view = findViewById(id.iv_back);
             if (view!= null) {

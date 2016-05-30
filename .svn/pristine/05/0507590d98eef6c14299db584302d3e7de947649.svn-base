@@ -1,0 +1,358 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.engine;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import org.simple.eventbus.EventBus;
+
+import android.os.Handler;
+import android.os.Message;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.ChatRoomInfo;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+
+/**
+ * @ClassName: ChatGroupEngine.java
+ * @Description: 群聊业务类
+ * @author: cj
+ * @date: 2016年4月21日 下午7:52:32
+ */
+public class ChatGroupEngine
+{
+    public static final String TAG = "ChatGroupEngine";
+    public static ChatGroupEngine instance = null;
+    private SendUrl sendUrl;
+
+    /**
+     * 私有构造函数，防止产生多个实例
+     */
+    private ChatGroupEngine()
+    {
+        this.sendUrl = new SendUrl(DecentWorldApp.getGlobalContext());
+    }
+
+    // ///////////////////////////////初始化//////////////////////////////////////
+
+    /**
+     * 获取单聊管理者实例
+     * 
+     * @return
+     */
+    public static ChatGroupEngine getInstance()
+    {
+        if (instance == null)
+        {
+            synchronized (ChatGroupEngine.class)
+            {
+                if (instance == null)
+                    instance = new ChatGroupEngine();
+            }
+        }
+        return instance;
+    }
+
+    // /////////////////////////////////公有方法////////////////////////////////////////////
+
+    /**
+     * 首次进入聊天室，自动从服务器拿取历史记录
+     * 
+     * @param roomID
+     */
+    public void autoGetRoomHistoryMsg(String roomID)
+    {
+        LogUtils.i(TAG, "autoGetRoomHistoryMsg...首次进入聊天室，自动从服务器拿取历史记录");
+        autoGetRoomHistoryMsg(roomID, handler);
+    }
+
+    /**
+     * 手动刷新从服务器拿取历史记录
+     * 
+     * @param dwID
+     *            当前用户ID
+     * @param roomID
+     *            当前聊天室ID
+     * @param minMsgID
+     *            最小消息ID
+     */
+    public void manualGetRoomHistoryMsg(String dwID, String roomID, long minMsgID)
+    {
+        LogUtils.i(TAG, "manualGetRoomHistoryMsg...手动刷新从服务器拿取历史记录");
+        manualGetRoomHistoryMsg(roomID, minMsgID, handler);
+    }
+
+    /**
+     * 获取聊天室列表
+     * 
+     * @param handler
+     *            用于返回待处理的结果
+     */
+    public void getRoomList(final GetRoomListListener listener)
+    {
+        final Handler mHandler = new Handler()
+        {
+            public void handleMessage(Message msg)
+            {
+                switch (msg.what)
+                {
+                    case 0:
+                        String json = msg.obj.toString();
+                        List<ChatRoomInfo> chatRoomInfo = (List<ChatRoomInfo>) JsonUtils.json2BeanArray(json, ChatRoomInfo.class);
+                        listener.onSuccess(chatRoomInfo);
+                        break;
+                    case -1:
+                        listener.onFailure(msg.obj.toString());
+                        break;
+                    case 1:
+                        listener.onFailure(msg.obj.toString());
+                        break;
+                    default:
+                        break;
+                }
+            };
+        };
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + ConstantNet.API_GET_CHATROOM_LIST, Method.GET, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String response, final ResultBean msg)
+            {
+                LogUtils.i(TAG, "getRoomList...response:" + response);
+                if (msg.getResultCode() == 2222)
+                {
+                    sendHandlerMsg(mHandler, 0, msg.getData().toString());
+                }
+                if (msg.getResultCode() == 3333)
+                {
+                    sendHandlerMsg(mHandler, 1, "聊天室为空");
+                }
+            }
+
+            @Override
+            public void onFailure(String error)
+            {
+                LogUtils.e(TAG, "getNearStrangerList...onFailure，cause by:" + error);
+                sendHandlerMsg(mHandler, -1, Constants.NET_WRONG);
+            }
+        });
+
+    }
+
+    /** 获取聊天室列表回调 **/
+    public interface GetRoomListListener
+    {
+        void onSuccess(List<ChatRoomInfo> list);
+
+        void onFailure(String cause);
+    }
+
+    // /////////////////////////////////私有方法////////////////////////////////////////////
+
+    /**
+     * 发送通知
+     * 
+     * @param handler
+     * @param what
+     * @param info
+     */
+    private void sendHandlerMsg(Handler handler, int what, Object info)
+    {
+        Message message = Message.obtain();
+        message.what = what;
+        message.obj = info;
+        handler.sendMessage(message);
+    }
+
+    /**
+     * 首次进入聊天室，自动从服务器拿取历史记录
+     * 
+     * @param dwID
+     *            自己的ID
+     * @param roomID
+     *            聊天室的ID
+     * @param firstIndext
+     *            消息开始的位置
+     * @param handler
+     *            回调Handler
+     * @param requestCode
+     *            请求码
+     */
+    private void autoGetRoomHistoryMsg(String roomID, final Handler handler)
+    {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("roomID", roomID);
+        LogUtils.v(TAG, "autoGetRoomHistoryMsg...begin:" + JSON.toJSONString(map));
+        sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH_OPENFIRE + ConstantNet.API_AUTO_GET_HISTORY_MSG, Method.GET, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String response, ResultBean msg)
+            {
+                LogUtils.v(TAG, "autoGetRoomHistoryMsg...response:" + response);
+                if (msg.getResultCode() == 2222)
+                {
+                    LogUtils.v(TAG, "autoGetRoomHistoryMsg...success");
+                    sendHandlerMsg(handler, 0, msg.getData().toString());
+                }
+                if (msg.getResultCode() == 3333)
+                {
+                    LogUtils.i(TAG, "autoGetRoomHistoryMsg...onfailure,cause by:" + msg.getMsg());
+                    sendHandlerMsg(handler, 1, msg.getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.e(TAG, "autoGetRoomHistoryMsg...onFailure,cause by:" + e);
+                sendHandlerMsg(handler, -1, Constants.NET_WRONG);
+            }
+        });
+    }
+
+    /**
+     * 手动刷新从服务器拿取历史记录
+     * 
+     * @param roomID
+     * @param minMsgID
+     * @param handler
+     */
+    private void manualGetRoomHistoryMsg(String roomID, long minMsgID, final Handler handler)
+    {
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("roomID", roomID);
+        map.put("firstIndex", String.valueOf(minMsgID));
+        LogUtils.v(TAG, "manualGetRoomHistoryMsg...begin:" + JSON.toJSONString(map));
+        sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_MANUAL_GET_HISTORY_MSG, Method.POST, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String response, ResultBean msg)
+            {
+                LogUtils.v(TAG, "manualGetRoomHistoryMsg...response:" + response);
+                if (msg.getResultCode() == 2222)
+                {
+                    LogUtils.v(TAG, "manualGetRoomHistoryMsg...success");
+                    sendHandlerMsg(handler, 0, msg.getData().toString());
+                }
+                if (msg.getResultCode() == 3333)
+                {
+                    LogUtils.i(TAG, "manualGetRoomHistoryMsg...onfailure,cause by:" + msg.getMsg());
+                    sendHandlerMsg(handler, 1, msg.getMsg());
+                    // 无历史聊天记录
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.e(TAG, "manualGetRoomHistoryMsg...onFailure,cause by:" + e);
+                sendHandlerMsg(handler, -1, Constants.NET_WRONG);
+            }
+        });
+    }
+
+    // 服务器返回数据后经过解析，在把结果通过EventBus传递到ChatRoomChatActivity中
+    Handler handler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            // 解析下列数据
+            List<DWMessage> temp = new ArrayList<DWMessage>();
+            switch (msg.what)
+            {
+                case 0:// 成功
+                    String result = msg.obj.toString();
+                    LogUtils.v(TAG, "获取用户聊天室历史记录成功，内容为：" + result);
+                    JSONObject jsonObject = JSON.parseObject(result);
+                    JSONArray array = jsonObject.getJSONArray("history");
+                    DWMessage dwMessage;
+                    for (int i = 0; i < array.size(); i++)
+                    {
+                        JSONObject ob = array.getJSONObject(i);
+                        int chatType = ob.getIntValue("chatType");
+                        long id = ob.getLongValue("id");
+                        int messageType = ob.getIntValue("messageType");
+                        String roomID = ob.getString("roomID");
+                        String senderID = ob.getString("senderID");
+                        String sendTime = ob.getString("sendTime");
+                        dwMessage = new DWMessage(DWMessage.CHAT_TYPE_MULTI);
+                        dwMessage.setChatType(chatType);
+                        dwMessage.setMid(id);
+                        dwMessage.setMessageType(messageType);
+                        dwMessage.setFrom(senderID);
+                        dwMessage.setTo(roomID);
+                        dwMessage.setTime(sendTime);
+                        dwMessage.setSendSuccess(1);
+
+                        if (messageType == DWMessage.TXT)
+                        {
+                            // 如果是文字，message就是body
+                            dwMessage.setBody(ob.getString("message"));
+                        }
+                        else if (messageType == DWMessage.VOICE)
+                        {
+                            // 如果是语音，需要uri,length
+                            String data = ob.getString("message");
+                            JSONObject object = JSON.parseObject(data);
+                            String uri = object.getString("uri");
+                            int length = Integer.valueOf(object.getString("length"));
+                            dwMessage.setUri(uri);
+                            dwMessage.setRemoteUrl(uri);
+                            dwMessage.setVoiceTime(length);
+                        }
+                        else if (messageType == DWMessage.IMAGE)
+                        {
+                            // 如果是图片，需要uri,img
+                            String data = ob.getString("message");
+                            JSONObject object = JSON.parseObject(data);
+                            String uri = object.getString("uri");
+                            String img = object.getString("img");
+                            if (null != img)
+                            {
+                                File file = ImageUtils.AnalyticThumbnail(img);
+                                dwMessage.setUri(file.getAbsolutePath());
+                            }
+                            dwMessage.setRemoteUrl(uri);
+                        }
+                        // 将结果保存到数据库
+                        dwMessage.save();
+                        // 加到temp中
+                        temp.add(dwMessage);
+                    }
+                    break;
+                case 1:// 失败
+                    LogUtils.i(TAG, "获取历史聊天记录失败，cause by:" + msg.obj.toString());
+                    break;
+                case -1:// 失败
+                    LogUtils.i(TAG, "获取历史聊天记录失败，cause by:" + msg.obj.toString());
+                    break;
+                default:
+                    break;
+            }
+            // 将结果通过EventBus传递到ChatActivity中
+            EventBus.getDefault().post(temp, NotifyByEventBus.NT_UPDATE_ROOM_HISTORY_MSG);
+        };
+    };
+
+}

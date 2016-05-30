@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.KeyboardComponent_;
 import cn.sx.decentworld.component.ToastComponent_;
 import cn.sx.decentworld.widget.CircularImage;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -34,15 +35,17 @@ public final class RechargeBenefitActivity_
 
     private void init_(Bundle savedInstanceState) {
         toast = ToastComponent_.getInstance_(this);
+        keyboardComponent = KeyboardComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        tv_rb_title_benefit = ((TextView) findViewById(id.tv_rb_title_benefit));
-        ll_rb_title_bg = ((LinearLayout) findViewById(id.ll_rb_title_bg));
-        ll_rb_back = ((LinearLayout) findViewById(id.ll_rb_back));
-        tv_rb_title_recharge = ((TextView) findViewById(id.tv_rb_title_recharge));
         iv_rb_icon = ((CircularImage) findViewById(id.iv_rb_icon));
+        tv_rb_title_recharge = ((TextView) findViewById(id.tv_rb_title_recharge));
+        ll_rb_back = ((LinearLayout) findViewById(id.ll_rb_back));
+        ll_rb_title_bg = ((LinearLayout) findViewById(id.ll_rb_title_bg));
+        tv_rb_title_benefit = ((TextView) findViewById(id.tv_rb_title_benefit));
         ((ToastComponent_) toast).afterSetContentView_();
+        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         init();
     }
 

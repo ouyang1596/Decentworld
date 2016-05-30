@@ -1,0 +1,715 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.engine;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.simple.eventbus.EventBus;
+
+import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.bean.ConversationList;
+import cn.sx.decentworld.bean.DWMessage;
+import cn.sx.decentworld.bean.MsgAndInfo;
+import cn.sx.decentworld.bean.NotifyByEventBus;
+import cn.sx.decentworld.bean.UserSessionInfo;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.ConstantNet;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.entity.MatchSuccessEntity;
+import cn.sx.decentworld.entity.dao.ContactUserDao;
+import cn.sx.decentworld.entity.db.ContactUser;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.SendUrl;
+import cn.sx.decentworld.network.SendUrl.HttpCallBack;
+import cn.sx.decentworld.network.entity.ResultBean;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.AnonymityNickNameCreator;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+
+import com.activeandroid.query.Select;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.android.volley.Request.Method;
+
+/**
+ * @ClassName: ConversationEngine.java
+ * @Description: 会话列表（单例）
+ * @author: cj
+ * @date: 2016年3月21日 上午10:14:57
+ */
+public class ConversationEngine
+{
+    public static final String TAG = "ConversationEngine";
+    public static ConversationEngine instance = null;
+    public static Object LOCK = new Object();
+
+    // ///////////////////////////////////////////变量/////////////////////////////////////
+    // 用来显示数据
+    private List<ConversationList> convList;
+    // 用来保存数据
+    private Map<String, ConversationList> convMap;
+    // 将要移除的会话列表的小红点
+    private Set<String> unReadRedPoint = new HashSet<String>();
+
+    /** 从网络获取会话列表的类型 **/
+    private enum GetConvType
+    {
+        Friend(1), Stranger(2), FriendAndStranger(3);
+        private int index;
+
+        /**
+         * 
+         */
+        private GetConvType(int index)
+        {
+            this.index = index;
+        }
+
+        /**
+         * @return the index
+         */
+        public int getIndex()
+        {
+            return index;
+        }
+
+    }
+
+    /**
+     * 构造函数
+     */
+    private ConversationEngine()
+    {
+
+    }
+
+    /**
+     * 获取实例
+     * 
+     * @return
+     */
+    public static ConversationEngine getInstance()
+    {
+        if (instance == null)
+        {
+            synchronized (LOCK)
+            {
+                if (instance == null)
+                {
+                    instance = new ConversationEngine();
+                }
+            }
+        }
+        return instance;
+    }
+
+    // ///////////////////////////////////////////共有方法//////////////////////////////////
+    /**
+     * 第一次登陆的时候，初始化会话列表
+     */
+    public void initConv()
+    {
+        LogUtils.v(TAG,TAG+ " initConv");
+        if (convList == null && convMap == null)
+        {
+            convList = new ArrayList<ConversationList>();
+            convMap = new HashMap<String, ConversationList>();
+        }
+        getLocalConv(new GetLocalConvListener()
+        {
+            @Override
+            public void onCompleted(List<ConversationList> friendConvList, List<ConversationList> strangerConvList)
+            {
+                checkConv(friendConvList, strangerConvList);
+                addDataToMemory(friendConvList, strangerConvList);
+            }
+
+            @Override
+            public void onGetFromNet(int type)
+            {
+                if (NetworkUtils.isNetWorkConnected(DecentWorldApp.getGlobalContext()))
+                {
+                    // 进行网络请求
+                    getConvFromNet(type);
+                }
+            }
+        });
+    }
+
+    /**
+     * 获取会话列表，包括陌生人和好友
+     */
+    public List<ConversationList> getConv()
+    {
+        LogUtils.v(TAG, "getConv");
+        if (convList == null && convMap == null)
+        {
+            convList = new ArrayList<ConversationList>();
+            convMap = new HashMap<String, ConversationList>();
+        }
+        Collections.sort(convList);
+        return convList;
+    }
+
+    /**
+     * 将要清除小红点的联系人添加到Set中
+     * 
+     * @param idAndChatType
+     */
+    public void addUnReadRedPoint(String idAndChatType)
+    {
+        unReadRedPoint.add(idAndChatType);
+    }
+
+    /**
+     * 清除所有指定的小红点
+     */
+    public void removeUnReadRedPoint()
+    {
+        removeUnReadRedPointE();
+    }
+
+    /**
+     * 刷新会话列表
+     * 
+     * @param msgAndInfo
+     * @param info
+     */
+    public void refreshConv(MsgAndInfo msgAndInfo, String info)
+    {
+        refreshConvE(msgAndInfo, info);
+    }
+
+    /**
+     * 重新加载数据库的数据到内存 1.同意添加为好友；【同意添加，更新好友会话列表】 2.接到添加好友的回执时；【同意加为好友回执，更新好友会话列表】
+     * 3.主动删除好友；【删除好友，通知主页面更新会话列表】 4.备注好友；【修改完备注】 5.被别人删除；【被人删除，更新好友会话列表】
+     * 
+     * @param cause
+     */
+    public void reloadConv(String cause)
+    {
+        LogUtils.v(TAG, "reloadConv...cause:" + cause);
+        reloadDataToMemory(false);
+    }
+
+    /**
+     * 匹配成功
+     */
+    public void matchSuccess(MatchSuccessEntity entity)
+    {
+        LogUtils.v(TAG, "matchSuccess..." + entity.toString());
+        String promptInfo = "你喜欢的人也喜欢了你！珍惜，聊一聊";
+        String otherID = entity.getDwID();
+        String otherNickName = entity.getName();
+        int userType = entity.getUserType();
+        float otherWorth = entity.getWorth();
+        // 生成会话列表
+        DWMessage msg = new DWMessage();
+        // 聊天关系
+        if (ContactUserDao.isContact(otherID))
+        {
+            msg.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_FRIEND);
+        }
+        else
+            msg.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+        // 聊天类型
+        msg.setChatType(DWMessage.CHAT_TYPE_SINGLE);
+        // 消息内容(系统提示信息)
+        msg.setBody(promptInfo);
+        // 消息类型（文字）
+        msg.setMessageType(DWMessage.TXT);
+        // from
+        msg.setFrom(otherID);
+        // 时间
+        msg.setTime(String.valueOf(System.currentTimeMillis()));
+
+        UserSessionInfo userSessionInfo = new UserSessionInfo(otherID , otherNickName , otherWorth , userType);
+        refreshConvE(new MsgAndInfo(msg , userSessionInfo), "收到匹配成功的系统推送消息");
+        // 生成系统提示消息
+        DWMessage dwMessage = new DWMessage(DWMessage.NOTIFY , DWMessage.Direct.RECEIVE);
+        dwMessage.setFrom(otherID);
+        dwMessage.setBody(promptInfo);
+        dwMessage.save();
+    }
+
+    // ///////////////////////////////////////////私有方法//////////////////////////////////
+
+    /**
+     * 发送通知
+     * 
+     * @param handler
+     * @param what
+     * @param info
+     */
+    private void sendHandlerMsg(Handler handler, int what, String info)
+    {
+        Message message = Message.obtain();
+        message.what = what;
+        message.obj = info;
+        handler.sendMessage(message);
+    }
+
+    private void getLocalConv(GetLocalConvListener listener)
+    {
+        // 获取好友会话列表
+        List<ConversationList> friendConvFromLocal = getConvFromLocal(DWMessage.CHAT_RELATIONSHIP_FRIEND);
+        // 获取陌生人会话列表
+        List<ConversationList> strangerConvFromLocal = getConvFromLocal(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+        if (friendConvFromLocal.size() == 0 && strangerConvFromLocal.size() == 0)
+        {
+            // 好友和陌生人
+            listener.onGetFromNet(GetConvType.FriendAndStranger.getIndex());
+        }
+        else if (friendConvFromLocal.size() > 0 && strangerConvFromLocal.size() == 0)
+        {
+            // 陌生人
+            listener.onGetFromNet(GetConvType.Stranger.getIndex());
+        }
+        else if (friendConvFromLocal.size() == 0 && strangerConvFromLocal.size() > 0)
+        {
+            // 好友
+            listener.onGetFromNet(GetConvType.Friend.getIndex());
+        }
+        else
+        {
+            // 直接返回数据
+            listener.onCompleted(friendConvFromLocal, strangerConvFromLocal);
+        }
+    }
+
+    /**
+     * 从本地获取会话列表回调
+     */
+    public interface GetLocalConvListener
+    {
+        // 返回数据，当没有数据时，列表大小为0
+        void onCompleted(List<ConversationList> friendConvList, List<ConversationList> strangerConvList);
+
+        // type的值为：1（朋友）、2（陌生人）、3（朋友和陌生人）
+        void onGetFromNet(int type);
+    }
+
+    /**
+     * 获取本地会话列表
+     * 
+     * @param chatRelationship
+     *            聊天关系
+     * @return 未排序的会话列表
+     */
+    private List<ConversationList> getConvFromLocal(int chatRelationship)
+    {
+        // 查询好友的会话列表
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID=? and chatRelationship=?";
+        List<ConversationList> list = new Select().from(ConversationList.class).where(sql, userID, chatRelationship).orderBy("time desc").execute();
+        if (list != null && list.size() > 0)
+        {
+            // 去掉相同的，将数据暂时存储在map中
+            HashMap<String, ConversationList> map = new HashMap<String, ConversationList>();
+            for (ConversationList conv : list)
+            {
+                String key = conv.getDwID() + conv.getChatType();
+                map.put(key, conv);
+            }
+
+            // 重新将数据放回list中
+            list.clear();
+            for (Map.Entry<String, ConversationList> t : map.entrySet())
+            {
+                list.add(t.getValue());
+            }
+
+            // 除去已经不是联系人的
+            Iterator<ConversationList> iterator = list.iterator();
+            while (iterator.hasNext())
+            {
+                ConversationList next = iterator.next();
+                if (chatRelationship == DWMessage.CHAT_RELATIONSHIP_FRIEND)
+                {
+                    if (!ContactUserDao.isContact(next.getDwID()))
+                    {
+                        next.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+                        // t.setTitle("重新获取昵称");//待优化，删除联系人后，应该显示昵称，而不应该显示备注
+                        next.save();
+                        iterator.remove();
+                    }
+                }
+                else if (chatRelationship == DWMessage.CHAT_RELATIONSHIP_STRANGER)
+                {
+                    if (ContactUserDao.isContact(next.getDwID()))
+                    {
+                        LogUtils.i(TAG, "dwID=" + next.getDwID() + ",已经是自己的好友，将会话列表移到好友处");
+                        next.setChatRelationship(DWMessage.CHAT_RELATIONSHIP_FRIEND);
+                        next.setTitle(ContactUserDao.getName(next.getDwID()));
+                        next.save();
+                        iterator.remove();
+                    }
+                }
+
+            }
+        }
+        return list;
+    }
+
+    private void getConvFromNet(final int type)
+    {
+        final Handler handler = new Handler()
+        {
+            public void handleMessage(android.os.Message msg)
+            {
+                switch (msg.what)
+                {
+                    case -1:
+                        // 网络错误
+
+                        break;
+                    case 0:
+                        // 解析数据
+                        processConvList(msg.obj.toString(), type);
+                        reloadDataToMemory(true);
+                        break;
+                    case 1:
+                        // 获取失败
+
+                        break;
+
+                    default:
+                        break;
+                }
+
+            };
+        };
+
+        String userID = DecentWorldApp.getInstance().getDwID();
+        Context context = DecentWorldApp.getGlobalContext();
+        SendUrl sendUrl = new SendUrl(context);
+
+        HashMap<String, String> map = new HashMap<String, String>();
+        map.put("dwID", userID);
+        map.put("type", String.valueOf(type));
+        LogUtils.i(TAG, "getConvFromNet...begin:" + JSON.toJSONString(map));
+        sendUrl.httpRequestWithParams(map, Constants.CONTEXTPATH + ConstantNet.API_GET_CONVERSATION_LIST_V11, Method.GET, new HttpCallBack()
+        {
+            @Override
+            public void onSuccess(String response, ResultBean msg)
+            {
+                LogUtils.i(TAG, "getConvFromNet...begin,response:"+response);
+                if (msg.getResultCode() == 2222)
+                {
+                    sendHandlerMsg(handler, 0, msg.getData().toString());
+                }
+                else if (msg.getResultCode() == 3333)
+                {
+                    sendHandlerMsg(handler, 1, "");
+                }
+                else
+                {
+                    sendHandlerMsg(handler, 1, "");
+                }
+            }
+
+            @Override
+            public void onFailure(String e)
+            {
+                LogUtils.w(TAG, "getConvFromNet...onFailure,cause by:" + e.toString());
+                sendHandlerMsg(handler, -1, "");
+            }
+        });
+    }
+
+    /**
+     * 将数据放入内存中
+     */
+    private void addDataToMemory(List<ConversationList> friendConvList, List<ConversationList> strangerConvList)
+    {
+        // 清理数据
+        convList.clear();
+        convMap.clear();
+        // 将数据放到 list 中
+        convList.addAll(friendConvList);
+        convList.addAll(strangerConvList);
+        Collections.sort(convList);
+        // 将数据放到 map 中
+        if (convList.size() > 0)
+        {
+            for (ConversationList conv : convList)
+            {
+                String key = conv.getChatRelationship() + conv.getDwID() + conv.getChatType();
+                convMap.put(key, conv);
+            }
+        }
+    }
+
+    private void processConvList(String msg, int type)
+    {
+        // 解解析好友和陌生人数据，并保存
+        JSONObject jsonObject = JSON.parseObject(msg);
+        String friendStr = jsonObject.getString("friend");
+        String strangerStr = jsonObject.getString("stranger");
+        String userID = DecentWorldApp.getInstance().getDwID();
+        if (type == 1)
+        {
+            ConversationList.deleteConversation(userID, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+        }
+        else if (type == 2)
+        {
+            ConversationList.deleteConversation(userID, DWMessage.CHAT_RELATIONSHIP_STRANGER);
+        }
+        else
+        {
+            ConversationList.deleteConversation(userID, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+            ConversationList.deleteConversation(userID, DWMessage.CHAT_RELATIONSHIP_STRANGER);
+        }
+        if (CommUtil.isNotBlank(friendStr))
+        {
+            ResultBean friendBean = JsonUtils.json2Bean(friendStr, ResultBean.class);
+            processConvList(friendBean, DWMessage.CHAT_RELATIONSHIP_FRIEND);
+        }
+        if (CommUtil.isNotBlank(strangerStr))
+        {
+            ResultBean strangerBean = JsonUtils.json2Bean(strangerStr, ResultBean.class);
+            processConvList(strangerBean, DWMessage.CHAT_RELATIONSHIP_STRANGER);
+        }
+    }
+
+    private void processConvList(ResultBean friendBean, int chatRelationship)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String jsonStr = friendBean.getData().toString();
+        LogUtils.v(TAG, "processConvList...从网络获取的会话列表数据为：" + jsonStr);
+        JSONObject jsonObject = JSON.parseObject(jsonStr);
+        String jsonArrayStr = null;
+        if (chatRelationship == DWMessage.CHAT_RELATIONSHIP_FRIEND)
+        {
+            jsonArrayStr = jsonObject.getString("friendCoversations");
+        }
+        else if (chatRelationship == DWMessage.CHAT_RELATIONSHIP_STRANGER)
+        {
+            jsonArrayStr = jsonObject.getString("strangerCoversations");
+        }
+
+        // 解析数据
+        JSONArray array = JSON.parseArray(jsonArrayStr);
+        if (null != array && array.size() > 0)
+        {
+            for (int i = 0; i < array.size(); i++)
+            {
+                JSONObject object = array.getJSONObject(i);
+                int t_chatRelationship = object.getIntValue("chatRelationship");
+                int chatType = object.getIntValue("chatType");
+                String content = object.getString("content");
+                int messageType = object.getIntValue("messageType");
+                String otherID = object.getString("otherID");
+                String title = object.getString("title");
+                String worth = object.getString("worth");
+                long time = object.getLongValue("time");
+                String icon = ImageUtils.getIconByDwID(otherID, ImageUtils.ICON_SMALL);
+                // 构造会话对象
+                ConversationList conversation = new ConversationList(otherID , icon , title , content , time);
+                conversation.setMessageType(messageType);
+                conversation.setChatType(chatType);
+                conversation.setChatRelationship(chatRelationship);
+                conversation.setWorth(worth);
+                conversation.save();
+            }
+        }
+    }
+
+    /**
+     * 重新从数据库加载数据到内存
+     * 
+     * @param isCheck
+     *            是否检查会话列表； 检查过程是：遍历ConverstionList,更新未读消息数和其它内容
+     */
+    private void reloadDataToMemory(boolean isCheck)
+    {
+        // 将convList中的已经存在的小红点保存下来
+
+        // 获取好友会话列表
+        List<ConversationList> friendConvFromLocal = getConvFromLocal(DWMessage.CHAT_RELATIONSHIP_FRIEND);
+        // 获取陌生人会话列表
+        List<ConversationList> strangerConvFromLocal = getConvFromLocal(DWMessage.CHAT_RELATIONSHIP_STRANGER);
+        // 检查会话列表
+        if (isCheck)
+            checkConv(friendConvFromLocal, strangerConvFromLocal);
+        addDataToMemory(friendConvFromLocal, strangerConvFromLocal);
+        EventBus.getDefault().post("重新加载好友会话列表", NotifyByEventBus.NT_RE_LOAD_FRIEND_CONV);
+        EventBus.getDefault().post("重新加载陌生人会话列表", NotifyByEventBus.NT_RE_LOAD_STRANGER_CONV);
+    }
+
+    /**
+     * 清除好友未读消息
+     */
+    private void removeUnReadRedPointE()
+    {
+        if (unReadRedPoint != null && unReadRedPoint.size() > 0)
+        {
+            Iterator<String> iterator = unReadRedPoint.iterator();
+            while (iterator.hasNext())
+            {
+                String key = iterator.next();
+                ConversationList conversation = convMap.get(key);
+                if (conversation != null)
+                {
+                    conversation.setUnReadCount(0);
+                    conversation.updateUnReadCount();
+                    conversation.save();
+                }
+            }
+            unReadRedPoint.clear();
+            // 排序
+            Collections.sort(convList);
+            // 将消息路由到ConversationFragment
+            EventBus.getDefault().post("清除好友会话列表小红点", NotifyByEventBus.NT_RE_LOAD_FRIEND_CONV);
+            EventBus.getDefault().post("清除陌生人会话列表小红点", NotifyByEventBus.NT_RE_LOAD_STRANGER_CONV);
+        }
+    }
+
+    /**
+     * 刷新好友会话列表 收到一条好友消息时更新会话列表，这条消息可能是接收到的，也可能是自己发送的;
+     * 接收到一条消息，如果不存在该DwID的会话项，则新建，如果存在则修改对应的内存数据然后保存即可，这时会同步保存到数据库
+     * 
+     * @param msgAndInfo
+     *            消息
+     * @param conversationLists
+     *            内存中的数据
+     * @param conversationMap
+     *            数据键值对 1.【消息类型为单聊,发送更新会话列表的通知】; 2.【消息类型为单聊,发送更新消息列表的通知】;
+     *            3.【消息类型为单聊,发送更新消息列表的通知】; 4.【朋友单聊，收到朋友发送的名片，并发送更新会话列表的通知】；
+     *            5.【发送消息】
+     */
+    private void refreshConvE(MsgAndInfo msgAndInfo, String info)
+    {
+        LogUtils.i(TAG, "refreshConvE..." + info+",msgAndInfo="+msgAndInfo.toString());
+        DWMessage dwMessage = msgAndInfo.getDwMessage();
+        UserSessionInfo userSessionInfo = msgAndInfo.getUserSessionInfo();
+        String userID = DecentWorldApp.getInstance().getDwID();
+        // 对方信息
+        String otherID = userSessionInfo.getFriendID();
+        String otherNickname = userSessionInfo.getShowName();
+        String otherWorth = String.valueOf(userSessionInfo.getWorth());
+        int userType = userSessionInfo.getUserType();
+        int chatType = dwMessage.getChatType();
+        int chatRelationship = dwMessage.getChatRelationship();
+        String key = chatRelationship + otherID + chatType;
+        ConversationList conversation = convMap.get(key);
+        if (conversation == null)
+        {
+            // 头像
+            String icon = ImageUtils.getIconByDwID(otherID, ImageUtils.ICON_SMALL);
+            String title = null;
+            if (chatType == DWMessage.CHAT_TYPE_SINGLE)
+            {
+                title = userSessionInfo.getShowName();
+            }
+            else if (chatType == DWMessage.CHAT_TYPE_SINGLE_ANONYMITY)
+            {
+                title = AnonymityNickNameCreator.getRandomName() + "[匿名聊天]";
+            }
+            String body = dwMessage.getBody();
+            if (dwMessage.getFrom().equals(userID))
+            {
+                // 为发送出去的消息
+                conversation = new ConversationList(otherID , icon , title , body , 0);
+            }
+            else
+            {
+                conversation = new ConversationList(otherID , icon , title , body , 1);
+            }
+            // 用户类型
+            conversation.setUserType(userType);
+            conversation.setMessageType(dwMessage.getMessageType());
+            conversation.setChatType(chatType);
+            conversation.setChatRelationship(dwMessage.getChatRelationship());
+            conversation.setWorth(otherWorth);
+            conversation.save();
+            convMap.put(key, conversation);
+            convList.add(conversation);
+        }
+        else
+        {
+            /** 修改内存 **/
+            conversation.setCount(conversation.getCount() + 1);
+            if (!dwMessage.getFrom().equals(userID))
+            {
+                conversation.setUnReadCount(conversation.getUnReadCount() + 1);
+                conversation.setUserType(userType);
+            }
+            conversation.setMessageType(dwMessage.getMessageType());
+            conversation.setContent(dwMessage.getBody());
+            conversation.setTime(Long.valueOf(dwMessage.getTime()));
+            conversation.setWorth(otherWorth);
+            conversation.save();
+        }
+        // 排序
+        Collections.sort(convList);
+        // 更新会话列表界面
+        EventBus.getDefault().post("接到消息，刷新新好友会话列表", NotifyByEventBus.NT_RE_LOAD_FRIEND_CONV);
+        EventBus.getDefault().post("接到消息，刷新陌生人会话列表", NotifyByEventBus.NT_RE_LOAD_STRANGER_CONV);
+    }
+
+    /**
+     * 检查会话列表；
+     * 
+     * @param friendConvFromLocal
+     * @param strangerConvFromLocal
+     */
+    private void checkConv(List<ConversationList> friendConvFromLocal, List<ConversationList> strangerConvFromLocal)
+    {
+        refreshConvItem(friendConvFromLocal);
+        refreshConvItem(strangerConvFromLocal);
+    }
+
+    /**
+     * 刷新会话列表中的每一项数据
+     * 
+     * @param conversationLists
+     */
+    private void refreshConvItem(List<ConversationList> conversationLists)
+    {
+        // 流程：遍历会话列表，更新未读消息数和其它内容
+        if (conversationLists != null && conversationLists.size() > 0)
+        {
+            for (ConversationList conv : conversationLists)
+            {
+                String sql = "userID=? and chatRelationship=? and chatType=? and messageType!=?" + "and" + "((fromDwId=? and toDwId=?) or (fromDwId=? and toDwId=?))";
+                List<DWMessage> list = new Select().from(DWMessage.class)
+                        .where(sql, conv.getUserID(), conv.getChatRelationship(), conv.getChatType(), DWMessage.NOTIFY, conv.getUserID(), conv.getDwID(), conv.getDwID(), conv.getUserID())
+                        .orderBy("mid desc").execute();
+                if (list != null && list.size() > 0)
+                {
+                    // 取出第一条消息更新到会话列表
+                    DWMessage dwMessage = list.get(0);
+                    conv.setMessageType(dwMessage.getMessageType());
+                    conv.setContent(dwMessage.getBody());
+                    conv.setTime(Long.valueOf(dwMessage.getTime()));
+                    // 计算小红点的数目更新到会话列表
+                    int count = 0;
+                    for (DWMessage msg : list)
+                    {
+                        if (msg.getIsRead() == DWMessage.ReadStatus.NO.getIndex())
+                        {
+                            count++;
+                        }
+                    }
+                    conv.setUnReadCount(count);
+                    conv.save();
+                }
+            }
+        }
+    }
+
+}

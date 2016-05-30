@@ -1,0 +1,32 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.handleMessage;
+
+import org.jivesoftware.smack.PacketListener;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
+
+import cn.sx.decentworld.logSystem.LogUtils;
+
+/**
+ * @ClassName: DWPacketListener
+ * @Description: TODO (在这里用一句话描述类的作用)
+ * @author: Jackchen
+ * @date: 2016年5月23日 下午3:31:58
+ */
+public class DWPacketListener implements PacketListener
+{
+    private static final String TAG = "DWPacketListener";
+
+    @Override
+    public void processPacket(Packet packet) throws NotConnectedException
+    {
+        if(packet instanceof Message)
+        {
+            Message message = (Message) packet;
+            DispatchMessage.getInstance().dispatch(message);
+        }
+    }
+}

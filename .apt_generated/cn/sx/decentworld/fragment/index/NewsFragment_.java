@@ -15,7 +15,6 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R.layout;
-import cn.sx.decentworld.network.request.GetRoomInfo_;
 import com.handmark.pulltorefresh.library.PullToRefreshListView;
 
 public final class NewsFragment_
@@ -25,7 +24,6 @@ public final class NewsFragment_
     private View contentView_;
 
     private void init_(Bundle savedInstanceState) {
-        getRoomInfo = GetRoomInfo_.getInstance_(getActivity());
     }
 
     @Override
@@ -35,12 +33,12 @@ public final class NewsFragment_
     }
 
     private void afterSetContentView_() {
+        mLvList = ((PullToRefreshListView) findViewById(cn.sx.decentworld.R.id.main_layout_news_lv));
         ll_layout_news_root = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_layout_news_root));
-        tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
         add_topic_detail = ((ImageView) findViewById(cn.sx.decentworld.R.id.add_topic_detail));
-        ivMe = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me));
-        chat_room_title_root = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rel_title_root));
-        main_layout_news_lv = ((PullToRefreshListView) findViewById(cn.sx.decentworld.R.id.main_layout_news_lv));
+        mTvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
+        mIvMe = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me));
+        chat_room_title_root = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rel_top_title_root));
         {
             View view = findViewById(cn.sx.decentworld.R.id.add_topic_detail);
             if (view!= null) {
@@ -56,7 +54,6 @@ public final class NewsFragment_
                 );
             }
         }
-        ((GetRoomInfo_) getRoomInfo).afterSetContentView_();
         init();
     }
 

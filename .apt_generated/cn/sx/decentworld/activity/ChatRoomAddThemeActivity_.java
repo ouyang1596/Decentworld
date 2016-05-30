@@ -38,10 +38,10 @@ public final class ChatRoomAddThemeActivity_
     }
 
     private void afterSetContentView_() {
-        rbContent = ((RadioButton) findViewById(id.rb_content));
-        tvSend = ((TextView) findViewById(id.tv_send));
-        ivBack = ((ImageView) findViewById(id.iv_back));
         rgContentFee = ((RadioGroup) findViewById(id.rg_content));
+        ivBack = ((ImageView) findViewById(id.iv_back));
+        tvSend = ((TextView) findViewById(id.tv_send));
+        rbContent = ((RadioButton) findViewById(id.rb_content));
         rbFeeScale = ((RadioButton) findViewById(id.rb_fee_scale));
         ((ChatRoomInfoSettingAndGetting_) chatRoomInfoSettingAndGetting).afterSetContentView_();
         init();

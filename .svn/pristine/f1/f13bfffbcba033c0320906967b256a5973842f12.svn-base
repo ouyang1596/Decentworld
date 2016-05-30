@@ -1,0 +1,21 @@
+/**
+ * 
+ */
+package cn.sx.decentworld;
+
+/**
+ * @ClassName: Config
+ * @Description: App的全局配置信息；
+ * @author: Jackchen
+ * @date: 2016年5月9日 下午12:35:56
+ */
+public class AppConfig
+{
+    private static final String TAG = "Config";
+    //log级别
+    
+    //xmpplog
+    
+    //
+    
+}

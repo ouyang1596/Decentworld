@@ -1,0 +1,243 @@
+package cn.sx.decentworld.activity;
+
+import java.util.HashMap;
+
+import android.content.Intent;
+import android.net.Uri;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.FragmentManager;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.Constants;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.component.ui.RegisterComponent;
+import cn.sx.decentworld.dialog.GetIdentifyingCodeDialogFragment;
+import cn.sx.decentworld.dialog.GetIdentifyingCodeDialogFragment.OnEnsureClickListener;
+import cn.sx.decentworld.observer.SmsObserver;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.widget.ClearEditText;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+@EActivity(R.layout.activity_register_mobile)
+public class RegisterMobileActivity extends BaseFragmentActivity implements OnClickListener, TextWatcher, OnEnsureClickListener {
+	@ViewById(R.id.iv_back)
+	ImageView ivBack;
+	@ViewById(R.id.tv_header_title)
+	TextView tvTitle;
+	@ViewById(R.id.et_mobile)
+	ClearEditText etMobile;
+	@ViewById(R.id.et_code)
+	ClearEditText etCode;
+	@ViewById(R.id.btn_OK)
+	Button btnOk;
+	@ViewById(R.id.tv_no_receive_code)
+	TextView tvNoReceive;
+	private FragmentManager fragmentManager;
+	private TimeCount timeCount = new TimeCount(60000, 1000);
+	private String mMobile = "";
+	@Bean
+	RegisterComponent registerComponent;
+	private Handler mCheckCodeHandle = new Handler() {
+		public void handleMessage(Message msg) {
+			startActivity(new Intent(mContext, RegisterNickActivity_.class));
+			finish();
+		};
+	};
+	private Handler mRequestCodeHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			timeCount.cancel();
+			btnOk.setText("获取验证码");
+			setBtnOk(true);
+		};
+	};
+	private SmsObserver mObserver;
+	private Handler mHandler = new Handler() {
+
+		@Override
+		public void handleMessage(Message msg) {
+			if (msg.what == Constants.MSG_RECEIVED_CODE) {
+				String code = (String) msg.obj;
+				etCode.setText(code);
+			}
+		}
+	};
+
+	@AfterViews
+	public void init() {
+		fragmentManager = getSupportFragmentManager();
+		tvTitle.setText("输入手机号");
+		ivBack.setVisibility(View.VISIBLE);
+		ivBack.setOnClickListener(this);
+		btnOk.setOnClickListener(this);
+		tvNoReceive.setOnClickListener(this);
+		btnOk.setText(getResources().getString(R.string.get_identify_code));
+		etCode.addTextChangedListener(this);
+		etMobileAddTextChangedListener();
+		initObserver();
+	}
+
+	private void initObserver() {
+		mObserver = new SmsObserver(this, mHandler);
+		Uri uri = Uri.parse("content://sms");
+		getContentResolver().registerContentObserver(uri, true, mObserver);
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.iv_back:
+			finish();
+			break;
+		case R.id.btn_OK:
+			handlerBtnOk();
+			break;
+		case R.id.tv_no_receive_code:
+			showGetIdentifyingCodeDialog();
+			break;
+		}
+	}
+
+	private void showGetIdentifyingCodeDialog() {
+		GetIdentifyingCodeDialogFragment gif = GetIdentifyingCodeDialogFragment.newInstance(registerComponent.tel);
+		gif.setOnEnsureClickListener(RegisterMobileActivity.this);
+		gif.show(fragmentManager, "getIdentifyingcodes");
+	}
+
+	private void handlerBtnOk() {
+		if (getResources().getString(R.string.register_get_identifying_code).equals(btnOk.getText().toString())) {
+			getIdentifyingCode();
+		} else if (getResources().getString(R.string.register_next).equals(btnOk.getText().toString())) {
+			sendIdentifyingCode();
+		}
+	}
+
+	private void sendIdentifyingCode() {
+		if (etCode.length() <= 0) {
+			ToastUtil.showToast("请输入验证码");
+			return;
+		}
+		if (etMobile.length() <= 0) {
+			ToastUtil.showToast("请输入手机号码");
+			return;
+		}
+		String iCode = etCode.getText().toString();
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("phoneNum", etMobile.getText().toString());
+		map.put("code", iCode);
+		registerComponent.identifyCode(map, mCheckCodeHandle);
+	}
+
+	private void getIdentifyingCode() {
+		if (etMobile.length() <= 0) {
+			ToastUtil.showToast("请输入手机号码");
+			return;
+		}
+		if (etMobile.length() != 11) {
+			ToastUtil.showToast("手机号码输入不正确");
+			return;
+		}
+		String mobile = etMobile.getText().toString();
+		registerComponent.requestCode(mobile, mRequestCodeHandler);
+		timeCount.start();
+		setBtnOk(false);
+	}
+
+	@Override
+	public void afterTextChanged(Editable arg0) {
+
+	}
+
+	@Override
+	public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+	}
+
+	@Override
+	public void onTextChanged(CharSequence data, int arg1, int arg2, int arg3) {
+		timeCount.cancel();
+		setBtnOk(true);
+		if (data.length() > 0) {
+			btnOk.setText(getResources().getString(R.string.register_next));
+		} else {
+			btnOk.setText(getResources().getString(R.string.register_get_identifying_code));
+		}
+	}
+
+	private void etMobileAddTextChangedListener() {
+		etMobile.addTextChangedListener(new TextWatcher() {
+			public void onTextChanged(CharSequence data, int arg1, int arg2, int arg3) {
+			}
+
+			public void beforeTextChanged(CharSequence data, int arg1, int arg2, int arg3) {
+			}
+
+			public void afterTextChanged(Editable arg0) {
+
+			}
+		});
+	}
+
+	@Override
+	public void ensureClick() {
+		getIdentifyingCode();
+	}
+
+	private void setBtnOk(boolean flag) {
+		btnOk.setEnabled(flag);
+	}
+
+	/**
+	 * 倒计时类
+	 */
+	class TimeCount extends CountDownTimer {
+		/**
+		 * @param millisInFuture
+		 * @param countDownInterval
+		 */
+		public TimeCount(long millisInFuture, long countDownInterval) {
+			// 参数依次为总时长,和计时的时间间隔
+			super(millisInFuture, countDownInterval);
+		}
+
+		public void onTick(long millisUntilFinished) {
+			btnOk.setText(millisUntilFinished / 1000 + "秒");
+		}
+
+		public void onFinish() {
+			btnOk.setText(getResources().getString(R.string.get_identify_code));
+			setBtnOk(true);
+		}
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (CommUtil.isNotBlank(RegisterComponent.tel)) {
+			etMobile.setText(RegisterComponent.tel);
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		getContentResolver().unregisterContentObserver(mObserver);
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		timeCount.cancel();
+	}
+}

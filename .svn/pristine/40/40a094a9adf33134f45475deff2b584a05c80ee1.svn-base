@@ -1,0 +1,26 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.dao;
+
+import cn.sx.decentworld.entity.db.UserInfo;
+
+import com.activeandroid.query.Select;
+
+/**
+ * @ClassName: UserInfoDao.java
+ * @Description: 
+ * @author: cj
+ * @date: 2016年4月23日 下午3:46:58
+ */
+public class UserInfoDao
+{
+    /**
+     * 查询指定dwID号的记录并返回结果
+     * @param dwID
+     */
+    public static UserInfo query(String userID) {
+        return new Select().from(UserInfo.class).where("userId=?", userID).executeSingle();
+    }
+
+}

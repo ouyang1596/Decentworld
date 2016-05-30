@@ -1,0 +1,635 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.adapter;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.crypto.spec.IvParameterSpec;
+
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.AnimationDrawable;
+import android.media.MediaPlayer;
+import android.os.Handler;
+import android.os.Message;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.RotateAnimation;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.abstractclass.AbstractPlayListener;
+import cn.sx.decentworld.activity.ChatSettingWhistleblowingActivity_;
+import cn.sx.decentworld.activity.discover.MomentActivity;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.FilePath;
+import cn.sx.decentworld.common.MediaManager;
+import cn.sx.decentworld.engine.MomentEngine;
+import cn.sx.decentworld.entity.db.CommentEntity;
+import cn.sx.decentworld.entity.db.CommentEntity.CommentType;
+import cn.sx.decentworld.entity.db.DWMessage;
+import cn.sx.decentworld.entity.db.MomentEntity;
+import cn.sx.decentworld.fragment.PublishFragment;
+import cn.sx.decentworld.listener.CommentCallback;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.utils.ImageLoaderHelper;
+import cn.sx.decentworld.utils.ImageUtils;
+import cn.sx.decentworld.utils.TimeUtils;
+import cn.sx.decentworld.utils.ToastUtil;
+import cn.sx.decentworld.widget.ExpandGridView;
+import cn.sx.decentworld.widget.ListViewForScrollView;
+
+import com.lidroid.xutils.HttpUtils;
+import com.lidroid.xutils.exception.HttpException;
+import com.lidroid.xutils.http.ResponseInfo;
+import com.lidroid.xutils.http.callback.RequestCallBack;
+
+/**
+ * 
+ * @ClassName: FriendsCircleAdapter.java
+ * @Description: 作品圈适配器
+ * @author: cj
+ * @date: 2016年2月27日 上午10:29:22
+ */
+public class MomentAdapter extends BaseAdapter
+{
+    private static final String TAG = "MomentAdapter";
+    private Context context;
+    private List<MomentEntity> momentEntities;
+    private PublishFragment mPublishFragment;
+
+    /**
+     * 构造函数
+     */
+    public MomentAdapter(Context context, List<MomentEntity> momentEntities, PublishFragment publishFragment)
+    {
+        this.context = context;
+        this.momentEntities = momentEntities;
+        this.mPublishFragment = publishFragment;
+    }
+
+    @Override
+    public View getView(final int position, View convertView, ViewGroup parent)
+    {
+        final ViewHolder holder;
+        if (convertView == null)
+        {
+            holder = new ViewHolder();
+            convertView = LayoutInflater.from(context).inflate(R.layout.item_moment, null);
+            holder.ivIcon = (ImageView) convertView.findViewById(R.id.iv_moment_icon);
+            holder.tvPublisherName = (TextView) convertView.findViewById(R.id.tv_moment_publisherName);
+            holder.tvPublisherTime = (TextView) convertView.findViewById(R.id.tv_moment_publishTime);
+            holder.tvDelete = (TextView) convertView.findViewById(R.id.tv_moment_delete);
+            holder.tvContent = (TextView) convertView.findViewById(R.id.tv_moment_content);
+            // 图片容器
+            holder.llImgContainer = (LinearLayout) convertView.findViewById(R.id.ll_moment_img_container);
+            holder.gvImgs = (ExpandGridView) convertView.findViewById(R.id.gv_moment_imgs);
+            // 语音容器
+            holder.llVoiceContainer = (LinearLayout) convertView.findViewById(R.id.ll_moment_voice_container);
+            // 按钮容器
+            holder.llBtnContainer = (LinearLayout) convertView.findViewById(R.id.ll_moment_btn_container);
+            holder.llReport = (LinearLayout) convertView.findViewById(R.id.ll_moment_report);
+            holder.llLike = (LinearLayout) convertView.findViewById(R.id.ll_moment_like);
+            holder.llDislike = (LinearLayout) convertView.findViewById(R.id.ll_moment_dislike);
+            holder.llComment = (LinearLayout) convertView.findViewById(R.id.ll_moment_comment);
+            holder.tvLike = (TextView) convertView.findViewById(R.id.tv_moment_like);
+            holder.tvDislike = (TextView) convertView.findViewById(R.id.tv_moment_dislike);
+            // 评论列表
+            holder.mLvComment = (ListViewForScrollView) convertView.findViewById(R.id.lv_moment_comment);
+            // 是否显示评论列表
+            holder.tvCommentShow = (TextView) convertView.findViewById(R.id.tv_moment_comment_show);
+            holder.tvCommentCount = (TextView) convertView.findViewById(R.id.tv_moment_comment_count);
+            holder.ivPlayVoice = (ImageView) convertView.findViewById(R.id.iv_moment_voice_play);
+            convertView.setTag(holder);
+        }
+        else
+        {
+            holder = (ViewHolder) convertView.getTag();
+        }
+        final MomentEntity momentEntity = momentEntities.get(position);
+
+        // 设置头像的点击事件
+        holder.ivIcon.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                ToastUtil.showToast("开发中 ...");
+            }
+        });
+
+        // 设置发布者的头像
+        String iconPath = ImageUtils.getIconByDwID(momentEntity.getPublisherID(), ImageUtils.ICON_SMALL);
+        ImageLoaderHelper.mImageLoader.displayImage(iconPath, holder.ivIcon, ImageLoaderHelper.mOptions);
+        // 设置发布者的名字
+        holder.tvPublisherName.setText(momentEntity.getPublisherName());
+        // 设置发布的时间
+        String time = TimeUtils.toMsgFormat(momentEntity.getPublishTime());
+        holder.tvPublisherTime.setText(time);
+        // 是否显示删除按钮
+        if (momentEntity.getPublisherID().equals(DecentWorldApp.getInstance().getDwID()))
+        {
+            holder.tvDelete.setVisibility(View.VISIBLE);
+            holder.tvDelete.setOnClickListener(new OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    ToastUtil.showToast("开发中...");
+                }
+            });
+        }
+        else
+        {
+            holder.tvDelete.setVisibility(View.GONE);
+        }
+        holder.tvContent.setText(momentEntity.getContent());
+        // 根据发布类型选择不同布局
+        if (momentEntity.getContentType() == DWMessage.TXT)
+        {
+            // 文字
+            // 设置文字信息
+            holder.llVoiceContainer.setVisibility(View.GONE);
+            holder.llImgContainer.setVisibility(View.GONE);
+        }
+        else if (momentEntity.getContentType() == DWMessage.VOICE)
+        {
+            // 语音
+            holder.llImgContainer.setVisibility(View.GONE);
+            holder.llVoiceContainer.setVisibility(View.VISIBLE);
+            // 播放语音
+            holder.ivPlayVoice.setOnClickListener(new OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    if (CommUtil.isNotBlank(momentEntity.getLocalUrl()))
+                    {
+                        String localPath = momentEntity.getLocalUrl();
+                        LogUtils.d(TAG, "ivPlayVoice,onClick() localPath:" + localPath);
+                        playLocalMusic(localPath, position, holder.ivPlayVoice);
+                    }
+                    else
+                    {
+                        String remotePath = momentEntity.getRemoteUrl();
+                        LogUtils.d(TAG, "ivPlayVoice,onClick() remotePath:" + remotePath);
+                        DownLoadAudio(momentEntity, position, holder.ivPlayVoice);
+                    }
+                }
+            });
+        }
+        else if (momentEntity.getContentType() == DWMessage.IMAGE)
+        {
+            // 图片
+            holder.llImgContainer.setVisibility(View.VISIBLE);
+            holder.llVoiceContainer.setVisibility(View.GONE);
+            final int imageType[] = new int[2];
+            String imagePaths = "";
+            if (CommUtil.isNotBlank(momentEntity.getLocalUrl()))
+            {
+                imageType[0] = ImageUtils.IMAGE_FROM_LOCAL;
+                imagePaths = momentEntity.getLocalUrl();
+            }
+            else
+            {
+                imageType[0] = ImageUtils.IMAGE_FROM_NET;
+                imagePaths = momentEntity.getRemoteUrl();
+            }
+
+            if (CommUtil.isNotBlank(imagePaths))
+            {
+                String[] u = imagePaths.split(";");
+                final ArrayList<String> imageList;
+                if (u != null && u.length > 0)
+                {
+                    imageList = new ArrayList<String>();
+                    for (String str : u)
+                    {
+                        imageList.add(str);
+                    }
+                    holder.gvImgs.setAdapter(new MomentImgAdapter(context , imageList , imageType[0]));
+                    holder.gvImgs.setOnItemClickListener(new OnItemClickListener()
+                    {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                        {
+                            ImageUtils.browerBigImage(context, imageList, imageType[0], position);
+                        }
+                    });
+                }
+            }
+        }
+        else
+        {
+            // 其它类型，防止遗漏
+        }
+
+        // 计算喜欢、不喜欢的次数
+        int likeCount = 0;
+        int disLikeCount = 0;
+        int commentCount = 0;
+        List<CommentEntity> commentTemp = new ArrayList<CommentEntity>();
+        List<CommentEntity> commentList = momentEntity.getCommentList();
+        if (commentList != null && commentList.size() > 0)
+        {
+            for (CommentEntity entity : commentList)
+            {
+                CommentType type = CommentType.getType(entity.getType());
+                switch (type)
+                {
+                    case LIKE:
+                        likeCount++;
+                        break;
+                    case DISLIKE:
+                        disLikeCount++;
+                        break;
+                    case NOMAL:
+                        commentCount++;
+                        commentTemp.add(entity);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        // 点击事件
+        ClickListener clickListener = new ClickListener(holder , position);
+        holder.llReport.setOnClickListener(clickListener);
+
+        holder.tvLike.setText("" + likeCount);
+        holder.llLike.setOnClickListener(clickListener);
+        holder.tvDislike.setText("" + disLikeCount);
+        holder.llDislike.setOnClickListener(clickListener);
+        holder.tvCommentCount.setText("" + commentCount);
+        holder.llComment.setOnClickListener(clickListener);
+        // 显示评论
+        holder.mLvComment.setAdapter(new MomentCommentAdapter(context , commentTemp));
+        // 设置评论列表的显示状态
+        holder.tvCommentShow.setOnClickListener(new OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (holder.tvCommentShow.getText().equals("隐藏评论"))
+                {
+                    holder.tvCommentShow.setText("显示评论");
+                    holder.mLvComment.setVisibility(View.GONE);
+                }
+                else
+                {
+                    holder.tvCommentShow.setText("隐藏评论");
+                    holder.mLvComment.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+        return convertView;
+    }
+
+    @Override
+    public int getCount()
+    {
+        return momentEntities.size();
+    }
+
+    @Override
+    public MomentEntity getItem(int position)
+    {
+        return momentEntities.get(position);
+    }
+
+    @Override
+    public long getItemId(int position)
+    {
+        return position;
+    }
+
+    /**
+     * @Description:点击事件
+     */
+    public class ClickListener implements OnClickListener
+    {
+        private ViewHolder holder;
+        private int position;
+
+        public ClickListener(ViewHolder holder, int position)
+        {
+            this.holder = holder;
+            this.position = position;
+        }
+
+        /**
+         * 处理 赞、踩、评论、举报的点击事件
+         */
+        @Override
+        public void onClick(View v)
+        {
+            switch (v.getId())
+            {
+                case R.id.ll_moment_comment:
+                    if (mPublishFragment.relPublish.getVisibility() == View.VISIBLE)
+                    {
+                        //打开评论
+                        mPublishFragment.relComment.setVisibility(View.VISIBLE);
+                        mPublishFragment.relPublish.setVisibility(View.GONE);
+                        LogUtils.v(TAG, "onClick() 打开评论，position="+position+",holder="+holder.toString());
+                        openComment(getItem(position),holder);
+                    }
+                    else
+                    {
+                        //关闭评论
+                        mPublishFragment.relComment.setVisibility(View.GONE);
+                        mPublishFragment.relPublish.setVisibility(View.VISIBLE);
+                        LogUtils.v(TAG, "onClick() 关闭评论");
+                        closeComment();
+                    }
+                    break;
+                case R.id.tv_moment_delete:
+                    break;
+                case R.id.ll_moment_report:
+                    Intent intent = new Intent(context , ChatSettingWhistleblowingActivity_.class);
+                    intent.putExtra("position", position);
+                    ((Activity) context).startActivityForResult(intent, MomentActivity.REQUEST_CODE.REPORT.getIndex());
+                    break;
+                case R.id.ll_moment_like:
+                    comment(getItem(position), holder, CommentType.LIKE.getIndex(), "");
+                    break;
+                case R.id.ll_moment_dislike:
+                    comment(getItem(position), holder, CommentType.DISLIKE.getIndex(), "");
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public static class ViewHolder
+    {
+        // 发布者头像
+        ImageView ivIcon;
+        // 发布者名字
+        TextView tvPublisherName;
+        // 发布时间
+        TextView tvPublisherTime;
+        // 删除按钮
+        TextView tvDelete;
+        // 发布的文字
+        TextView tvContent;
+        // 语音显示控件
+        LinearLayout llVoiceContainer;
+        // 图片显示容器
+        LinearLayout llImgContainer;
+        // 显示图片
+        ExpandGridView gvImgs;
+        // 按钮容器
+        LinearLayout llBtnContainer;
+        // 举报
+        LinearLayout llReport;
+        // 喜欢
+        LinearLayout llLike;
+        // 不喜欢
+        LinearLayout llDislike;
+        // 评论
+        LinearLayout llComment;
+        TextView tvLike;
+        TextView tvDislike;
+        // 评论列表
+        ListViewForScrollView mLvComment;
+        // 是否显示评论列表
+        TextView tvCommentShow;
+        // 评论次数
+        TextView tvCommentCount;
+
+        // 播放语音的按钮
+        ImageView ivPlayVoice;
+    }
+
+    /**
+     * 评论
+     */
+    public void comment(final MomentEntity momentEntity, final ViewHolder holder, final int commentType, String commentContent)
+    {
+        long momentID = momentEntity.getMomentID();
+        String publisherID = momentEntity.getPublisherID();
+        String publisherName = momentEntity.getPublisherName();
+        CommentEntity commentEntity = new CommentEntity(momentID , publisherID , publisherName , commentType , commentContent);
+        new MomentEngine().comment(commentEntity, new CommentCallback()
+        {
+            @Override
+            public void onSuccess(String info, CommentEntity commentEntity)
+            {
+                if (commentType == CommentType.NOMAL.getIndex())
+                {
+                    LogUtils.v(TAG, "评论成功");
+                    ToastUtil.showToast("评论成功");
+                    MomentAdapter.this.notifyDataSetChanged();
+                }
+                else if (commentType == CommentType.LIKE.getIndex())
+                {
+                    LogUtils.v(TAG, "喜欢成功");
+                    ToastUtil.showToast("喜欢成功");
+                    int count = Integer.valueOf(holder.tvLike.getText().toString()) + 1;
+                    holder.tvLike.setText("" + count);
+                    momentEntity.setLikeCount(count);
+                    momentEntity.save();
+                    MomentAdapter.this.notifyDataSetChanged();
+                }
+                else if (commentType == CommentType.DISLIKE.getIndex())
+                {
+                    LogUtils.v(TAG, "不喜欢成功");
+                    ToastUtil.showToast("不喜欢成功");
+                    int count = Integer.valueOf(holder.tvDislike.getText().toString()) + 1;
+                    holder.tvDislike.setText("" + count);
+                    momentEntity.setDislikeCount(count);
+                    momentEntity.save();
+                    MomentAdapter.this.notifyDataSetChanged();
+                }
+                else if (commentType == CommentType.REPORT.getIndex())
+                {
+                    // 暂时不做
+                    LogUtils.i(TAG, "举报成功");
+                    ToastUtil.showToast("举报成功");
+                    MomentAdapter.this.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void onFailure(String cause, CommentEntity commentEntity)
+            {
+                // 喜欢失败
+                ToastUtil.showToast(cause);
+            }
+        });
+    }
+
+    /**
+     * 举报
+     * 
+     * @param position
+     *            位置信息
+     * @param info
+     *            举报理由
+     */
+    public void report(int position, String info)
+    {
+        comment(getItem(position), null, CommentType.REPORT.getIndex(), info);
+    }
+
+    // /////////////////////////////////////播放语音////////////////////////////////////////////
+
+    /**
+     * 播放语音
+     */
+    private void playLocalMusic(String filePath, int position, final ImageView mIvVoice)
+    {
+        LogUtils.d(TAG, "playLocalMusic() params[filePath=" + filePath + ",position=" + position + "]");
+        MediaManager.playLocal(filePath, position, mIvVoice, new AbstractPlayListener(position , mIvVoice)
+        {
+            @Override
+            public void stop(ImageView ivVoice)
+            {
+                LogUtils.d(TAG, "playLocalMusic() stop");
+                ivVoice.setBackgroundResource(R.drawable.chatfrom_voice_playing);
+                Message msg = new Message();
+                msg.what = 1;
+                msg.obj = ivVoice;
+                handler.sendMessage(msg);
+            }
+
+            @Override
+            public void play(int position, int duration)
+            {
+                LogUtils.d(TAG, "playLocalMusic() play,position=" + position + ",duration=" + duration);
+                Message msg = new Message();
+                msg.what = 0;
+                msg.obj = mIvVoice;
+                handler.sendMessage(msg);
+            }
+
+            @Override
+            public void onFinish(MediaPlayer mp, ImageView ivVoice)
+            {
+                ivVoice.setBackgroundResource(R.drawable.chatfrom_voice_playing);
+                Message msg = new Message();
+                msg.what = 1;
+                msg.obj = ivVoice;
+                handler.sendMessage(msg);
+                LogUtils.d(TAG, "playLocalMusic() onFinish");
+            }
+        });
+    }
+
+    /**
+     * 下载语音
+     */
+    public void DownLoadAudio(final MomentEntity momentEntity, final int position, final ImageView ivVoice)
+    {
+        final String remotePath = momentEntity.getRemoteUrl();
+        String fileName = remotePath.substring(remotePath.lastIndexOf("/"));
+        showProgressDialog();
+        HttpUtils httpUtils = new HttpUtils();
+        httpUtils.download(remotePath, FilePath.AUDIO_PATH + fileName, new RequestCallBack<File>()
+        {
+            @Override
+            public void onSuccess(ResponseInfo<File> responseInfo)
+            {
+                hideProgressDialog();
+                String absolutePath = responseInfo.result.getAbsolutePath();
+                LogUtils.d(TAG, "DownLoadAudio() onSuccess,remotePath=" + remotePath + ",absolutePath=" + absolutePath);
+                momentEntity.setLocalUrl(absolutePath);
+                momentEntity.save();
+                playLocalMusic(absolutePath, position, ivVoice);
+            }
+
+            @Override
+            public void onFailure(HttpException error, String msg)
+            {
+                hideProgressDialog();
+                ToastUtil.showToast("语音文件下载失败");
+                LogUtils.d(TAG, "DownLoadAudio() onFailure,remotePath=" + remotePath + ",error=" + error);
+                notifyDataSetChanged();
+            }
+        });
+    }
+
+    private ProgressDialog mProDialog;
+
+    private void showProgressDialog()
+    {
+        if (null == mProDialog)
+            mProDialog = ProgressDialog.show(context, null, "loading");
+        else
+            mProDialog.show();
+    }
+
+    private void hideProgressDialog()
+    {
+        if (null != mProDialog)
+        {
+            mProDialog.hide();
+        }
+    }
+
+    Handler handler = new Handler()
+    {
+        public void handleMessage(android.os.Message msg)
+        {
+            ImageView imageView = (ImageView) msg.obj;
+            switch (msg.what)
+            {
+                case 0:
+                    // 播放
+                    LogUtils.v(TAG, "handler() 0");
+                    Animation animation = new RotateAnimation(0 , 359 , Animation.RELATIVE_TO_SELF , 0.5f , Animation.RELATIVE_TO_SELF , 0.5f);
+                    animation.setDuration(1000 * 2);
+                    animation.setRepeatCount(-1);
+                    imageView.startAnimation(animation);
+                    break;
+                case 1:
+                    // 停止
+                    LogUtils.v(TAG, "handler() 1");
+                    imageView.clearAnimation();
+                    break;
+                default:
+                    break;
+            }
+        };
+    };
+    
+    private MomentEntity entity;
+    private ViewHolder holder;
+    private void openComment(MomentEntity momentEntity,ViewHolder holder)
+    {
+        LogUtils.v(TAG, "openComment() "+momentEntity.toString());
+        this.entity  = momentEntity;
+        this.holder = holder;
+    }
+    
+    public void closeComment()
+    {
+        
+    }
+    
+    /**
+     * 提交评论
+     */
+    public void submitComment(String content)
+    {
+        LogUtils.v(TAG, "submitComment() params[content="+content+"]");
+        comment(entity, holder, CommentType.NOMAL.getIndex(), content);
+        mPublishFragment.clearContent();
+    }
+}

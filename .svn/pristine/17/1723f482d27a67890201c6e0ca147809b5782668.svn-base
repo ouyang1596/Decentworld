@@ -1,0 +1,2 @@
+1.消息Entity增加两个字段 currentStatus，nextStatus;
+2.消息类型：free(绿) nomal（黄） overflow（红）;

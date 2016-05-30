@@ -14,9 +14,11 @@ import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
+import cn.sx.decentworld.component.KeyboardComponent_;
 import cn.sx.decentworld.component.ui.RegisterComponent_;
 import cn.sx.decentworld.widget.ClearEditText;
 import com.googlecode.androidannotations.api.SdkVersionHelper;
@@ -35,16 +37,19 @@ public final class RegisterMobileActivity_
 
     private void init_(Bundle savedInstanceState) {
         registerComponent = RegisterComponent_.getInstance_(this);
+        keyboardComponent = KeyboardComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
-        etMobile = ((ClearEditText) findViewById(id.et_mobile));
-        tvNoReceive = ((TextView) findViewById(id.tv_no_receive_code));
-        btnOk = ((Button) findViewById(id.btn_OK));
-        etCode = ((ClearEditText) findViewById(id.et_code));
         tvTitle = ((TextView) findViewById(id.tv_header_title));
+        etMobile = ((ClearEditText) findViewById(id.et_mobile));
         ivBack = ((ImageView) findViewById(id.iv_back));
+        btnOk = ((Button) findViewById(id.btn_OK));
+        tvNoReceive = ((TextView) findViewById(id.tv_no_receive_code));
+        llRegisterMobile = ((LinearLayout) findViewById(id.ll_register_mobile));
+        etCode = ((ClearEditText) findViewById(id.et_code));
         ((RegisterComponent_) registerComponent).afterSetContentView_();
+        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         init();
     }
 

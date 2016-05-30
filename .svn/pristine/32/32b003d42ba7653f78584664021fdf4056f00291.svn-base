@@ -1,0 +1,304 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.utils.sputils;
+
+import java.util.Date;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.config.ConstantConfig;
+import cn.sx.decentworld.engine.ChatGroupEngine;
+import cn.sx.decentworld.engine.ChatSingleEngine;
+import cn.sx.decentworld.engine.ContactEngine;
+import cn.sx.decentworld.engine.ConversationEngine;
+import cn.sx.decentworld.engine.UserDataEngine;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.manager.MomentManager;
+import cn.sx.decentworld.manager.SelfExtraInfoManager;
+import cn.sx.decentworld.manager.SelfInfoManager;
+import cn.sx.decentworld.utils.TimeUtils;
+
+/**
+ * @ClassName: LoginHelper.java
+ * @Description:
+ * @author: cj
+ * @date: 2015年11月10日 下午10:49:53
+ */
+public class UserInfoHelper {
+	private static final String TAG = "UserInfoHelper";
+	// 保存用户信息用到的SharedPreference文件名
+	public static final String SP_FILE_NAME = "userInfo";
+
+	/**
+	 * 键名
+	 */
+	public static final String SP_KEY_DW_ID = "dwID";
+	public static final String SP_KEY_TOKEN = "token";
+	public static final String SP_KEY_USER_NAME = "usernmae";
+	public static final String SP_KEY_PASSWORD = "password";
+	// 登录时获取信息的当前版本号
+	public static final String SP_KEY_ALL_USERINFO_VERSION = "sp_key_all_userinfo_version";
+	// 设置被挤下线的状态
+	public static final String SP_KEY_LOGIN_STATUS = "SP_KEY_LOGIN_STATUS";
+	// key的更新时间
+	public static final String SP_KEY_MODIFY_KEY_TIME = "SP_KEY_MODIFY_KEY_TIME";
+	// 保存用户的randomStr
+	public static final String SP_KEY_RANDOMSTR = "SP_KEY_RANDOMSTR";
+	// 登录类型
+	public static final String SP_KEY_LOGIN_TYPE = "SP_KEY_LOGIN_TYPE";
+	/** 用户登录类型 **/
+	public enum LoginType
+	{
+	    Default(-1,"默认的"),PHONE_NUM(0,"手机号码"),WX(1,"微信");
+	    private int type;
+	    private String info;
+        private LoginType(int type,String info)
+        {
+            this.type = type;
+            this.info = info;
+        }
+        public int getType()
+        {
+            return type;
+        }
+	}
+
+	/**
+	 * 登录成功后将用户的信息保存到SharedPre和Application中
+	 * 
+	 * @param dwID
+	 *            用户ID
+	 * @param password
+	 *            密码（密文）
+	 */
+	public static void saveLoginInfo(String dwID, String password) {
+		LogUtils.v(TAG, "saveLoginInfo() params[dwID=" + dwID + ",password=" + password + "]");
+		// 保存数据到sp文件中
+		SharedPreferences preferences = getSP();
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putString(SP_KEY_DW_ID, dwID);
+		editor.putString(SP_KEY_PASSWORD, password);
+		editor.commit();
+		// 保存数据到Application内存中
+		DecentWorldApp.getInstance().setDwID(dwID);
+		DecentWorldApp.getInstance().setPassword(password);
+	}
+
+    /**
+     * 0手机号登录 1微信号登录
+     * @param loginType 
+     */
+    public static void saveLoginType(int loginType)
+    {
+        // 保存数据到sp文件中
+        SharedPreferences preferences = getSP();
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(SP_KEY_LOGIN_TYPE, loginType);
+        editor.commit();
+    }
+
+	public static int getLoginType() {
+		// 保存数据到sp文件中
+		SharedPreferences preferences = getSP();
+		return preferences.getInt(SP_KEY_LOGIN_TYPE, LoginType.PHONE_NUM.getType());
+	}
+
+	/**
+	 * 判断用户是否登录
+	 * 
+	 * @param context
+	 * @return true代表登录过，四个参数可以从内存中获取，否则没有登录过；
+	 */
+	public static boolean isLogined() {
+		// 1.判断SharedPreference中是否有登录信息，有则返回true,否则返回false;(注意登出后一定要销毁掉SharedPre中的数据)
+		SharedPreferences preferences = getSP();
+		String dwID = preferences.getString(SP_KEY_DW_ID, "");
+		String password = preferences.getString(SP_KEY_PASSWORD, "");
+		if (CommUtil.isNotBlank(dwID) && CommUtil.isNotBlank(password)) {
+			// 登录成功之后，在内存中存储一份用户信息数据，注销的时候注意，销毁。
+			DecentWorldApp.getInstance().setDwID(dwID);
+			DecentWorldApp.getInstance().setPassword(password);
+			return true;
+		}
+		// 2.如果在内存和xml文件中都没有用户登录信息，则返回false，并确保内存中的数据为空
+		DecentWorldApp.getInstance().setDwID("");
+		DecentWorldApp.getInstance().setPassword("");
+		return false;
+	}
+
+	/**
+	 * 获取登录时获取信息的当前版本号
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static String getAllUserInfoVersion() {
+		String userID = DecentWorldApp.getInstance().getDwID();
+		Context context = DecentWorldApp.getGlobalContext();
+		SharedPreferences preferences = context.getSharedPreferences(SP_FILE_NAME, 0);
+		String version = preferences.getString(SP_KEY_ALL_USERINFO_VERSION + userID, "-1");
+		return version;
+	}
+
+	/**
+	 * 保存登录时获取信息的当前版本号
+	 * 
+	 * @param context
+	 * @return
+	 */
+	public static void setAllUserInfoVersion(String version) {
+		String userID = DecentWorldApp.getInstance().getDwID();
+		SharedPreferences preferences = getSP();
+		Editor edit = preferences.edit();
+		edit.putString(SP_KEY_ALL_USERINFO_VERSION + userID, version);
+		edit.commit();
+	}
+
+	/**
+	 * 获取DwID
+	 * 
+	 * @return
+	 */
+	public static String getDwID() {
+		SharedPreferences preferences = getSP();
+		String dwID = preferences.getString(SP_KEY_DW_ID, "");
+		return dwID;
+	}
+
+	/**
+	 * 保存密码
+	 * 
+	 * @param pwd
+	 */
+	public static void setPassword(String pwd) {
+		SharedPreferences preferences = getSP();
+		Editor edit = preferences.edit();
+		edit.putString(SP_KEY_PASSWORD, pwd);
+		edit.commit();
+	}
+
+	/**
+	 * 是否被挤下线
+	 * 
+	 * @param userID
+	 * @return
+	 */
+	public static boolean isCrushOffline(String userID) {
+		SharedPreferences preferences = getSP();
+		boolean loginStatus = preferences.getBoolean(SP_KEY_LOGIN_STATUS + userID, false);
+		return loginStatus;
+	}
+
+	/**
+	 * 设置被挤下线的状态
+	 * 
+	 * @param userID
+	 * @param isCrushOffline
+	 */
+	public static void setCrushOffline(String userID, boolean isCrushOffline) {
+		SharedPreferences preferences = getSP();
+		Editor edit = preferences.edit();
+		edit.putBoolean(SP_KEY_LOGIN_STATUS + userID, isCrushOffline);
+		edit.commit();
+	}
+
+	/**
+	 * 是否更新本地key
+	 */
+	public static boolean isModifyKey() 
+	{
+        String userID = DecentWorldApp.getInstance().getDwID();
+        SharedPreferences preferences = getSP();
+        long oldTime = preferences.getLong(SP_KEY_MODIFY_KEY_TIME + userID, -1);
+        if ((oldTime == -1) || (System.currentTimeMillis() - oldTime > ConstantConfig.INTERVAL_TIME_KEY_UPDATE))
+        {
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putLong(SP_KEY_MODIFY_KEY_TIME + userID, System.currentTimeMillis());
+            editor.commit();
+            return true;
+        }
+        return false;
+	}
+
+	/**
+	 * 保存随机字符串
+	 */
+	public static void saveRandomStr(String randomStr) {
+		LogUtils.v(TAG, "saveRandomStr() params[randomStr=" + randomStr + "]");
+		String userID = DecentWorldApp.getInstance().getDwID();
+		SharedPreferences preferences = getSP();
+		SharedPreferences.Editor editor = preferences.edit();
+		editor.putString(SP_KEY_RANDOMSTR + userID, randomStr);
+		editor.commit();
+	}
+
+	/**
+	 * 获取随机字符串
+	 */
+	public static String getRandomStr() {
+		String userID = DecentWorldApp.getInstance().getDwID();
+		SharedPreferences preferences = getSP();
+		String randomStr = preferences.getString(SP_KEY_RANDOMSTR + userID, "");
+		LogUtils.v(TAG, "getRandomStr() params[randomStr=" + randomStr + "]");
+		return randomStr;
+	}
+
+	/**
+	 * 登出时清理参数
+	 */
+	public static void clearLogout() {
+		LogUtils.v(TAG, "clearLogout() begin");
+		String userID = DecentWorldApp.getInstance().getDwID();
+		SharedPreferences preferences = getSP();
+		SharedPreferences.Editor editor = preferences.edit();
+		// key
+		editor.putLong(SP_KEY_MODIFY_KEY_TIME + userID, -1);
+		// 清除randomStr
+		editor.putString(SP_KEY_RANDOMSTR + userID, "");
+		// 将被挤下线的状态保存到sp中
+		editor.putBoolean(SP_KEY_LOGIN_STATUS + userID, false);
+		// 清除用户信息
+		editor.putString(SP_KEY_DW_ID, "");
+		editor.putString(SP_KEY_TOKEN, "");
+		editor.putString(SP_KEY_USER_NAME, "");
+		editor.putString(SP_KEY_PASSWORD, "");
+		editor.commit();
+		LogUtils.v(TAG, "clearLogout() end,userID=" + userID);
+		// 清除内存中的数据
+		DecentWorldApp.getInstance().setDwID("");
+		DecentWorldApp.getInstance().setPassword("");
+		DecentWorldApp.getInstance().getIsStart().set(false);
+		// 设置为UI没有初始化
+		DecentWorldApp.getInstance().setMainActivityInit(false);
+	}
+
+	/**
+	 * 清除单例
+	 */
+	public static void clearSingleton() {
+		SelfInfoManager.clear();
+		SelfExtraInfoManager.clear();
+		MomentManager.clear();
+		ChatGroupEngine.clear();
+		ChatSingleEngine.clear();
+		ContactEngine.clear();
+		ConversationEngine.clear();
+		UserDataEngine.clear();
+	}
+	
+	////////////////////////////////////////////私有静态方法////////////////////////////
+
+	/**
+	 * 获取SharedPreferences
+	 */
+	private static SharedPreferences getSP() {
+		Context context = DecentWorldApp.getGlobalContext();
+		SharedPreferences preferences = context.getSharedPreferences(SP_FILE_NAME, 0);
+		return preferences;
+	}
+
+}

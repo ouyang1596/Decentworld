@@ -1,0 +1,415 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.handleMessage;
+
+import java.io.File;
+
+import org.jivesoftware.smack.packet.Message;
+import org.simple.eventbus.EventBus;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.engine.ConversationEngine;
+import cn.sx.decentworld.entity.MsgAndInfo;
+import cn.sx.decentworld.entity.UserSessionInfo;
+import cn.sx.decentworld.entity.dao.ContactUserDao;
+import cn.sx.decentworld.entity.dao.DWMessageDao;
+import cn.sx.decentworld.entity.db.DWMessage;
+import cn.sx.decentworld.entity.db.DWMessage.ChatRelationship;
+import cn.sx.decentworld.entity.db.DWMessage.ChatType;
+import cn.sx.decentworld.entity.db.DWMessage.Direct;
+import cn.sx.decentworld.entity.db.DWMessage.MessageType;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.manager.MsgNotifyManager;
+import cn.sx.decentworld.manager.SelfInfoManager;
+import cn.sx.decentworld.network.utils.JsonUtils;
+import cn.sx.decentworld.utils.ImageUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
+/**
+ * @ClassName: handleChat
+ * @Description: 处理聊天消息
+ * @author: Jackchen
+ * @date: 2016年5月12日 上午10:02:46
+ */
+public class HandleChat
+{
+    private static final String TAG = "handleChat";
+    private static HandleChat instance = new HandleChat();
+
+    private HandleChat()
+    {
+    }
+
+    public static HandleChat getInstance()
+    {
+        return instance;
+    }
+
+    /**
+     * 单聊文字
+     */
+    public void textSingle(Message message)
+    {
+        try
+        {
+            LogUtils.v(TAG, "textSingle() " + message.toString());
+            JSONObject jsonObject = JSON.parseObject(message.getBody());
+            String s_msg = jsonObject.getString("msg");
+            String s_userSessionInfo = jsonObject.getString("userSessionInfo");
+            // 构造UserSessionInfo
+            UserSessionInfo userSessionInfo = (UserSessionInfo) JsonUtils.json2Bean(s_userSessionInfo, UserSessionInfo.class);
+            JSONObject jsonObject2 = JSONObject.parseObject(s_userSessionInfo);
+            userSessionInfo.setFriendID(jsonObject2.getString("id"));
+            // 构造DWMessage
+            DWMessage dwMessage = DWMessage.toDWMessage(s_msg);
+            
+            DWMessage temp = DWMessageDao.query(dwMessage.getTxtMsgID());
+            if(temp!=null)
+            {
+                LogUtils.e(TAG, "textSingle() temp!=null,dwMessage=" + dwMessage.toString()+"\ntemp="+temp.toString());
+                return;
+            }
+
+            
+            DWMessage temp2 = DWMessageDao.query(dwMessage.getMid());
+            if(temp2!=null)
+            {
+                LogUtils.e(TAG, "textSingle() temp2!=null," + dwMessage.toString()+"\ntemp2="+temp2.toString());
+                return;
+            }
+            
+            LogUtils.e(TAG, "textSingle() execute this");
+                
+            
+            dwMessage.setSendSuccess(DWMessage.SendStatus.SUCCESS.getIndex());// 接收成功
+            dwMessage.setMessageType(MessageType.TEXT.getIndex());
+            dwMessage.setDirect(Direct.RECEIVE.ordinal());
+            dwMessage.save();
+            //更新身家
+            try
+            {
+                Float wealth = Float.valueOf(dwMessage.getWealth());
+                SelfInfoManager.getInstance().notifyWealthChanged(wealth);
+            }
+            catch (Exception e)
+            {
+                LogUtils.e(TAG, "textSingle() parse wealth occur Exception:"+e.toString());
+                e.printStackTrace();
+            }
+            
+            
+            LogUtils.v(TAG, "接收到一条文字消息，解析完之后得到待显示的消息为：" + dwMessage.toString());
+            // 确保为非聊天室信息
+            if (dwMessage.getChatType() != ChatType.MULTI.getIndex())
+            {
+                MsgAndInfo msgAndInfo = new MsgAndInfo(dwMessage , userSessionInfo);
+                // 通知聊天界面更新
+                EventBus.getDefault().post(dwMessage, NotifyByEventBus.NT_UPDATE_CHAT_LISTVIEW_RECEIVE_MSG);
+                // 显示消息通知
+                MsgNotifyManager.getInstance().SingleNotify(msgAndInfo);
+                ConversationEngine.getInstance().refreshConversation(msgAndInfo, "【单聊文字,发送更新会话列表的通知】");
+                sendFourAck(dwMessage.getMid(), dwMessage.getFromDwId(), message.getPacketID());
+            }
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "textSingle() Exception:" + e.toString() + ",message=" + message.toString(), true);
+        }
+    }
+
+    /**
+     * 聊天室文字
+     */
+    public void textMulti(Message message)
+    {
+        try
+        {
+            LogUtils.v(TAG, "textMulti() " + message.toString());
+            JSONObject jsonObject = JSON.parseObject(message.getBody());
+            String msg = jsonObject.getString("msg");
+            String userSessionInfo = jsonObject.getString("userSessionInfo");
+            String dwID = DecentWorldApp.getInstance().getDwID();
+            DWMessage dwMessage = DWMessage.toDWMessage(msg);
+            if (dwMessage.getChatType() == ChatType.MULTI.getIndex())
+            {
+                if (!dwMessage.getFromDwId().equals(dwID))
+                {
+                    // 别人发送过来的消息
+                    dwMessage.setSendSuccess(DWMessage.SendStatus.SUCCESS.getIndex());
+                    dwMessage.setDirect(DWMessage.Direct.RECEIVE.ordinal());
+                    dwMessage.save();
+                    EventBus.getDefault().post(dwMessage, NotifyByEventBus.NT_CHAT_ROOM_MSG);
+                    // 聊天室文字消息通知
+                    MsgNotifyManager.getInstance().MultiNotify(dwMessage);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "textMulti() Exception:" + e.toString() + ",message=" + message.toString(), true);
+        }
+    }
+    
+    /**
+     * 语音
+     */
+    public void voice(Message message)
+    {
+        try
+        {
+            LogUtils.v(TAG, "voice() " + message.toString());
+            JSONObject jsonObject = JSON.parseObject(message.getBody());
+            String s_msg = jsonObject.getString("msg");
+            String s_userSessionInfo = jsonObject.getString("userSessionInfo");
+            UserSessionInfo userSessionInfo = (UserSessionInfo) JsonUtils.json2Bean(s_userSessionInfo, UserSessionInfo.class);
+            JSONObject jsonObject2 = JSONObject.parseObject(s_userSessionInfo);
+            userSessionInfo.setFriendID(jsonObject2.getString("id"));
+            /** 解析所需参数 **/
+            JSONObject jsonMsg = JSONObject.parseObject(s_msg);
+            String chatType = jsonMsg.getString("chatType");
+            if (Integer.valueOf(chatType) == ChatType.MULTI.getIndex())
+            {
+                // 聊天室的dwID
+                String fromDwID = jsonMsg.getString("fromID");
+                String myDwID = DecentWorldApp.getInstance().getDwID();
+                LogUtils.v(TAG, "voice() fromDwID=" + fromDwID + ",myID=" + myDwID);
+                String roomID = message.getFrom().split("@")[0];
+                if (!myDwID.equals(fromDwID))
+                {
+                    LogUtils.v(TAG, "voice() 接收到一条聊天室语音消息:" + jsonMsg.toJSONString());
+                    Float length = jsonMsg.getFloat("length");
+                    String url = jsonMsg.getString("uri");
+                    String wealth = jsonMsg.getString("wealth");
+                    long id = jsonMsg.getLongValue("id");
+                    final DWMessage dwMessage = new DWMessage(MessageType.VOICE.getIndex() , DWMessage.Direct.RECEIVE);
+                    dwMessage.setFromDwId(fromDwID);
+                    dwMessage.setTo(roomID);
+                    dwMessage.setWealth(wealth);
+                    dwMessage.setChatType(Integer.valueOf(chatType));
+                    dwMessage.setUri(url);
+                    dwMessage.ifFromNet = 0;
+                    dwMessage.setRemoteUrl(url);
+                    dwMessage.setVoiceTime(length);
+                    dwMessage.setSendSuccess(DWMessage.SendStatus.SUCCESS.getIndex());
+                    dwMessage.setTxtMsgID(message.getPacketID());
+                    dwMessage.setMid(id);
+                    dwMessage.save();
+                    EventBus.getDefault().post(dwMessage, NotifyByEventBus.NT_RECEIVE_CHATROOM_AUDIO);
+                    // 聊天室语音消息通知
+                    MsgNotifyManager.getInstance().MultiNotify(dwMessage);
+                }
+            }
+            else
+            {
+                LogUtils.v(TAG, "voice() 接收到一条单聊语音消息:" + jsonMsg.toJSONString());
+                Float length = jsonMsg.getFloat("length");
+                String url = jsonMsg.getString("uri");
+                String wealth = jsonMsg.getString("wealth");
+                String fromDwID = jsonMsg.getString("fromID");
+                long id = jsonMsg.getLongValue("id");
+                
+                DWMessage temp = DWMessageDao.query(id);
+                if(temp!=null)
+                    return;
+                
+                
+                
+                ///////
+                String chatRelationship = jsonMsg.getString("chatRelationship");
+                String currentStatus = jsonMsg.getString("currentStatus");
+                String nextStatus = jsonMsg.getString("nextStatus");
+                
+                final DWMessage dwMessage = new DWMessage(MessageType.VOICE.getIndex() , DWMessage.Direct.RECEIVE);
+                dwMessage.setFromDwId(fromDwID);
+                dwMessage.setWealth(wealth);
+                dwMessage.setChatType(Integer.valueOf(chatType));
+                /** 判断好友关系 **/
+                if (ContactUserDao.isContact(fromDwID))
+                    dwMessage.setChatRelationship(ChatRelationship.FRIEND.getIndex());
+                else
+                    dwMessage.setChatRelationship(ChatRelationship.STRANGER.getIndex());
+                dwMessage.ifFromNet = 0;
+                dwMessage.setUri(url);
+                dwMessage.setRemoteUrl(url);
+                dwMessage.setVoiceTime(length);
+                dwMessage.setSendSuccess(DWMessage.SendStatus.SUCCESS.getIndex());
+                dwMessage.setTxtMsgID(message.getPacketID());
+                dwMessage.setMid(id);
+                dwMessage.setCurrentStatus(currentStatus);
+                dwMessage.setNextStatus(nextStatus);
+                dwMessage.save();
+                MsgAndInfo msgAndInfo = new MsgAndInfo(dwMessage , userSessionInfo);
+                EventBus.getDefault().post(msgAndInfo, NotifyByEventBus.NT_RECEIVE_SINGLE_AUDIO);
+                MsgNotifyManager.getInstance().SingleNotify(msgAndInfo);
+                sendFourAck(dwMessage.getMid(), dwMessage.getFromDwId(), message.getPacketID());
+            }
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "voice() Exception:" + e.toString() + ",message=" + message.toString(), true);
+        }
+    }
+
+    
+    /**
+     * 图片
+     */
+    public void image(Message message)
+    {
+        try
+        {
+            LogUtils.v(TAG, "image() " + message.toString());
+            JSONObject jsonObject = JSON.parseObject(message.getBody());
+            String s_msg = jsonObject.getString("msg");
+            String s_userSessionInfo = jsonObject.getString("userSessionInfo");
+            UserSessionInfo userSessionInfo = (UserSessionInfo) JsonUtils.json2Bean(s_userSessionInfo, UserSessionInfo.class);
+            JSONObject jsonObject2 = JSONObject.parseObject(s_userSessionInfo);
+            userSessionInfo.setFriendID(jsonObject2.getString("id"));
+            // 接收图片
+            JSONObject jsonMsg = JSONObject.parseObject(s_msg);
+            String chatType = jsonMsg.getString("chatType");
+            
+            if (Integer.valueOf(chatType) == ChatType.MULTI.getIndex())
+            {
+                LogUtils.v(TAG, "image() 接收到一条聊天室图片消息：" + jsonMsg.toJSONString());
+                // 发图片的人的dwID
+                String fromDwID = jsonMsg.getString("fromID");
+                String myDwID = DecentWorldApp.getInstance().getDwID();
+                if (!myDwID.equals(fromDwID))
+                {
+                    String img = jsonMsg.getString("img");
+                    String uri = jsonMsg.getString("uri");
+                    String wealth = jsonMsg.getString("wealth");
+                    long id = jsonMsg.getLongValue("id");
+                    String roomID = message.getFrom().split("@")[0];
+                    final DWMessage dwMessage = new DWMessage(MessageType.IMAGE.getIndex() , DWMessage.Direct.RECEIVE);
+                    dwMessage.setFromDwId(fromDwID);
+                    dwMessage.setTo(roomID);
+                    dwMessage.setWealth(wealth);
+                    dwMessage.setChatType(Integer.valueOf(chatType));
+                    File file = ImageUtils.AnalyticThumbnail(img);
+                    dwMessage.setUri(file.getAbsolutePath());
+                    dwMessage.setRemoteUrl(uri);
+                    dwMessage.setSendSuccess(DWMessage.SendStatus.SUCCESS.getIndex());
+                    dwMessage.setTxtMsgID(message.getPacketID());
+                    dwMessage.setMid(id);
+                    dwMessage.save();
+
+                    EventBus.getDefault().post(dwMessage, NotifyByEventBus.NT_CHAT_ROOM_MSG);
+                    // 聊天室图片消息通知
+                    MsgNotifyManager.getInstance().MultiNotify(dwMessage);
+                }
+            }
+            else
+            {
+                LogUtils.v(TAG, "image() 接收到一条单聊图片消息");
+                String img = jsonMsg.getString("img");
+                String uri = jsonMsg.getString("uri");
+                String wealth = jsonMsg.getString("wealth");
+                long id = jsonMsg.getLongValue("id");
+                String fromDwId = message.getFrom().split("@")[0];
+                String chatRelationship = jsonMsg.getString("chatRelationship");
+                String currentStatus = jsonMsg.getString("currentStatus");
+                String nextStatus = jsonMsg.getString("nextStatus");
+                
+                DWMessage temp = DWMessageDao.query(id);
+                if(temp!=null)
+                    return;
+                
+                // 构造DWMessage
+                final DWMessage dwMessage = new DWMessage(MessageType.IMAGE.getIndex() , DWMessage.Direct.RECEIVE);
+                dwMessage.setFromDwId(fromDwId);
+                dwMessage.setWealth(wealth);
+                dwMessage.setChatType(Integer.valueOf(chatType));
+                /** 判断好友关系 **/
+                if (ContactUserDao.isContact(fromDwId))
+                    dwMessage.setChatRelationship(ChatRelationship.FRIEND.getIndex());
+                else
+                    dwMessage.setChatRelationship(ChatRelationship.STRANGER.getIndex());
+                File file = ImageUtils.AnalyticThumbnail(img);
+                dwMessage.setUri(file.getAbsolutePath());
+                dwMessage.setRemoteUrl(uri);
+                dwMessage.setSendSuccess(DWMessage.SendStatus.SUCCESS.getIndex());
+                dwMessage.setTxtMsgID(message.getPacketID());
+                dwMessage.setMid(id);
+                dwMessage.setCurrentStatus(currentStatus);
+                dwMessage.setNextStatus(nextStatus);
+                dwMessage.save();
+
+                MsgAndInfo msgAndInfo = new MsgAndInfo(dwMessage , userSessionInfo);
+                if (dwMessage.getChatType() != ChatType.MULTI.getIndex())
+                {
+                    ConversationEngine.getInstance().refreshConversation(msgAndInfo, "【消息类型为单聊,发送更新陌生人消息列表的通知】");
+                    // 消息通知
+                    MsgNotifyManager.getInstance().SingleNotify(msgAndInfo);
+                    EventBus.getDefault().post(dwMessage, NotifyByEventBus.NT_UPDATE_CHAT_LISTVIEW_RECEIVE_MSG);
+                    sendFourAck(dwMessage.getMid(), dwMessage.getFromDwId(), message.getPacketID());
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "image() Exception:" + e.toString() + ",message=" + message.toString(), true);
+        }
+    }
+
+  
+
+
+    /**
+     * 单聊名片
+     */
+    public void cardSingle(Message message)
+    {
+        try
+        {
+            LogUtils.v(TAG, "cardSingle() " + message.toString());
+            JSONObject jsonObject = JSON.parseObject(message.getBody());
+            String s_msg = jsonObject.getString("msg");
+            String s_userSessionInfo = jsonObject.getString("userSessionInfo");
+            UserSessionInfo userSessionInfo = (UserSessionInfo) JsonUtils.json2Bean(s_userSessionInfo, UserSessionInfo.class);
+            JSONObject jsonObject2 = JSONObject.parseObject(s_userSessionInfo);
+            userSessionInfo.setFriendID(jsonObject2.getString("id"));
+
+            DWMessage dwMessage = DWMessage.toDWMessage(s_msg);
+            
+            DWMessage temp = DWMessageDao.query(dwMessage.getTxtMsgID());
+            if(temp!=null)
+                return;
+            
+            DWMessage temp2 = DWMessageDao.query(dwMessage.getMid());
+            if(temp2!=null)
+                return;
+            
+            
+            dwMessage.setSendSuccess(DWMessage.SendStatus.SUCCESS.getIndex());
+            dwMessage.setDirect(Direct.RECEIVE.ordinal());
+            dwMessage.setTxtMsgID(message.getPacketID());
+            dwMessage.save();
+            MsgAndInfo msgAndInfo = new MsgAndInfo(dwMessage , userSessionInfo);
+            if (dwMessage.getChatType() != ChatType.MULTI.getIndex())
+            {
+                ConversationEngine.getInstance().refreshConversation(msgAndInfo, "【单聊，收到朋友发送的名片，并发送更新会话列表的通知】");
+                MsgNotifyManager.getInstance().SingleNotify(msgAndInfo);
+                EventBus.getDefault().post(dwMessage, NotifyByEventBus.NT_UPDATE_CHAT_LISTVIEW_RECEIVE_MSG);
+                sendFourAck(dwMessage.getMid(), dwMessage.getFromDwId(), message.getPacketID());
+            }
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "cardSingle() Exception:" + e.toString() + ",message=" + message.toString(), true);
+        }
+    }
+
+    /**
+     * 发送4号回执
+     */
+    private void sendFourAck(long mid, String fromDwID, String packetID)
+    {
+        ComfirmSystem.getInstance().sendFourAck(mid, fromDwID, packetID);
+    }
+}

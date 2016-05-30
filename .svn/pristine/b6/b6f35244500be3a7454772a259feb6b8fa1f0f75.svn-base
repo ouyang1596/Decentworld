@@ -1,0 +1,73 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.dao;
+
+import java.util.List;
+
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.entity.db.CommentEntity;
+import cn.sx.decentworld.entity.db.MomentEntity;
+import cn.sx.decentworld.logSystem.LogUtils;
+
+import com.activeandroid.query.Delete;
+import com.activeandroid.query.Select;
+
+/**
+ * @ClassName: CommentDao
+ * @Description: TODO (在这里用一句话描述类的作用)
+ * @author: Jackchen
+ * @date: 2016年5月10日 下午4:12:51
+ */
+public class CommentDao
+{
+    private static final String TAG = "CommentDao";
+    
+    /**
+     * 获取当前用户所有的朋友圈评论数据
+     * @return
+     */
+    public static List<CommentEntity> queryAll()
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID = ?";
+        List<CommentEntity> execute = new Select().from(CommentEntity.class).where(sql, userID).orderBy("commentID asc").execute();
+        return execute;
+    }
+    
+    /**
+     * 获取当前用户所有的朋友圈评论数据
+     * @return
+     */
+    public static List<CommentEntity> queryList(long momentID)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID = ? and momentID = ?";
+        List<CommentEntity> execute = new Select().from(CommentEntity.class).where(sql, userID,momentID).orderBy("commentID asc").execute();
+        return execute;
+    }
+    
+    
+    /**
+     * 删除
+     * @return
+     */
+    public static void delete(long momentID)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID = ? and momentID = ?";
+        LogUtils.v(TAG, "delete() sql:"+sql);
+        new Delete().from(CommentEntity.class).where(sql, userID,momentID).execute();
+    }
+    
+    /**
+     * 查询是否存在指定的评论
+     */
+    public static CommentEntity query(long momentID,long commentID)
+    {
+        String userID = DecentWorldApp.getInstance().getDwID();
+        String sql = "userID = ? and momentID = ? and commentID =?";
+        CommentEntity execute = new Select().from(CommentEntity.class).where(sql, userID,momentID,commentID).executeSingle();
+        return execute;
+    }
+}

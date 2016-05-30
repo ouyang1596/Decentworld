@@ -1,0 +1,103 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.task;
+
+import org.jivesoftware.smack.packet.Message;
+import org.simple.eventbus.EventBus;
+
+import android.content.Context;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.entity.dao.ContactUserDao;
+import cn.sx.decentworld.entity.dao.DWMessageDao;
+import cn.sx.decentworld.entity.db.ContactUser;
+import cn.sx.decentworld.entity.db.DWMessage;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.manager.MsgNotifyManager;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
+/**
+ * @ClassName: ProcessErrorMessageThread.java
+ * @Description:
+ * @author: cj
+ * @date: 2015年11月28日 下午6:12:24
+ */
+public class ProcessSystemMessageThread extends DWPacketHandler
+{
+    public static final String TAG = "ProcessSystemMessageThread";
+
+    public ProcessSystemMessageThread(Message msg, Context context)
+    {
+        super(msg, context);
+    }
+
+    /**
+	 * 
+	 */
+    public ProcessSystemMessageThread()
+    {
+        // TODO Auto-generated constructor stub
+    }
+
+    @Override
+    public void run()
+    {
+        Message message = (Message) packet;
+        LogUtils.v(TAG, "run() 收到一条系统消息：" + message.toString());
+        String subject = message.getSubject();
+        //暂时有两种情况
+        if ("error".equals(subject))
+        {
+            if (message.getBody().equals("找不到用户"))
+            {
+                LogUtils.e(TAG, "run() error【找不到用户】：" + message.toString());
+            }
+            else
+            {
+                // 发送消息时身价不足，服务器提示
+                LogUtils.i(TAG, "run() error【身家不足】：" + message.toString());
+                String packetId = message.getPacketID();
+                // 改变数据库中信息的发送状态
+                DWMessage msg = DWMessageDao.queryItem(packetId);
+                if (msg != null)
+                {
+                    msg.setSendSuccess(0);
+                    msg.save();
+                }
+                else
+                {
+                    LogUtils.e(TAG, "run() 接收到系统subject= error的消息，此时为身家不足，但是数据库中找不到对应的记录packetId="+packetId);
+                }
+                // 将消息路由到ChatActivity和ChatRoomChatActivity，将刚才发送的消息的状态改为发送失败
+                EventBus.getDefault().post(packetId, NotifyByEventBus.NT_WEALTH_SHORTAGE);
+            }
+        }
+        else if ("broadcast_benefit".equals(subject))
+        {
+            LogUtils.v(TAG, "run() broadcast_benefit【新的收益】：" + message.toString());
+            // 消息通知
+            MsgNotifyManager.getInstance().newBenefit(message.getBody().toString());
+        }
+        else if ("broadcast_worth".equals(subject))
+        {
+            LogUtils.v(TAG, "run() broadcast_worth【对方身价改变】：" + message.toString());
+            JSONObject jsonObject = JSON.parseObject(message.getBody());
+            String dwID = jsonObject.getString("dwID");
+            String worth = jsonObject.getString("worth");
+            // 如果时好友，修改联系人列表中的worth字段
+            ContactUser user = ContactUserDao.query(dwID);
+            if (user != null)
+            {
+                user.setWorth(Float.valueOf(worth));
+                user.save();
+            }
+            // 消息路由到ChatActivity中；
+            EventBus.getDefault().post(message, NotifyByEventBus.NT_SYSTEM_PUSH_WORTH);
+            // 消息通知
+            MsgNotifyManager.getInstance().otherWorthChanged(dwID, worth);
+        }
+    }
+
+}

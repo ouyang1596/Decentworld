@@ -40,9 +40,9 @@ public final class ContactActivity_
     private void afterSetContentView_() {
         lvContact = ((ListViewForScrollView) findViewById(id.lv_contact));
         tvHeadTitle = ((TextView) findViewById(id.tv_header_title));
-        cScro = ((CustomScrollView) findViewById(id.cScro));
-        ivBack = ((ImageView) findViewById(id.iv_delete_back));
         lvRecommend = ((ListViewForScrollView) findViewById(id.lv_recommend));
+        ivBack = ((ImageView) findViewById(id.iv_delete_back));
+        cScro = ((CustomScrollView) findViewById(id.cScro));
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }

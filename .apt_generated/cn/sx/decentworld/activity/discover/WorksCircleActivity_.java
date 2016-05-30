@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.LinearLayout;
 import cn.sx.decentworld.R.id;
 import cn.sx.decentworld.R.layout;
 import cn.sx.decentworld.component.KeyboardComponent_;
@@ -35,8 +36,9 @@ public final class WorksCircleActivity_
     }
 
     private void afterSetContentView_() {
-        viewMask = ((View) findViewById(id.view_mask));
         plvWorkCircle = ((PullToRefreshListView) findViewById(id.plv_work_circle));
+        llNews = ((LinearLayout) findViewById(id.ll_news));
+        viewMask = ((View) findViewById(id.view_mask));
         ((KeyboardComponent_) KeyboardComponent).afterSetContentView_();
         inti();
     }

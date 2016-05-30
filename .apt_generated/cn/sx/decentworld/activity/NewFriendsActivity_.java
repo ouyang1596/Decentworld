@@ -36,30 +36,15 @@ public final class NewFriendsActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        getUserInfo = GetUserInfo_.getInstance_(this);
-        titleBar = TitleBar_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        titleBar = TitleBar_.getInstance_(this);
+        getUserInfo = GetUserInfo_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
+        bt_to_add = ((Button) findViewById(id.bt_to_add));
         main_header_left_tv = ((TextView) findViewById(id.main_header_left_tv));
         lv_newfriends = ((ListViewForScrollView) findViewById(id.lv_newfriends));
-        bt_to_add = ((Button) findViewById(id.bt_to_add));
-        {
-            View view = findViewById(id.main_header_right_tv);
-            if (view!= null) {
-                view.setOnClickListener(new OnClickListener() {
-
-
-                    @Override
-                    public void onClick(View view) {
-                        NewFriendsActivity_.this.refreshList();
-                    }
-
-                }
-                );
-            }
-        }
         {
             View view = findViewById(id.main_header_left);
             if (view!= null) {
@@ -75,9 +60,24 @@ public final class NewFriendsActivity_
                 );
             }
         }
-        ((GetUserInfo_) getUserInfo).afterSetContentView_();
-        ((TitleBar_) titleBar).afterSetContentView_();
+        {
+            View view = findViewById(id.main_header_right_tv);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        NewFriendsActivity_.this.refreshList();
+                    }
+
+                }
+                );
+            }
+        }
         ((ToastComponent_) toast).afterSetContentView_();
+        ((TitleBar_) titleBar).afterSetContentView_();
+        ((GetUserInfo_) getUserInfo).afterSetContentView_();
         init();
     }
 

@@ -8,6 +8,7 @@ package cn.sx.decentworld.fragment.me;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import cn.sx.decentworld.R.layout;
@@ -34,7 +35,22 @@ public final class InnateFragment_
 
     private void afterSetContentView_() {
         iv_me_innate_edit = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_me_innate_edit));
-        lv_me_innate = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.lv_me_innate));
+        mLvUserInfo = ((ListViewForScrollView) findViewById(cn.sx.decentworld.R.id.lv_me_innate));
+        {
+            View view = findViewById(cn.sx.decentworld.R.id.iv_me_innate_edit);
+            if (view!= null) {
+                view.setOnClickListener(new OnClickListener() {
+
+
+                    @Override
+                    public void onClick(View view) {
+                        InnateFragment_.this.edit(view);
+                    }
+
+                }
+                );
+            }
+        }
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();

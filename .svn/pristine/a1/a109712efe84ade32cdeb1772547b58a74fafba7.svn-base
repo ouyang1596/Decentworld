@@ -1,0 +1,55 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.handleMessage;
+
+import org.jivesoftware.smack.packet.Message;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+
+import cn.sx.decentworld.logSystem.LogUtils;
+
+/**
+ * @ClassName: HandleMoment
+ * @Description: TODO (在这里用一句话描述类的作用)
+ * @author: Jackchen
+ * @date: 2016年5月17日 下午8:47:08
+ */
+public class HandleMoment
+{
+    private static final String TAG = "HandleMoment";
+    private static HandleMoment instance = new HandleMoment();
+
+    private HandleMoment()
+    {
+    }
+
+    public static HandleMoment getInstance()
+    {
+        return instance;
+    }
+    /**
+     * 05-17 20:45:41.495: D/SMACK(8808): RCV (0): <message to="990357@decentworld" type="normal"><subject>CommentNotice</subject><body>{"dwID":"107691","momentID":"251"}</body></message>
+05-17 20:45:41.495: D/dw PacketReader(8808): [2016-05-17 20:45:41]parsePackets() packet[message]:<message to='990357@decentworld'><subject>CommentNotice</subject><body>{&quot;dwID&quot;:&quot;107691&quot;,&quot;momentID&quot;:&quot;251&quot;}</body></message>
+
+     */
+    
+    /**
+     * 提示（用于显示小红点）
+     * 朋友圈评论提示
+     */
+    public void notice(Message message)
+    {
+        // 
+        LogUtils.v(TAG, "notice() " + message.toString());
+        String result = message.getBody();
+        JSONObject jsonObject = JSON.parseObject(result);
+        //解析数据
+        
+        //发送广播
+        
+        LogUtils.d(TAG, "notice() " + jsonObject.toJSONString());
+    }
+    
+}

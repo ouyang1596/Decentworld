@@ -31,10 +31,10 @@ public final class BenefitFragment_
     }
 
     private void afterSetContentView_() {
-        tv_benefit_3 = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_benefit_3));
-        ll_benefit_titile_switch_bg = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_benefit_titile_switch_bg));
         tv_benefit_2 = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_benefit_2));
         tv_benefit_1 = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_benefit_1));
+        tv_benefit_3 = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_benefit_3));
+        ll_benefit_titile_switch_bg = ((LinearLayout) findViewById(cn.sx.decentworld.R.id.ll_benefit_titile_switch_bg));
         ((ToastComponent_) toast).afterSetContentView_();
         init();
     }

@@ -1,0 +1,409 @@
+package cn.sx.decentworld.common;
+
+import java.io.IOException;
+import java.util.Collection;
+
+import org.apache.harmony.javax.security.sasl.SaslException;
+import org.jivesoftware.smack.ConnectionConfiguration;
+import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
+import org.jivesoftware.smack.PacketCollector;
+import org.jivesoftware.smack.SASLAuthentication;
+import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.simple.eventbus.EventBus;
+
+import android.content.Context;
+import android.os.Looper;
+import cn.sx.decentworld.DWConnectionListener;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.filter.SubjectPacketFilter;
+import cn.sx.decentworld.listener.CommCallback;
+import cn.sx.decentworld.listener.LoginListener;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.task.CollectorThreadStarter;
+import cn.sx.decentworld.task.ConnectOpenFireTask;
+import cn.sx.decentworld.task.ProcessAudioThread;
+import cn.sx.decentworld.task.ProcessCardThread;
+import cn.sx.decentworld.task.ProcessCheckBeautyMessageThread;
+import cn.sx.decentworld.task.ProcessFriendMessageThread;
+import cn.sx.decentworld.task.ProcessMatchSuccessThread;
+import cn.sx.decentworld.task.ProcessMessageThread;
+import cn.sx.decentworld.task.ProcessPictureThread;
+import cn.sx.decentworld.task.ProcessRoomMessageThread;
+import cn.sx.decentworld.task.ProcessSystemMessageThread;
+import cn.sx.decentworld.task.ProcessWealthPacketThread;
+import cn.sx.decentworld.utils.NetworkUtils;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper;
+
+/**
+ * @ClassName: XmppHelper.java
+ * @Description:
+ * @author: cj
+ * @date: 2015年10月22日 下午3:58:55
+ */
+public class XmppHelper
+{
+    private static final String TAG = "XmppHelper";
+    private static XMPPTCPConnection conn = null;
+
+    /**
+     * 私有化，防止外部通过构造函数新建对象
+     */
+    private XmppHelper()
+    {
+
+    }
+
+    /**
+     * 获取XMPPTCPConnection
+     * 
+     * @return
+     */
+    public static XMPPTCPConnection getConnection()
+    {
+        return getConnection(null);
+    }
+
+    /**
+     * 获取XMPPTCPConnection
+     * 
+     * @param callback
+     *            回调
+     * @return
+     */
+    public static XMPPTCPConnection getConnection(CommCallback callback)
+    {
+        if (conn == null)
+        {
+            try
+            {
+                LogUtils.d(TAG, "XMPPConnection is null,then create it");
+                /** 获取Configuration **/
+                ConnectionConfiguration connConfig = new ConnectionConfiguration(Constants.HOST_OPEN_FIRE , Constants.PORT_OPEN_FIRE , Constants.SERVER_NAME);
+                connConfig.setCompressionEnabled(false);// 不启用压缩 （默认值也是不启用）
+                // connConfig.setSASLAuthenticationEnabled(true);
+                connConfig.setSecurityMode(SecurityMode.enabled);
+                connConfig.setSendPresence(false);// 登录不接收离线消息推送，除非登录后收到发送Presence
+                connConfig.setReconnectionAllowed(true);
+                SASLAuthentication.supportSASLMechanism("PLAIN");
+                connConfig.setDebuggerEnabled(true);
+                /** 创建连接 **/
+                conn = new XMPPTCPConnection(connConfig);
+                /** 增加包过滤器 **/
+                PacketFilter chat_filter = new SubjectPacketFilter(new String[]
+                { "chat" });
+                conn.createPacketCollector(chat_filter, ProcessMessageThread.class);
+                PacketFilter wealth_filter = new SubjectPacketFilter(new String[]
+                { "wealth","confirm" });
+                conn.createPacketCollector(wealth_filter, ProcessWealthPacketThread.class);
+                PacketFilter friend_message_filter = new SubjectPacketFilter(new String[]
+                { "add_friend_reason", "accept_Friend", "refuse_Friend", "delete_Friend" });
+                conn.createPacketCollector(friend_message_filter, ProcessFriendMessageThread.class);
+                PacketFilter picture = new SubjectPacketFilter(new String[]
+                { "picture" });
+                conn.createPacketCollector(picture, ProcessPictureThread.class);
+                PacketFilter audio = new SubjectPacketFilter(new String[]
+                { "audio" });
+                conn.createPacketCollector(audio, ProcessAudioThread.class);
+                PacketFilter room_message_filter = new SubjectPacketFilter(new String[]
+                { "roomMSG", "room_presence", "room_leave" });
+                conn.createPacketCollector(room_message_filter, ProcessRoomMessageThread.class);
+                PacketFilter system_message_filter = new SubjectPacketFilter(new String[]
+                { "error", "broadcast_benefit", "broadcast_worth" });
+                conn.createPacketCollector(system_message_filter, ProcessSystemMessageThread.class);
+                PacketFilter broadcast_beauty = new SubjectPacketFilter(new String[]
+                { "broadcast_check", "CheckResult" });
+                conn.createPacketCollector(broadcast_beauty, ProcessCheckBeautyMessageThread.class);
+
+                PacketFilter match = new SubjectPacketFilter(new String[]
+                { "match" });
+                conn.createPacketCollector(match, ProcessMatchSuccessThread.class);
+
+                PacketFilter card = new SubjectPacketFilter(new String[]
+                { "card" });
+                conn.createPacketCollector(card, ProcessCardThread.class);
+                /** 建立连接 **/
+                conn.connect();
+                /** 增加监听，只要不新建连接，那么重连后监听仍然有效 （目前只监听断开连接和被挤下线的消息） **/
+                conn.addConnectionListener(new DWConnectionListener());
+                /** 开启消息监听 **/
+                Collection<PacketCollector> collectors = conn.getPacketCollectors();
+                Context context = DecentWorldApp.getGlobalContext();
+                for (PacketCollector packetCollector : collectors)
+                {
+                    Thread t = new CollectorThreadStarter(packetCollector , context);
+                    t.setDaemon(true);
+                    t.setName("dw");
+                    t.start();
+                }
+            }
+            catch (Exception e)
+            {
+                LogUtils.e(TAG, "getConnection...连接异常:" + e.getCause() +","+ e.getMessage());
+            }
+        }
+
+        if (callback != null)
+        {
+            callback.execute();
+        }
+        return conn;
+    }
+
+    /**
+     * 发送信息
+     * @param message
+     */
+    public static void sendMessage(Message message)
+    {
+        sendPacket(message);
+    }
+
+    /**
+     * 发送信息
+     * @param packet
+     */
+    public static void sendPacket(final Packet packet)
+    {
+        // 属于 连接为空、断开连接、没有登录 情况之一都将 重新连接
+        if (conn == null || !conn.isConnected() || !conn.isAuthenticated())
+        {
+            if (conn == null)
+                LogUtils.i(TAG, "sendPacket...连接为空");
+            else if (!conn.isConnected())
+                LogUtils.i(TAG, "sendPacket...断开了连接");
+            else if (!conn.isAuthenticated())
+                LogUtils.i(TAG, "sendPacket...没有登录服务器");
+            CommCallback callback = new CommCallback()
+            {
+                @Override
+                public void execute()
+                {
+                    try
+                    {
+                        conn.sendPacket(packet);
+                    }
+                    catch (NotConnectedException e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            getConnection(null);
+        }
+        else
+        {
+            try
+            {
+                conn.sendPacket(packet);
+            }
+            catch (NotConnectedException e)
+            {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    /**
+     * 将连接置为null
+     * 1)登录失败后
+     */
+    public static void setConnNull()
+    {
+        LogUtils.d(TAG, "将连接置为 null");
+        conn =  null;
+    }
+
+    /**
+     * 关闭连接
+     */
+    public static void closeConnection()
+    {
+        if (conn != null)
+        {
+            if (conn.isConnected())
+            {
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            conn.disconnect();
+                            conn = null;
+                        }
+                        catch (NotConnectedException e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+            }
+        }
+    }
+
+    /**
+     * 发送上线通知
+     */
+    public static void sendPresence()
+    {
+        try
+        {
+            if (DecentWorldApp.getInstance().isMainActivityInit())
+            {
+                EventBus.getDefault().post(NetworkUtils.RECONNECTION_SUCCESSFUL, NotifyByEventBus.NT_NETWORK_STATE_OF);
+                getConnection().sendPacket(new Presence(Presence.Type.available));
+                LogUtils.v(TAG, "sendPresence");
+            }
+        }
+        catch (NotConnectedException e)
+        {
+            LogUtils.e(TAG, "发送上线通知时抛出异常，cause by:" + e.toString(),true);
+        }
+    }
+    
+    
+
+    /**
+     * 第一次登录
+     * @param dwID 用户ID
+     * @param password 密码（加密后）
+     * @param listener 回调监听
+     */
+    public static void firstLogin(final String dwID, final String password, final LoginListener listener)
+    {
+        Thread loginThread = new Thread(new Runnable()
+        {
+            public void run()
+            {
+                try
+                {
+                    LogUtils.v(TAG, "firstLogin....begin");
+                    Looper.prepare();
+                    XMPPConnection con = getConnection();
+                    con.login(dwID, password, "Smack");
+                    listener.onLoginSuccess();
+                }
+                catch (SaslException e)
+                {
+                    LogUtils.e(TAG, "firstLogin,SaslException...casue by:" + e.toString());
+                    listener.onLoginFailure(e);
+                    e.printStackTrace();
+                }
+                catch (XMPPException e)
+                {
+                    // 登录密码错误，提示：XMPPException...casue
+                    // by:org.jivesoftware.smack.sasl.SASLErrorException:
+                    // SASLError using PLAIN: not-authorized
+                    LogUtils.e(TAG, "firstLogin,XMPPException...casue by:" + e.toString());
+                    listener.onLoginFailure(e);
+                    e.printStackTrace();
+                }
+                catch (SmackException e)
+                {
+                    LogUtils.e(TAG, "firstLogin,SmackException...casue by:" + e.toString());
+                    listener.onLoginFailure(e);
+                    e.printStackTrace();
+                }
+                catch (IOException e)
+                {
+                    LogUtils.e(TAG, "firstLogin,IOException...casue by:" + e.toString());
+                    listener.onLoginFailure(e);
+                    e.printStackTrace();
+                }
+            }
+        });
+        loginThread.setName("loginThread");
+        loginThread.start();
+    }
+
+    /**
+     * 登录openfire
+     */
+    public static Integer openFireLogin(String dwID, String password)
+    {
+        try
+        {
+            XMPPTCPConnection conn = getConnection();
+            if (conn.isConnected() && conn.isAuthenticated())
+            {
+                LogUtils.i(TAG, "已经连接到服务器，并且已经授权，不需要重新登录");
+            }
+            else
+            {
+                LogUtils.i(TAG, "conn.isConnected()=" + conn.isConnected());
+                LogUtils.i(TAG, "conn.isAuthenticated()=" + conn.isAuthenticated());
+                if (!conn.isConnected())
+                {
+                    LogUtils.i(TAG, "没有连接到服务器，开始连接...");
+                    conn.connect();
+                }
+                if (conn.isConnected() && !conn.isAuthenticated())
+                {
+                    LogUtils.i(TAG, "已经连接到服务器，但是没有授权，开始登录授权...");
+                    conn.login(dwID, password, "Smack");
+                }
+            }
+            return ConnectOpenFireTask.SUCCESS;
+        }
+        catch (Exception e)
+        {
+            LogUtils.e(TAG, "连接openfire服务器时出现异常，cause by:" + e.toString() + e.getMessage() + e.getCause());
+            return ConnectOpenFireTask.FAILURE;
+        }
+    }
+    
+    /**
+     * 手动触发重连，即重新登录
+     * @param listener
+     */
+    public static void reLogin(Context context,final LoginListener listener)
+    {
+        if(getConnection().isConnected())
+        {
+            if(UserInfoHelper.isLogined(context))
+            {
+                final String dwID = DecentWorldApp.getInstance().getDwID();
+                final String password = DecentWorldApp.getInstance().getPassword();
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if(openFireLogin(dwID, password) == ConnectOpenFireTask.SUCCESS)
+                        {
+                            listener.onLoginSuccess();
+                        }
+                        else
+                        {
+                            listener.onLoginFailure(new Exception("登录失败"));
+                        }
+                    }
+                }).start();
+            }
+        }
+    }
+    
+    /**
+     * 测试连接时的测试代码
+     * 获取XMPPTCPConnection
+     * @return
+     */
+    public static XMPPTCPConnection getTestConn()
+    {
+        return conn;
+    }
+    
+    
+    
+ 
+}

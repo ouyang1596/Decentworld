@@ -1,0 +1,73 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.bean;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import cn.sx.decentworld.bean.UserInfoField.Field;
+import cn.sx.decentworld.bean.UserInfoField.FieldGroup;
+
+/**
+ * @author Sammax 普通朋友的userInfo
+ */
+public class UserInfo {
+	private String dwID;
+	private String versionNum;
+	private List<OtherUserInfoField> infos = new ArrayList<OtherUserInfoField>(60);
+	private HashMap<Field, OtherUserInfoField> map = null;
+
+	public String getFieldValue(Field field) {
+		if (map == null) {
+			initIndex();
+		}
+		return map.get(field).getFieldValue();
+	}
+
+	public String getFieldName(Field field) {
+		if (map == null) {
+			initIndex();
+		}
+		return map.get(field).getFieldName();
+	}
+
+	public String getGroupName(Field field) {
+		if (map == null) {
+			initIndex();
+		}
+		return FieldGroup.getFieldGroup(map.get(field).getGroupCode()).getGroupName();
+	}
+
+	private void initIndex() {
+		map = new HashMap<UserInfoField.Field, OtherUserInfoField>(60);
+		for (OtherUserInfoField field : infos) {
+			map.put(Field.getField(field.getFieldCode()), field);
+		}
+	}
+
+	public String getDwID() {
+		return dwID;
+	}
+
+	public void setDwID(String dwID) {
+		this.dwID = dwID;
+	}
+
+	public String getVersionNum() {
+		return versionNum;
+	}
+
+	public void setVersionNum(String versionNum) {
+		this.versionNum = versionNum;
+	}
+
+	public List<OtherUserInfoField> getInfos() {
+		return infos;
+	}
+
+	public void setInfos(List<OtherUserInfoField> infos) {
+		this.infos = infos;
+	}
+}

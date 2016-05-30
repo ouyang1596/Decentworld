@@ -41,10 +41,10 @@ public final class ChatRoomInfoSettingAndGetting_
         if (context_ instanceof Activity) {
             Activity activity = ((Activity) context_);
         }
+        context = context_;
         if (context_ instanceof Activity) {
             activity = ((Activity) context_);
         }
-        context = context_;
     }
 
     public static ChatRoomInfoSettingAndGetting_ getInstance_(Context context) {

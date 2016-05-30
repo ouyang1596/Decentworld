@@ -1,0 +1,170 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.activity;
+
+import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
+import android.widget.TextView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.bean.UserInfoField.Field;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.engine.ConversationEngine;
+import cn.sx.decentworld.engine.ProcessUserData;
+import cn.sx.decentworld.engine.UserDataEngine;
+import cn.sx.decentworld.engine.UserDataEngine.CheckUserInfoVersionListener;
+import cn.sx.decentworld.engine.UserDataEngine.UserKeyListener;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.entity.SelfUserInfo;
+import cn.sx.decentworld.entity.dao.SelfInfoDao;
+import cn.sx.decentworld.entity.db.SelfInfoEntity;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.utils.NetworkUtils;
+import cn.sx.decentworld.utils.sputils.UserInfoHelper;
+
+import com.alibaba.fastjson.JSON;
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.EActivity;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: LoadNetdataActivity.java
+ * @Description: 初次登陆时加载数据
+ * @author: cj
+ * @date: 2016年1月30日 上午10:16:40
+ */
+@EActivity(R.layout.activity_load_net_data)
+public class LoadDataActivity extends BaseFragmentActivity
+{
+    /**
+     * 常量
+     */
+    public static final String TAG = "LoadNetdataActivity";
+    private static final int HANDLER_KEY_SUCCESS = 0;// 获取key成功
+
+    /**
+     * 工具类
+     */
+    @ViewById(R.id.tv_load_net_data)
+    TextView tvLoadNetData;
+
+    /**
+     * 变量
+     */
+    private String userID = DecentWorldApp.getInstance().getDwID();
+
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        LogUtils.v(TAG, "init()");
+        if (NetworkUtils.isNetWorkConnected(this))
+            loadDataFromNet();
+        else
+            loadDataFromLocal();
+    }
+
+    /**
+     * 有网络，从网络加载数据
+     */
+    private void loadDataFromNet()
+    {
+        LogUtils.v(TAG, "loadDataFromNet() 有网络，从网络加载数据");
+        modifyKey();
+    }
+
+    /**
+     * 修改key
+     */
+    private void modifyKey()
+    {
+        if (UserInfoHelper.isModifyKey())
+        {
+            LogUtils.v(TAG, "modifyKey() modifyKey begin");
+            UserDataEngine userKey = UserDataEngine.getInstance();
+            userKey.modifyKey(new UserKeyListener()
+            {
+                @Override
+                public void onSucceed()
+                {
+                    LogUtils.v(TAG, "modifyKey() modifyKey success");
+                    checkUserInfoVersion();
+                }
+
+                @Override
+                public void onFailed(String casue)
+                {
+                    LogUtils.e(TAG, "modifyKey() modifyKey failure，casue：" + casue);
+                    tvLoadNetData.setText("获取key失败");
+                }
+            });
+        }
+        else
+        {
+            LogUtils.v(TAG, "modifyKey() no modifyKey,then checkUserInfoVersion");
+            checkUserInfoVersion();
+        }
+    }
+
+    /**
+     * 检查用户信息版本号
+     */
+    private void checkUserInfoVersion()
+    {
+        LogUtils.v(TAG, "checkUserInfoVersion() ");
+        UserDataEngine.getInstance().checkUserInfoVersion(new CheckUserInfoVersionListener()
+        {
+            @Override
+            public void onSuccess(String jsonStr)
+            {
+                LogUtils.v(TAG, "checkUserInfoVersion() onSuccess,result:" + jsonStr);
+                if (CommUtil.isNotBlank(jsonStr))
+                {
+                    new ProcessUserData().processLoginNetData(jsonStr);
+                }
+                loadDataFromLocal();
+            }
+
+            @Override
+            public void onFailure(String cause)
+            {
+                LogUtils.e(TAG, "checkUserInfoVersion() onFailure,cause by:" + cause);
+                tvLoadNetData.setText("获取用户数据失败");
+            }
+
+            @Override
+            public void onSameVersion(String info)
+            {
+                LogUtils.v(TAG, "checkUserInfoVersion()  onSameVersion," + info);
+                loadDataFromLocal();
+            }
+        });
+    }
+
+    /**
+     * 没有网络，从本地加载数据
+     */
+    private void loadDataFromLocal()
+    {
+        LogUtils.v(TAG, "loadDataFromLocal()");
+        UserInfoEngine.getInstance().initSelfUserInfo();
+        ConversationEngine.getInstance().initConversation();
+        completed();
+    }
+
+    /**
+     * 处理数据完成
+     */
+    private void completed()
+    {
+        LogUtils.v(TAG, "completed()");
+        Intent intent = new Intent(LoadDataActivity.this , MainActivity_.class);
+        startActivity(intent);
+        finish();
+    }
+
+}

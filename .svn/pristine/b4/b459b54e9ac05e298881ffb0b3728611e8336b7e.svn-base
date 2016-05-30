@@ -1,0 +1,198 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.fragment.me;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.simple.eventbus.EventBus;
+import org.simple.eventbus.Subscriber;
+
+import android.content.Intent;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.ImageView;
+import cn.sx.decentworld.DecentWorldApp;
+import cn.sx.decentworld.R;
+import cn.sx.decentworld.activity.EditUserInfoActivity_;
+import cn.sx.decentworld.adapter.UserInfoItemAdapter;
+import cn.sx.decentworld.common.CommUtil;
+import cn.sx.decentworld.common.NotifyByEventBus;
+import cn.sx.decentworld.component.ToastComponent;
+import cn.sx.decentworld.engine.UserDataEngine;
+import cn.sx.decentworld.engine.UserDataEngine.GetWealthListener;
+import cn.sx.decentworld.engine.UserInfoEngine;
+import cn.sx.decentworld.entity.SelfUserField;
+import cn.sx.decentworld.fragment.BaseFragment;
+import cn.sx.decentworld.logSystem.LogUtils;
+import cn.sx.decentworld.network.request.GetUserInfo;
+import cn.sx.decentworld.widget.ListViewForScrollView;
+
+import com.googlecode.androidannotations.annotations.AfterViews;
+import com.googlecode.androidannotations.annotations.Bean;
+import com.googlecode.androidannotations.annotations.Click;
+import com.googlecode.androidannotations.annotations.EFragment;
+import com.googlecode.androidannotations.annotations.ViewById;
+
+/**
+ * @ClassName: InnateFragment.java
+ * @Description: 资料
+ * @author: cj
+ * @date: 2016年1月18日 下午7:48:34
+ */
+@EFragment(R.layout.fragment_me_innate)
+public class InnateFragment extends BaseFragment implements GetWealthListener
+{
+    /**
+     * 常量
+     */
+    private static final String TAG = "InnateFragment";
+    private static final int R_GET_USER_THREE_ICON = 1;
+
+    /**
+     * 工具类
+     */
+    @Bean
+    ToastComponent toast;
+    @Bean
+    GetUserInfo getUserInfo;
+
+    /**
+     * 界面资源
+     */
+    @ViewById(R.id.iv_me_innate_edit)
+    ImageView iv_me_innate_edit;
+    @ViewById(R.id.lv_me_innate)
+    ListViewForScrollView lv_me_innate;
+
+    public ImageView getIvEdit()
+    {
+        return iv_me_innate_edit;
+    }
+
+    /**
+     * 变量
+     */
+    private String userID = "";
+    private boolean isPrepared = false;
+    // 原始数据
+    public List<SelfUserField> fields;
+    // 处理过的数据
+    private List<SelfUserField> proDatas;
+    private UserInfoItemAdapter userInfoItemAdapter;
+
+    /**
+     * 入口
+     */
+    @AfterViews
+    void init()
+    {
+        EventBus.getDefault().register(this);
+        userID = DecentWorldApp.getInstance().getDwID();
+        fields = UserInfoEngine.getInstance().getSelfUserInfo().getFields();
+        Collections.sort(fields);
+        proDatas = new ArrayList<SelfUserField>();
+        userInfoItemAdapter = new UserInfoItemAdapter(getActivity() , proDatas);
+        lv_me_innate.setAdapter(userInfoItemAdapter);
+    }
+
+    /**
+     * 数据延迟加载
+     */
+    @Override
+    protected void lazyLoad()
+    {
+    }
+
+    @Override
+    public void turnToTab(int tab)
+    {
+
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        LogUtils.v(TAG, "onResume");
+        dataPrePro(fields);
+    }
+
+    /**
+     * 数据预处理
+     */
+    private void dataPrePro(List<SelfUserField> mDatas)
+    {
+        LogUtils.v(TAG, "dataPrePro() ");
+        if (proDatas == null || mDatas == null)
+        {
+            return;
+        }
+        proDatas.clear();
+        for (SelfUserField item : mDatas)
+        {
+            if (CommUtil.isNotBlank(item.getFieldValue()) && !item.getFieldValue().equals("-1") && item.isDisplayAuth())
+            {
+                proDatas.add(item);
+            }
+        }
+        if (userInfoItemAdapter != null)
+        {
+            userInfoItemAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * 界面销毁
+     */
+    @Override
+    public void onDestroy()
+    {
+        EventBus.getDefault().unregister(this);
+        super.onDestroy();
+    }
+    
+    /**
+     * 编辑个人资料
+     */
+    @Click(R.id.iv_me_innate_edit)
+    public void edit(View v)
+    {
+        // 编辑资料
+        Intent intent = new Intent(getActivity() , EditUserInfoActivity_.class);
+        startActivityForResult(intent, R_GET_USER_THREE_ICON);
+    }
+
+
+    /**
+     * 编辑完资料后调用，用于更新界面
+     */
+    @Subscriber(tag = NotifyByEventBus.NT_EDIT_INFO_COMPLETE)
+    public void refreshView(String tag)
+    {
+        // 更新我的资料的"天生"部分资料
+        LogUtils.v(TAG, "refreshView..." + tag + ",更新我的资料的\"天生\"部分资料");
+        dataPrePro(fields);
+    }
+
+    /**
+     * 更新身家
+     */
+    @Subscriber(tag = NotifyByEventBus.NT_REFRESH_WEALTH)
+    public void refreshWealth(String info)
+    {
+        LogUtils.i(TAG, info);
+        UserDataEngine.getInstance().getWealth(this);
+    }
+
+    /**
+     * 获取身家完成
+     */
+    @Override
+    public void onGetWealthFinished(String wealth)
+    {
+        dataPrePro(fields);
+    }
+}

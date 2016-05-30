@@ -36,20 +36,21 @@ public final class LoginActivity_
     }
 
     private void init_(Bundle savedInstanceState) {
-        keyboardComponent = KeyboardComponent_.getInstance_(this);
         toast = ToastComponent_.getInstance_(this);
+        keyboardComponent = KeyboardComponent_.getInstance_(this);
     }
 
     private void afterSetContentView_() {
         tvCeshi = ((TextView) findViewById(id.tv_ceshi));
-        ivForgetPwd = ((ImageView) findViewById(id.iv_forget_password));
         etPassword = ((EditText) findViewById(id.et_password));
         flLogin = ((LinearLayout) findViewById(id.fl_login));
+        ivWeixinAuthorize = ((ImageView) findViewById(id.iv_weixin_authorize));
         etMobile = ((EditText) findViewById(id.et_mobile));
+        ivForgetPwd = ((ImageView) findViewById(id.iv_forget_password));
         ivRegister = ((ImageView) findViewById(id.iv_register));
         btnLogin = ((Button) findViewById(id.btn_login));
-        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
+        ((KeyboardComponent_) keyboardComponent).afterSetContentView_();
         init();
     }
 

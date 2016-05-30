@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical" >
+
+    <RelativeLayout
+        android:layout_width="@dimen/dig_width"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:background="@color/white" >
+
+        <TextView
+            android:id="@+id/tv_prompt_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/dig_margin_left_1"
+            android:text="自定义信息"
+            android:textColor="@color/black"
+            android:textSize="@dimen/dig_title_size" />
+    </RelativeLayout>
+
+</LinearLayout>

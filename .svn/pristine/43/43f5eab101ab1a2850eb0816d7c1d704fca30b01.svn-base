@@ -1,0 +1,30 @@
+/**
+ * 
+ */
+package cn.sx.decentworld.entity.dao;
+
+import cn.sx.decentworld.entity.db.DisplayAuthority;
+
+import com.activeandroid.query.Select;
+
+/**
+ * @ClassName: DisplayAuthorityDao.java
+ * @Description:
+ * @author: cj
+ * @date: 2016年4月25日 上午11:42:30
+ */
+public class DisplayAuthorityDao
+{
+    /**
+     * 查询指定dwID号的记录并返回结果
+     * 
+     * @param dwID
+     */
+    public static DisplayAuthority query(String userId)
+    {
+        return new Select().from(DisplayAuthority.class).where("userId=?", userId).executeSingle();
+    }
+    
+
+
+}

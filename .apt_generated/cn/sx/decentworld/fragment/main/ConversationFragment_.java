@@ -35,11 +35,11 @@ public final class ConversationFragment_
     }
 
     private void afterSetContentView_() {
+        fragment_chat_chat_lv = ((ListView) findViewById(cn.sx.decentworld.R.id.fragment_chat_chat_lv));
         ivSearch = ((ImageView) findViewById(cn.sx.decentworld.R.id.iv_search));
+        tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
         tv_connect_errormsg = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_connect_errormsg));
         rl_fragment_chat_chat_error = ((RelativeLayout) findViewById(cn.sx.decentworld.R.id.rl_fragment_chat_chat_error));
-        tvTitle = ((TextView) findViewById(cn.sx.decentworld.R.id.tv_header_title));
-        fragment_chat_chat_lv = ((ListView) findViewById(cn.sx.decentworld.R.id.fragment_chat_chat_lv));
         ((GetUserInfo_) getUserInfo).afterSetContentView_();
         ((ToastComponent_) toast).afterSetContentView_();
         init();
